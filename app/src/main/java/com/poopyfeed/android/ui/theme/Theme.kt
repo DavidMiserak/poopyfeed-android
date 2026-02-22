@@ -1,41 +1,53 @@
 package com.poopyfeed.android.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    primary = Rose400,
+    onPrimary = White,
+    primaryContainer = Rose50,
+    onPrimaryContainer = Slate800,
+    secondary = Orange400,
+    onSecondary = White,
+    secondaryContainer = Orange50,
+    onSecondaryContainer = Slate800,
+    tertiary = Amber400,
+    onTertiary = White,
+    tertiaryContainer = Amber50,
+    onTertiaryContainer = Slate800,
+    background = White,
+    onBackground = Slate800,
+    surface = White,
+    onSurface = Slate800,
+    onSurfaceVariant = Slate600,
+    outline = Rose200,
+    error = Red500,
+    onError = White,
+    errorContainer = Red50,
+    onErrorContainer = Red700,
+)
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Rose400,
+    onPrimary = White,
+    secondary = Orange400,
+    onSecondary = White,
+    tertiary = Amber400,
+    onTertiary = White,
+    error = Red500,
+    onError = White,
 )
 
 @Composable
 fun PoopyFeedTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

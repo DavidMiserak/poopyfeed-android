@@ -2,10 +2,24 @@ package com.poopyfeed.android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Brand gradient colors
+val Rose400 = Color(0xFFfb7185)
+val Rose200 = Color(0xFFfecdd3)
+val Rose50 = Color(0xFFfff1f2)
+val Orange400 = Color(0xFFfb923c)
+val Orange50 = Color(0xFFfff7ed)
+val Amber400 = Color(0xFFfbbf24)
+val Amber50 = Color(0xFFfffbeb)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Semantic colors
+val Slate800 = Color(0xFF1e293b)
+val Slate600 = Color(0xFF475569)
+val Slate400 = Color(0xFF94a3b8)
+
+// Error colors
+val Red50 = Color(0xFFfef2f2)
+val Red500 = Color(0xFFef4444)
+val Red700 = Color(0xFFb91c1c)
+
+// Surface
+val White = Color(0xFFFFFFFF)

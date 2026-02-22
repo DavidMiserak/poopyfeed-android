@@ -6,6 +6,7 @@ help:
 	@echo "=========================="
 	@echo "make build          - Build debug APK in container"
 	@echo "make test           - Run unit tests in container"
+	@echo "make test-coverage  - Run tests with JaCoCo coverage (for SonarQube)"
 	@echo "make lint           - Run lint checks in container"
 	@echo "make clean          - Clean build artifacts in container"
 	@echo ""
@@ -26,6 +27,12 @@ test:
 	@echo "Running unit tests..."
 	cd .. && $(RUNTIME) compose --profile android build android
 	cd .. && $(RUNTIME) compose --profile android run --rm android test --no-daemon
+
+.PHONY: test-coverage
+test-coverage:
+	@echo "Running unit tests with coverage..."
+	cd .. && $(RUNTIME) compose --profile android build android
+	cd .. && $(RUNTIME) compose --profile android run --rm android jacocoTestReport --no-daemon
 
 .PHONY: lint
 lint:
