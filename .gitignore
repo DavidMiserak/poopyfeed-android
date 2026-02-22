@@ -21,17 +21,23 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Build artifacts
-dist/
+# Gradle
+.gradle/
 build/
-out/
-*.egg-info/
-__pycache__/
-*.pyc
-*.pyo
-node_modules/
-.cache/
-.parcel-cache/
+!gradle/wrapper/gradle-wrapper.properties
+
+# Android
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+*.class
 
 # Logs
 *.log
@@ -41,7 +47,6 @@ logs/
 coverage/
 .coverage
 htmlcov/
-.nyc_output/
 
 # Temporary files
 tmp/
