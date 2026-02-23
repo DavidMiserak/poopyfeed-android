@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.poopyfeed.android.ui.screens.HomeScreen
+import com.poopyfeed.android.ui.screens.children.ChildrenListScreen
 import com.poopyfeed.android.ui.screens.greeting.GreetingScreen
 import com.poopyfeed.android.ui.screens.login.LoginScreen
 import com.poopyfeed.android.ui.screens.signup.SignupScreen
@@ -46,7 +47,7 @@ fun PoopyFeedNavHost(
                     }
                 },
                 onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.ChildrenList.route) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
@@ -61,9 +62,23 @@ fun PoopyFeedNavHost(
                     }
                 },
                 onSignupSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.ChildrenList.route) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+            )
+        }
+
+        composable(Screen.ChildrenList.route) {
+            ChildrenListScreen(
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route)
+                },
+                onNavigateToChildDashboard = { childId ->
+                    navController.navigate(Screen.Home.route)
+                },
+                onNavigateToAddChild = {
+                    // TODO: Navigate to add child screen when implemented
                 },
             )
         }
@@ -72,6 +87,9 @@ fun PoopyFeedNavHost(
             HomeScreen(
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
                 },
             )
         }

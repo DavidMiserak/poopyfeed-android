@@ -27,6 +27,7 @@ import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 @Composable
 fun HomeScreen(
     onNavigateToProfile: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
 

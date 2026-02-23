@@ -3,6 +3,7 @@ package com.poopyfeed.android.di
 import com.poopyfeed.android.BuildConfig
 import com.poopyfeed.android.data.local.TokenManager
 import com.poopyfeed.android.data.remote.AuthApi
+import com.poopyfeed.android.data.remote.ChildrenApi
 import com.poopyfeed.android.data.remote.CookieStore
 import com.poopyfeed.android.data.remote.ProfileApi
 import dagger.Module
@@ -92,5 +93,11 @@ object NetworkModule {
     @Singleton
     fun provideProfileApi(retrofit: Retrofit): ProfileApi {
         return retrofit.create(ProfileApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChildrenApi(retrofit: Retrofit): ChildrenApi {
+        return retrofit.create(ChildrenApi::class.java)
     }
 }
