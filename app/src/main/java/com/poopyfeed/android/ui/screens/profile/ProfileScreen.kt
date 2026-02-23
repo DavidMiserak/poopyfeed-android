@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -78,10 +80,16 @@ fun ProfileScreen(
         }
     }
 
+    LaunchedEffect(uiState.logoutSuccess) {
+        if (uiState.logoutSuccess) {
+            onLogout()
+        }
+    }
+
     ProfileContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
-        onLogout = onLogout,
+        onLogoutNavigate = onLogout,
         onFirstNameChange = viewModel::onFirstNameChange,
         onLastNameChange = viewModel::onLastNameChange,
         onTimezoneChange = viewModel::onTimezoneChange,
@@ -93,6 +101,7 @@ fun ProfileScreen(
         onSaveProfile = viewModel::saveProfile,
         onChangePassword = viewModel::changePassword,
         onDeleteAccount = viewModel::deleteAccount,
+        onLogout = viewModel::logout,
     )
 }
 
@@ -101,7 +110,7 @@ fun ProfileScreen(
 private fun ProfileContent(
     uiState: ProfileUiState,
     onNavigateBack: () -> Unit,
-    onLogout: () -> Unit,
+    onLogoutNavigate: () -> Unit,
     onFirstNameChange: (String) -> Unit,
     onLastNameChange: (String) -> Unit,
     onTimezoneChange: (String) -> Unit,
@@ -113,9 +122,16 @@ private fun ProfileContent(
     onSaveProfile: () -> Unit,
     onChangePassword: () -> Unit,
     onDeleteAccount: () -> Unit,
+    onLogout: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+    ) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -190,10 +206,12 @@ private fun ProfileContent(
                         onDeletePasswordChange = onDeletePasswordChange,
                         onDeleteAccount = onDeleteAccount,
                         onLogout = onLogout,
+                        isLoggingOut = uiState.isLoggingOut,
                     )
                 }
             }
         }
+    }
     }
 }
 
@@ -530,6 +548,7 @@ private fun AccountTab(
     onDeletePasswordChange: (String) -> Unit,
     onDeleteAccount: () -> Unit,
     onLogout: () -> Unit,
+    isLoggingOut: Boolean = false,
 ) {
     var deletePasswordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -544,7 +563,17 @@ private fun AccountTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+            enabled = !isLoggingOut,
         ) {
+            if (isLoggingOut) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 8.dp),
+                    color = MaterialTheme.colorScheme.outline,
+                    strokeWidth = 2.dp,
+                )
+            }
             Text("Log Out")
         }
 

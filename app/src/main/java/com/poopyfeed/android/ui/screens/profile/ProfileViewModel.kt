@@ -3,6 +3,7 @@ package com.poopyfeed.android.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.poopyfeed.android.data.remote.dto.UserProfile
+import com.poopyfeed.android.data.repository.AuthRepository
 import com.poopyfeed.android.data.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ data class ProfileUiState(
     val isSavingProfile: Boolean = false,
     val isSavingPassword: Boolean = false,
     val isDeletingAccount: Boolean = false,
+    val isLoggingOut: Boolean = false,
     // Profile data
     val profile: UserProfile? = null,
     // Profile tab form fields
@@ -45,8 +47,9 @@ data class ProfileUiState(
     // Success messages
     val profileSuccessMessage: String? = null,
     val passwordSuccessMessage: String? = null,
-    // Navigation trigger
+    // Navigation triggers
     val deleteSuccess: Boolean = false,
+    val logoutSuccess: Boolean = false,
     // Tab selection
     val selectedTabIndex: Int = 0,
 )
@@ -54,6 +57,7 @@ data class ProfileUiState(
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -248,6 +252,15 @@ class ProfileViewModel @Inject constructor(
                     }
                 },
             )
+        }
+    }
+
+    fun logout() {
+        _uiState.update { it.copy(isLoggingOut = true) }
+
+        viewModelScope.launch {
+            authRepository.logout()
+            _uiState.update { it.copy(isLoggingOut = false, logoutSuccess = true) }
         }
     }
 

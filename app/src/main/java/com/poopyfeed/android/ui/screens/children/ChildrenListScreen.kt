@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -53,6 +55,12 @@ fun ChildrenListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+    ) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,7 +75,6 @@ fun ChildrenListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToAddChild,
-                modifier = Modifier.padding(16.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Child")
             }
@@ -155,6 +162,7 @@ fun ChildrenListScreen(
                 }
             }
         }
+    }
     }
 }
 

@@ -32,7 +32,7 @@ fun PoopyFeedNavHost(
                     navController.navigate(Screen.Signup.route)
                 },
                 onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.ChildrenList.route) {
                         popUpTo(Screen.Greeting.route) { inclusive = true }
                     }
                 },
@@ -89,7 +89,7 @@ fun PoopyFeedNavHost(
                     navController.navigate(Screen.Profile.route)
                 },
                 onNavigateBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 },
             )
         }
@@ -97,7 +97,7 @@ fun PoopyFeedNavHost(
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onNavigateBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 },
                 onLogout = {
                     navController.navigate(Screen.Greeting.route) {
