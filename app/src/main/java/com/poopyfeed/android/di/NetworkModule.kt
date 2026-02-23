@@ -4,6 +4,7 @@ import com.poopyfeed.android.BuildConfig
 import com.poopyfeed.android.data.local.TokenManager
 import com.poopyfeed.android.data.remote.AuthApi
 import com.poopyfeed.android.data.remote.CookieStore
+import com.poopyfeed.android.data.remote.ProfileApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -85,5 +86,11 @@ object NetworkModule {
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 }
