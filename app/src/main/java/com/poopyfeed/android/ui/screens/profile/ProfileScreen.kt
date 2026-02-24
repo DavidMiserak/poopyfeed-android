@@ -450,110 +450,139 @@ private fun AccountTab(
             .fillMaxSize()
             .padding(24.dp),
     ) {
-        // Logout section
-        OutlinedButton(
-            onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            enabled = !isLoggingOut,
-        ) {
-            if (isLoggingOut) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(end = 8.dp),
-                    color = MaterialTheme.colorScheme.outline,
-                    strokeWidth = 2.dp,
-                )
-            }
-            Text("Log Out")
-        }
+        LogoutSection(onLogout = onLogout, isLoggingOut = isLoggingOut)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Delete account section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    shape = MaterialTheme.shapes.medium,
-                )
-                .padding(16.dp),
-        ) {
-            Text(
-                text = "Deleting your account is permanent and cannot be undone. All your data will be deleted.",
-                color = MaterialTheme.colorScheme.onErrorContainer,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
+        DeleteAccountWarningBox()
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (uiState.deleteApiError != null) {
-            ErrorBanner(message = uiState.deleteApiError)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        AccountDeleteErrorBanner(error = uiState.deleteApiError)
 
-        AuthTextField(
+        AccountDeletePasswordField(
             value = uiState.deletePassword,
             onValueChange = onDeletePasswordChange,
-            label = "Password",
             error = uiState.deletePasswordError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { onDeleteAccount() },
-            ),
-            visualTransformation = if (deletePasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            trailingIcon = {
-                IconButton(onClick = { deletePasswordVisible = !deletePasswordVisible }) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (deletePasswordVisible) {
-                                android.R.drawable.ic_menu_view
-                            } else {
-                                android.R.drawable.ic_secure
-                            },
-                        ),
-                        contentDescription = if (deletePasswordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        },
-                        tint = Slate600,
-                    )
-                }
-            },
+            isVisible = deletePasswordVisible,
+            onVisibilityToggle = { deletePasswordVisible = !deletePasswordVisible },
+            onDone = onDeleteAccount,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        OutlinedButton(
+        DeleteAccountButton(
             onClick = onDeleteAccount,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            enabled = !uiState.isDeletingAccount,
-        ) {
-            if (uiState.isDeletingAccount) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(end = 8.dp),
-                    color = MaterialTheme.colorScheme.error,
-                    strokeWidth = 2.dp,
-                )
-            }
-            Text("Delete Account")
+            isDeletingAccount = uiState.isDeletingAccount,
+        )
+    }
+}
+
+@Composable
+private fun LogoutSection(
+    onLogout: () -> Unit,
+    isLoggingOut: Boolean,
+) {
+    OutlinedButton(
+        onClick = onLogout,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        enabled = !isLoggingOut,
+    ) {
+        if (isLoggingOut) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(end = 8.dp),
+                color = MaterialTheme.colorScheme.outline,
+                strokeWidth = 2.dp,
+            )
         }
+        Text("Log Out")
+    }
+}
+
+@Composable
+private fun DeleteAccountWarningBox() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = MaterialTheme.shapes.medium,
+            )
+            .padding(16.dp),
+    ) {
+        Text(
+            text = "Deleting your account is permanent and cannot be undone. All your data will be deleted.",
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Composable
+private fun AccountDeleteErrorBanner(error: String?) {
+    if (error != null) {
+        ErrorBanner(message = error)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun AccountDeletePasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    error: String?,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    onDone: () -> Unit,
+) {
+    AuthTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = "Password",
+        error = error,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { onDone() },
+        ),
+        visualTransformation = getPasswordVisualTransformation(isVisible),
+        trailingIcon = {
+            PasswordVisibilityIcon(
+                isVisible = isVisible,
+                onClick = onVisibilityToggle,
+            )
+        },
+    )
+}
+
+@Composable
+private fun DeleteAccountButton(
+    onClick: () -> Unit,
+    isDeletingAccount: Boolean,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        enabled = !isDeletingAccount,
+    ) {
+        if (isDeletingAccount) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(end = 8.dp),
+                color = MaterialTheme.colorScheme.error,
+                strokeWidth = 2.dp,
+            )
+        }
+        Text("Delete Account")
     }
 }
 
