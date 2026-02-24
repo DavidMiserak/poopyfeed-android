@@ -55,6 +55,7 @@ temp/
 *.temp
 *~
 *.orig
+kls_database.db
 
 # SonarQube Scanner files
 .scannerwork/

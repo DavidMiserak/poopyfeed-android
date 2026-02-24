@@ -62,7 +62,6 @@ import com.poopyfeed.android.ui.theme.Rose200
 import com.poopyfeed.android.ui.theme.Rose400
 import com.poopyfeed.android.ui.theme.Rose50
 import com.poopyfeed.android.ui.theme.Slate600
-import com.poopyfeed.android.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
