@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.poopyfeed.android.ui.components.AuthTextField
+import com.poopyfeed.android.ui.components.AuthTextFieldConfig
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.components.GradientButton
 import com.poopyfeed.android.ui.components.PasswordVisibilityIcon
@@ -287,13 +288,15 @@ private fun ProfileTab(
                 value = uiState.firstName,
                 onValueChange = onFirstNameChange,
                 label = "First Name",
-                error = uiState.firstNameError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                config = AuthTextFieldConfig(
+                    error = uiState.firstNameError,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    ),
                 ),
             )
 
@@ -303,13 +306,15 @@ private fun ProfileTab(
                 value = uiState.lastName,
                 onValueChange = onLastNameChange,
                 label = "Last Name",
-                error = uiState.lastNameError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                config = AuthTextFieldConfig(
+                    error = uiState.lastNameError,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    ),
                 ),
             )
 
@@ -542,21 +547,23 @@ private fun AccountDeletePasswordField(
         value = value,
         onValueChange = onValueChange,
         label = "Password",
-        error = error,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done,
+        config = AuthTextFieldConfig(
+            error = error,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { onDone() },
+            ),
+            visualTransformation = getPasswordVisualTransformation(isVisible),
+            trailingIcon = {
+                PasswordVisibilityIcon(
+                    isVisible = isVisible,
+                    onClick = onVisibilityToggle,
+                )
+            },
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { onDone() },
-        ),
-        visualTransformation = getPasswordVisualTransformation(isVisible),
-        trailingIcon = {
-            PasswordVisibilityIcon(
-                isVisible = isVisible,
-                onClick = onVisibilityToggle,
-            )
-        },
     )
 }
 
@@ -631,25 +638,27 @@ private fun PasswordChangeField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        error = error,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) },
-            onDone = {
-                focusManager.clearFocus()
-                onDone?.invoke()
+        config = AuthTextFieldConfig(
+            error = error,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                onDone = {
+                    focusManager.clearFocus()
+                    onDone?.invoke()
+                },
+            ),
+            visualTransformation = getPasswordVisualTransformation(isVisible),
+            trailingIcon = {
+                PasswordVisibilityIcon(
+                    isVisible = isVisible,
+                    onClick = onVisibilityToggle,
+                )
             },
         ),
-        visualTransformation = getPasswordVisualTransformation(isVisible),
-        trailingIcon = {
-            PasswordVisibilityIcon(
-                isVisible = isVisible,
-                onClick = onVisibilityToggle,
-            )
-        },
     )
 }
 

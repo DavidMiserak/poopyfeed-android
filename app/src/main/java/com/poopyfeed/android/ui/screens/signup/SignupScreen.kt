@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.poopyfeed.android.ui.components.AuthTextField
+import com.poopyfeed.android.ui.components.AuthTextFieldConfig
 import com.poopyfeed.android.ui.components.BrandLogo
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.components.GradientButton
@@ -177,13 +178,15 @@ private fun SignupFormCard(
             value = uiState.name,
             onValueChange = onNameChange,
             label = "Name",
-            error = uiState.nameError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            config = AuthTextFieldConfig(
+                error = uiState.nameError,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                ),
             ),
         )
 
@@ -193,13 +196,15 @@ private fun SignupFormCard(
             value = uiState.email,
             onValueChange = onEmailChange,
             label = "Email",
-            error = uiState.emailError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            config = AuthTextFieldConfig(
+                error = uiState.emailError,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                ),
             ),
         )
 
@@ -263,25 +268,27 @@ private fun PasswordField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        error = error,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) },
-            onDone = {
-                focusManager.clearFocus()
-                onDone?.invoke()
+        config = AuthTextFieldConfig(
+            error = error,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                onDone = {
+                    focusManager.clearFocus()
+                    onDone?.invoke()
+                },
+            ),
+            visualTransformation = getPasswordVisualTransformation(isVisible),
+            trailingIcon = {
+                PasswordVisibilityIcon(
+                    isVisible = isVisible,
+                    onClick = onVisibilityToggle,
+                )
             },
         ),
-        visualTransformation = getPasswordVisualTransformation(isVisible),
-        trailingIcon = {
-            PasswordVisibilityIcon(
-                isVisible = isVisible,
-                onClick = onVisibilityToggle,
-            )
-        },
     )
 }
 

@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.poopyfeed.android.ui.components.AuthTextField
+import com.poopyfeed.android.ui.components.AuthTextFieldConfig
 import com.poopyfeed.android.ui.components.BrandLogo
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.components.GradientButton
@@ -164,13 +165,15 @@ private fun LoginFormCard(
             value = uiState.email,
             onValueChange = onEmailChange,
             label = "Email",
-            error = uiState.emailError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            config = AuthTextFieldConfig(
+                error = uiState.emailError,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                ),
             ),
         )
 
@@ -220,24 +223,26 @@ private fun LoginPasswordField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        error = error,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done,
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                focusManager.clearFocus()
-                onDone()
+        config = AuthTextFieldConfig(
+            error = error,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    onDone()
+                },
+            ),
+            visualTransformation = getPasswordVisualTransformation(isVisible),
+            trailingIcon = {
+                PasswordVisibilityIcon(
+                    isVisible = isVisible,
+                    onClick = onVisibilityToggle,
+                )
             },
         ),
-        visualTransformation = getPasswordVisualTransformation(isVisible),
-        trailingIcon = {
-            PasswordVisibilityIcon(
-                isVisible = isVisible,
-                onClick = onVisibilityToggle,
-            )
-        },
     )
 }
 

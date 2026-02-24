@@ -20,25 +20,52 @@ import com.poopyfeed.android.ui.theme.Rose200
 import com.poopyfeed.android.ui.theme.Rose400
 import com.poopyfeed.android.ui.theme.Slate600
 
+/**
+ * Configuration for AuthTextField optional parameters.
+ * Groups keyboard, visual transformation, and UI customization options.
+ */
+data class AuthTextFieldConfig(
+    val modifier: Modifier = Modifier,
+    val error: String? = null,
+    val keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    val keyboardActions: KeyboardActions = KeyboardActions.Default,
+    val visualTransformation: VisualTransformation = VisualTransformation.None,
+    val trailingIcon: @Composable (() -> Unit)? = null,
+)
+
+/**
+ * Public API function with 4 parameters (within SonarQube 7-parameter limit).
+ * Config object groups all optional parameters for cleaner API.
+ */
 @Composable
 fun AuthTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier = Modifier,
-    error: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    config: AuthTextFieldConfig = AuthTextFieldConfig(),
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    AuthTextFieldContent(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        config = config,
+    )
+}
+
+@Composable
+private fun AuthTextFieldContent(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    config: AuthTextFieldConfig,
+) {
+    Column(modifier = config.modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
-            isError = error != null,
+            isError = config.error != null,
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -48,14 +75,14 @@ fun AuthTextField(
                 unfocusedLabelColor = Slate600,
                 cursorColor = Rose400,
             ),
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            visualTransformation = visualTransformation,
-            trailingIcon = trailingIcon,
+            keyboardOptions = config.keyboardOptions,
+            keyboardActions = config.keyboardActions,
+            visualTransformation = config.visualTransformation,
+            trailingIcon = config.trailingIcon,
         )
-        if (error != null) {
+        if (config.error != null) {
             Text(
-                text = error,
+                text = config.error,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
