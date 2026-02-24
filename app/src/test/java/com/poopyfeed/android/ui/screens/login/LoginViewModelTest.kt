@@ -22,7 +22,6 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
-
     private lateinit var authRepository: AuthRepository
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -97,33 +96,35 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login success sets isSuccess`() = runTest {
-        whenever(authRepository.login(any(), any()))
-            .thenReturn(Result.success(Unit))
+    fun `login success sets isSuccess`() =
+        runTest {
+            whenever(authRepository.login(any(), any()))
+                .thenReturn(Result.success(Unit))
 
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.login()
-        advanceUntilIdle()
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.login()
+            advanceUntilIdle()
 
-        assertTrue(viewModel.uiState.value.isSuccess)
-        assertFalse(viewModel.uiState.value.isLoading)
-    }
+            assertTrue(viewModel.uiState.value.isSuccess)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
 
     @Test
-    fun `login failure sets apiError`() = runTest {
-        whenever(authRepository.login(any(), any()))
-            .thenReturn(Result.failure(Exception("Invalid credentials")))
+    fun `login failure sets apiError`() =
+        runTest {
+            whenever(authRepository.login(any(), any()))
+                .thenReturn(Result.failure(Exception("Invalid credentials")))
 
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.login()
-        advanceUntilIdle()
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.login()
+            advanceUntilIdle()
 
-        assertEquals("Invalid credentials", viewModel.uiState.value.apiError)
-        assertFalse(viewModel.uiState.value.isLoading)
-        assertFalse(viewModel.uiState.value.isSuccess)
-    }
+            assertEquals("Invalid credentials", viewModel.uiState.value.apiError)
+            assertFalse(viewModel.uiState.value.isLoading)
+            assertFalse(viewModel.uiState.value.isSuccess)
+        }
 
     @Test
     fun `validateEmail returns null for valid email`() {

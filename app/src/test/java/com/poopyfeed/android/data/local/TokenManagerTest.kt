@@ -8,8 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
@@ -19,7 +17,6 @@ import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TokenManagerTest {
-
     @get:Rule
     val tmpFolder = TemporaryFolder()
 
@@ -31,10 +28,11 @@ class TokenManagerTest {
 
     @Before
     fun setup() {
-        dataStore = PreferenceDataStoreFactory.create(
-            scope = testScope,
-            produceFile = { tmpFolder.newFile("test_auth_prefs.preferences_pb") },
-        )
+        dataStore =
+            PreferenceDataStoreFactory.create(
+                scope = testScope,
+                produceFile = { tmpFolder.newFile("test_auth_prefs.preferences_pb") },
+            )
         // TokenManager uses Context.dataStore extension, so we test the logic indirectly
         // by testing the repository which calls TokenManager
         // For direct testing, we'd need Robolectric. Instead, test via companion/static methods.
@@ -47,9 +45,10 @@ class TokenManagerTest {
 
     @Test
     fun `TokenManager can be instantiated with mock context`() {
-        val context = mock<Context> {
-            on { applicationContext }.thenReturn(mock())
-        }
+        val context =
+            mock<Context> {
+                on { applicationContext }.thenReturn(mock())
+            }
         // Verify the class exists and has the expected interface
         // Actual DataStore operations are tested via integration tests
         assertNull(null) // Placeholder - real tests go through AuthRepositoryTest

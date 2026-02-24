@@ -93,20 +93,22 @@ private fun SignupContent(
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Rose50, Amber50),
-                ),
-            )
-            .imePadding(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Rose50, Amber50),
+                    ),
+                )
+                .imePadding(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -152,11 +154,12 @@ private fun SignupFormCard(
     focusManager: androidx.compose.ui.focus.FocusManager,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(White, RoundedCornerShape(24.dp))
-            .border(2.dp, Rose200, RoundedCornerShape(24.dp))
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(White, RoundedCornerShape(24.dp))
+                .border(2.dp, Rose200, RoundedCornerShape(24.dp))
+                .padding(24.dp),
     ) {
         Text(
             text = "Create Account",
@@ -178,16 +181,19 @@ private fun SignupFormCard(
             value = uiState.name,
             onValueChange = onNameChange,
             label = "Name",
-            config = AuthTextFieldConfig(
-                error = uiState.nameError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
+            config =
+                AuthTextFieldConfig(
+                    error = uiState.nameError,
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        ),
                 ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                ),
-            ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -196,16 +202,19 @@ private fun SignupFormCard(
             value = uiState.email,
             onValueChange = onEmailChange,
             label = "Email",
-            config = AuthTextFieldConfig(
-                error = uiState.emailError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next,
+            config =
+                AuthTextFieldConfig(
+                    error = uiState.emailError,
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        ),
                 ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                ),
-            ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -268,27 +277,30 @@ private fun PasswordField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        config = AuthTextFieldConfig(
-            error = error,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                onDone = {
-                    focusManager.clearFocus()
-                    onDone?.invoke()
+        config =
+            AuthTextFieldConfig(
+                error = error,
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        onDone = {
+                            focusManager.clearFocus()
+                            onDone?.invoke()
+                        },
+                    ),
+                visualTransformation = getPasswordVisualTransformation(isVisible),
+                trailingIcon = {
+                    PasswordVisibilityIcon(
+                        isVisible = isVisible,
+                        onClick = onVisibilityToggle,
+                    )
                 },
             ),
-            visualTransformation = getPasswordVisualTransformation(isVisible),
-            trailingIcon = {
-                PasswordVisibilityIcon(
-                    isVisible = isVisible,
-                    onClick = onVisibilityToggle,
-                )
-            },
-        ),
     )
 }
 

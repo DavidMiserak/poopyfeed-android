@@ -88,20 +88,22 @@ private fun LoginContent(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Rose50, Amber50),
-                ),
-            )
-            .imePadding(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Rose50, Amber50),
+                    ),
+                )
+                .imePadding(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -139,11 +141,12 @@ private fun LoginFormCard(
     focusManager: androidx.compose.ui.focus.FocusManager,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(White, RoundedCornerShape(24.dp))
-            .border(2.dp, Rose200, RoundedCornerShape(24.dp))
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(White, RoundedCornerShape(24.dp))
+                .border(2.dp, Rose200, RoundedCornerShape(24.dp))
+                .padding(24.dp),
     ) {
         Text(
             text = "Welcome Back",
@@ -165,32 +168,37 @@ private fun LoginFormCard(
             value = uiState.email,
             onValueChange = onEmailChange,
             label = "Email",
-            config = AuthTextFieldConfig(
-                error = uiState.emailError,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next,
+            config =
+                AuthTextFieldConfig(
+                    error = uiState.emailError,
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        ),
                 ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                ),
-            ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         LoginPasswordField(
-            state = PasswordFieldState(
-                value = uiState.password,
-                error = uiState.passwordError,
-                isVisible = passwordVisible,
-            ),
+            state =
+                PasswordFieldState(
+                    value = uiState.password,
+                    error = uiState.passwordError,
+                    isVisible = passwordVisible,
+                ),
             label = "Password",
-            callbacks = PasswordFieldCallbacks(
-                onValueChange = onPasswordChange,
-                onVisibilityToggle = onPasswordVisibilityToggle,
-                onDone = onLogin,
-            ),
+            callbacks =
+                PasswordFieldCallbacks(
+                    onValueChange = onPasswordChange,
+                    onVisibilityToggle = onPasswordVisibilityToggle,
+                    onDone = onLogin,
+                ),
             focusManager = focusManager,
         )
 
@@ -235,26 +243,29 @@ private fun LoginPasswordField(
         value = state.value,
         onValueChange = callbacks.onValueChange,
         label = label,
-        config = AuthTextFieldConfig(
-            error = state.error,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    callbacks.onDone()
+        config =
+            AuthTextFieldConfig(
+                error = state.error,
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            callbacks.onDone()
+                        },
+                    ),
+                visualTransformation = getPasswordVisualTransformation(state.isVisible),
+                trailingIcon = {
+                    PasswordVisibilityIcon(
+                        isVisible = state.isVisible,
+                        onClick = callbacks.onVisibilityToggle,
+                    )
                 },
             ),
-            visualTransformation = getPasswordVisualTransformation(state.isVisible),
-            trailingIcon = {
-                PasswordVisibilityIcon(
-                    isVisible = state.isVisible,
-                    onClick = callbacks.onVisibilityToggle,
-                )
-            },
-        ),
     )
 }
 

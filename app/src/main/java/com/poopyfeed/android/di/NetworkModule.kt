@@ -23,13 +23,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
-    fun provideJson(): Json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
 
     @Provides
     @Singleton
@@ -41,9 +41,10 @@ object NetworkModule {
             if (url.contains("/api/v1/") && !url.contains("/auth/")) {
                 val token = runBlocking { tokenManager.getToken() }
                 if (token != null) {
-                    val newRequest = request.newBuilder()
-                        .addHeader("Authorization", "Token $token")
-                        .build()
+                    val newRequest =
+                        request.newBuilder()
+                            .addHeader("Authorization", "Token $token")
+                            .build()
                     return@Interceptor chain.proceed(newRequest)
                 }
             }
@@ -63,19 +64,23 @@ object NetworkModule {
             .addInterceptor(authInterceptor)
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
-                    level = if (BuildConfig.DEBUG) {
-                        HttpLoggingInterceptor.Level.BODY
-                    } else {
-                        HttpLoggingInterceptor.Level.NONE
-                    }
-                }
+                    level =
+                        if (BuildConfig.DEBUG) {
+                            HttpLoggingInterceptor.Level.BODY
+                        } else {
+                            HttpLoggingInterceptor.Level.NONE
+                        }
+                },
             )
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit {
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.API_BASE_URL + "/")
             .client(okHttpClient)

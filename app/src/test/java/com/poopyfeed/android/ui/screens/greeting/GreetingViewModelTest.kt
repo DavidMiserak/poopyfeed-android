@@ -17,7 +17,6 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GreetingViewModelTest {
-
     private lateinit var authRepository: AuthRepository
     private val testDispatcher = StandardTestDispatcher()
 
@@ -33,25 +32,28 @@ class GreetingViewModelTest {
     }
 
     @Test
-    fun `initial state is LOADING`() = runTest {
-        whenever(authRepository.hasToken()).thenReturn(false)
-        val viewModel = GreetingViewModel(authRepository)
-        assertEquals(AuthCheckState.LOADING, viewModel.authState.value)
-    }
+    fun `initial state is LOADING`() =
+        runTest {
+            whenever(authRepository.hasToken()).thenReturn(false)
+            val viewModel = GreetingViewModel(authRepository)
+            assertEquals(AuthCheckState.LOADING, viewModel.authState.value)
+        }
 
     @Test
-    fun `emits AUTHENTICATED when token exists`() = runTest {
-        whenever(authRepository.hasToken()).thenReturn(true)
-        val viewModel = GreetingViewModel(authRepository)
-        advanceUntilIdle()
-        assertEquals(AuthCheckState.AUTHENTICATED, viewModel.authState.value)
-    }
+    fun `emits AUTHENTICATED when token exists`() =
+        runTest {
+            whenever(authRepository.hasToken()).thenReturn(true)
+            val viewModel = GreetingViewModel(authRepository)
+            advanceUntilIdle()
+            assertEquals(AuthCheckState.AUTHENTICATED, viewModel.authState.value)
+        }
 
     @Test
-    fun `emits UNAUTHENTICATED when no token`() = runTest {
-        whenever(authRepository.hasToken()).thenReturn(false)
-        val viewModel = GreetingViewModel(authRepository)
-        advanceUntilIdle()
-        assertEquals(AuthCheckState.UNAUTHENTICATED, viewModel.authState.value)
-    }
+    fun `emits UNAUTHENTICATED when no token`() =
+        runTest {
+            whenever(authRepository.hasToken()).thenReturn(false)
+            val viewModel = GreetingViewModel(authRepository)
+            advanceUntilIdle()
+            assertEquals(AuthCheckState.UNAUTHENTICATED, viewModel.authState.value)
+        }
 }

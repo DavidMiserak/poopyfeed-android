@@ -31,21 +31,24 @@ fun BrandLogo(modifier: Modifier = Modifier) {
         )
         Text(
             text = "Poopy",
-            style = TextStyle(
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(Rose400, Orange400, Amber400),
+            style =
+                TextStyle(
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    brush =
+                        Brush.horizontalGradient(
+                            colors = listOf(Rose400, Orange400, Amber400),
+                        ),
                 ),
-            ),
         )
         Text(
             text = "Feed",
-            style = TextStyle(
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = Slate800,
-            ),
+            style =
+                TextStyle(
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Slate800,
+                ),
         )
     }
 }

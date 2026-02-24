@@ -19,9 +19,10 @@ fun PasswordVisibilityIcon(
 ) {
     IconButton(onClick = onClick) {
         Icon(
-            painter = painterResource(
-                id = getPasswordIconResource(isVisible),
-            ),
+            painter =
+                painterResource(
+                    id = getPasswordIconResource(isVisible),
+                ),
             contentDescription = getPasswordContentDescription(isVisible),
             tint = Slate600,
         )

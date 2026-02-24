@@ -27,85 +27,89 @@ data class SignupUiState(
 )
 
 @HiltViewModel
-class SignupViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class SignupViewModel
+    @Inject
+    constructor(
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(SignupUiState())
+        val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(SignupUiState())
-    val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
-
-    fun onNameChange(name: String) {
-        _uiState.update { it.copy(name = name, nameError = null, apiError = null) }
-    }
-
-    fun onEmailChange(email: String) {
-        _uiState.update { it.copy(email = email, emailError = null, apiError = null) }
-    }
-
-    fun onPasswordChange(password: String) {
-        _uiState.update { it.copy(password = password, passwordError = null, apiError = null) }
-    }
-
-    fun onConfirmPasswordChange(confirmPassword: String) {
-        _uiState.update {
-            it.copy(confirmPassword = confirmPassword, confirmPasswordError = null, apiError = null)
+        fun onNameChange(name: String) {
+            _uiState.update { it.copy(name = name, nameError = null, apiError = null) }
         }
-    }
 
-    fun signup() {
-        val state = _uiState.value
+        fun onEmailChange(email: String) {
+            _uiState.update { it.copy(email = email, emailError = null, apiError = null) }
+        }
 
-        val nameError = validateName(state.name)
-        val emailError = LoginViewModel.validateEmail(state.email)
-        val passwordError = LoginViewModel.validatePassword(state.password)
-        val confirmPasswordError = validateConfirmPassword(state.password, state.confirmPassword)
+        fun onPasswordChange(password: String) {
+            _uiState.update { it.copy(password = password, passwordError = null, apiError = null) }
+        }
 
-        if (nameError != null || emailError != null || passwordError != null || confirmPasswordError != null) {
+        fun onConfirmPasswordChange(confirmPassword: String) {
             _uiState.update {
-                it.copy(
-                    nameError = nameError,
-                    emailError = emailError,
-                    passwordError = passwordError,
-                    confirmPasswordError = confirmPasswordError,
+                it.copy(confirmPassword = confirmPassword, confirmPasswordError = null, apiError = null)
+            }
+        }
+
+        fun signup() {
+            val state = _uiState.value
+
+            val nameError = validateName(state.name)
+            val emailError = LoginViewModel.validateEmail(state.email)
+            val passwordError = LoginViewModel.validatePassword(state.password)
+            val confirmPasswordError = validateConfirmPassword(state.password, state.confirmPassword)
+
+            if (nameError != null || emailError != null || passwordError != null || confirmPasswordError != null) {
+                _uiState.update {
+                    it.copy(
+                        nameError = nameError,
+                        emailError = emailError,
+                        passwordError = passwordError,
+                        confirmPasswordError = confirmPasswordError,
+                    )
+                }
+                return
+            }
+
+            _uiState.update { it.copy(isLoading = true, apiError = null) }
+
+            viewModelScope.launch {
+                val result = authRepository.signup(state.email, state.password)
+                result.fold(
+                    onSuccess = {
+                        _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                apiError = error.message ?: "Signup failed",
+                            )
+                        }
+                    },
                 )
             }
-            return
         }
 
-        _uiState.update { it.copy(isLoading = true, apiError = null) }
-
-        viewModelScope.launch {
-            val result = authRepository.signup(state.email, state.password)
-            result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            apiError = error.message ?: "Signup failed",
-                        )
-                    }
-                },
-            )
-        }
-    }
-
-    companion object {
-        fun validateName(name: String): String? {
-            return when {
-                name.isBlank() -> "Name is required"
-                else -> null
+        companion object {
+            fun validateName(name: String): String? {
+                return when {
+                    name.isBlank() -> "Name is required"
+                    else -> null
+                }
             }
-        }
 
-        fun validateConfirmPassword(password: String, confirmPassword: String): String? {
-            return when {
-                confirmPassword.isBlank() -> "Please confirm your password"
-                confirmPassword != password -> "Passwords do not match"
-                else -> null
+            fun validateConfirmPassword(
+                password: String,
+                confirmPassword: String,
+            ): String? {
+                return when {
+                    confirmPassword.isBlank() -> "Please confirm your password"
+                    confirmPassword != password -> "Passwords do not match"
+                    else -> null
+                }
             }
         }
     }
-}

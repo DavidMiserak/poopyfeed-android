@@ -36,35 +36,40 @@ fun GradientButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(52.dp),
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+            ),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = if (enabled && !isLoading) {
-                            listOf(Rose400, Orange400, Amber400)
-                        } else {
-                            listOf(
-                                Rose400.copy(alpha = 0.5f),
-                                Orange400.copy(alpha = 0.5f),
-                                Amber400.copy(alpha = 0.5f),
-                            )
-                        },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors =
+                                    if (enabled && !isLoading) {
+                                        listOf(Rose400, Orange400, Amber400)
+                                    } else {
+                                        listOf(
+                                            Rose400.copy(alpha = 0.5f),
+                                            Orange400.copy(alpha = 0.5f),
+                                            Amber400.copy(alpha = 0.5f),
+                                        )
+                                    },
+                            ),
+                        shape = RoundedCornerShape(12.dp),
                     ),
-                    shape = RoundedCornerShape(12.dp),
-                ),
             contentAlignment = Alignment.Center,
         ) {
             if (isLoading) {

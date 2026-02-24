@@ -23,7 +23,6 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignupViewModelTest {
-
     private lateinit var authRepository: AuthRepository
     private lateinit var viewModel: SignupViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -119,51 +118,54 @@ class SignupViewModelTest {
     }
 
     @Test
-    fun `signup success sets isSuccess`() = runTest {
-        whenever(authRepository.signup(any(), any()))
-            .thenReturn(Result.success(Unit))
+    fun `signup success sets isSuccess`() =
+        runTest {
+            whenever(authRepository.signup(any(), any()))
+                .thenReturn(Result.success(Unit))
 
-        viewModel.onNameChange("John")
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.onConfirmPasswordChange("password123")
-        viewModel.signup()
-        advanceUntilIdle()
+            viewModel.onNameChange("John")
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.onConfirmPasswordChange("password123")
+            viewModel.signup()
+            advanceUntilIdle()
 
-        assertTrue(viewModel.uiState.value.isSuccess)
-        assertFalse(viewModel.uiState.value.isLoading)
-    }
-
-    @Test
-    fun `signup sends only email and password to API (not name)`() = runTest {
-        whenever(authRepository.signup(any(), any()))
-            .thenReturn(Result.success(Unit))
-
-        viewModel.onNameChange("John Doe")
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.onConfirmPasswordChange("password123")
-        viewModel.signup()
-        advanceUntilIdle()
-
-        verify(authRepository).signup("test@example.com", "password123")
-    }
+            assertTrue(viewModel.uiState.value.isSuccess)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
 
     @Test
-    fun `signup failure sets apiError`() = runTest {
-        whenever(authRepository.signup(any(), any()))
-            .thenReturn(Result.failure(Exception("Email already exists")))
+    fun `signup sends only email and password to API (not name)`() =
+        runTest {
+            whenever(authRepository.signup(any(), any()))
+                .thenReturn(Result.success(Unit))
 
-        viewModel.onNameChange("John")
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.onConfirmPasswordChange("password123")
-        viewModel.signup()
-        advanceUntilIdle()
+            viewModel.onNameChange("John Doe")
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.onConfirmPasswordChange("password123")
+            viewModel.signup()
+            advanceUntilIdle()
 
-        assertEquals("Email already exists", viewModel.uiState.value.apiError)
-        assertFalse(viewModel.uiState.value.isLoading)
-    }
+            verify(authRepository).signup("test@example.com", "password123")
+        }
+
+    @Test
+    fun `signup failure sets apiError`() =
+        runTest {
+            whenever(authRepository.signup(any(), any()))
+                .thenReturn(Result.failure(Exception("Email already exists")))
+
+            viewModel.onNameChange("John")
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.onConfirmPasswordChange("password123")
+            viewModel.signup()
+            advanceUntilIdle()
+
+            assertEquals("Email already exists", viewModel.uiState.value.apiError)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
 
     @Test
     fun `validateName returns error for blank name`() {

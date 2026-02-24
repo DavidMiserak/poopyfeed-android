@@ -20,7 +20,6 @@ import org.mockito.kotlin.whenever
 import retrofit2.Response
 
 class AuthRepositoryTest {
-
     private lateinit var authApi: AuthApi
     private lateinit var tokenManager: TokenManager
     private lateinit var cookieStore: CookieStore
@@ -35,118 +34,132 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun `login success stores token`() = runTest {
-        val allauthResponse = AllauthResponse(
-            status = 200,
-            data = AllauthData(user = AllauthUser(id = 1, email = "test@example.com")),
-        )
-        whenever(authApi.login(org.mockito.kotlin.any()))
-            .thenReturn(Response.success(allauthResponse))
-        whenever(authApi.getToken())
-            .thenReturn(Response.success(TokenResponse(authToken = "test-token")))
+    fun `login success stores token`() =
+        runTest {
+            val allauthResponse =
+                AllauthResponse(
+                    status = 200,
+                    data = AllauthData(user = AllauthUser(id = 1, email = "test@example.com")),
+                )
+            whenever(authApi.login(org.mockito.kotlin.any()))
+                .thenReturn(Response.success(allauthResponse))
+            whenever(authApi.getToken())
+                .thenReturn(Response.success(TokenResponse(authToken = "test-token")))
 
-        val result = repository.login("test@example.com", "password123")
+            val result = repository.login("test@example.com", "password123")
 
-        assertTrue(result.isSuccess)
-        verify(tokenManager).saveToken("test-token")
-    }
-
-    @Test
-    fun `login failure returns error`() = runTest {
-        val errorBody = """{"non_field_errors":["Invalid credentials"]}"""
-            .toResponseBody("application/json".toMediaType())
-        whenever(authApi.login(org.mockito.kotlin.any()))
-            .thenReturn(Response.error(400, errorBody))
-
-        val result = repository.login("test@example.com", "wrong")
-
-        assertTrue(result.isFailure)
-        assertEquals("Invalid credentials", result.exceptionOrNull()?.message)
-    }
+            assertTrue(result.isSuccess)
+            verify(tokenManager).saveToken("test-token")
+        }
 
     @Test
-    fun `login token retrieval failure returns error`() = runTest {
-        val allauthResponse = AllauthResponse(
-            status = 200,
-            data = AllauthData(user = AllauthUser(id = 1, email = "test@example.com")),
-        )
-        whenever(authApi.login(org.mockito.kotlin.any()))
-            .thenReturn(Response.success(allauthResponse))
-        val errorBody = "".toResponseBody("application/json".toMediaType())
-        whenever(authApi.getToken())
-            .thenReturn(Response.error(401, errorBody))
+    fun `login failure returns error`() =
+        runTest {
+            val errorBody =
+                """{"non_field_errors":["Invalid credentials"]}"""
+                    .toResponseBody("application/json".toMediaType())
+            whenever(authApi.login(org.mockito.kotlin.any()))
+                .thenReturn(Response.error(400, errorBody))
 
-        val result = repository.login("test@example.com", "password123")
+            val result = repository.login("test@example.com", "wrong")
 
-        assertTrue(result.isFailure)
-        assertEquals("Failed to retrieve auth token", result.exceptionOrNull()?.message)
-    }
+            assertTrue(result.isFailure)
+            assertEquals("Invalid credentials", result.exceptionOrNull()?.message)
+        }
 
     @Test
-    fun `signup success stores token`() = runTest {
-        val allauthResponse = AllauthResponse(
-            status = 200,
-            data = AllauthData(user = AllauthUser(id = 1, email = "new@example.com")),
-        )
-        whenever(authApi.signup(org.mockito.kotlin.any()))
-            .thenReturn(Response.success(allauthResponse))
-        whenever(authApi.getToken())
-            .thenReturn(Response.success(TokenResponse(authToken = "new-token")))
+    fun `login token retrieval failure returns error`() =
+        runTest {
+            val allauthResponse =
+                AllauthResponse(
+                    status = 200,
+                    data = AllauthData(user = AllauthUser(id = 1, email = "test@example.com")),
+                )
+            whenever(authApi.login(org.mockito.kotlin.any()))
+                .thenReturn(Response.success(allauthResponse))
+            val errorBody = "".toResponseBody("application/json".toMediaType())
+            whenever(authApi.getToken())
+                .thenReturn(Response.error(401, errorBody))
 
-        val result = repository.signup("new@example.com", "password123")
+            val result = repository.login("test@example.com", "password123")
 
-        assertTrue(result.isSuccess)
-        verify(tokenManager).saveToken("new-token")
-    }
-
-    @Test
-    fun `signup failure returns error`() = runTest {
-        val errorBody = """{"email":["A user with this email already exists."]}"""
-            .toResponseBody("application/json".toMediaType())
-        whenever(authApi.signup(org.mockito.kotlin.any()))
-            .thenReturn(Response.error(409, errorBody))
-
-        val result = repository.signup("existing@example.com", "password123")
-
-        assertTrue(result.isFailure)
-        assertEquals("A user with this email already exists.", result.exceptionOrNull()?.message)
-    }
+            assertTrue(result.isFailure)
+            assertEquals("Failed to retrieve auth token", result.exceptionOrNull()?.message)
+        }
 
     @Test
-    fun `logout clears token and cookies`() = runTest {
-        whenever(authApi.logout()).thenReturn(Response.success(Unit))
+    fun `signup success stores token`() =
+        runTest {
+            val allauthResponse =
+                AllauthResponse(
+                    status = 200,
+                    data = AllauthData(user = AllauthUser(id = 1, email = "new@example.com")),
+                )
+            whenever(authApi.signup(org.mockito.kotlin.any()))
+                .thenReturn(Response.success(allauthResponse))
+            whenever(authApi.getToken())
+                .thenReturn(Response.success(TokenResponse(authToken = "new-token")))
 
-        val result = repository.logout()
+            val result = repository.signup("new@example.com", "password123")
 
-        assertTrue(result.isSuccess)
-        verify(tokenManager).clearToken()
-        verify(cookieStore).clear()
-    }
-
-    @Test
-    fun `logout clears local state even when API fails`() = runTest {
-        whenever(authApi.logout()).thenThrow(RuntimeException("Network error"))
-
-        val result = repository.logout()
-
-        assertTrue(result.isSuccess)
-        verify(tokenManager).clearToken()
-        verify(cookieStore).clear()
-    }
+            assertTrue(result.isSuccess)
+            verify(tokenManager).saveToken("new-token")
+        }
 
     @Test
-    fun `hasToken returns true when token exists`() = runTest {
-        whenever(tokenManager.getToken()).thenReturn("some-token")
+    fun `signup failure returns error`() =
+        runTest {
+            val errorBody =
+                """{"email":["A user with this email already exists."]}"""
+                    .toResponseBody("application/json".toMediaType())
+            whenever(authApi.signup(org.mockito.kotlin.any()))
+                .thenReturn(Response.error(409, errorBody))
 
-        assertTrue(repository.hasToken())
-    }
+            val result = repository.signup("existing@example.com", "password123")
+
+            assertTrue(result.isFailure)
+            assertEquals("A user with this email already exists.", result.exceptionOrNull()?.message)
+        }
 
     @Test
-    fun `hasToken returns false when no token`() = runTest {
-        whenever(tokenManager.getToken()).thenReturn(null)
+    fun `logout clears token and cookies`() =
+        runTest {
+            whenever(authApi.logout()).thenReturn(Response.success(Unit))
 
-        assertTrue(!repository.hasToken())
-    }
+            val result = repository.logout()
+
+            assertTrue(result.isSuccess)
+            verify(tokenManager).clearToken()
+            verify(cookieStore).clear()
+        }
+
+    @Test
+    fun `logout clears local state even when API fails`() =
+        runTest {
+            whenever(authApi.logout()).thenThrow(RuntimeException("Network error"))
+
+            val result = repository.logout()
+
+            assertTrue(result.isSuccess)
+            verify(tokenManager).clearToken()
+            verify(cookieStore).clear()
+        }
+
+    @Test
+    fun `hasToken returns true when token exists`() =
+        runTest {
+            whenever(tokenManager.getToken()).thenReturn("some-token")
+
+            assertTrue(repository.hasToken())
+        }
+
+    @Test
+    fun `hasToken returns false when no token`() =
+        runTest {
+            whenever(tokenManager.getToken()).thenReturn(null)
+
+            assertTrue(!repository.hasToken())
+        }
 
     // Error parsing tests
     @Test
@@ -191,9 +204,10 @@ class AuthRepositoryTest {
 
     @Test
     fun `getNetworkErrorMessage handles no internet`() {
-        val result = AuthRepository.getNetworkErrorMessage(
-            Exception("Unable to resolve host api.example.com"),
-        )
+        val result =
+            AuthRepository.getNetworkErrorMessage(
+                Exception("Unable to resolve host api.example.com"),
+            )
         assertEquals("No internet connection. Please check your network.", result)
     }
 

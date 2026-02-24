@@ -9,10 +9,11 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ChildrenApi {
-
     @GET("api/v1/children/")
     suspend fun getChildren(): Response<ChildrenResponse>
 
     @POST("api/v1/children/")
-    suspend fun createChild(@Body request: CreateChildRequest): Response<Child>
+    suspend fun createChild(
+        @Body request: CreateChildRequest,
+    ): Response<Child>
 }

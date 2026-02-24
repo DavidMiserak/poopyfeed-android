@@ -5,7 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class AuthDtoTest {
-
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test

@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,10 +21,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -87,30 +87,35 @@ fun ProfileScreen(
 
     ProfileContent(
         uiState = uiState,
-        callbacks = ProfileContentCallbacks(
-            navigation = NavigationCallbacks(
-                onNavigateBack = onNavigateBack,
-                onLogoutNavigate = onLogout,
+        callbacks =
+            ProfileContentCallbacks(
+                navigation =
+                    NavigationCallbacks(
+                        onNavigateBack = onNavigateBack,
+                        onLogoutNavigate = onLogout,
+                    ),
+                onTabSelected = viewModel::onTabSelected,
+                profileTab =
+                    ProfileTabCallbacks(
+                        onFirstNameChange = viewModel::onFirstNameChange,
+                        onLastNameChange = viewModel::onLastNameChange,
+                        onTimezoneChange = viewModel::onTimezoneChange,
+                        onSaveProfile = viewModel::saveProfile,
+                    ),
+                securityTab =
+                    SecurityTabCallbacks(
+                        onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
+                        onNewPasswordChange = viewModel::onNewPasswordChange,
+                        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+                        onChangePassword = viewModel::changePassword,
+                    ),
+                accountTab =
+                    AccountTabCallbacks(
+                        onDeletePasswordChange = viewModel::onDeletePasswordChange,
+                        onDeleteAccount = viewModel::deleteAccount,
+                        onLogout = viewModel::logout,
+                    ),
             ),
-            onTabSelected = viewModel::onTabSelected,
-            profileTab = ProfileTabCallbacks(
-                onFirstNameChange = viewModel::onFirstNameChange,
-                onLastNameChange = viewModel::onLastNameChange,
-                onTimezoneChange = viewModel::onTimezoneChange,
-                onSaveProfile = viewModel::saveProfile,
-            ),
-            securityTab = SecurityTabCallbacks(
-                onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
-                onNewPasswordChange = viewModel::onNewPasswordChange,
-                onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-                onChangePassword = viewModel::changePassword,
-            ),
-            accountTab = AccountTabCallbacks(
-                onDeletePasswordChange = viewModel::onDeletePasswordChange,
-                onDeleteAccount = viewModel::deleteAccount,
-                onLogout = viewModel::logout,
-            ),
-        ),
     )
 }
 
@@ -156,91 +161,98 @@ private fun ProfileContent(
     val focusManager = LocalFocusManager.current
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-    ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Settings") },
-                navigationIcon = {
-                    IconButton(onClick = callbacks.navigation.onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        },
-        modifier = Modifier.fillMaxSize(),
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
+        modifier =
+            Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Rose50, Amber50),
-                    ),
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Settings") },
+                    navigationIcon = {
+                        IconButton(onClick = callbacks.navigation.onNavigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
                 )
-                .imePadding(),
-        ) {
-            TabRow(
-                selectedTabIndex = uiState.selectedTabIndex,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            },
+            modifier = Modifier.fillMaxSize(),
+        ) { innerPadding ->
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Rose50, Amber50),
+                            ),
+                        )
+                        .imePadding(),
             ) {
-                Tab(
-                    selected = uiState.selectedTabIndex == 0,
-                    onClick = { callbacks.onTabSelected(0) },
-                    text = { Text("Profile") },
-                )
-                Tab(
-                    selected = uiState.selectedTabIndex == 1,
-                    onClick = { callbacks.onTabSelected(1) },
-                    text = { Text("Security") },
-                )
-                Tab(
-                    selected = uiState.selectedTabIndex == 2,
-                    onClick = { callbacks.onTabSelected(2) },
-                    text = { Text("Account") },
-                )
-            }
+                TabRow(
+                    selectedTabIndex = uiState.selectedTabIndex,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                ) {
+                    Tab(
+                        selected = uiState.selectedTabIndex == 0,
+                        onClick = { callbacks.onTabSelected(0) },
+                        text = { Text("Profile") },
+                    )
+                    Tab(
+                        selected = uiState.selectedTabIndex == 1,
+                        onClick = { callbacks.onTabSelected(1) },
+                        text = { Text("Security") },
+                    )
+                    Tab(
+                        selected = uiState.selectedTabIndex == 2,
+                        onClick = { callbacks.onTabSelected(2) },
+                        text = { Text("Account") },
+                    )
+                }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                when (uiState.selectedTabIndex) {
-                    0 -> ProfileTab(
-                        uiState = uiState,
-                        onFirstNameChange = callbacks.profileTab.onFirstNameChange,
-                        onLastNameChange = callbacks.profileTab.onLastNameChange,
-                        onTimezoneChange = callbacks.profileTab.onTimezoneChange,
-                        onSaveProfile = callbacks.profileTab.onSaveProfile,
-                        focusManager = focusManager,
-                    )
-                    1 -> SecurityTab(
-                        uiState = uiState,
-                        onCurrentPasswordChange = callbacks.securityTab.onCurrentPasswordChange,
-                        onNewPasswordChange = callbacks.securityTab.onNewPasswordChange,
-                        onConfirmPasswordChange = callbacks.securityTab.onConfirmPasswordChange,
-                        onChangePassword = callbacks.securityTab.onChangePassword,
-                        focusManager = focusManager,
-                    )
-                    2 -> AccountTab(
-                        uiState = uiState,
-                        onDeletePasswordChange = callbacks.accountTab.onDeletePasswordChange,
-                        onDeleteAccount = callbacks.accountTab.onDeleteAccount,
-                        onLogout = callbacks.accountTab.onLogout,
-                        isLoggingOut = uiState.isLoggingOut,
-                    )
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                ) {
+                    when (uiState.selectedTabIndex) {
+                        0 ->
+                            ProfileTab(
+                                uiState = uiState,
+                                onFirstNameChange = callbacks.profileTab.onFirstNameChange,
+                                onLastNameChange = callbacks.profileTab.onLastNameChange,
+                                onTimezoneChange = callbacks.profileTab.onTimezoneChange,
+                                onSaveProfile = callbacks.profileTab.onSaveProfile,
+                                focusManager = focusManager,
+                            )
+                        1 ->
+                            SecurityTab(
+                                uiState = uiState,
+                                onCurrentPasswordChange = callbacks.securityTab.onCurrentPasswordChange,
+                                onNewPasswordChange = callbacks.securityTab.onNewPasswordChange,
+                                onConfirmPasswordChange = callbacks.securityTab.onConfirmPasswordChange,
+                                onChangePassword = callbacks.securityTab.onChangePassword,
+                                focusManager = focusManager,
+                            )
+                        2 ->
+                            AccountTab(
+                                uiState = uiState,
+                                onDeletePasswordChange = callbacks.accountTab.onDeletePasswordChange,
+                                onDeleteAccount = callbacks.accountTab.onDeleteAccount,
+                                onLogout = callbacks.accountTab.onLogout,
+                                isLoggingOut = uiState.isLoggingOut,
+                            )
+                    }
                 }
             }
         }
-    }
     }
 }
 
@@ -257,9 +269,10 @@ private fun ProfileTab(
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
     ) {
         if (uiState.isLoadingProfile) {
             Box(
@@ -276,13 +289,14 @@ private fun ProfileTab(
 
             if (uiState.profileSuccessMessage != null) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.medium,
+                            )
+                            .padding(12.dp),
                 ) {
                     Text(
                         text = uiState.profileSuccessMessage,
@@ -306,10 +320,11 @@ private fun ProfileTab(
                     enabled = false,
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = Rose200,
-                        disabledLabelColor = Slate600,
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            disabledBorderColor = Rose200,
+                            disabledLabelColor = Slate600,
+                        ),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -318,16 +333,19 @@ private fun ProfileTab(
                 value = uiState.firstName,
                 onValueChange = onFirstNameChange,
                 label = "First Name",
-                config = AuthTextFieldConfig(
-                    error = uiState.firstNameError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next,
+                config =
+                    AuthTextFieldConfig(
+                        error = uiState.firstNameError,
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next,
+                            ),
+                        keyboardActions =
+                            KeyboardActions(
+                                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                            ),
                     ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -336,16 +354,19 @@ private fun ProfileTab(
                 value = uiState.lastName,
                 onValueChange = onLastNameChange,
                 label = "Last Name",
-                config = AuthTextFieldConfig(
-                    error = uiState.lastNameError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next,
+                config =
+                    AuthTextFieldConfig(
+                        error = uiState.lastNameError,
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next,
+                            ),
+                        keyboardActions =
+                            KeyboardActions(
+                                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                            ),
                     ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -360,16 +381,18 @@ private fun ProfileTab(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Timezone") },
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Rose400,
-                        unfocusedBorderColor = Rose200,
-                        focusedLabelColor = Rose400,
-                        unfocusedLabelColor = Slate600,
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Rose400,
+                            unfocusedBorderColor = Rose200,
+                            focusedLabelColor = Rose400,
+                            unfocusedLabelColor = Slate600,
+                        ),
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
@@ -416,9 +439,10 @@ private fun SecurityTab(
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
     ) {
         PasswordChangeErrorBanner(error = uiState.passwordApiError)
         PasswordChangeSuccessBanner(message = uiState.passwordSuccessMessage)
@@ -480,9 +504,10 @@ private fun AccountTab(
     var deletePasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
     ) {
         LogoutSection(onLogout = onLogout, isLoggingOut = isLoggingOut)
 
@@ -519,16 +544,18 @@ private fun LogoutSection(
 ) {
     OutlinedButton(
         onClick = onLogout,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(52.dp),
         enabled = !isLoggingOut,
     ) {
         if (isLoggingOut) {
             CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 8.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 8.dp),
                 color = MaterialTheme.colorScheme.outline,
                 strokeWidth = 2.dp,
             )
@@ -540,13 +567,14 @@ private fun LogoutSection(
 @Composable
 private fun DeleteAccountWarningBox() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = MaterialTheme.shapes.medium,
-            )
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .padding(16.dp),
     ) {
         Text(
             text = "Deleting your account is permanent and cannot be undone. All your data will be deleted.",
@@ -577,23 +605,26 @@ private fun AccountDeletePasswordField(
         value = value,
         onValueChange = onValueChange,
         label = "Password",
-        config = AuthTextFieldConfig(
-            error = error,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
+        config =
+            AuthTextFieldConfig(
+                error = error,
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = { onDone() },
+                    ),
+                visualTransformation = getPasswordVisualTransformation(isVisible),
+                trailingIcon = {
+                    PasswordVisibilityIcon(
+                        isVisible = isVisible,
+                        onClick = onVisibilityToggle,
+                    )
+                },
             ),
-            keyboardActions = KeyboardActions(
-                onDone = { onDone() },
-            ),
-            visualTransformation = getPasswordVisualTransformation(isVisible),
-            trailingIcon = {
-                PasswordVisibilityIcon(
-                    isVisible = isVisible,
-                    onClick = onVisibilityToggle,
-                )
-            },
-        ),
     )
 }
 
@@ -604,16 +635,18 @@ private fun DeleteAccountButton(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(52.dp),
         enabled = !isDeletingAccount,
     ) {
         if (isDeletingAccount) {
             CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 8.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 8.dp),
                 color = MaterialTheme.colorScheme.error,
                 strokeWidth = 2.dp,
             )
@@ -634,13 +667,14 @@ private fun PasswordChangeErrorBanner(error: String?) {
 private fun PasswordChangeSuccessBanner(message: String?) {
     if (message != null) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.medium,
-                )
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.medium,
+                    )
+                    .padding(12.dp),
         ) {
             Text(
                 text = message,
@@ -668,27 +702,30 @@ private fun PasswordChangeField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        config = AuthTextFieldConfig(
-            error = error,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                onDone = {
-                    focusManager.clearFocus()
-                    onDone?.invoke()
+        config =
+            AuthTextFieldConfig(
+                error = error,
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        onDone = {
+                            focusManager.clearFocus()
+                            onDone?.invoke()
+                        },
+                    ),
+                visualTransformation = getPasswordVisualTransformation(isVisible),
+                trailingIcon = {
+                    PasswordVisibilityIcon(
+                        isVisible = isVisible,
+                        onClick = onVisibilityToggle,
+                    )
                 },
             ),
-            visualTransformation = getPasswordVisualTransformation(isVisible),
-            trailingIcon = {
-                PasswordVisibilityIcon(
-                    isVisible = isVisible,
-                    onClick = onVisibilityToggle,
-                )
-            },
-        ),
     )
 }
 

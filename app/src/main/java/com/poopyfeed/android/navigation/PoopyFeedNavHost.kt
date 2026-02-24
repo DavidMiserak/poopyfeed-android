@@ -10,8 +10,8 @@ import com.poopyfeed.android.ui.screens.HomeScreen
 import com.poopyfeed.android.ui.screens.children.ChildrenListScreen
 import com.poopyfeed.android.ui.screens.greeting.GreetingScreen
 import com.poopyfeed.android.ui.screens.login.LoginScreen
-import com.poopyfeed.android.ui.screens.signup.SignupScreen
 import com.poopyfeed.android.ui.screens.profile.ProfileScreen
+import com.poopyfeed.android.ui.screens.signup.SignupScreen
 
 @Composable
 fun PoopyFeedNavHost(

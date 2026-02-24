@@ -55,266 +55,276 @@ data class ProfileUiState(
 )
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
-    private val profileRepository: ProfileRepository,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class ProfileViewModel
+    @Inject
+    constructor(
+        private val profileRepository: ProfileRepository,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(ProfileUiState())
+        val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
-
-    init {
-        loadProfile()
-    }
-
-    fun loadProfile() {
-        _uiState.update { it.copy(isLoadingProfile = true) }
-
-        viewModelScope.launch {
-            val result = profileRepository.getProfile()
-            result.fold(
-                onSuccess = { profile ->
-                    _uiState.update {
-                        it.copy(
-                            profile = profile,
-                            firstName = profile.firstName,
-                            lastName = profile.lastName,
-                            email = profile.email,
-                            timezone = profile.timezone,
-                            isLoadingProfile = false,
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isLoadingProfile = false,
-                            profileApiError = error.message ?: "Failed to load profile",
-                        )
-                    }
-                },
-            )
+        init {
+            loadProfile()
         }
-    }
 
-    fun onFirstNameChange(value: String) {
-        _uiState.update { it.copy(firstName = value, firstNameError = null, profileApiError = null) }
-    }
+        fun loadProfile() {
+            _uiState.update { it.copy(isLoadingProfile = true) }
 
-    fun onLastNameChange(value: String) {
-        _uiState.update { it.copy(lastName = value, lastNameError = null, profileApiError = null) }
-    }
-
-    fun onTimezoneChange(value: String) {
-        _uiState.update { it.copy(timezone = value, profileApiError = null) }
-    }
-
-    fun onCurrentPasswordChange(value: String) {
-        _uiState.update { it.copy(currentPassword = value, currentPasswordError = null, passwordApiError = null) }
-    }
-
-    fun onNewPasswordChange(value: String) {
-        _uiState.update { it.copy(newPassword = value, newPasswordError = null, passwordApiError = null) }
-    }
-
-    fun onConfirmPasswordChange(value: String) {
-        _uiState.update { it.copy(confirmPassword = value, confirmPasswordError = null, passwordApiError = null) }
-    }
-
-    fun onDeletePasswordChange(value: String) {
-        _uiState.update { it.copy(deletePassword = value, deletePasswordError = null, deleteApiError = null) }
-    }
-
-    fun onTabSelected(index: Int) {
-        _uiState.update { it.copy(selectedTabIndex = index) }
-    }
-
-    fun saveProfile() {
-        val state = _uiState.value
-
-        val firstNameError = validateNonEmpty(state.firstName, "First name")
-        val lastNameError = validateNonEmpty(state.lastName, "Last name")
-
-        if (firstNameError != null || lastNameError != null) {
-            _uiState.update {
-                it.copy(
-                    firstNameError = firstNameError,
-                    lastNameError = lastNameError,
+            viewModelScope.launch {
+                val result = profileRepository.getProfile()
+                result.fold(
+                    onSuccess = { profile ->
+                        _uiState.update {
+                            it.copy(
+                                profile = profile,
+                                firstName = profile.firstName,
+                                lastName = profile.lastName,
+                                email = profile.email,
+                                timezone = profile.timezone,
+                                isLoadingProfile = false,
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isLoadingProfile = false,
+                                profileApiError = error.message ?: "Failed to load profile",
+                            )
+                        }
+                    },
                 )
             }
-            return
         }
 
-        _uiState.update { it.copy(isSavingProfile = true, profileApiError = null, profileSuccessMessage = null) }
-
-        viewModelScope.launch {
-            val result = profileRepository.updateProfile(
-                firstName = state.firstName,
-                lastName = state.lastName,
-                timezone = state.timezone,
-            )
-            result.fold(
-                onSuccess = { profile ->
-                    _uiState.update {
-                        it.copy(
-                            isSavingProfile = false,
-                            profile = profile,
-                            profileSuccessMessage = "Profile updated successfully",
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isSavingProfile = false,
-                            profileApiError = error.message ?: "Failed to save profile",
-                        )
-                    }
-                },
-            )
+        fun onFirstNameChange(value: String) {
+            _uiState.update { it.copy(firstName = value, firstNameError = null, profileApiError = null) }
         }
-    }
 
-    fun changePassword() {
-        val state = _uiState.value
+        fun onLastNameChange(value: String) {
+            _uiState.update { it.copy(lastName = value, lastNameError = null, profileApiError = null) }
+        }
 
-        val currentPasswordError = validateNonEmpty(state.currentPassword, "Current password")
-        val newPasswordError = validatePassword(state.newPassword)
-        val confirmPasswordError = validateConfirmPassword(state.newPassword, state.confirmPassword)
+        fun onTimezoneChange(value: String) {
+            _uiState.update { it.copy(timezone = value, profileApiError = null) }
+        }
 
-        if (currentPasswordError != null || newPasswordError != null || confirmPasswordError != null) {
-            _uiState.update {
-                it.copy(
-                    currentPasswordError = currentPasswordError,
-                    newPasswordError = newPasswordError,
-                    confirmPasswordError = confirmPasswordError,
+        fun onCurrentPasswordChange(value: String) {
+            _uiState.update { it.copy(currentPassword = value, currentPasswordError = null, passwordApiError = null) }
+        }
+
+        fun onNewPasswordChange(value: String) {
+            _uiState.update { it.copy(newPassword = value, newPasswordError = null, passwordApiError = null) }
+        }
+
+        fun onConfirmPasswordChange(value: String) {
+            _uiState.update { it.copy(confirmPassword = value, confirmPasswordError = null, passwordApiError = null) }
+        }
+
+        fun onDeletePasswordChange(value: String) {
+            _uiState.update { it.copy(deletePassword = value, deletePasswordError = null, deleteApiError = null) }
+        }
+
+        fun onTabSelected(index: Int) {
+            _uiState.update { it.copy(selectedTabIndex = index) }
+        }
+
+        fun saveProfile() {
+            val state = _uiState.value
+
+            val firstNameError = validateNonEmpty(state.firstName, "First name")
+            val lastNameError = validateNonEmpty(state.lastName, "Last name")
+
+            if (firstNameError != null || lastNameError != null) {
+                _uiState.update {
+                    it.copy(
+                        firstNameError = firstNameError,
+                        lastNameError = lastNameError,
+                    )
+                }
+                return
+            }
+
+            _uiState.update { it.copy(isSavingProfile = true, profileApiError = null, profileSuccessMessage = null) }
+
+            viewModelScope.launch {
+                val result =
+                    profileRepository.updateProfile(
+                        firstName = state.firstName,
+                        lastName = state.lastName,
+                        timezone = state.timezone,
+                    )
+                result.fold(
+                    onSuccess = { profile ->
+                        _uiState.update {
+                            it.copy(
+                                isSavingProfile = false,
+                                profile = profile,
+                                profileSuccessMessage = "Profile updated successfully",
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isSavingProfile = false,
+                                profileApiError = error.message ?: "Failed to save profile",
+                            )
+                        }
+                    },
                 )
             }
-            return
         }
 
-        _uiState.update { it.copy(isSavingPassword = true, passwordApiError = null, passwordSuccessMessage = null) }
+        fun changePassword() {
+            val state = _uiState.value
 
-        viewModelScope.launch {
-            val result = profileRepository.changePassword(
-                currentPassword = state.currentPassword,
-                newPassword = state.newPassword,
-                newPasswordConfirm = state.confirmPassword,
-            )
-            result.fold(
-                onSuccess = {
-                    _uiState.update {
-                        it.copy(
-                            isSavingPassword = false,
-                            currentPassword = "",
-                            newPassword = "",
-                            confirmPassword = "",
-                            passwordSuccessMessage = "Password changed successfully",
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isSavingPassword = false,
-                            passwordApiError = error.message ?: "Failed to change password",
-                        )
-                    }
-                },
-            )
-        }
-    }
+            val currentPasswordError = validateNonEmpty(state.currentPassword, "Current password")
+            val newPasswordError = validatePassword(state.newPassword)
+            val confirmPasswordError = validateConfirmPassword(state.newPassword, state.confirmPassword)
 
-    fun deleteAccount() {
-        val state = _uiState.value
+            if (currentPasswordError != null || newPasswordError != null || confirmPasswordError != null) {
+                _uiState.update {
+                    it.copy(
+                        currentPasswordError = currentPasswordError,
+                        newPasswordError = newPasswordError,
+                        confirmPasswordError = confirmPasswordError,
+                    )
+                }
+                return
+            }
 
-        val deletePasswordError = validateNonEmpty(state.deletePassword, "Password")
+            _uiState.update { it.copy(isSavingPassword = true, passwordApiError = null, passwordSuccessMessage = null) }
 
-        if (deletePasswordError != null) {
-            _uiState.update { it.copy(deletePasswordError = deletePasswordError) }
-            return
-        }
-
-        _uiState.update { it.copy(isDeletingAccount = true, deleteApiError = null) }
-
-        viewModelScope.launch {
-            val result = profileRepository.deleteAccount(state.deletePassword)
-            result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isDeletingAccount = false, deleteSuccess = true) }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isDeletingAccount = false,
-                            deleteApiError = error.message ?: "Failed to delete account",
-                        )
-                    }
-                },
-            )
-        }
-    }
-
-    fun logout() {
-        _uiState.update { it.copy(isLoggingOut = true) }
-
-        viewModelScope.launch {
-            authRepository.logout()
-            _uiState.update { it.copy(isLoggingOut = false, logoutSuccess = true) }
-        }
-    }
-
-    companion object {
-        val TIMEZONES = listOf(
-            "UTC",
-            "America/New_York",
-            "America/Chicago",
-            "America/Denver",
-            "America/Los_Angeles",
-            "Europe/London",
-            "Europe/Paris",
-            "Europe/Berlin",
-            "Europe/Madrid",
-            "Europe/Amsterdam",
-            "Asia/Tokyo",
-            "Asia/Shanghai",
-            "Asia/Hong_Kong",
-            "Asia/Bangkok",
-            "Asia/Singapore",
-            "Asia/Dubai",
-            "Asia/Kolkata",
-            "Australia/Sydney",
-            "Australia/Melbourne",
-            "Australia/Brisbane",
-            "Pacific/Auckland",
-            "America/Toronto",
-            "America/Mexico_City",
-            "America/Sao_Paulo",
-            "Africa/Cairo",
-            "Africa/Johannesburg",
-            "Africa/Lagos",
-            "Asia/Seoul",
-            "Asia/Jakarta",
-        )
-
-        fun validateNonEmpty(value: String, fieldName: String): String? {
-            return if (value.isBlank()) "$fieldName is required" else null
-        }
-
-        fun validatePassword(password: String): String? {
-            return when {
-                password.isBlank() -> "Password is required"
-                password.length < 8 -> "Password must be at least 8 characters"
-                else -> null
+            viewModelScope.launch {
+                val result =
+                    profileRepository.changePassword(
+                        currentPassword = state.currentPassword,
+                        newPassword = state.newPassword,
+                        newPasswordConfirm = state.confirmPassword,
+                    )
+                result.fold(
+                    onSuccess = {
+                        _uiState.update {
+                            it.copy(
+                                isSavingPassword = false,
+                                currentPassword = "",
+                                newPassword = "",
+                                confirmPassword = "",
+                                passwordSuccessMessage = "Password changed successfully",
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isSavingPassword = false,
+                                passwordApiError = error.message ?: "Failed to change password",
+                            )
+                        }
+                    },
+                )
             }
         }
 
-        fun validateConfirmPassword(password: String, confirmPassword: String): String? {
-            return when {
-                confirmPassword.isBlank() -> "Please confirm your password"
-                confirmPassword != password -> "Passwords do not match"
-                else -> null
+        fun deleteAccount() {
+            val state = _uiState.value
+
+            val deletePasswordError = validateNonEmpty(state.deletePassword, "Password")
+
+            if (deletePasswordError != null) {
+                _uiState.update { it.copy(deletePasswordError = deletePasswordError) }
+                return
+            }
+
+            _uiState.update { it.copy(isDeletingAccount = true, deleteApiError = null) }
+
+            viewModelScope.launch {
+                val result = profileRepository.deleteAccount(state.deletePassword)
+                result.fold(
+                    onSuccess = {
+                        _uiState.update { it.copy(isDeletingAccount = false, deleteSuccess = true) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isDeletingAccount = false,
+                                deleteApiError = error.message ?: "Failed to delete account",
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        fun logout() {
+            _uiState.update { it.copy(isLoggingOut = true) }
+
+            viewModelScope.launch {
+                authRepository.logout()
+                _uiState.update { it.copy(isLoggingOut = false, logoutSuccess = true) }
+            }
+        }
+
+        companion object {
+            val TIMEZONES =
+                listOf(
+                    "UTC",
+                    "America/New_York",
+                    "America/Chicago",
+                    "America/Denver",
+                    "America/Los_Angeles",
+                    "Europe/London",
+                    "Europe/Paris",
+                    "Europe/Berlin",
+                    "Europe/Madrid",
+                    "Europe/Amsterdam",
+                    "Asia/Tokyo",
+                    "Asia/Shanghai",
+                    "Asia/Hong_Kong",
+                    "Asia/Bangkok",
+                    "Asia/Singapore",
+                    "Asia/Dubai",
+                    "Asia/Kolkata",
+                    "Australia/Sydney",
+                    "Australia/Melbourne",
+                    "Australia/Brisbane",
+                    "Pacific/Auckland",
+                    "America/Toronto",
+                    "America/Mexico_City",
+                    "America/Sao_Paulo",
+                    "Africa/Cairo",
+                    "Africa/Johannesburg",
+                    "Africa/Lagos",
+                    "Asia/Seoul",
+                    "Asia/Jakarta",
+                )
+
+            fun validateNonEmpty(
+                value: String,
+                fieldName: String,
+            ): String? {
+                return if (value.isBlank()) "$fieldName is required" else null
+            }
+
+            fun validatePassword(password: String): String? {
+                return when {
+                    password.isBlank() -> "Password is required"
+                    password.length < 8 -> "Password must be at least 8 characters"
+                    else -> null
+                }
+            }
+
+            fun validateConfirmPassword(
+                password: String,
+                confirmPassword: String,
+            ): String? {
+                return when {
+                    confirmPassword.isBlank() -> "Please confirm your password"
+                    confirmPassword != password -> "Passwords do not match"
+                    else -> null
+                }
             }
         }
     }
-}

@@ -76,18 +76,20 @@ private fun GreetingContent(
     onLogIn: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Rose50, Amber50),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Rose50, Amber50),
+                    ),
                 ),
-            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -113,9 +115,10 @@ private fun GreetingContent(
 
             OutlinedButton(
                 onClick = onLogIn,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 border = androidx.compose.foundation.BorderStroke(2.dp, Rose200),
             ) {

@@ -26,18 +26,19 @@ fun ErrorBanner(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Red50, RoundedCornerShape(8.dp))
-            .drawBehind {
-                drawLine(
-                    color = Red500,
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, size.height),
-                    strokeWidth = 8f,
-                )
-            }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(Red50, RoundedCornerShape(8.dp))
+                .drawBehind {
+                    drawLine(
+                        color = Red500,
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, size.height),
+                        strokeWidth = 8f,
+                    )
+                }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

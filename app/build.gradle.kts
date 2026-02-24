@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     jacoco
+    id("com.diffplug.spotless")
 }
 
 android {
@@ -32,7 +33,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -116,31 +117,64 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     }
 
     val mainSrc = "${project.projectDir}/src/main/java"
-    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(
-            "**/R.class",
-            "**/R\$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*_Hilt*.class",
-            "**/Hilt_*.class",
-            "**/*_Factory.class",
-            "**/*_MembersInjector.class",
-            "**/*Module_*.class",
-            "**/*_Impl*.class",
-            "**/di/**",
-        )
-    }
+    val debugTree =
+        fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+            exclude(
+                "**/R.class",
+                "**/R\$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*_Hilt*.class",
+                "**/Hilt_*.class",
+                "**/*_Factory.class",
+                "**/*_MembersInjector.class",
+                "**/*Module_*.class",
+                "**/*_Impl*.class",
+                "**/di/**",
+            )
+        }
 
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(layout.buildDirectory) {
-        include("jacoco/testDebugUnitTest.exec")
-    })
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("jacoco/testDebugUnitTest.exec")
+        },
+    )
 }
 
 afterEvaluate {
     tasks.named("testDebugUnitTest") {
         finalizedBy("jacocoTestReport")
+    }
+}
+
+spotless {
+    kotlin {
+        target("src/**/*.kt")
+        targetExclude("**/build/**", "**/generated/**")
+        ktlint("1.2.1")
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_code_style" to "android",
+                    "max_line_length" to "140",
+                    "indent_size" to "4",
+                    "ij_kotlin_allow_trailing_comma" to "true",
+                    "ij_kotlin_allow_trailing_comma_on_call_site" to "true",
+                    "ktlint_standard_function-naming" to "disabled",
+                ),
+            )
+    }
+
+    kotlinGradle {
+        target("*.gradle.kts", "buildSrc/**/*.kts")
+        ktlint("1.2.1")
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_code_style" to "android",
+                    "max_line_length" to "140",
+                    "indent_size" to "4",
+                ),
+            )
     }
 }

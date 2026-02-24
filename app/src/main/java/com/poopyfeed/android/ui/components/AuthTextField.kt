@@ -68,13 +68,14 @@ private fun AuthTextFieldContent(
             isError = config.error != null,
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Rose400,
-                unfocusedBorderColor = Rose200,
-                focusedLabelColor = Rose400,
-                unfocusedLabelColor = Slate600,
-                cursorColor = Rose400,
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Rose400,
+                    unfocusedBorderColor = Rose200,
+                    focusedLabelColor = Rose400,
+                    unfocusedLabelColor = Slate600,
+                    cursorColor = Rose400,
+                ),
             keyboardOptions = config.keyboardOptions,
             keyboardActions = config.keyboardActions,
             visualTransformation = config.visualTransformation,

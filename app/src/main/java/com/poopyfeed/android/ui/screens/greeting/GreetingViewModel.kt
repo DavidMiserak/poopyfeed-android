@@ -17,25 +17,27 @@ enum class AuthCheckState {
 }
 
 @HiltViewModel
-class GreetingViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class GreetingViewModel
+    @Inject
+    constructor(
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val _authState = MutableStateFlow(AuthCheckState.LOADING)
+        val authState: StateFlow<AuthCheckState> = _authState.asStateFlow()
 
-    private val _authState = MutableStateFlow(AuthCheckState.LOADING)
-    val authState: StateFlow<AuthCheckState> = _authState.asStateFlow()
+        init {
+            checkAuthState()
+        }
 
-    init {
-        checkAuthState()
-    }
-
-    private fun checkAuthState() {
-        viewModelScope.launch {
-            val hasToken = authRepository.hasToken()
-            _authState.value = if (hasToken) {
-                AuthCheckState.AUTHENTICATED
-            } else {
-                AuthCheckState.UNAUTHENTICATED
+        private fun checkAuthState() {
+            viewModelScope.launch {
+                val hasToken = authRepository.hasToken()
+                _authState.value =
+                    if (hasToken) {
+                        AuthCheckState.AUTHENTICATED
+                    } else {
+                        AuthCheckState.UNAUTHENTICATED
+                    }
             }
         }
     }
-}
