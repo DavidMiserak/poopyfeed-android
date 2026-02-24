@@ -174,19 +174,19 @@ class AuthRepositoryTest {
     @Test
     fun `parseErrorBody handles null body`() {
         val result = AuthRepository.parseErrorBody(null)
-        assertEquals("An unknown error occurred", result)
+        assertEquals(RepositoryConstants.UNKNOWN_ERROR_MESSAGE, result)
     }
 
     @Test
     fun `parseErrorBody handles empty body`() {
         val result = AuthRepository.parseErrorBody("")
-        assertEquals("An unknown error occurred", result)
+        assertEquals(RepositoryConstants.UNKNOWN_ERROR_MESSAGE, result)
     }
 
     @Test
     fun `parseErrorBody handles invalid JSON`() {
         val result = AuthRepository.parseErrorBody("not json")
-        assertEquals("An unknown error occurred", result)
+        assertEquals(RepositoryConstants.UNKNOWN_ERROR_MESSAGE, result)
     }
 
     @Test

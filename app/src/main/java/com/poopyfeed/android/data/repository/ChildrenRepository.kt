@@ -60,7 +60,7 @@ class ChildrenRepository @Inject constructor(
         private val json = Json { ignoreUnknownKeys = true }
 
         fun parseErrorBody(errorBody: String?): String {
-            if (errorBody.isNullOrBlank()) return "An unknown error occurred"
+            if (errorBody.isNullOrBlank()) return RepositoryConstants.UNKNOWN_ERROR_MESSAGE
 
             return try {
                 val jsonObject = json.decodeFromString<JsonObject>(errorBody)
@@ -87,10 +87,10 @@ class ChildrenRepository @Inject constructor(
                 if (fieldErrors.isNotEmpty()) {
                     fieldErrors.joinToString(". ")
                 } else {
-                    "An unknown error occurred"
+                    RepositoryConstants.UNKNOWN_ERROR_MESSAGE
                 }
             } catch (_: Exception) {
-                "An unknown error occurred"
+                RepositoryConstants.UNKNOWN_ERROR_MESSAGE
             }
         }
 
