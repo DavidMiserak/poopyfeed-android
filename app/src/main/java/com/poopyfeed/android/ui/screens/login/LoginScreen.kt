@@ -111,123 +111,160 @@ private fun LoginContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(White, RoundedCornerShape(24.dp))
-                    .border(2.dp, Rose200, RoundedCornerShape(24.dp))
-                    .padding(24.dp),
-            ) {
-                Text(
-                    text = "Welcome Back",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Text(
-                    text = "Log in to your account",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Slate600,
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (uiState.apiError != null) {
-                    ErrorBanner(message = uiState.apiError)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                AuthTextField(
-                    value = uiState.email,
-                    onValueChange = onEmailChange,
-                    label = "Email",
-                    error = uiState.emailError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                AuthTextField(
-                    value = uiState.password,
-                    onValueChange = onPasswordChange,
-                    label = "Password",
-                    error = uiState.passwordError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                            onLogin()
-                        },
-                    ),
-                    visualTransformation = if (passwordVisible) {
-                        VisualTransformation.None
-                    } else {
-                        PasswordVisualTransformation()
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (passwordVisible) {
-                                        android.R.drawable.ic_menu_view
-                                    } else {
-                                        android.R.drawable.ic_secure
-                                    },
-                                ),
-                                contentDescription = if (passwordVisible) {
-                                    "Hide password"
-                                } else {
-                                    "Show password"
-                                },
-                                tint = Slate600,
-                            )
-                        }
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                GradientButton(
-                    text = "Log In",
-                    onClick = onLogin,
-                    isLoading = uiState.isLoading,
-                )
-            }
+            LoginFormCard(
+                uiState = uiState,
+                passwordVisible = passwordVisible,
+                onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
+                onEmailChange = onEmailChange,
+                onPasswordChange = onPasswordChange,
+                onLogin = onLogin,
+                focusManager = focusManager,
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row {
-                Text(
-                    text = "Don't have an account? ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Slate600,
-                )
-                Text(
-                    text = "Sign Up",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Rose400,
-                    modifier = Modifier.clickable { onNavigateToSignup() },
-                )
-            }
+            LoginSignupLink(onNavigateToSignup = onNavigateToSignup)
 
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
+@Composable
+private fun LoginFormCard(
+    uiState: LoginUiState,
+    passwordVisible: Boolean,
+    onPasswordVisibilityToggle: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLogin: () -> Unit,
+    focusManager: androidx.compose.ui.focus.FocusManager,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(White, RoundedCornerShape(24.dp))
+            .border(2.dp, Rose200, RoundedCornerShape(24.dp))
+            .padding(24.dp),
+    ) {
+        Text(
+            text = "Welcome Back",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Text(
+            text = "Log in to your account",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Slate600,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        LoginErrorBanner(error = uiState.apiError)
+
+        AuthTextField(
+            value = uiState.email,
+            onValueChange = onEmailChange,
+            label = "Email",
+            error = uiState.emailError,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            ),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LoginPasswordField(
+            value = uiState.password,
+            onValueChange = onPasswordChange,
+            label = "Password",
+            error = uiState.passwordError,
+            isVisible = passwordVisible,
+            onVisibilityToggle = onPasswordVisibilityToggle,
+            onDone = onLogin,
+            focusManager = focusManager,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        GradientButton(
+            text = "Log In",
+            onClick = onLogin,
+            isLoading = uiState.isLoading,
+        )
+    }
+}
+
+@Composable
+private fun LoginErrorBanner(error: String?) {
+    if (error != null) {
+        ErrorBanner(message = error)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun LoginPasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: String?,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    onDone: () -> Unit,
+    focusManager: androidx.compose.ui.focus.FocusManager,
+) {
+    AuthTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        error = error,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+                onDone()
+            },
+        ),
+        visualTransformation = getPasswordVisualTransformation(isVisible),
+        trailingIcon = {
+            PasswordVisibilityIcon(
+                isVisible = isVisible,
+                onClick = onVisibilityToggle,
+            )
+        },
+    )
+}
+
+@Composable
+private fun LoginSignupLink(onNavigateToSignup: () -> Unit) {
+    Row {
+        Text(
+            text = "Don't have an account? ",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Slate600,
+        )
+        Text(
+            text = "Sign Up",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = Rose400,
+            modifier = Modifier.clickable { onNavigateToSignup() },
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-private fun LoginContentPreview() {
+private fun LoginScreenPreview() {
     PoopyFeedTheme {
         LoginContent(
             uiState = LoginUiState(),
