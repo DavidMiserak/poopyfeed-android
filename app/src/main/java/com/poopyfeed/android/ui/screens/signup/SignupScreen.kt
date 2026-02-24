@@ -116,179 +116,239 @@ private fun SignupContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(White, RoundedCornerShape(24.dp))
-                    .border(2.dp, Rose200, RoundedCornerShape(24.dp))
-                    .padding(24.dp),
-            ) {
-                Text(
-                    text = "Create Account",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Text(
-                    text = "Start tracking your baby's care",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Slate600,
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (uiState.apiError != null) {
-                    ErrorBanner(message = uiState.apiError)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                AuthTextField(
-                    value = uiState.name,
-                    onValueChange = onNameChange,
-                    label = "Name",
-                    error = uiState.nameError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                AuthTextField(
-                    value = uiState.email,
-                    onValueChange = onEmailChange,
-                    label = "Email",
-                    error = uiState.emailError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                AuthTextField(
-                    value = uiState.password,
-                    onValueChange = onPasswordChange,
-                    label = "Password",
-                    error = uiState.passwordError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    ),
-                    visualTransformation = if (passwordVisible) {
-                        VisualTransformation.None
-                    } else {
-                        PasswordVisualTransformation()
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (passwordVisible) {
-                                        android.R.drawable.ic_menu_view
-                                    } else {
-                                        android.R.drawable.ic_secure
-                                    },
-                                ),
-                                contentDescription = if (passwordVisible) {
-                                    "Hide password"
-                                } else {
-                                    "Show password"
-                                },
-                                tint = Slate600,
-                            )
-                        }
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                AuthTextField(
-                    value = uiState.confirmPassword,
-                    onValueChange = onConfirmPasswordChange,
-                    label = "Confirm Password",
-                    error = uiState.confirmPasswordError,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                            onSignup()
-                        },
-                    ),
-                    visualTransformation = if (confirmPasswordVisible) {
-                        VisualTransformation.None
-                    } else {
-                        PasswordVisualTransformation()
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (confirmPasswordVisible) {
-                                        android.R.drawable.ic_menu_view
-                                    } else {
-                                        android.R.drawable.ic_secure
-                                    },
-                                ),
-                                contentDescription = if (confirmPasswordVisible) {
-                                    "Hide password"
-                                } else {
-                                    "Show password"
-                                },
-                                tint = Slate600,
-                            )
-                        }
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                GradientButton(
-                    text = "Create Account",
-                    onClick = onSignup,
-                    isLoading = uiState.isLoading,
-                )
-            }
+            SignupFormCard(
+                uiState = uiState,
+                passwordVisible = passwordVisible,
+                onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
+                confirmPasswordVisible = confirmPasswordVisible,
+                onConfirmPasswordVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
+                onNameChange = onNameChange,
+                onEmailChange = onEmailChange,
+                onPasswordChange = onPasswordChange,
+                onConfirmPasswordChange = onConfirmPasswordChange,
+                onSignup = onSignup,
+                focusManager = focusManager,
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row {
-                Text(
-                    text = "Already have an account? ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Slate600,
-                )
-                Text(
-                    text = "Log In",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Rose400,
-                    modifier = Modifier.clickable { onNavigateToLogin() },
-                )
-            }
+            SignupLoginLink(onNavigateToLogin = onNavigateToLogin)
 
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
+@Composable
+private fun SignupFormCard(
+    uiState: SignupUiState,
+    passwordVisible: Boolean,
+    onPasswordVisibilityToggle: () -> Unit,
+    confirmPasswordVisible: Boolean,
+    onConfirmPasswordVisibilityToggle: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onSignup: () -> Unit,
+    focusManager: androidx.compose.ui.focus.FocusManager,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(White, RoundedCornerShape(24.dp))
+            .border(2.dp, Rose200, RoundedCornerShape(24.dp))
+            .padding(24.dp),
+    ) {
+        Text(
+            text = "Create Account",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Text(
+            text = "Start tracking your baby's care",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Slate600,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        SignupErrorBanner(apiError = uiState.apiError)
+
+        AuthTextField(
+            value = uiState.name,
+            onValueChange = onNameChange,
+            label = "Name",
+            error = uiState.nameError,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            ),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AuthTextField(
+            value = uiState.email,
+            onValueChange = onEmailChange,
+            label = "Email",
+            error = uiState.emailError,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            ),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        PasswordField(
+            value = uiState.password,
+            onValueChange = onPasswordChange,
+            label = "Password",
+            error = uiState.passwordError,
+            isVisible = passwordVisible,
+            onVisibilityToggle = onPasswordVisibilityToggle,
+            focusManager = focusManager,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        PasswordField(
+            value = uiState.confirmPassword,
+            onValueChange = onConfirmPasswordChange,
+            label = "Confirm Password",
+            error = uiState.confirmPasswordError,
+            isVisible = confirmPasswordVisible,
+            onVisibilityToggle = onConfirmPasswordVisibilityToggle,
+            isLastField = true,
+            onDone = onSignup,
+            focusManager = focusManager,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        GradientButton(
+            text = "Create Account",
+            onClick = onSignup,
+            isLoading = uiState.isLoading,
+        )
+    }
+}
+
+@Composable
+private fun SignupErrorBanner(apiError: String?) {
+    if (apiError != null) {
+        ErrorBanner(message = apiError)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun PasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: String?,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    focusManager: androidx.compose.ui.focus.FocusManager,
+    isLastField: Boolean = false,
+    onDone: (() -> Unit)? = null,
+) {
+    AuthTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        error = error,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            onDone = {
+                focusManager.clearFocus()
+                onDone?.invoke()
+            },
+        ),
+        visualTransformation = getPasswordVisualTransformation(isVisible),
+        trailingIcon = {
+            PasswordVisibilityIcon(
+                isVisible = isVisible,
+                onClick = onVisibilityToggle,
+            )
+        },
+    )
+}
+
+@Composable
+private fun PasswordVisibilityIcon(
+    isVisible: Boolean,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(
+                id = getPasswordIconResource(isVisible),
+            ),
+            contentDescription = getPasswordContentDescription(isVisible),
+            tint = Slate600,
+        )
+    }
+}
+
+@Composable
+private fun SignupLoginLink(onNavigateToLogin: () -> Unit) {
+    Row {
+        Text(
+            text = "Already have an account? ",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Slate600,
+        )
+        Text(
+            text = "Log In",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = Rose400,
+            modifier = Modifier.clickable { onNavigateToLogin() },
+        )
+    }
+}
+
+private fun getPasswordVisualTransformation(isVisible: Boolean): VisualTransformation {
+    return if (isVisible) {
+        VisualTransformation.None
+    } else {
+        PasswordVisualTransformation()
+    }
+}
+
+private fun getPasswordIconResource(isVisible: Boolean): Int {
+    return if (isVisible) {
+        android.R.drawable.ic_menu_view
+    } else {
+        android.R.drawable.ic_secure
+    }
+}
+
+private fun getPasswordContentDescription(isVisible: Boolean): String {
+    return if (isVisible) {
+        "Hide password"
+    } else {
+        "Show password"
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-private fun SignupContentPreview() {
+private fun SignupScreenPreview() {
     PoopyFeedTheme {
         SignupContent(
             uiState = SignupUiState(),
