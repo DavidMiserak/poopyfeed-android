@@ -47,6 +47,8 @@ import com.poopyfeed.android.ui.components.AuthTextField
 import com.poopyfeed.android.ui.components.BrandLogo
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.components.GradientButton
+import com.poopyfeed.android.ui.components.PasswordVisibilityIcon
+import com.poopyfeed.android.ui.components.getPasswordVisualTransformation
 import com.poopyfeed.android.ui.theme.Amber50
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose200

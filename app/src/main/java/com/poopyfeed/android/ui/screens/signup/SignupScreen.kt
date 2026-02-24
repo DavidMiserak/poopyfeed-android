@@ -47,6 +47,10 @@ import com.poopyfeed.android.ui.components.AuthTextField
 import com.poopyfeed.android.ui.components.BrandLogo
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.components.GradientButton
+import com.poopyfeed.android.ui.components.PasswordVisibilityIcon
+import com.poopyfeed.android.ui.components.getPasswordContentDescription
+import com.poopyfeed.android.ui.components.getPasswordIconResource
+import com.poopyfeed.android.ui.components.getPasswordVisualTransformation
 import com.poopyfeed.android.ui.theme.Amber50
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose200
@@ -289,22 +293,6 @@ private fun PasswordField(
 }
 
 @Composable
-private fun PasswordVisibilityIcon(
-    isVisible: Boolean,
-    onClick: () -> Unit,
-) {
-    IconButton(onClick = onClick) {
-        Icon(
-            painter = painterResource(
-                id = getPasswordIconResource(isVisible),
-            ),
-            contentDescription = getPasswordContentDescription(isVisible),
-            tint = Slate600,
-        )
-    }
-}
-
-@Composable
 private fun SignupLoginLink(onNavigateToLogin: () -> Unit) {
     Row {
         Text(
@@ -319,30 +307,6 @@ private fun SignupLoginLink(onNavigateToLogin: () -> Unit) {
             color = Rose400,
             modifier = Modifier.clickable { onNavigateToLogin() },
         )
-    }
-}
-
-private fun getPasswordVisualTransformation(isVisible: Boolean): VisualTransformation {
-    return if (isVisible) {
-        VisualTransformation.None
-    } else {
-        PasswordVisualTransformation()
-    }
-}
-
-private fun getPasswordIconResource(isVisible: Boolean): Int {
-    return if (isVisible) {
-        android.R.drawable.ic_menu_view
-    } else {
-        android.R.drawable.ic_secure
-    }
-}
-
-private fun getPasswordContentDescription(isVisible: Boolean): String {
-    return if (isVisible) {
-        "Hide password"
-    } else {
-        "Show password"
     }
 }
 
