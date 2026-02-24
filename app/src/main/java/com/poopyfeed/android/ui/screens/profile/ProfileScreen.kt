@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -62,6 +63,24 @@ import com.poopyfeed.android.ui.theme.Rose200
 import com.poopyfeed.android.ui.theme.Rose400
 import com.poopyfeed.android.ui.theme.Rose50
 import com.poopyfeed.android.ui.theme.Slate600
+
+/**
+ * State and callbacks for a password field with visibility toggle.
+ */
+private data class PasswordFieldState(
+    val isVisible: Boolean,
+    val onVisibilityToggle: () -> Unit,
+)
+
+/**
+ * Configuration for password field display and behavior.
+ */
+private data class PasswordFieldConfig(
+    val label: String,
+    val error: String?,
+    val isLastField: Boolean = false,
+    val onDone: (() -> Unit)? = null,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -432,11 +451,29 @@ private fun SecurityTab(
     onNewPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onChangePassword: () -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager,
+    focusManager: FocusManager,
 ) {
     var currentPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var newPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
+    val currentPasswordFieldState =
+        PasswordFieldState(
+            isVisible = currentPasswordVisible,
+            onVisibilityToggle = { currentPasswordVisible = !currentPasswordVisible },
+        )
+
+    val newPasswordFieldState =
+        PasswordFieldState(
+            isVisible = newPasswordVisible,
+            onVisibilityToggle = { newPasswordVisible = !newPasswordVisible },
+        )
+
+    val confirmPasswordFieldState =
+        PasswordFieldState(
+            isVisible = confirmPasswordVisible,
+            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
+        )
 
     Column(
         modifier =
@@ -450,11 +487,13 @@ private fun SecurityTab(
         PasswordChangeField(
             value = uiState.currentPassword,
             onValueChange = onCurrentPasswordChange,
-            label = "Current Password",
-            error = uiState.currentPasswordError,
-            isVisible = currentPasswordVisible,
-            onVisibilityToggle = { currentPasswordVisible = !currentPasswordVisible },
+            passwordFieldState = currentPasswordFieldState,
             focusManager = focusManager,
+            config =
+                PasswordFieldConfig(
+                    label = "Current Password",
+                    error = uiState.currentPasswordError,
+                ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -462,11 +501,13 @@ private fun SecurityTab(
         PasswordChangeField(
             value = uiState.newPassword,
             onValueChange = onNewPasswordChange,
-            label = "New Password",
-            error = uiState.newPasswordError,
-            isVisible = newPasswordVisible,
-            onVisibilityToggle = { newPasswordVisible = !newPasswordVisible },
+            passwordFieldState = newPasswordFieldState,
             focusManager = focusManager,
+            config =
+                PasswordFieldConfig(
+                    label = "New Password",
+                    error = uiState.newPasswordError,
+                ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -474,13 +515,15 @@ private fun SecurityTab(
         PasswordChangeField(
             value = uiState.confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = "Confirm New Password",
-            error = uiState.confirmPasswordError,
-            isVisible = confirmPasswordVisible,
-            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
-            isLastField = true,
-            onDone = onChangePassword,
+            passwordFieldState = confirmPasswordFieldState,
             focusManager = focusManager,
+            config =
+                PasswordFieldConfig(
+                    label = "Confirm New Password",
+                    error = uiState.confirmPasswordError,
+                    isLastField = true,
+                    onDone = onChangePassword,
+                ),
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -690,39 +733,35 @@ private fun PasswordChangeSuccessBanner(message: String?) {
 private fun PasswordChangeField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
-    error: String?,
-    isVisible: Boolean,
-    onVisibilityToggle: () -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager,
-    isLastField: Boolean = false,
-    onDone: (() -> Unit)? = null,
+    passwordFieldState: PasswordFieldState,
+    focusManager: FocusManager,
+    config: PasswordFieldConfig,
 ) {
     AuthTextField(
         value = value,
         onValueChange = onValueChange,
-        label = label,
+        label = config.label,
         config =
             AuthTextFieldConfig(
-                error = error,
+                error = config.error,
                 keyboardOptions =
                     KeyboardOptions(
                         keyboardType = KeyboardType.Password,
-                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                        imeAction = if (config.isLastField) ImeAction.Done else ImeAction.Next,
                     ),
                 keyboardActions =
                     KeyboardActions(
                         onNext = { focusManager.moveFocus(FocusDirection.Down) },
                         onDone = {
                             focusManager.clearFocus()
-                            onDone?.invoke()
+                            config.onDone?.invoke()
                         },
                     ),
-                visualTransformation = getPasswordVisualTransformation(isVisible),
+                visualTransformation = getPasswordVisualTransformation(passwordFieldState.isVisible),
                 trailingIcon = {
                     PasswordVisibilityIcon(
-                        isVisible = isVisible,
-                        onClick = onVisibilityToggle,
+                        isVisible = passwordFieldState.isVisible,
+                        onClick = passwordFieldState.onVisibilityToggle,
                     )
                 },
             ),
