@@ -180,13 +180,17 @@ private fun LoginFormCard(
         Spacer(modifier = Modifier.height(16.dp))
 
         LoginPasswordField(
-            value = uiState.password,
-            onValueChange = onPasswordChange,
+            state = PasswordFieldState(
+                value = uiState.password,
+                error = uiState.passwordError,
+                isVisible = passwordVisible,
+            ),
             label = "Password",
-            error = uiState.passwordError,
-            isVisible = passwordVisible,
-            onVisibilityToggle = onPasswordVisibilityToggle,
-            onDone = onLogin,
+            callbacks = PasswordFieldCallbacks(
+                onValueChange = onPasswordChange,
+                onVisibilityToggle = onPasswordVisibilityToggle,
+                onDone = onLogin,
+            ),
             focusManager = focusManager,
         )
 
@@ -208,23 +212,31 @@ private fun LoginErrorBanner(error: String?) {
     }
 }
 
+private data class PasswordFieldState(
+    val value: String,
+    val error: String?,
+    val isVisible: Boolean,
+)
+
+private data class PasswordFieldCallbacks(
+    val onValueChange: (String) -> Unit,
+    val onVisibilityToggle: () -> Unit,
+    val onDone: () -> Unit,
+)
+
 @Composable
 private fun LoginPasswordField(
-    value: String,
-    onValueChange: (String) -> Unit,
+    state: PasswordFieldState,
     label: String,
-    error: String?,
-    isVisible: Boolean,
-    onVisibilityToggle: () -> Unit,
-    onDone: () -> Unit,
+    callbacks: PasswordFieldCallbacks,
     focusManager: androidx.compose.ui.focus.FocusManager,
 ) {
     AuthTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = state.value,
+        onValueChange = callbacks.onValueChange,
         label = label,
         config = AuthTextFieldConfig(
-            error = error,
+            error = state.error,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done,
@@ -232,14 +244,14 @@ private fun LoginPasswordField(
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    onDone()
+                    callbacks.onDone()
                 },
             ),
-            visualTransformation = getPasswordVisualTransformation(isVisible),
+            visualTransformation = getPasswordVisualTransformation(state.isVisible),
             trailingIcon = {
                 PasswordVisibilityIcon(
-                    isVisible = isVisible,
-                    onClick = onVisibilityToggle,
+                    isVisible = state.isVisible,
+                    onClick = callbacks.onVisibilityToggle,
                 )
             },
         ),
