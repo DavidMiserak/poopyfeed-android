@@ -5,10 +5,14 @@ import com.poopyfeed.android.data.remote.dto.LoginRequest
 import com.poopyfeed.android.data.remote.dto.SignupRequest
 import com.poopyfeed.android.data.remote.dto.TokenResponse
 import retrofit2.Response
+import kotlinx.serialization.Serializable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+
+@Serializable
+data class EmptyRequest(val unused: String = "")
 
 interface AuthApi {
 
@@ -18,8 +22,8 @@ interface AuthApi {
     @POST("api/v1/browser/v1/auth/signup")
     suspend fun signup(@Body request: SignupRequest): Response<AllauthResponse>
 
-    @GET("api/v1/browser/v1/auth/token/")
-    suspend fun getToken(): Response<TokenResponse>
+    @POST("api/v1/browser/v1/auth/token/")
+    suspend fun getToken(@Body body: EmptyRequest = EmptyRequest()): Response<TokenResponse>
 
     @DELETE("api/v1/browser/v1/auth/session")
     suspend fun logout(): Response<Unit>
