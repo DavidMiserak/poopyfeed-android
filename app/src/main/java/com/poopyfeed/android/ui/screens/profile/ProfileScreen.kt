@@ -87,41 +87,71 @@ fun ProfileScreen(
 
     ProfileContent(
         uiState = uiState,
-        onNavigateBack = onNavigateBack,
-        onLogoutNavigate = onLogout,
-        onFirstNameChange = viewModel::onFirstNameChange,
-        onLastNameChange = viewModel::onLastNameChange,
-        onTimezoneChange = viewModel::onTimezoneChange,
-        onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
-        onNewPasswordChange = viewModel::onNewPasswordChange,
-        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-        onDeletePasswordChange = viewModel::onDeletePasswordChange,
-        onTabSelected = viewModel::onTabSelected,
-        onSaveProfile = viewModel::saveProfile,
-        onChangePassword = viewModel::changePassword,
-        onDeleteAccount = viewModel::deleteAccount,
-        onLogout = viewModel::logout,
+        callbacks = ProfileContentCallbacks(
+            navigation = NavigationCallbacks(
+                onNavigateBack = onNavigateBack,
+                onLogoutNavigate = onLogout,
+            ),
+            onTabSelected = viewModel::onTabSelected,
+            profileTab = ProfileTabCallbacks(
+                onFirstNameChange = viewModel::onFirstNameChange,
+                onLastNameChange = viewModel::onLastNameChange,
+                onTimezoneChange = viewModel::onTimezoneChange,
+                onSaveProfile = viewModel::saveProfile,
+            ),
+            securityTab = SecurityTabCallbacks(
+                onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
+                onNewPasswordChange = viewModel::onNewPasswordChange,
+                onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+                onChangePassword = viewModel::changePassword,
+            ),
+            accountTab = AccountTabCallbacks(
+                onDeletePasswordChange = viewModel::onDeletePasswordChange,
+                onDeleteAccount = viewModel::deleteAccount,
+                onLogout = viewModel::logout,
+            ),
+        ),
     )
 }
+
+private data class NavigationCallbacks(
+    val onNavigateBack: () -> Unit,
+    val onLogoutNavigate: () -> Unit,
+)
+
+private data class ProfileTabCallbacks(
+    val onFirstNameChange: (String) -> Unit,
+    val onLastNameChange: (String) -> Unit,
+    val onTimezoneChange: (String) -> Unit,
+    val onSaveProfile: () -> Unit,
+)
+
+private data class SecurityTabCallbacks(
+    val onCurrentPasswordChange: (String) -> Unit,
+    val onNewPasswordChange: (String) -> Unit,
+    val onConfirmPasswordChange: (String) -> Unit,
+    val onChangePassword: () -> Unit,
+)
+
+private data class AccountTabCallbacks(
+    val onDeletePasswordChange: (String) -> Unit,
+    val onDeleteAccount: () -> Unit,
+    val onLogout: () -> Unit,
+)
+
+private data class ProfileContentCallbacks(
+    val navigation: NavigationCallbacks,
+    val onTabSelected: (Int) -> Unit,
+    val profileTab: ProfileTabCallbacks,
+    val securityTab: SecurityTabCallbacks,
+    val accountTab: AccountTabCallbacks,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileContent(
     uiState: ProfileUiState,
-    onNavigateBack: () -> Unit,
-    onLogoutNavigate: () -> Unit,
-    onFirstNameChange: (String) -> Unit,
-    onLastNameChange: (String) -> Unit,
-    onTimezoneChange: (String) -> Unit,
-    onCurrentPasswordChange: (String) -> Unit,
-    onNewPasswordChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
-    onDeletePasswordChange: (String) -> Unit,
-    onTabSelected: (Int) -> Unit,
-    onSaveProfile: () -> Unit,
-    onChangePassword: () -> Unit,
-    onDeleteAccount: () -> Unit,
-    onLogout: () -> Unit,
+    callbacks: ProfileContentCallbacks,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -136,7 +166,7 @@ private fun ProfileContent(
             TopAppBar(
                 title = { Text("Settings") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = callbacks.navigation.onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -163,17 +193,17 @@ private fun ProfileContent(
             ) {
                 Tab(
                     selected = uiState.selectedTabIndex == 0,
-                    onClick = { onTabSelected(0) },
+                    onClick = { callbacks.onTabSelected(0) },
                     text = { Text("Profile") },
                 )
                 Tab(
                     selected = uiState.selectedTabIndex == 1,
-                    onClick = { onTabSelected(1) },
+                    onClick = { callbacks.onTabSelected(1) },
                     text = { Text("Security") },
                 )
                 Tab(
                     selected = uiState.selectedTabIndex == 2,
-                    onClick = { onTabSelected(2) },
+                    onClick = { callbacks.onTabSelected(2) },
                     text = { Text("Account") },
                 )
             }
@@ -186,25 +216,25 @@ private fun ProfileContent(
                 when (uiState.selectedTabIndex) {
                     0 -> ProfileTab(
                         uiState = uiState,
-                        onFirstNameChange = onFirstNameChange,
-                        onLastNameChange = onLastNameChange,
-                        onTimezoneChange = onTimezoneChange,
-                        onSaveProfile = onSaveProfile,
+                        onFirstNameChange = callbacks.profileTab.onFirstNameChange,
+                        onLastNameChange = callbacks.profileTab.onLastNameChange,
+                        onTimezoneChange = callbacks.profileTab.onTimezoneChange,
+                        onSaveProfile = callbacks.profileTab.onSaveProfile,
                         focusManager = focusManager,
                     )
                     1 -> SecurityTab(
                         uiState = uiState,
-                        onCurrentPasswordChange = onCurrentPasswordChange,
-                        onNewPasswordChange = onNewPasswordChange,
-                        onConfirmPasswordChange = onConfirmPasswordChange,
-                        onChangePassword = onChangePassword,
+                        onCurrentPasswordChange = callbacks.securityTab.onCurrentPasswordChange,
+                        onNewPasswordChange = callbacks.securityTab.onNewPasswordChange,
+                        onConfirmPasswordChange = callbacks.securityTab.onConfirmPasswordChange,
+                        onChangePassword = callbacks.securityTab.onChangePassword,
                         focusManager = focusManager,
                     )
                     2 -> AccountTab(
                         uiState = uiState,
-                        onDeletePasswordChange = onDeletePasswordChange,
-                        onDeleteAccount = onDeleteAccount,
-                        onLogout = onLogout,
+                        onDeletePasswordChange = callbacks.accountTab.onDeletePasswordChange,
+                        onDeleteAccount = callbacks.accountTab.onDeleteAccount,
+                        onLogout = callbacks.accountTab.onLogout,
                         isLoggingOut = uiState.isLoggingOut,
                     )
                 }
