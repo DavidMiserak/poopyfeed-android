@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +53,35 @@ import com.poopyfeed.android.ui.theme.Rose400
 import com.poopyfeed.android.ui.theme.Rose50
 import com.poopyfeed.android.ui.theme.Slate600
 import com.poopyfeed.android.ui.theme.White
+
+/**
+ * Callback handlers for form input changes in the signup form.
+ */
+private data class SignupFormCallbacks(
+    val onNameChange: (String) -> Unit,
+    val onEmailChange: (String) -> Unit,
+    val onPasswordChange: (String) -> Unit,
+    val onConfirmPasswordChange: (String) -> Unit,
+    val onSignup: () -> Unit,
+)
+
+/**
+ * State and callbacks for a password field with visibility toggle.
+ */
+private data class PasswordFieldState(
+    val isVisible: Boolean,
+    val onVisibilityToggle: () -> Unit,
+)
+
+/**
+ * Configuration for password field display and behavior.
+ */
+private data class PasswordFieldConfig(
+    val label: String,
+    val error: String?,
+    val isLastField: Boolean = false,
+    val onDone: (() -> Unit)? = null,
+)
 
 @Composable
 fun SignupScreen(
@@ -92,6 +122,27 @@ private fun SignupContent(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
+    val formCallbacks =
+        SignupFormCallbacks(
+            onNameChange = onNameChange,
+            onEmailChange = onEmailChange,
+            onPasswordChange = onPasswordChange,
+            onConfirmPasswordChange = onConfirmPasswordChange,
+            onSignup = onSignup,
+        )
+
+    val passwordFieldState =
+        PasswordFieldState(
+            isVisible = passwordVisible,
+            onVisibilityToggle = { passwordVisible = !passwordVisible },
+        )
+
+    val confirmPasswordFieldState =
+        PasswordFieldState(
+            isVisible = confirmPasswordVisible,
+            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
+        )
+
     Box(
         modifier =
             Modifier
@@ -118,15 +169,9 @@ private fun SignupContent(
 
             SignupFormCard(
                 uiState = uiState,
-                passwordVisible = passwordVisible,
-                onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
-                confirmPasswordVisible = confirmPasswordVisible,
-                onConfirmPasswordVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
-                onNameChange = onNameChange,
-                onEmailChange = onEmailChange,
-                onPasswordChange = onPasswordChange,
-                onConfirmPasswordChange = onConfirmPasswordChange,
-                onSignup = onSignup,
+                formCallbacks = formCallbacks,
+                passwordFieldState = passwordFieldState,
+                confirmPasswordFieldState = confirmPasswordFieldState,
                 focusManager = focusManager,
             )
 
@@ -142,16 +187,10 @@ private fun SignupContent(
 @Composable
 private fun SignupFormCard(
     uiState: SignupUiState,
-    passwordVisible: Boolean,
-    onPasswordVisibilityToggle: () -> Unit,
-    confirmPasswordVisible: Boolean,
-    onConfirmPasswordVisibilityToggle: () -> Unit,
-    onNameChange: (String) -> Unit,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
-    onSignup: () -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager,
+    formCallbacks: SignupFormCallbacks,
+    passwordFieldState: PasswordFieldState,
+    confirmPasswordFieldState: PasswordFieldState,
+    focusManager: FocusManager,
 ) {
     Column(
         modifier =
@@ -179,7 +218,7 @@ private fun SignupFormCard(
 
         AuthTextField(
             value = uiState.name,
-            onValueChange = onNameChange,
+            onValueChange = formCallbacks.onNameChange,
             label = "Name",
             config =
                 AuthTextFieldConfig(
@@ -200,7 +239,7 @@ private fun SignupFormCard(
 
         AuthTextField(
             value = uiState.email,
-            onValueChange = onEmailChange,
+            onValueChange = formCallbacks.onEmailChange,
             label = "Email",
             config =
                 AuthTextFieldConfig(
@@ -221,33 +260,37 @@ private fun SignupFormCard(
 
         PasswordField(
             value = uiState.password,
-            onValueChange = onPasswordChange,
-            label = "Password",
-            error = uiState.passwordError,
-            isVisible = passwordVisible,
-            onVisibilityToggle = onPasswordVisibilityToggle,
+            onValueChange = formCallbacks.onPasswordChange,
+            passwordFieldState = passwordFieldState,
             focusManager = focusManager,
+            config =
+                PasswordFieldConfig(
+                    label = "Password",
+                    error = uiState.passwordError,
+                ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         PasswordField(
             value = uiState.confirmPassword,
-            onValueChange = onConfirmPasswordChange,
-            label = "Confirm Password",
-            error = uiState.confirmPasswordError,
-            isVisible = confirmPasswordVisible,
-            onVisibilityToggle = onConfirmPasswordVisibilityToggle,
-            isLastField = true,
-            onDone = onSignup,
+            onValueChange = formCallbacks.onConfirmPasswordChange,
+            passwordFieldState = confirmPasswordFieldState,
             focusManager = focusManager,
+            config =
+                PasswordFieldConfig(
+                    label = "Confirm Password",
+                    error = uiState.confirmPasswordError,
+                    isLastField = true,
+                    onDone = formCallbacks.onSignup,
+                ),
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         GradientButton(
             text = "Create Account",
-            onClick = onSignup,
+            onClick = formCallbacks.onSignup,
             isLoading = uiState.isLoading,
         )
     }
@@ -265,39 +308,35 @@ private fun SignupErrorBanner(apiError: String?) {
 private fun PasswordField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
-    error: String?,
-    isVisible: Boolean,
-    onVisibilityToggle: () -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager,
-    isLastField: Boolean = false,
-    onDone: (() -> Unit)? = null,
+    passwordFieldState: PasswordFieldState,
+    focusManager: FocusManager,
+    config: PasswordFieldConfig,
 ) {
     AuthTextField(
         value = value,
         onValueChange = onValueChange,
-        label = label,
+        label = config.label,
         config =
             AuthTextFieldConfig(
-                error = error,
+                error = config.error,
                 keyboardOptions =
                     KeyboardOptions(
                         keyboardType = KeyboardType.Password,
-                        imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+                        imeAction = if (config.isLastField) ImeAction.Done else ImeAction.Next,
                     ),
                 keyboardActions =
                     KeyboardActions(
                         onNext = { focusManager.moveFocus(FocusDirection.Down) },
                         onDone = {
                             focusManager.clearFocus()
-                            onDone?.invoke()
+                            config.onDone?.invoke()
                         },
                     ),
-                visualTransformation = getPasswordVisualTransformation(isVisible),
+                visualTransformation = getPasswordVisualTransformation(passwordFieldState.isVisible),
                 trailingIcon = {
                     PasswordVisibilityIcon(
-                        isVisible = isVisible,
-                        onClick = onVisibilityToggle,
+                        isVisible = passwordFieldState.isVisible,
+                        onClick = passwordFieldState.onVisibilityToggle,
                     )
                 },
             ),
