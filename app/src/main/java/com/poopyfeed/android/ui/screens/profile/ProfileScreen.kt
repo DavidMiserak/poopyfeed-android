@@ -386,149 +386,43 @@ private fun SecurityTab(
             .fillMaxSize()
             .padding(24.dp),
     ) {
-        if (uiState.passwordApiError != null) {
-            ErrorBanner(message = uiState.passwordApiError)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        PasswordChangeErrorBanner(error = uiState.passwordApiError)
+        PasswordChangeSuccessBanner(message = uiState.passwordSuccessMessage)
 
-        if (uiState.passwordSuccessMessage != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                    .padding(12.dp),
-            ) {
-                Text(
-                    text = uiState.passwordSuccessMessage,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        AuthTextField(
+        PasswordChangeField(
             value = uiState.currentPassword,
             onValueChange = onCurrentPasswordChange,
             label = "Current Password",
             error = uiState.currentPasswordError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-            ),
-            visualTransformation = if (currentPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            trailingIcon = {
-                IconButton(onClick = { currentPasswordVisible = !currentPasswordVisible }) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (currentPasswordVisible) {
-                                android.R.drawable.ic_menu_view
-                            } else {
-                                android.R.drawable.ic_secure
-                            },
-                        ),
-                        contentDescription = if (currentPasswordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        },
-                        tint = Slate600,
-                    )
-                }
-            },
+            isVisible = currentPasswordVisible,
+            onVisibilityToggle = { currentPasswordVisible = !currentPasswordVisible },
+            focusManager = focusManager,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        AuthTextField(
+        PasswordChangeField(
             value = uiState.newPassword,
             onValueChange = onNewPasswordChange,
             label = "New Password",
             error = uiState.newPasswordError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-            ),
-            visualTransformation = if (newPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            trailingIcon = {
-                IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (newPasswordVisible) {
-                                android.R.drawable.ic_menu_view
-                            } else {
-                                android.R.drawable.ic_secure
-                            },
-                        ),
-                        contentDescription = if (newPasswordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        },
-                        tint = Slate600,
-                    )
-                }
-            },
+            isVisible = newPasswordVisible,
+            onVisibilityToggle = { newPasswordVisible = !newPasswordVisible },
+            focusManager = focusManager,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        AuthTextField(
+        PasswordChangeField(
             value = uiState.confirmPassword,
             onValueChange = onConfirmPasswordChange,
             label = "Confirm New Password",
             error = uiState.confirmPasswordError,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    onChangePassword()
-                },
-            ),
-            visualTransformation = if (confirmPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            trailingIcon = {
-                IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (confirmPasswordVisible) {
-                                android.R.drawable.ic_menu_view
-                            } else {
-                                android.R.drawable.ic_secure
-                            },
-                        ),
-                        contentDescription = if (confirmPasswordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        },
-                        tint = Slate600,
-                    )
-                }
-            },
+            isVisible = confirmPasswordVisible,
+            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
+            isLastField = true,
+            onDone = onChangePassword,
+            focusManager = focusManager,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -661,6 +555,74 @@ private fun AccountTab(
             Text("Delete Account")
         }
     }
+}
+
+@Composable
+private fun PasswordChangeErrorBanner(error: String?) {
+    if (error != null) {
+        ErrorBanner(message = error)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun PasswordChangeSuccessBanner(message: String?) {
+    if (message != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .padding(12.dp),
+        ) {
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun PasswordChangeField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: String?,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    focusManager: androidx.compose.ui.focus.FocusManager,
+    isLastField: Boolean = false,
+    onDone: (() -> Unit)? = null,
+) {
+    AuthTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        error = error,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = if (isLastField) ImeAction.Done else ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            onDone = {
+                focusManager.clearFocus()
+                onDone?.invoke()
+            },
+        ),
+        visualTransformation = getPasswordVisualTransformation(isVisible),
+        trailingIcon = {
+            PasswordVisibilityIcon(
+                isVisible = isVisible,
+                onClick = onVisibilityToggle,
+            )
+        },
+    )
 }
 
 @Preview(showBackground = true)
