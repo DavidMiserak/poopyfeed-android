@@ -44,11 +44,11 @@ lint:
 .PHONY: format
 format:
 	@echo "Formatting Kotlin code..."
-	@if grep -q "spotless\|ktlint" build.gradle.kts app/build.gradle.kts 2>/dev/null; then \
-		./gradlew spotlessApply --no-daemon 2>/dev/null || ./gradlew ktlintFormat --no-daemon; \
+	@if grep -q "spotless" build.gradle.kts app/build.gradle.kts 2>/dev/null; then \
+		./gradlew spotlessApply --no-daemon; \
 	else \
-		echo "⚠️  No formatting plugin detected. Install ktlint or Spotless plugin first."; \
-		echo "   See: https://github.com/JLLeitschuh/ktlint-gradle or https://github.com/diffplug/spotless"; \
+		echo "⚠️  No Spotless plugin detected. Add com.diffplug.spotless to build.gradle.kts."; \
+		exit 1; \
 	fi
 
 .PHONY: clean

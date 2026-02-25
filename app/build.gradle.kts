@@ -156,7 +156,7 @@ spotless {
         ktlint("1.2.1")
             .editorConfigOverride(
                 mapOf(
-                    "ktlint_code_style" to "android",
+                    "ktlint_code_style" to "ktlint_official",
                     "max_line_length" to "140",
                     "indent_size" to "4",
                     "ij_kotlin_allow_trailing_comma" to "true",
@@ -171,7 +171,7 @@ spotless {
         ktlint("1.2.1")
             .editorConfigOverride(
                 mapOf(
-                    "ktlint_code_style" to "android",
+                    "ktlint_code_style" to "ktlint_official",
                     "max_line_length" to "140",
                     "indent_size" to "4",
                 ),
