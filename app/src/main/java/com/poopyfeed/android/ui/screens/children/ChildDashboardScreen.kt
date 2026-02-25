@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -188,6 +190,9 @@ fun ChildDashboardScreen(
     }
 }
 
+private val DashboardPadding = 20.dp
+private val CardShape = RoundedCornerShape(16.dp)
+
 @Composable
 private fun ChildDashboardContent(
     child: Child,
@@ -203,185 +208,266 @@ private fun ChildDashboardContent(
     onExport: () -> Unit = {},
 ) {
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(DashboardPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Child info card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        // Compact child header
+        ChildHeader(child = child)
+
+        // Primary: quick-add actions (hero section)
+        QuickAddCard(
+            onAddFeeding = onAddFeeding,
+            onAddDiaper = onAddDiaper,
+            onAddNap = onAddNap,
+        )
+
+        // Single card: today's summary + last activity
+        TodayAndActivityCard(
+            child = child,
+            todaySummary = todaySummary,
+        )
+
+        // Secondary: view lists, export, sharing
+        SecondaryActionsCard(
+            onFeedingsList = onFeedingsList,
+            onDiapersList = onDiapersList,
+            onNapsList = onNapsList,
+            onExport = onExport,
+            onSharing = onSharing,
+            canManageSharing = canManageSharing,
+        )
+    }
+}
+
+@Composable
+private fun ChildHeader(child: Child) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            Box(
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(12.dp),
+                        ),
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(56.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = RoundedCornerShape(12.dp),
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = ChildDisplayUtils.getGenderEmoji(child.gender),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                }
-                Column {
-                    Text(
-                        text = child.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                Text(
+                    text = ChildDisplayUtils.getGenderEmoji(child.gender),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = child.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
+    }
+}
 
-        // Last activity
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Last activity",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                LastActivityRow("Feeding", "🍼", child.lastFeeding)
-                LastActivityRow("Diaper", "🧷", child.lastDiaperChange)
-                LastActivityRow("Nap", "😴", child.lastNap)
-            }
-        }
-
-        // Today's summary
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Today's summary",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                if (todaySummary != null &&
-                    (
-                        todaySummary.feedings.count > 0 ||
-                            todaySummary.diapers.count > 0 ||
-                            todaySummary.sleep.naps > 0
-                    )
+@Composable
+private fun QuickAddCard(
+    onAddFeeding: () -> Unit,
+    onAddDiaper: () -> Unit,
+    onAddNap: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Log activity",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilledTonalButton(
+                    onClick = onAddFeeding,
+                    modifier = Modifier.weight(1f),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        SummaryChip("🍼", "Feedings", todaySummary.feedings.count.toString())
-                        SummaryChip("💩", "Diapers", todaySummary.diapers.count.toString())
-                        SummaryChip(
-                            "😴",
-                            "Naps",
-                            "${todaySummary.sleep.naps} (${ChildDisplayUtils.formatMinutes(todaySummary.sleep.totalMinutes)})",
-                        )
+                        Text(text = "🍼", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "Feeding", style = MaterialTheme.typography.labelMedium)
                     }
-                } else {
-                    Text(
-                        text = "No activity recorded today",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                }
+                FilledTonalButton(
+                    onClick = onAddDiaper,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(text = "💩", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "Diaper", style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                FilledTonalButton(
+                    onClick = onAddNap,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(text = "😴", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "Nap", style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
         }
+    }
+}
 
-        // Quick actions
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Quick actions",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+@Composable
+private fun TodayAndActivityCard(
+    child: Child,
+    todaySummary: TodaySummaryResponse?,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Today",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (todaySummary != null &&
+                (
+                    todaySummary.feedings.count > 0 ||
+                        todaySummary.diapers.count > 0 ||
+                        todaySummary.sleep.naps > 0
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    androidx.compose.material3.Button(
-                        onClick = onAddFeeding,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("🍼 Feeding")
-                    }
-                    androidx.compose.material3.Button(
-                        onClick = onAddDiaper,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("💩 Diaper")
-                    }
-                    androidx.compose.material3.Button(
-                        onClick = onAddNap,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("😴 Nap")
-                    }
+                    SummaryChip("🍼", "Feedings", todaySummary.feedings.count.toString())
+                    SummaryChip("💩", "Diapers", todaySummary.diapers.count.toString())
+                    SummaryChip(
+                        "😴",
+                        "Naps",
+                        "${todaySummary.sleep.naps} (${ChildDisplayUtils.formatMinutes(todaySummary.sleep.totalMinutes)})",
+                    )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+            } else {
+                Text(
+                    text = "No activity recorded today",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Last activity",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            LastActivityRow("Feeding", "🍼", child.lastFeeding)
+            LastActivityRow("Diaper", "🧷", child.lastDiaperChange)
+            LastActivityRow("Nap", "😴", child.lastNap)
+        }
+    }
+}
+
+@Composable
+private fun SecondaryActionsCard(
+    onFeedingsList: () -> Unit,
+    onDiapersList: () -> Unit,
+    onNapsList: () -> Unit,
+    onExport: () -> Unit,
+    onSharing: () -> Unit,
+    canManageSharing: Boolean,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "More",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                androidx.compose.material3.TextButton(
+                    onClick = onFeedingsList,
+                    modifier = Modifier.weight(1f),
                 ) {
-                    androidx.compose.material3.TextButton(
-                        onClick = onFeedingsList,
-                    ) {
-                        Text("View feedings")
-                    }
-                    androidx.compose.material3.TextButton(
-                        onClick = onDiapersList,
-                    ) {
-                        Text("View diapers")
-                    }
-                    androidx.compose.material3.TextButton(
-                        onClick = onNapsList,
-                    ) {
-                        Text("View naps")
-                    }
+                    Text("Feedings", style = MaterialTheme.typography.labelLarge)
                 }
+                androidx.compose.material3.TextButton(
+                    onClick = onDiapersList,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Diapers", style = MaterialTheme.typography.labelLarge)
+                }
+                androidx.compose.material3.TextButton(
+                    onClick = onNapsList,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Naps", style = MaterialTheme.typography.labelLarge)
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            androidx.compose.material3.OutlinedButton(
+                onClick = onExport,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Export data")
+            }
+            if (canManageSharing) {
+                Spacer(modifier = Modifier.height(6.dp))
                 androidx.compose.material3.OutlinedButton(
-                    onClick = onExport,
+                    onClick = onSharing,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Export data")
-                }
-                if (canManageSharing) {
-                    androidx.compose.material3.OutlinedButton(
-                        onClick = onSharing,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("Manage sharing")
-                    }
+                    Text("Manage sharing")
                 }
             }
         }
