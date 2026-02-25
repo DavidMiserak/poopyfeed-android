@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.poopyfeed.android.ui.screens.HomeScreen
+import com.poopyfeed.android.ui.screens.catchup.CatchUpScreen
 import com.poopyfeed.android.ui.screens.children.ChildDashboardScreen
 import com.poopyfeed.android.ui.screens.children.ChildDeleteScreen
 import com.poopyfeed.android.ui.screens.children.ChildFormScreen
@@ -30,6 +31,7 @@ import com.poopyfeed.android.ui.screens.naps.NapsListScreen
 import com.poopyfeed.android.ui.screens.profile.ProfileScreen
 import com.poopyfeed.android.ui.screens.sharing.SharingScreen
 import com.poopyfeed.android.ui.screens.signup.SignupScreen
+import com.poopyfeed.android.ui.screens.timeline.TimelineScreen
 
 @Composable
 fun PoopyFeedNavHost(
@@ -163,6 +165,8 @@ fun PoopyFeedNavHost(
                 onNavigateToFeedingsList = { navController.navigate(Screen.FeedingsList.createRoute(childId)) },
                 onNavigateToDiapersList = { navController.navigate(Screen.DiapersList.createRoute(childId)) },
                 onNavigateToNapsList = { navController.navigate(Screen.NapsList.createRoute(childId)) },
+                onNavigateToCatchUp = { navController.navigate(Screen.CatchUp.createRoute(childId)) },
+                onNavigateToTimeline = { navController.navigate(Screen.Timeline.createRoute(childId)) },
                 onNavigateToSharing = {
                     navController.navigate(Screen.Sharing.createRoute(childId))
                 },
@@ -170,6 +174,23 @@ fun PoopyFeedNavHost(
                     navController.navigate(Screen.Export.createRoute(childId))
                 },
             )
+        }
+
+        composable(
+            route = Screen.CatchUp.route,
+            arguments = listOf(navArgument("childId") { type = NavType.StringType }),
+        ) {
+            CatchUpScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onSubmitSuccess = { navController.navigateUp() },
+            )
+        }
+
+        composable(
+            route = Screen.Timeline.route,
+            arguments = listOf(navArgument("childId") { type = NavType.StringType }),
+        ) {
+            TimelineScreen(onNavigateBack = { navController.navigateUp() })
         }
 
         composable(

@@ -66,6 +66,8 @@ fun ChildDashboardScreen(
     onNavigateToFeedingsList: () -> Unit = {},
     onNavigateToDiapersList: () -> Unit = {},
     onNavigateToNapsList: () -> Unit = {},
+    onNavigateToCatchUp: () -> Unit = {},
+    onNavigateToTimeline: () -> Unit = {},
     onNavigateToSharing: () -> Unit = {},
     onNavigateToExport: () -> Unit = {},
     viewModel: ChildDashboardViewModel = hiltViewModel(),
@@ -179,6 +181,8 @@ fun ChildDashboardScreen(
                             onFeedingsList = onNavigateToFeedingsList,
                             onDiapersList = onNavigateToDiapersList,
                             onNapsList = onNavigateToNapsList,
+                            onCatchUp = onNavigateToCatchUp,
+                            onTimeline = onNavigateToTimeline,
                             onSharing = onNavigateToSharing,
                             canManageSharing = uiState.child!!.canManageSharing,
                             onExport = onNavigateToExport,
@@ -203,6 +207,8 @@ private fun ChildDashboardContent(
     onFeedingsList: () -> Unit = {},
     onDiapersList: () -> Unit = {},
     onNapsList: () -> Unit = {},
+    onCatchUp: () -> Unit = {},
+    onTimeline: () -> Unit = {},
     onSharing: () -> Unit = {},
     canManageSharing: Boolean = false,
     onExport: () -> Unit = {},
@@ -232,6 +238,8 @@ private fun ChildDashboardContent(
             onFeedingsList = onFeedingsList,
             onDiapersList = onDiapersList,
             onNapsList = onNapsList,
+            onCatchUp = onCatchUp,
+            onTimeline = onTimeline,
             onExport = onExport,
             onSharing = onSharing,
             canManageSharing = canManageSharing,
@@ -414,6 +422,8 @@ private fun SecondaryActionsCard(
     onFeedingsList: () -> Unit,
     onDiapersList: () -> Unit,
     onNapsList: () -> Unit,
+    onCatchUp: () -> Unit,
+    onTimeline: () -> Unit,
     onExport: () -> Unit,
     onSharing: () -> Unit,
     canManageSharing: Boolean,
@@ -453,6 +463,20 @@ private fun SecondaryActionsCard(
                 ) {
                     Text("Naps", style = MaterialTheme.typography.labelLarge)
                 }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            androidx.compose.material3.OutlinedButton(
+                onClick = onCatchUp,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Catch-up")
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            androidx.compose.material3.OutlinedButton(
+                onClick = onTimeline,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Timeline")
             }
             Spacer(modifier = Modifier.height(6.dp))
             androidx.compose.material3.OutlinedButton(

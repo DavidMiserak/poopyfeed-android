@@ -89,6 +89,14 @@ sealed class Screen(val route: String) {
         ) = "child_dashboard/$childId/naps/$napId/delete"
     }
 
+    data object CatchUp : Screen("child_dashboard/{childId}/catchup") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId/catchup"
+    }
+
+    data object Timeline : Screen("child_dashboard/{childId}/timeline") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId/timeline"
+    }
+
     data object Export : Screen("child_dashboard/{childId}/analytics/export") {
         fun createRoute(childId: Int) = "child_dashboard/$childId/analytics/export"
     }

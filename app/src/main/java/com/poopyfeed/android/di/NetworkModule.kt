@@ -4,6 +4,7 @@ import com.poopyfeed.android.BuildConfig
 import com.poopyfeed.android.data.local.TokenManager
 import com.poopyfeed.android.data.remote.AnalyticsApi
 import com.poopyfeed.android.data.remote.AuthApi
+import com.poopyfeed.android.data.remote.BatchApi
 import com.poopyfeed.android.data.remote.ChildrenApi
 import com.poopyfeed.android.data.remote.CookieStore
 import com.poopyfeed.android.data.remote.DiapersApi
@@ -146,5 +147,11 @@ object NetworkModule {
     @Singleton
     fun provideInvitesApi(retrofit: Retrofit): InvitesApi {
         return retrofit.create(InvitesApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBatchApi(retrofit: Retrofit): BatchApi {
+        return retrofit.create(BatchApi::class.java)
     }
 }
