@@ -9,6 +9,10 @@ sealed class Screen(val route: String) {
 
     data object ChildrenList : Screen("children_list")
 
+    data object ChildDashboard : Screen("child_dashboard/{childId}") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId"
+    }
+
     data object Home : Screen("home")
 
     data object Profile : Screen("profile")

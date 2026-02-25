@@ -207,7 +207,7 @@ private fun ChildCard(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = ChildrenListViewModel.getGenderEmoji(child.gender),
+                        text = ChildDisplayUtils.getGenderEmoji(child.gender),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 }
@@ -221,7 +221,7 @@ private fun ChildCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = ChildrenListViewModel.getChildAge(child.dateOfBirth),
+                        text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

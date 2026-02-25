@@ -6,7 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.poopyfeed.android.ui.screens.HomeScreen
+import com.poopyfeed.android.ui.screens.children.ChildDashboardScreen
 import com.poopyfeed.android.ui.screens.children.ChildrenListScreen
 import com.poopyfeed.android.ui.screens.greeting.GreetingScreen
 import com.poopyfeed.android.ui.screens.login.LoginScreen
@@ -75,10 +77,22 @@ fun PoopyFeedNavHost(
                     navController.navigate(Screen.Profile.route)
                 },
                 onNavigateToChildDashboard = { childId ->
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.ChildDashboard.createRoute(childId))
                 },
                 onNavigateToAddChild = {
                     // TODO: Navigate to add child screen when implemented
+                },
+            )
+        }
+
+        composable(
+            route = Screen.ChildDashboard.route,
+            arguments = listOf(navArgument("childId") { type = androidx.navigation.NavType.StringType }),
+        ) {
+            ChildDashboardScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route)
                 },
             )
         }

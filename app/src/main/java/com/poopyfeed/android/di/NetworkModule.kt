@@ -2,6 +2,7 @@ package com.poopyfeed.android.di
 
 import com.poopyfeed.android.BuildConfig
 import com.poopyfeed.android.data.local.TokenManager
+import com.poopyfeed.android.data.remote.AnalyticsApi
 import com.poopyfeed.android.data.remote.AuthApi
 import com.poopyfeed.android.data.remote.ChildrenApi
 import com.poopyfeed.android.data.remote.CookieStore
@@ -104,5 +105,11 @@ object NetworkModule {
     @Singleton
     fun provideChildrenApi(retrofit: Retrofit): ChildrenApi {
         return retrofit.create(ChildrenApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsApi(retrofit: Retrofit): AnalyticsApi {
+        return retrofit.create(AnalyticsApi::class.java)
     }
 }

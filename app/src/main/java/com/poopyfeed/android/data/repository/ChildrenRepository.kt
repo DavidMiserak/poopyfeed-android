@@ -33,6 +33,19 @@ class ChildrenRepository
             }
         }
 
+        suspend fun getChild(id: Int): Result<Child> {
+            return try {
+                val response = childrenApi.getChild(id)
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception(parseErrorBody(response.errorBody()?.string())))
+                }
+                val child = response.body() ?: return Result.failure(Exception("Empty child response"))
+                Result.success(child)
+            } catch (e: Exception) {
+                Result.failure(Exception(getNetworkErrorMessage(e)))
+            }
+        }
+
         suspend fun createChild(
             name: String,
             dateOfBirth: String,
