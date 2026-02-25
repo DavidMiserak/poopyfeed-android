@@ -11,7 +11,7 @@ data class Nap(
     @SerialName("ended_at")
     val endedAt: String? = null,
     @SerialName("duration_minutes")
-    val durationMinutes: Int? = null,
+    val durationMinutes: Double? = null,
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("updated_at")
