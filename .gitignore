@@ -63,3 +63,9 @@ kls_database.db
 # AI generated files
 CLAUDE.md
 memory/
+
+# Node (e.g. for tooling)
+node_modules/
+
+# Generated docs
+docs/
