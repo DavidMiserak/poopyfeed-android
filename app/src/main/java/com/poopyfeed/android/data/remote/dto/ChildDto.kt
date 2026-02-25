@@ -43,3 +43,11 @@ data class CreateChildRequest(
     val dateOfBirth: String,
     val gender: String? = null,
 )
+
+@Serializable
+data class UpdateChildRequest(
+    val name: String? = null,
+    @SerialName("date_of_birth")
+    val dateOfBirth: String? = null,
+    val gender: String? = null,
+)

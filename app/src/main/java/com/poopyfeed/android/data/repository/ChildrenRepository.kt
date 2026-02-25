@@ -3,6 +3,7 @@ package com.poopyfeed.android.data.repository
 import com.poopyfeed.android.data.remote.ChildrenApi
 import com.poopyfeed.android.data.remote.dto.Child
 import com.poopyfeed.android.data.remote.dto.CreateChildRequest
+import com.poopyfeed.android.data.remote.dto.UpdateChildRequest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
@@ -68,6 +69,44 @@ class ChildrenRepository
                         ?: return Result.failure(Exception("Empty child response"))
 
                 Result.success(child)
+            } catch (e: Exception) {
+                Result.failure(Exception(getNetworkErrorMessage(e)))
+            }
+        }
+
+        suspend fun updateChild(
+            id: Int,
+            name: String? = null,
+            dateOfBirth: String? = null,
+            gender: String? = null,
+        ): Result<Child> {
+            return try {
+                val request =
+                    UpdateChildRequest(
+                        name = name,
+                        dateOfBirth = dateOfBirth,
+                        gender = gender,
+                    )
+                val response = childrenApi.updateChild(id, request)
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception(parseErrorBody(response.errorBody()?.string())))
+                }
+                val child =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty child response"))
+                Result.success(child)
+            } catch (e: Exception) {
+                Result.failure(Exception(getNetworkErrorMessage(e)))
+            }
+        }
+
+        suspend fun deleteChild(id: Int): Result<Unit> {
+            return try {
+                val response = childrenApi.deleteChild(id)
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception(parseErrorBody(response.errorBody()?.string())))
+                }
+                Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(Exception(getNetworkErrorMessage(e)))
             }

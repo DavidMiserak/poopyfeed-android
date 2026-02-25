@@ -31,7 +31,6 @@ class ChildDashboardViewModel
         private val analyticsRepository: AnalyticsRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
-
         private val childId: Int =
             savedStateHandle.get<String>("childId")?.toIntOrNull() ?: 0
 

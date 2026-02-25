@@ -61,5 +61,4 @@ class ChildrenListViewModel
         fun selectChild(childId: Int) {
             _uiState.update { it.copy(selectedChildId = childId) }
         }
-
     }

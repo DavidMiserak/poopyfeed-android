@@ -6,7 +6,12 @@ import com.poopyfeed.android.data.remote.AnalyticsApi
 import com.poopyfeed.android.data.remote.AuthApi
 import com.poopyfeed.android.data.remote.ChildrenApi
 import com.poopyfeed.android.data.remote.CookieStore
+import com.poopyfeed.android.data.remote.DiapersApi
+import com.poopyfeed.android.data.remote.FeedingsApi
+import com.poopyfeed.android.data.remote.InvitesApi
+import com.poopyfeed.android.data.remote.NapsApi
 import com.poopyfeed.android.data.remote.ProfileApi
+import com.poopyfeed.android.data.remote.SharingApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -111,5 +116,35 @@ object NetworkModule {
     @Singleton
     fun provideAnalyticsApi(retrofit: Retrofit): AnalyticsApi {
         return retrofit.create(AnalyticsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFeedingsApi(retrofit: Retrofit): FeedingsApi {
+        return retrofit.create(FeedingsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDiapersApi(retrofit: Retrofit): DiapersApi {
+        return retrofit.create(DiapersApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNapsApi(retrofit: Retrofit): NapsApi {
+        return retrofit.create(NapsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharingApi(retrofit: Retrofit): SharingApi {
+        return retrofit.create(SharingApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideInvitesApi(retrofit: Retrofit): InvitesApi {
+        return retrofit.create(InvitesApi::class.java)
     }
 }

@@ -18,10 +18,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +35,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -51,9 +56,20 @@ import com.poopyfeed.android.ui.theme.Rose50
 fun ChildDashboardScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToEditChild: (() -> Unit)? = null,
+    onNavigateToDeleteChild: (() -> Unit)? = null,
+    onNavigateToAddFeeding: () -> Unit = {},
+    onNavigateToAddDiaper: () -> Unit = {},
+    onNavigateToAddNap: () -> Unit = {},
+    onNavigateToFeedingsList: () -> Unit = {},
+    onNavigateToDiapersList: () -> Unit = {},
+    onNavigateToNapsList: () -> Unit = {},
+    onNavigateToSharing: () -> Unit = {},
+    onNavigateToExport: () -> Unit = {},
     viewModel: ChildDashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showMenu by androidx.compose.runtime.mutableStateOf(false)
 
     Box(
         modifier =
@@ -76,6 +92,34 @@ fun ChildDashboardScreen(
                         }
                     },
                     actions = {
+                        if (uiState.child != null && (onNavigateToEditChild != null || onNavigateToDeleteChild != null)) {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "More")
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                            ) {
+                                if (uiState.child?.canEdit == true && onNavigateToEditChild != null) {
+                                    DropdownMenuItem(
+                                        text = { androidx.compose.material3.Text("Edit child") },
+                                        onClick = {
+                                            showMenu = false
+                                            onNavigateToEditChild()
+                                        },
+                                    )
+                                }
+                                if (onNavigateToDeleteChild != null) {
+                                    DropdownMenuItem(
+                                        text = { androidx.compose.material3.Text("Delete child") },
+                                        onClick = {
+                                            showMenu = false
+                                            onNavigateToDeleteChild()
+                                        },
+                                    )
+                                }
+                            }
+                        }
                         IconButton(onClick = onNavigateToProfile) {
                             Icon(Icons.Default.Person, contentDescription = "Profile")
                         }
@@ -127,6 +171,15 @@ fun ChildDashboardScreen(
                         ChildDashboardContent(
                             child = uiState.child!!,
                             todaySummary = uiState.todaySummary,
+                            onAddFeeding = onNavigateToAddFeeding,
+                            onAddDiaper = onNavigateToAddDiaper,
+                            onAddNap = onNavigateToAddNap,
+                            onFeedingsList = onNavigateToFeedingsList,
+                            onDiapersList = onNavigateToDiapersList,
+                            onNapsList = onNavigateToNapsList,
+                            onSharing = onNavigateToSharing,
+                            canManageSharing = uiState.child!!.canManageSharing,
+                            onExport = onNavigateToExport,
                         )
                     }
                 }
@@ -139,6 +192,15 @@ fun ChildDashboardScreen(
 private fun ChildDashboardContent(
     child: Child,
     todaySummary: TodaySummaryResponse?,
+    onAddFeeding: () -> Unit = {},
+    onAddDiaper: () -> Unit = {},
+    onAddNap: () -> Unit = {},
+    onFeedingsList: () -> Unit = {},
+    onDiapersList: () -> Unit = {},
+    onNapsList: () -> Unit = {},
+    onSharing: () -> Unit = {},
+    canManageSharing: Boolean = false,
+    onExport: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.padding(16.dp),
@@ -221,9 +283,11 @@ private fun ChildDashboardContent(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 if (todaySummary != null &&
-                    (todaySummary.feedings.count > 0 ||
-                        todaySummary.diapers.count > 0 ||
-                        todaySummary.sleep.naps > 0)
+                    (
+                        todaySummary.feedings.count > 0 ||
+                            todaySummary.diapers.count > 0 ||
+                            todaySummary.sleep.naps > 0
+                    )
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -247,7 +311,7 @@ private fun ChildDashboardContent(
             }
         }
 
-        // Actions (placeholder for future Add Feeding / Diaper / Nap)
+        // Quick actions
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -260,12 +324,65 @@ private fun ChildDashboardContent(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    androidx.compose.material3.Button(
+                        onClick = onAddFeeding,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("🍼 Feeding")
+                    }
+                    androidx.compose.material3.Button(
+                        onClick = onAddDiaper,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("💩 Diaper")
+                    }
+                    androidx.compose.material3.Button(
+                        onClick = onAddNap,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("😴 Nap")
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Add feeding, diaper, and nap — coming soon",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    androidx.compose.material3.TextButton(
+                        onClick = onFeedingsList,
+                    ) {
+                        Text("View feedings")
+                    }
+                    androidx.compose.material3.TextButton(
+                        onClick = onDiapersList,
+                    ) {
+                        Text("View diapers")
+                    }
+                    androidx.compose.material3.TextButton(
+                        onClick = onNapsList,
+                    ) {
+                        Text("View naps")
+                    }
+                }
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onExport,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Export data")
+                }
+                if (canManageSharing) {
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = onSharing,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Manage sharing")
+                    }
+                }
             }
         }
     }

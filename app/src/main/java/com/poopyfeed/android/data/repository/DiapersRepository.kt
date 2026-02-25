@@ -1,95 +1,112 @@
 package com.poopyfeed.android.data.repository
 
-import com.poopyfeed.android.data.remote.AnalyticsApi
-import com.poopyfeed.android.data.remote.ExportPdfRequest
-import com.poopyfeed.android.data.remote.ExportStatusResponse
-import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
-import okhttp3.ResponseBody
+import com.poopyfeed.android.data.remote.DiapersApi
+import com.poopyfeed.android.data.remote.dto.CreateDiaperRequest
+import com.poopyfeed.android.data.remote.dto.Diaper
+import com.poopyfeed.android.data.remote.dto.UpdateDiaperRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AnalyticsRepository
+class DiapersRepository
     @Inject
     constructor(
-        private val analyticsApi: AnalyticsApi,
+        private val diapersApi: DiapersApi,
     ) {
-        suspend fun getTodaySummary(childId: Int): Result<TodaySummaryResponse> {
+        suspend fun getDiapers(childId: Int): Result<List<Diaper>> {
             return try {
-                val response = analyticsApi.getTodaySummary(childId)
+                val response = diapersApi.getDiapers(childId)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                val body = response.body() ?: return Result.failure(Exception("Empty today summary response"))
-                Result.success(body)
+                val body =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty diapers response"))
+                Result.success(body.results)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun exportCsv(
+        suspend fun getDiaper(
             childId: Int,
-            days: Int = 30,
-        ): Result<ResponseBody> {
+            id: Int,
+        ): Result<Diaper> {
             return try {
-                val response = analyticsApi.exportCsv(childId, days)
+                val response = diapersApi.getDiaper(childId, id)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                val diaper =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty diaper response"))
+                Result.success(diaper)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun exportPdf(
+        suspend fun createDiaper(
             childId: Int,
-            days: Int = 30,
-        ): Result<String> {
+            changeType: String,
+            changedAt: String,
+        ): Result<Diaper> {
             return try {
-                val response = analyticsApi.exportPdf(childId, ExportPdfRequest(days = days))
+                val request = CreateDiaperRequest(changeType = changeType, changedAt = changedAt)
+                val response = diapersApi.createDiaper(childId, request)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                val body = response.body() ?: return Result.failure(Exception("Empty export response"))
-                Result.success(body.task_id)
+                val diaper =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty diaper response"))
+                Result.success(diaper)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun getExportStatus(
+        suspend fun updateDiaper(
             childId: Int,
-            taskId: String,
-        ): Result<ExportStatusResponse> {
+            id: Int,
+            changeType: String? = null,
+            changedAt: String? = null,
+        ): Result<Diaper> {
             return try {
-                val response = analyticsApi.getExportStatus(childId, taskId)
+                val request = UpdateDiaperRequest(changeType = changeType, changedAt = changedAt)
+                val response = diapersApi.updateDiaper(childId, id, request)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                val diaper =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty diaper response"))
+                Result.success(diaper)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun downloadPdf(filename: String): Result<ResponseBody> {
+        suspend fun deleteDiaper(
+            childId: Int,
+            id: Int,
+        ): Result<Unit> {
             return try {
-                val response = analyticsApi.downloadPdf(filename)
+                val response = diapersApi.deleteDiaper(childId, id)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }

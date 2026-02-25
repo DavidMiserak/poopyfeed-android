@@ -1,95 +1,110 @@
 package com.poopyfeed.android.data.repository
 
-import com.poopyfeed.android.data.remote.AnalyticsApi
-import com.poopyfeed.android.data.remote.ExportPdfRequest
-import com.poopyfeed.android.data.remote.ExportStatusResponse
-import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
-import okhttp3.ResponseBody
+import com.poopyfeed.android.data.remote.NapsApi
+import com.poopyfeed.android.data.remote.dto.CreateNapRequest
+import com.poopyfeed.android.data.remote.dto.Nap
+import com.poopyfeed.android.data.remote.dto.UpdateNapRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AnalyticsRepository
+class NapsRepository
     @Inject
     constructor(
-        private val analyticsApi: AnalyticsApi,
+        private val napsApi: NapsApi,
     ) {
-        suspend fun getTodaySummary(childId: Int): Result<TodaySummaryResponse> {
+        suspend fun getNaps(childId: Int): Result<List<Nap>> {
             return try {
-                val response = analyticsApi.getTodaySummary(childId)
+                val response = napsApi.getNaps(childId)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                val body = response.body() ?: return Result.failure(Exception("Empty today summary response"))
-                Result.success(body)
+                val body =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty naps response"))
+                Result.success(body.results)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun exportCsv(
+        suspend fun getNap(
             childId: Int,
-            days: Int = 30,
-        ): Result<ResponseBody> {
+            id: Int,
+        ): Result<Nap> {
             return try {
-                val response = analyticsApi.exportCsv(childId, days)
+                val response = napsApi.getNap(childId, id)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                val nap =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty nap response"))
+                Result.success(nap)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun exportPdf(
+        suspend fun createNap(
             childId: Int,
-            days: Int = 30,
-        ): Result<String> {
+            nappedAt: String,
+        ): Result<Nap> {
             return try {
-                val response = analyticsApi.exportPdf(childId, ExportPdfRequest(days = days))
+                val request = CreateNapRequest(nappedAt = nappedAt)
+                val response = napsApi.createNap(childId, request)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                val body = response.body() ?: return Result.failure(Exception("Empty export response"))
-                Result.success(body.task_id)
+                val nap =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty nap response"))
+                Result.success(nap)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun getExportStatus(
+        suspend fun updateNap(
             childId: Int,
-            taskId: String,
-        ): Result<ExportStatusResponse> {
+            id: Int,
+            nappedAt: String? = null,
+        ): Result<Nap> {
             return try {
-                val response = analyticsApi.getExportStatus(childId, taskId)
+                val request = UpdateNapRequest(nappedAt = nappedAt)
+                val response = napsApi.updateNap(childId, id, request)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                val nap =
+                    response.body()
+                        ?: return Result.failure(Exception("Empty nap response"))
+                Result.success(nap)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
         }
 
-        suspend fun downloadPdf(filename: String): Result<ResponseBody> {
+        suspend fun deleteNap(
+            childId: Int,
+            id: Int,
+        ): Result<Unit> {
             return try {
-                val response = analyticsApi.downloadPdf(filename)
+                val response = napsApi.deleteNap(childId, id)
                 if (!response.isSuccessful) {
                     return Result.failure(
                         Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
                     )
                 }
-                Result.success(response.body()!!)
+                Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
             }
