@@ -18,6 +18,10 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.databinding.FragmentAccountSettingsBinding
 
+/**
+ * Account settings screen. Displays and edits user profile (name, email, timezone) via
+ * [AccountSettingsViewModel]. Shown from the main toolbar menu.
+ */
 @AndroidEntryPoint
 class AccountSettingsFragment : Fragment() {
 

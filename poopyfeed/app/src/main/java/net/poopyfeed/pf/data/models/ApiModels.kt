@@ -71,7 +71,7 @@ data class Diaper(
     val updated_at: String
 )
 
-/** DTO for creating/updating a Diaper change. */
+/** DTO for creating a diaper change. [change_type]: `"wet"`, `"dirty"`, or `"both"`. */
 @Serializable data class CreateDiaperRequest(val change_type: String, val timestamp: String)
 
 /** Nap event. */
@@ -85,10 +85,10 @@ data class Nap(
     val updated_at: String
 )
 
-/** DTO for creating a Nap. */
+/** DTO for creating a nap. [end_time] is null when the nap is ongoing. */
 @Serializable data class CreateNapRequest(val start_time: String, val end_time: String? = null)
 
-/** DTO for ending an ongoing nap. */
+/** DTO for ending an ongoing nap (PATCH with [end_time]). */
 @Serializable data class UpdateNapRequest(val end_time: String)
 
 /** Child sharing relationship. */
@@ -117,8 +117,12 @@ data class ShareInvite(
     val updated_at: String
 )
 
-/** Sealed class for API error responses. Type-safe error handling across the app. */
+/**
+ * Sealed class for API error responses. Type-safe error handling across the app. Use
+ * [getUserMessage] for user-facing strings.
+ */
 sealed class ApiError : Exception() {
+  /** HTTP error (4xx/5xx) with optional [detail] body and [fields] validation errors. */
   data class HttpError(
       val statusCode: Int,
       val errorMessage: String,
@@ -126,10 +130,13 @@ sealed class ApiError : Exception() {
       val fields: Map<String, List<String>>? = null
   ) : ApiError()
 
+  /** Network failure (e.g. timeout, no connectivity). */
   data class NetworkError(val errorMessage: String) : ApiError()
 
+  /** Response body could not be deserialized. */
   data class SerializationError(val errorMessage: String) : ApiError()
 
+  /** Any other error. */
   data class UnknownError(val errorMessage: String) : ApiError()
 
   /** Extract user-friendly error message. Requires [Context] for i18n string resources. */
@@ -142,12 +149,18 @@ sealed class ApiError : Exception() {
       }
 }
 
-/** Sealed class for API result state. Use for loading, success, and error states in UI. */
+/**
+ * Sealed class for API result state. Use for loading, success, and error states in UI. Flow-based
+ * repos typically emit [Loading] first, then [Success] or [Error].
+ */
 sealed class ApiResult<out T> {
+  /** Successful response with [data]. */
   data class Success<T>(val data: T) : ApiResult<T>()
 
+  /** Request in progress. */
   class Loading<T> : ApiResult<T>()
 
+  /** Request failed with [error]. */
   data class Error<T>(val error: ApiError) : ApiResult<T>()
 }
 
@@ -162,7 +175,7 @@ data class SessionLoginResponse(
     val meta: kotlinx.serialization.json.JsonElement? = null
 )
 
-/** User authentication token response from browser token endpoint. */
+/** Response from the browser token endpoint; contains the token for the Authorization header. */
 @Serializable data class AuthTokenResponse(val auth_token: String)
 
 /** Backwards-compatible auth token model (legacy key-based token endpoints). */
@@ -180,7 +193,7 @@ data class AuthToken(
 @Serializable
 data class SignupRequest(val email: String, val password: String, val re_password: String? = null)
 
-/** User login request. */
+/** User login request for the session login endpoint. */
 @Serializable data class LoginRequest(val email: String, val password: String)
 
 /** Authenticated user profile response. */

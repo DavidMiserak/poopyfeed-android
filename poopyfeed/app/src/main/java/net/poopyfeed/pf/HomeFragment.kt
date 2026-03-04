@@ -15,6 +15,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentHomeBinding
 
+/**
+ * Home screen shown after login. Loads profile via [HomeViewModel]; shows email when ready or
+ * navigates back to login if unauthorized. Placeholder for future children list and tracking.
+ */
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 

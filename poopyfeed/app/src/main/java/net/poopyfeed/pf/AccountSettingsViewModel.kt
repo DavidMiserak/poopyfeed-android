@@ -18,20 +18,31 @@ import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 
+/** UI state for the account settings screen. */
 sealed interface AccountSettingsUiState {
+  /** Profile is loading. */
   data object Loading : AccountSettingsUiState
 
+  /** Profile loaded; [profile] and [timezones] for the form. */
   data class Ready(val profile: UserProfile, val timezones: List<String>) : AccountSettingsUiState
 
+  /** No token; cannot edit. */
   data object Unauthorized : AccountSettingsUiState
 
+  /** Load or save failed; [message] is user-facing. */
   data class Error(val message: String) : AccountSettingsUiState
 
+  /** Save in progress. */
   data object Saving : AccountSettingsUiState
 
+  /** Save succeeded; [profile] and [timezones] updated. */
   data class Saved(val profile: UserProfile, val timezones: List<String>) : AccountSettingsUiState
 }
 
+/**
+ * ViewModel for [AccountSettingsFragment]. Loads and updates user profile via [AuthRepository];
+ * exposes [uiState] and [saveProfile] for the form.
+ */
 @HiltViewModel
 class AccountSettingsViewModel
 @Inject
@@ -51,6 +62,7 @@ constructor(
     loadProfile()
   }
 
+  /** Fetches profile from API and updates [uiState]; sets Unauthorized if no token. */
   fun loadProfile() {
     viewModelScope.launch {
       if (tokenManager.getToken() == null) {
@@ -81,6 +93,10 @@ constructor(
     }
   }
 
+  /**
+   * Sends profile update to API; transitions to Saving then Saved or Error. No-op if not in Ready
+   * state.
+   */
   fun saveProfile(firstName: String, lastName: String, timezone: String) {
     val currentState = _uiState.value
     if (currentState !is AccountSettingsUiState.Ready) {

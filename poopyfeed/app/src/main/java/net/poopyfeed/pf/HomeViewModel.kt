@@ -15,16 +15,25 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 
+/** UI state for the home screen. */
 sealed interface HomeUiState {
+  /** Profile is loading. */
   data object Loading : HomeUiState
 
+  /** Profile loaded; [email] is the current user's email. */
   data class Ready(val email: String) : HomeUiState
 
+  /** No token or auth failed; navigate to login. */
   data object Unauthorized : HomeUiState
 
+  /** Request failed; [message] is user-facing. */
   data class Error(val message: String) : HomeUiState
 }
 
+/**
+ * ViewModel for [HomeFragment]. Loads user profile on init; exposes [uiState]. Use [hasToken] to
+ * gate navigation and [loadProfile] for refresh.
+ */
 @HiltViewModel
 class HomeViewModel
 @Inject
@@ -41,8 +50,10 @@ constructor(
     loadProfile()
   }
 
+  /** True if an auth token is stored. */
   fun hasToken(): Boolean = tokenManager.getToken() != null
 
+  /** Fetches profile from API and updates [uiState]; sets Unauthorized if no token. */
   fun loadProfile() {
     viewModelScope.launch {
       if (!hasToken()) {

@@ -14,16 +14,25 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 
+/** UI state for the login screen. */
 sealed interface LoginUiState {
+  /** Initial state; form is editable. */
   data object Idle : LoginUiState
 
+  /** Login request in progress. */
   data object Loading : LoginUiState
 
+  /** Login succeeded; navigate to home. */
   data object Success : LoginUiState
 
+  /** Login failed; [message] is user-facing. */
   data class Error(val message: String) : LoginUiState
 }
 
+/**
+ * ViewModel for [LoginFragment]. Performs two-step auth (session login then token exchange),
+ * persists token via [TokenManager], and exposes [uiState] for the UI.
+ */
 @HiltViewModel
 class LoginViewModel
 @Inject
@@ -36,8 +45,12 @@ constructor(
   private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
   val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+  /** True if a token is already stored (skip login and go to home). */
   fun checkExistingToken(): Boolean = tokenManager.getToken() != null
 
+  /**
+   * Attempts login with [email] and [password]; updates [uiState] to Loading then Success or Error.
+   */
   fun login(email: String, password: String) {
     viewModelScope.launch {
       _uiState.value = LoginUiState.Loading
@@ -57,6 +70,7 @@ constructor(
     }
   }
 
+  /** Resets UI state from Error back to Idle (e.g. after showing Snackbar). */
   fun clearError() {
     if (_uiState.value is LoginUiState.Error) {
       _uiState.value = LoginUiState.Idle

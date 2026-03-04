@@ -15,6 +15,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentSignupBinding
 
+/**
+ * Signup screen. Collects email/password, validates with [EmailValidator], and delegates
+ * registration to [SignupViewModel]. Navigates to [HomeFragment] on success or back to
+ * [LoginFragment].
+ */
 @AndroidEntryPoint
 class SignupFragment : Fragment() {
 

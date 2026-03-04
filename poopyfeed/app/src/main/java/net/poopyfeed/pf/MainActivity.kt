@@ -18,6 +18,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.ActivityMainBinding
 
+/**
+ * Single-activity host for the app. Hosts the NavHostFragment, shows/hides AppBar and FAB based on
+ * destination (hidden on Login/Signup). Handles logout and navigation to Login with a clean back
+ * stack.
+ */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 

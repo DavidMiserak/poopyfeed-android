@@ -14,16 +14,25 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 
+/** UI state for the signup screen. */
 sealed interface SignupUiState {
+  /** Initial state; form is editable. */
   data object Idle : SignupUiState
 
+  /** Signup request in progress. */
   data object Loading : SignupUiState
 
+  /** Signup succeeded; navigate to home. */
   data object Success : SignupUiState
 
+  /** Signup failed; [message] is user-facing. */
   data class Error(val message: String) : SignupUiState
 }
 
+/**
+ * ViewModel for [SignupFragment]. Registers the user via [AuthRepository], persists token via
+ * [TokenManager], and exposes [uiState] for the UI.
+ */
 @HiltViewModel
 class SignupViewModel
 @Inject
@@ -36,6 +45,10 @@ constructor(
   private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState.Idle)
   val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
+  /**
+   * Attempts signup with [email] and [password]; updates [uiState] to Loading then Success or
+   * Error.
+   */
   fun signUp(email: String, password: String) {
     viewModelScope.launch {
       _uiState.value = SignupUiState.Loading
@@ -55,6 +68,7 @@ constructor(
     }
   }
 
+  /** Resets UI state from Error back to Idle (e.g. after showing Snackbar). */
   fun clearError() {
     if (_uiState.value is SignupUiState.Error) {
       _uiState.value = SignupUiState.Idle
