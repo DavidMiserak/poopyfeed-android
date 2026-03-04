@@ -216,13 +216,22 @@ private fun SummaryCard(
     }
 }
 
-private fun buildShareText(childName: String, summary: WeeklySummaryResponse): String {
+private fun buildShareText(
+    childName: String,
+    summary: WeeklySummaryResponse,
+): String {
     return buildString {
         appendLine("Summary for $childName")
         appendLine(summary.period)
         appendLine()
-        appendLine("Feedings: ${summary.feedings.count} (${summary.feedings.totalOz} oz total, bottle: ${summary.feedings.bottle}, breast: ${summary.feedings.breast})")
-        appendLine("Diapers: ${summary.diapers.count} (wet: ${summary.diapers.wet}, dirty: ${summary.diapers.dirty}, both: ${summary.diapers.both})")
+        appendLine(
+            "Feedings: ${summary.feedings.count} (${summary.feedings.totalOz} oz total, " +
+                "bottle: ${summary.feedings.bottle}, breast: ${summary.feedings.breast})",
+        )
+        appendLine(
+            "Diapers: ${summary.diapers.count} (wet: ${summary.diapers.wet}, " +
+                "dirty: ${summary.diapers.dirty}, both: ${summary.diapers.both})",
+        )
         appendLine("Sleep: ${summary.sleep.naps} naps, ${summary.sleep.totalMinutes} min total, avg ${summary.sleep.avgDuration} min")
     }
 }

@@ -66,7 +66,10 @@ fun FussBusScreen(
 }
 
 @Composable
-private fun FussBusContent(viewModel: FussBusViewModel, onNavigateBack: () -> Unit) {
+private fun FussBusContent(
+    viewModel: FussBusViewModel,
+    onNavigateBack: () -> Unit,
+) {
     val uiState by viewModel.uiState.collectAsState()
     when (val state = uiState) {
         is FussBusUiState.Loading -> {
@@ -150,7 +153,10 @@ private fun FussBusStep2Content(
         modifier = Modifier.padding(24.dp),
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
     ) {
-        androidx.compose.material3.Text("Checklist: ${progress.first}/${progress.second}", style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+        androidx.compose.material3.Text(
+            "Checklist: ${progress.first}/${progress.second}",
+            style = androidx.compose.material3.MaterialTheme.typography.titleSmall,
+        )
         for (item in checklist) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

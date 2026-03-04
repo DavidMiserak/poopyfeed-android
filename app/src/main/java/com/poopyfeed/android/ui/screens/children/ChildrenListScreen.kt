@@ -2,11 +2,13 @@ package com.poopyfeed.android.ui.screens.children
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,12 +16,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -42,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.poopyfeed.android.data.remote.dto.Child
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.theme.Amber50
+import com.poopyfeed.android.ui.theme.AppShapes
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose50
 
@@ -65,7 +71,17 @@ fun ChildrenListScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("PoopyFeed") },
+                    title = {
+                        Text(
+                            text = "PoopyFeed",
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                    },
+                    colors =
+                        androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                     actions = {
                         IconButton(onClick = onNavigateToProfile) {
                             Icon(Icons.Default.Person, contentDescription = "Profile")
@@ -76,6 +92,9 @@ fun ChildrenListScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = onNavigateToAddChild,
+                    shape = AppShapes.medium,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Child")
                 }
@@ -128,20 +147,20 @@ fun ChildrenListScreen(
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(32.dp),
                             ) {
                                 Text(
                                     text = "👶",
-                                    style = MaterialTheme.typography.displayLarge,
+                                    style = MaterialTheme.typography.displayMedium,
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
                                 Text(
                                     text = "No children yet",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.headlineSmall,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Add a child to get started",
+                                    text = "Tap + to add your first child and start tracking",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -153,8 +172,8 @@ fun ChildrenListScreen(
                             modifier =
                                 Modifier
                                     .fillMaxSize()
-                                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             items(uiState.children) { child ->
                                 ChildCard(
@@ -175,72 +194,90 @@ private fun ChildCard(
     child: Child,
     onClick: () -> Unit,
 ) {
-    Box(
+    Card(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(16.dp),
-                )
-                .clickable(onClick = onClick)
-                .padding(16.dp),
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+            Box(
+                modifier =
+                    Modifier
+                        .width(5.dp)
+                        .fillMaxHeight()
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = AppShapes.accentStrip,
+                        ),
+            )
             Row(
-                modifier = Modifier.weight(1f),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(56.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = RoundedCornerShape(12.dp),
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = ChildDisplayUtils.getGenderEmoji(child.gender),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                }
-
-                Column(
+                Row(
                     modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(56.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = MaterialTheme.shapes.small,
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = ChildDisplayUtils.getGenderEmoji(child.gender),
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = child.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = getRoleLabel(child.userRole),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                }
+                if (child.lastDiaperChange != null ||
+                    child.lastFeeding != null ||
+                    child.lastNap != null
                 ) {
                     Text(
-                        text = child.name,
+                        text = getRecentActivityEmoji(child),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = getRoleLabel(child.userRole),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Medium,
                     )
                 }
-            }
-
-            // Show activity summary if available
-            if (child.lastDiaperChange != null || child.lastFeeding != null || child.lastNap != null) {
-                Text(
-                    text = getRecentActivityEmoji(child),
-                    style = MaterialTheme.typography.titleMedium,
-                )
             }
         }
     }

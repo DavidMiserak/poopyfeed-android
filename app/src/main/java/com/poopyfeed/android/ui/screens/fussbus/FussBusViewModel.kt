@@ -13,7 +13,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,13 +37,17 @@ data class FussBusChecklistItem(
 /** Sealed UI state for the Fuss Bus wizard. */
 sealed class FussBusUiState {
     data object Loading : FussBusUiState()
+
     data class Step1Symptom(val childAgeMonths: Float) : FussBusUiState()
+
     data class Step2Checklist(
         val checklist: List<FussBusChecklistItem>,
         val checkedCount: Int,
         val totalCount: Int,
     ) : FussBusUiState()
+
     data class Step3Suggestions(val suggestions: List<String>) : FussBusUiState()
+
     data class Error(val message: String) : FussBusUiState()
 }
 
@@ -115,11 +118,12 @@ class FussBusViewModel
             val list = buildChecklist()
             val total = list.size
             val checked = list.count { it.isChecked } + list.count { manualCheckedIds.contains(it.id) }
-            _uiState.value = FussBusUiState.Step2Checklist(
-                checklist = list,
-                checkedCount = list.count { it.isChecked } + list.count { it.id in manualCheckedIds },
-                totalCount = total,
-            )
+            _uiState.value =
+                FussBusUiState.Step2Checklist(
+                    checklist = list,
+                    checkedCount = list.count { it.isChecked } + list.count { it.id in manualCheckedIds },
+                    totalCount = total,
+                )
         }
 
         private fun buildChecklist(): List<FussBusChecklistItem> {
@@ -185,14 +189,18 @@ class FussBusViewModel
         }
 
         fun toggleChecklistItem(id: String) {
-            if (manualCheckedIds.contains(id)) manualCheckedIds.remove(id)
-            else manualCheckedIds.add(id)
+            if (manualCheckedIds.contains(id)) {
+                manualCheckedIds.remove(id)
+            } else {
+                manualCheckedIds.add(id)
+            }
             val list = buildChecklist()
-            _uiState.value = FussBusUiState.Step2Checklist(
-                checklist = list,
-                checkedCount = list.count { item -> item.isChecked || item.id in manualCheckedIds },
-                totalCount = list.size,
-            )
+            _uiState.value =
+                FussBusUiState.Step2Checklist(
+                    checklist = list,
+                    checkedCount = list.count { item -> item.isChecked || item.id in manualCheckedIds },
+                    totalCount = list.size,
+                )
         }
 
         fun goToStep3() {

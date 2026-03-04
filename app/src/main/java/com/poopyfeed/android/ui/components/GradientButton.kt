@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.poopyfeed.android.ui.theme.Amber400
+import com.poopyfeed.android.ui.theme.AppShapes
 import com.poopyfeed.android.ui.theme.Orange400
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose400
@@ -41,7 +41,7 @@ fun GradientButton(
                 .fillMaxWidth()
                 .height(52.dp),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(12.dp),
+        shape = AppShapes.small,
         contentPadding = PaddingValues(0.dp),
         colors =
             ButtonDefaults.buttonColors(
@@ -68,7 +68,7 @@ fun GradientButton(
                                         )
                                     },
                             ),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = AppShapes.small,
                     ),
             contentAlignment = Alignment.Center,
         ) {

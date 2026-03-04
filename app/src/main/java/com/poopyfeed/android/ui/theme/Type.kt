@@ -7,41 +7,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 /**
- * Typography aligned with DESIGN_SYSTEM.md type scale.
- * Design system: display/headings (Fredoka), body (DM Sans). We use system default font;
- * to match exactly, add font resources (Fredoka, DM Sans) and set displayStyle.fontFamily / bodyStyle.fontFamily.
+ * Typography aligned with DESIGN_SYSTEM.md.
+ * Generous line heights and clear hierarchy for readability (including when tired).
  */
 val Typography =
     Typography(
-        // Display / hero (design: text-4xl–7xl, bold)
         displayLarge =
             TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Bold,
-                fontSize = 36.sp,
-                lineHeight = 44.sp,
+                fontSize = 38.sp,
+                lineHeight = 46.sp,
             ),
         displayMedium =
             TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                lineHeight = 38.sp,
+                fontSize = 32.sp,
+                lineHeight = 40.sp,
             ),
-        // Headlines / section (design: text-3xl, text-2xl, bold)
         headlineLarge =
             TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                lineHeight = 32.sp,
+                fontSize = 26.sp,
+                lineHeight = 34.sp,
             ),
         headlineMedium =
             TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
-                lineHeight = 28.sp,
+                lineHeight = 30.sp,
             ),
         headlineSmall =
             TextStyle(
@@ -77,9 +74,9 @@ val Typography =
             TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Normal,
-                fontSize = 18.sp,
-                lineHeight = 28.sp,
-                letterSpacing = 0.15.sp,
+                fontSize = 17.sp,
+                lineHeight = 26.sp,
+                letterSpacing = 0.1.sp,
             ),
         bodyMedium =
             TextStyle(
@@ -87,7 +84,7 @@ val Typography =
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                letterSpacing = 0.25.sp,
+                letterSpacing = 0.15.sp,
             ),
         bodySmall =
             TextStyle(

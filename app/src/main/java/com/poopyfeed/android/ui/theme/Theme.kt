@@ -1,10 +1,13 @@
 package com.poopyfeed.android.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 
 /**
  * Light color scheme aligned with DESIGN_SYSTEM.md.
@@ -57,6 +60,15 @@ private val DarkColorScheme =
         onError = White,
     )
 
+private val AppMaterialShapes =
+    Shapes(
+        extraSmall = RoundedCornerShape(8.dp),
+        small = AppShapes.small,
+        medium = AppShapes.medium,
+        large = AppShapes.large,
+        extraLarge = AppShapes.extraLarge,
+    )
+
 @Composable
 fun PoopyFeedTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -67,6 +79,7 @@ fun PoopyFeedTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = AppMaterialShapes,
         content = content,
     )
 }

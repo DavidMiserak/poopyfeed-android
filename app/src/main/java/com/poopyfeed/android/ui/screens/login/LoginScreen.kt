@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +45,7 @@ import com.poopyfeed.android.ui.components.GradientButton
 import com.poopyfeed.android.ui.components.PasswordVisibilityIcon
 import com.poopyfeed.android.ui.components.getPasswordVisualTransformation
 import com.poopyfeed.android.ui.theme.Amber50
+import com.poopyfeed.android.ui.theme.AppShapes
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose200
 import com.poopyfeed.android.ui.theme.Rose400
@@ -144,16 +144,15 @@ private fun LoginFormCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .background(White, RoundedCornerShape(24.dp))
-                .border(2.dp, Rose200, RoundedCornerShape(24.dp))
+                .background(White, AppShapes.large)
+                .border(2.dp, Rose200, AppShapes.large)
                 .padding(24.dp),
     ) {
         Text(
             text = "Welcome Back",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineMedium,
         )
-
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "Log in to your account",
             style = MaterialTheme.typography.bodyMedium,

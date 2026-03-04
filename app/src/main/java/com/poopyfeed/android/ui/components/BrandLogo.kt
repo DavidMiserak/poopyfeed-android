@@ -33,7 +33,7 @@ fun BrandLogo(modifier: Modifier = Modifier) {
             text = "Poopy",
             style =
                 TextStyle(
-                    fontSize = 36.sp,
+                    fontSize = 34.sp,
                     fontWeight = FontWeight.Bold,
                     brush =
                         Brush.horizontalGradient(
@@ -45,7 +45,7 @@ fun BrandLogo(modifier: Modifier = Modifier) {
             text = "Feed",
             style =
                 TextStyle(
-                    fontSize = 36.sp,
+                    fontSize = 34.sp,
                     fontWeight = FontWeight.Bold,
                     color = Slate800,
                 ),

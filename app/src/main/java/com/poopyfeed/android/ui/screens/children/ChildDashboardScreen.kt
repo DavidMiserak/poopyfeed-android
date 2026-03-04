@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -52,6 +51,7 @@ import com.poopyfeed.android.data.remote.dto.PatternAlertsResponse
 import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.theme.Amber50
+import com.poopyfeed.android.ui.theme.AppShapes
 import com.poopyfeed.android.ui.theme.PoopyFeedTheme
 import com.poopyfeed.android.ui.theme.Rose50
 
@@ -92,8 +92,14 @@ fun ChildDashboardScreen(
                     title = {
                         Text(
                             text = uiState.child?.name ?: "Dashboard",
+                            style = MaterialTheme.typography.titleLarge,
                         )
                     },
+                    colors =
+                        androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                            titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -201,8 +207,7 @@ fun ChildDashboardScreen(
     }
 }
 
-private val DashboardPadding = 20.dp
-private val CardShape = RoundedCornerShape(16.dp)
+private val DashboardPadding = 24.dp
 
 @Composable
 private fun ChildDashboardContent(
@@ -278,7 +283,7 @@ private fun PatternAlertsCard(patternAlerts: PatternAlertsResponse) {
     if (messages.isEmpty()) return
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = CardShape,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
@@ -306,39 +311,40 @@ private fun PatternAlertsCard(patternAlerts: PatternAlertsResponse) {
 private fun ChildHeader(child: Child) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = CardShape,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(48.dp)
+                        .size(52.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = MaterialTheme.shapes.small,
                         ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = ChildDisplayUtils.getGenderEmoji(child.gender),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = child.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = ChildDisplayUtils.getChildAge(child.dateOfBirth),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -354,54 +360,57 @@ private fun QuickAddCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = CardShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = "Log activity",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 FilledTonalButton(
                     onClick = onAddFeeding,
                     modifier = Modifier.weight(1f),
+                    shape = AppShapes.small,
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        Text(text = "🍼", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "🍼", style = MaterialTheme.typography.headlineSmall)
                         Text(text = "Feeding", style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 FilledTonalButton(
                     onClick = onAddDiaper,
                     modifier = Modifier.weight(1f),
+                    shape = AppShapes.small,
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        Text(text = "💩", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "💩", style = MaterialTheme.typography.headlineSmall)
                         Text(text = "Diaper", style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 FilledTonalButton(
                     onClick = onAddNap,
                     modifier = Modifier.weight(1f),
+                    shape = AppShapes.small,
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        Text(text = "😴", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "😴", style = MaterialTheme.typography.headlineSmall)
                         Text(text = "Nap", style = MaterialTheme.typography.labelMedium)
                     }
                 }
@@ -417,11 +426,11 @@ private fun TodayAndActivityCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = CardShape,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = "Today",
                 style = MaterialTheme.typography.titleMedium,
@@ -487,20 +496,20 @@ private fun SecondaryActionsCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = CardShape,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = "More",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 androidx.compose.material3.TextButton(
                     onClick = onFeedingsList,
@@ -521,44 +530,51 @@ private fun SecondaryActionsCard(
                     Text("Naps", style = MaterialTheme.typography.labelLarge)
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.material3.OutlinedButton(
                 onClick = onCatchUp,
                 modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.small,
             ) {
                 Text("Catch-up")
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.material3.OutlinedButton(
                 onClick = onTimeline,
                 modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.small,
             ) {
                 Text("Timeline")
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.material3.OutlinedButton(
                 onClick = onExport,
                 modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.small,
             ) {
                 Text("Export data")
             }
             androidx.compose.material3.OutlinedButton(
                 onClick = onAdvancedTools,
                 modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.small,
             ) {
                 Text("Advanced tools")
             }
+            Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.material3.FilledTonalButton(
                 onClick = onFussBus,
                 modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.small,
             ) {
                 Text("🚌 Fuss Bus")
             }
             if (canManageSharing) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 androidx.compose.material3.OutlinedButton(
                     onClick = onSharing,
                     modifier = Modifier.fillMaxWidth(),
+                    shape = AppShapes.small,
                 ) {
                     Text("Manage sharing")
                 }

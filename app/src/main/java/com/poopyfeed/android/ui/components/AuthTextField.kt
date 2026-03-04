@@ -3,7 +3,6 @@ package com.poopyfeed.android.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +66,7 @@ private fun AuthTextFieldContent(
             modifier = Modifier.fillMaxWidth(),
             isError = config.error != null,
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.small,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Rose400,
