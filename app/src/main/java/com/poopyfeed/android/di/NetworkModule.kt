@@ -23,6 +23,7 @@ import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
@@ -66,20 +67,27 @@ object NetworkModule {
         cookieStore: CookieStore,
         authInterceptor: Interceptor,
     ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .cookieJar(cookieStore)
-            .addInterceptor(authInterceptor)
-            .addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level =
-                        if (BuildConfig.DEBUG) {
-                            HttpLoggingInterceptor.Level.BODY
-                        } else {
-                            HttpLoggingInterceptor.Level.NONE
-                        }
-                },
-            )
-            .build()
+        val builder =
+            OkHttpClient.Builder()
+                .cookieJar(cookieStore)
+                .addInterceptor(authInterceptor)
+                .addInterceptor(
+                    HttpLoggingInterceptor().apply {
+                        level =
+                            if (BuildConfig.DEBUG) {
+                                HttpLoggingInterceptor.Level.BODY
+                            } else {
+                                HttpLoggingInterceptor.Level.NONE
+                            }
+                    },
+                )
+        if (BuildConfig.DEBUG) {
+            builder
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+        }
+        return builder.build()
     }
 
     @Provides

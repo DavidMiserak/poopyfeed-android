@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.poopyfeed.android.ui.screens.HomeScreen
 import com.poopyfeed.android.ui.screens.catchup.CatchUpScreen
+import com.poopyfeed.android.ui.screens.advancedtools.AdvancedToolsScreen
 import com.poopyfeed.android.ui.screens.children.ChildDashboardScreen
 import com.poopyfeed.android.ui.screens.children.ChildDeleteScreen
 import com.poopyfeed.android.ui.screens.children.ChildFormScreen
@@ -20,6 +21,8 @@ import com.poopyfeed.android.ui.screens.diapers.DiaperFormScreen
 import com.poopyfeed.android.ui.screens.diapers.DiapersListScreen
 import com.poopyfeed.android.ui.screens.export.ExportScreen
 import com.poopyfeed.android.ui.screens.feedings.FeedingDeleteScreen
+import com.poopyfeed.android.ui.screens.pediatrician.PediatricianSummaryScreen
+import com.poopyfeed.android.ui.screens.fussbus.FussBusScreen
 import com.poopyfeed.android.ui.screens.feedings.FeedingFormScreen
 import com.poopyfeed.android.ui.screens.feedings.FeedingsListScreen
 import com.poopyfeed.android.ui.screens.greeting.GreetingScreen
@@ -173,6 +176,12 @@ fun PoopyFeedNavHost(
                 onNavigateToExport = {
                     navController.navigate(Screen.Export.createRoute(childId))
                 },
+                onNavigateToAdvancedTools = {
+                    navController.navigate(Screen.AdvancedTools.createRoute(childId))
+                },
+                onNavigateToFussBus = {
+                    navController.navigate(Screen.FussBus.createRoute(childId))
+                },
             )
         }
 
@@ -198,6 +207,33 @@ fun PoopyFeedNavHost(
             arguments = listOf(navArgument("childId") { type = NavType.StringType }),
         ) {
             ExportScreen(onNavigateBack = { navController.navigateUp() })
+        }
+
+        composable(
+            route = Screen.PediatricianSummary.route,
+            arguments = listOf(navArgument("childId") { type = NavType.StringType }),
+        ) {
+            PediatricianSummaryScreen(onNavigateBack = { navController.navigateUp() })
+        }
+
+        composable(
+            route = Screen.AdvancedTools.route,
+            arguments = listOf(navArgument("childId") { type = NavType.StringType }),
+        ) { entry ->
+            val cid = entry.arguments?.getString("childId")?.toIntOrNull() ?: 0
+            AdvancedToolsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToExport = { navController.navigate(Screen.Export.createRoute(cid)) },
+                onNavigateToPediatricianSummary = { navController.navigate(Screen.PediatricianSummary.createRoute(cid)) },
+                onNavigateToFussBus = { navController.navigate(Screen.FussBus.createRoute(cid)) },
+            )
+        }
+
+        composable(
+            route = Screen.FussBus.route,
+            arguments = listOf(navArgument("childId") { type = NavType.StringType }),
+        ) {
+            FussBusScreen(onNavigateBack = { navController.navigateUp() })
         }
 
         composable(

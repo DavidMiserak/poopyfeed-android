@@ -105,6 +105,18 @@ sealed class Screen(val route: String) {
         fun createRoute(childId: Int) = "child_dashboard/$childId/sharing"
     }
 
+    data object PediatricianSummary : Screen("child_dashboard/{childId}/pediatrician_summary") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId/pediatrician_summary"
+    }
+
+    data object AdvancedTools : Screen("child_dashboard/{childId}/advanced_tools") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId/advanced_tools"
+    }
+
+    data object FussBus : Screen("child_dashboard/{childId}/fuss_bus") {
+        fun createRoute(childId: Int) = "child_dashboard/$childId/fuss_bus"
+    }
+
     data object AcceptInvite : Screen("invites/accept/{token}") {
         fun createRoute(token: String) = "invites/accept/$token"
     }

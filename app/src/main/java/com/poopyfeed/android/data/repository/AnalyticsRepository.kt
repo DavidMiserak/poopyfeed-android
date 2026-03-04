@@ -3,7 +3,9 @@ package com.poopyfeed.android.data.repository
 import com.poopyfeed.android.data.remote.AnalyticsApi
 import com.poopyfeed.android.data.remote.ExportPdfRequest
 import com.poopyfeed.android.data.remote.ExportStatusResponse
+import com.poopyfeed.android.data.remote.dto.PatternAlertsResponse
 import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
+import com.poopyfeed.android.data.remote.dto.WeeklySummaryResponse
 import okhttp3.ResponseBody
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,6 +25,36 @@ class AnalyticsRepository
                     )
                 }
                 val body = response.body() ?: return Result.failure(Exception("Empty today summary response"))
+                Result.success(body)
+            } catch (e: Exception) {
+                Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
+            }
+        }
+
+        suspend fun getPatternAlerts(childId: Int): Result<PatternAlertsResponse> {
+            return try {
+                val response = analyticsApi.getPatternAlerts(childId)
+                if (!response.isSuccessful) {
+                    return Result.failure(
+                        Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
+                    )
+                }
+                val body = response.body() ?: return Result.failure(Exception("Empty pattern alerts response"))
+                Result.success(body)
+            } catch (e: Exception) {
+                Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))
+            }
+        }
+
+        suspend fun getWeeklySummary(childId: Int): Result<WeeklySummaryResponse> {
+            return try {
+                val response = analyticsApi.getWeeklySummary(childId)
+                if (!response.isSuccessful) {
+                    return Result.failure(
+                        Exception(ChildrenRepository.parseErrorBody(response.errorBody()?.string())),
+                    )
+                }
+                val body = response.body() ?: return Result.failure(Exception("Empty weekly summary response"))
                 Result.success(body)
             } catch (e: Exception) {
                 Result.failure(Exception(ChildrenRepository.getNetworkErrorMessage(e)))

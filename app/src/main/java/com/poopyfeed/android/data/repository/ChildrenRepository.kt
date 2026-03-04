@@ -151,13 +151,14 @@ class ChildrenRepository
             }
 
             fun getNetworkErrorMessage(e: Exception): String {
+                val msg = e.message?.lowercase() ?: ""
                 return when {
-                    e.message?.contains("Unable to resolve host") == true ->
+                    msg.contains("unable to resolve host") ->
                         "No internet connection. Please check your network."
-                    e.message?.contains("timeout") == true ->
+                    msg.contains("timeout") ->
                         "Request timed out. Please try again."
-                    e.message?.contains("Connection refused") == true ->
-                        "Cannot reach the server. Please try again later."
+                    msg.contains("connection refused") || msg.contains("failed to connect") ->
+                        "Cannot reach the server. Ensure backend is running (make run). On a physical device, set api.base.url in android/local.properties to your computer's IP."
                     else -> e.message ?: "An unexpected error occurred"
                 }
             }

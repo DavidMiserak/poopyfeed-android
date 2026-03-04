@@ -1,6 +1,8 @@
 package com.poopyfeed.android.data.remote
 
+import com.poopyfeed.android.data.remote.dto.PatternAlertsResponse
 import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
+import com.poopyfeed.android.data.remote.dto.WeeklySummaryResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -13,6 +15,16 @@ interface AnalyticsApi {
     suspend fun getTodaySummary(
         @Path("id") id: Int,
     ): Response<TodaySummaryResponse>
+
+    @GET("api/v1/analytics/children/{id}/pattern-alerts/")
+    suspend fun getPatternAlerts(
+        @Path("id") id: Int,
+    ): Response<PatternAlertsResponse>
+
+    @GET("api/v1/analytics/children/{id}/weekly-summary/")
+    suspend fun getWeeklySummary(
+        @Path("id") id: Int,
+    ): Response<WeeklySummaryResponse>
 
     @POST("api/v1/analytics/children/{id}/export-csv/")
     suspend fun exportCsv(

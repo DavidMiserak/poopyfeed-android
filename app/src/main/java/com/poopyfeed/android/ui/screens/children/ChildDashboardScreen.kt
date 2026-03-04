@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.poopyfeed.android.data.remote.dto.Child
+import com.poopyfeed.android.data.remote.dto.PatternAlertsResponse
 import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
 import com.poopyfeed.android.ui.components.ErrorBanner
 import com.poopyfeed.android.ui.theme.Amber50
@@ -71,6 +72,8 @@ fun ChildDashboardScreen(
     onNavigateToTimeline: () -> Unit = {},
     onNavigateToSharing: () -> Unit = {},
     onNavigateToExport: () -> Unit = {},
+    onNavigateToAdvancedTools: () -> Unit = {},
+    onNavigateToFussBus: () -> Unit = {},
     viewModel: ChildDashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -176,6 +179,7 @@ fun ChildDashboardScreen(
                         ChildDashboardContent(
                             child = uiState.child!!,
                             todaySummary = uiState.todaySummary,
+                            patternAlerts = uiState.patternAlerts,
                             onAddFeeding = onNavigateToAddFeeding,
                             onAddDiaper = onNavigateToAddDiaper,
                             onAddNap = onNavigateToAddNap,
@@ -187,6 +191,8 @@ fun ChildDashboardScreen(
                             onSharing = onNavigateToSharing,
                             canManageSharing = uiState.child!!.canManageSharing,
                             onExport = onNavigateToExport,
+                            onAdvancedTools = onNavigateToAdvancedTools,
+                            onFussBus = onNavigateToFussBus,
                         )
                     }
                 }
@@ -202,6 +208,7 @@ private val CardShape = RoundedCornerShape(16.dp)
 private fun ChildDashboardContent(
     child: Child,
     todaySummary: TodaySummaryResponse?,
+    patternAlerts: PatternAlertsResponse? = null,
     onAddFeeding: () -> Unit = {},
     onAddDiaper: () -> Unit = {},
     onAddNap: () -> Unit = {},
@@ -213,6 +220,8 @@ private fun ChildDashboardContent(
     onSharing: () -> Unit = {},
     canManageSharing: Boolean = false,
     onExport: () -> Unit = {},
+    onAdvancedTools: () -> Unit = {},
+    onFussBus: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.padding(DashboardPadding),
@@ -220,6 +229,11 @@ private fun ChildDashboardContent(
     ) {
         // Compact child header
         ChildHeader(child = child)
+
+        // Pattern alerts (feeding/nap overdue)
+        if (patternAlerts != null && hasAnyAlert(patternAlerts)) {
+            PatternAlertsCard(patternAlerts = patternAlerts)
+        }
 
         // Primary: quick-add actions (hero section)
         QuickAddCard(
@@ -234,7 +248,7 @@ private fun ChildDashboardContent(
             todaySummary = todaySummary,
         )
 
-        // Secondary: view lists, export, sharing
+        // Secondary: view lists, export, advanced tools, Fuss Bus, sharing
         SecondaryActionsCard(
             onFeedingsList = onFeedingsList,
             onDiapersList = onDiapersList,
@@ -242,9 +256,49 @@ private fun ChildDashboardContent(
             onCatchUp = onCatchUp,
             onTimeline = onTimeline,
             onExport = onExport,
+            onAdvancedTools = onAdvancedTools,
+            onFussBus = onFussBus,
             onSharing = onSharing,
             canManageSharing = canManageSharing,
         )
+    }
+}
+
+private fun hasAnyAlert(alerts: PatternAlertsResponse): Boolean =
+    (alerts.feeding.alert && alerts.feeding.message != null) ||
+        (alerts.nap.alert && alerts.nap.message != null)
+
+@Composable
+private fun PatternAlertsCard(patternAlerts: PatternAlertsResponse) {
+    val messages =
+        buildList {
+            patternAlerts.feeding.message?.let { add(it) }
+            patternAlerts.nap.message?.let { add(it) }
+        }
+    if (messages.isEmpty()) return
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Alerts",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            messages.forEach { msg ->
+                Text(
+                    text = msg,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+                if (msg != messages.last()) Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
     }
 }
 
@@ -426,6 +480,8 @@ private fun SecondaryActionsCard(
     onCatchUp: () -> Unit,
     onTimeline: () -> Unit,
     onExport: () -> Unit,
+    onAdvancedTools: () -> Unit,
+    onFussBus: () -> Unit,
     onSharing: () -> Unit,
     canManageSharing: Boolean,
 ) {
@@ -485,6 +541,18 @@ private fun SecondaryActionsCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Export data")
+            }
+            androidx.compose.material3.OutlinedButton(
+                onClick = onAdvancedTools,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Advanced tools")
+            }
+            androidx.compose.material3.FilledTonalButton(
+                onClick = onFussBus,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("🚌 Fuss Bus")
             }
             if (canManageSharing) {
                 Spacer(modifier = Modifier.height(6.dp))

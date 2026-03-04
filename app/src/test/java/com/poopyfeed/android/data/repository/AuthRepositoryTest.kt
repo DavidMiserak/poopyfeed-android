@@ -220,7 +220,15 @@ class AuthRepositoryTest {
     @Test
     fun `getNetworkErrorMessage handles connection refused`() {
         val result = AuthRepository.getNetworkErrorMessage(Exception("Connection refused"))
-        assertEquals("Cannot reach the server. Please try again later.", result)
+        assertTrue(result.contains("Cannot reach the server"))
+        assertTrue(result.contains("make run"))
+    }
+
+    @Test
+    fun `getNetworkErrorMessage handles failed to connect`() {
+        val result = AuthRepository.getNetworkErrorMessage(Exception("Failed to connect to 10.0.2.2/10.0.2.2:8000"))
+        assertTrue(result.contains("Cannot reach the server"))
+        assertTrue(result.contains("make run"))
     }
 
     @Test

@@ -13,14 +13,32 @@ caregivers.
 - Retrofit + OkHttp for networking
 - Coroutines + StateFlow for async/reactive state
 - DataStore for local token persistence
-- Gradle 8.11.1 (Kotlin DSL)
+- Gradle 8.10 (Kotlin DSL)
 
 ## Development
 
 ### Android Studio
 
-Open the `android/` directory in Android Studio, sync Gradle,
-and run on an emulator or device.
+1. **Open the Android project only**
+   In Android Studio: **File → Open** and select the **`android`** folder (e.g. `path/to/poopyfeed/android`).
+   Do **not** open the repo root `poopyfeed` — the app is only in the `android` subfolder.
+
+2. **Let Gradle sync**
+   Android Studio will create `local.properties` with `sdk.dir` if needed.
+   Wait for sync to finish.
+
+3. **Gradle JDK**
+   Use **JDK 17** for Gradle: **File → Settings → Build, Execution, Deployment
+   → Build Tools → Gradle** → set **Gradle JDK** to 17 (or "Embedded JDK" if
+   it is 17+).
+
+4. **Run**
+   Choose an emulator or connected device and click **Run** (green triangle).
+   If "Run" is disabled, add a device (AVD Manager or USB) and select the
+   `app` run configuration.
+
+If sync fails, try **File → Invalidate Caches → Invalidate and Restart**.
+If Run fails, check the **Build** and **Run** tool windows for errors.
 
 ```bash
 ./gradlew build              # Build APK
@@ -74,12 +92,16 @@ make pre-commit-setup
 Enforces conventional commits, trailing whitespace, file
 endings, spell checking, and more.
 
-## API Configuration
+## API Configuration (localhost:8000)
 
-The backend API URL is set in `app/build.gradle.kts`:
+The app talks to your backend at **localhost:8000** on your machine.
 
-- **Emulator**: `http://10.0.2.2:8000` (default — maps to host localhost)
-- **Physical device**: Change `API_BASE_URL` to your machine's IP and rebuild
+- **Emulator (default):** Uses `http://10.0.2.2:8000`. The emulator maps
+  `10.0.2.2` to your host's localhost. Start the backend (e.g. `make run`
+  from repo root), then run the app. No extra setup.
+- **Physical device:** In `android/local.properties` add
+  `api.base.url=http://YOUR_IP:8000`, then rebuild. Find your IP with
+  `ip addr` or `ipconfig`.
 
 ## Architecture
 

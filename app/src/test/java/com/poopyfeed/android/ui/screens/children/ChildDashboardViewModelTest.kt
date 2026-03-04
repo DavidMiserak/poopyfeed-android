@@ -2,6 +2,9 @@ package com.poopyfeed.android.ui.screens.children
 
 import androidx.lifecycle.SavedStateHandle
 import com.poopyfeed.android.data.remote.dto.Child
+import com.poopyfeed.android.data.remote.dto.PatternAlertFeeding
+import com.poopyfeed.android.data.remote.dto.PatternAlertNap
+import com.poopyfeed.android.data.remote.dto.PatternAlertsResponse
 import com.poopyfeed.android.data.remote.dto.TodaySummaryDiapers
 import com.poopyfeed.android.data.remote.dto.TodaySummaryFeedings
 import com.poopyfeed.android.data.remote.dto.TodaySummaryResponse
@@ -58,6 +61,13 @@ class ChildDashboardViewModelTest {
             lastUpdated = "2024-01-15T14:00:00Z",
         )
 
+    private val mockPatternAlerts: PatternAlertsResponse =
+        PatternAlertsResponse(
+            childId = 1,
+            feeding = PatternAlertFeeding(alert = false, dataPoints = 2),
+            nap = PatternAlertNap(alert = false, dataPoints = 1),
+        )
+
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
@@ -109,6 +119,7 @@ class ChildDashboardViewModelTest {
             val savedStateHandle = SavedStateHandle(mapOf("childId" to "1"))
             whenever(childrenRepository.getChild(1)).thenReturn(Result.success(mockChild))
             whenever(analyticsRepository.getTodaySummary(1)).thenReturn(Result.success(mockSummary))
+            whenever(analyticsRepository.getPatternAlerts(1)).thenReturn(Result.success(mockPatternAlerts))
 
             val viewModel =
                 ChildDashboardViewModel(
@@ -132,6 +143,8 @@ class ChildDashboardViewModelTest {
                 .thenReturn(Result.failure(Exception("Child not found")))
             whenever(analyticsRepository.getTodaySummary(1))
                 .thenReturn(Result.success(mockSummary))
+            whenever(analyticsRepository.getPatternAlerts(1))
+                .thenReturn(Result.success(mockPatternAlerts))
 
             val viewModel =
                 ChildDashboardViewModel(
@@ -153,6 +166,8 @@ class ChildDashboardViewModelTest {
             whenever(childrenRepository.getChild(1)).thenReturn(Result.success(mockChild))
             whenever(analyticsRepository.getTodaySummary(1))
                 .thenReturn(Result.failure(Exception("Summary unavailable")))
+            whenever(analyticsRepository.getPatternAlerts(1))
+                .thenReturn(Result.success(mockPatternAlerts))
 
             val viewModel =
                 ChildDashboardViewModel(
@@ -174,6 +189,7 @@ class ChildDashboardViewModelTest {
             val savedStateHandle = SavedStateHandle(mapOf("childId" to "1"))
             whenever(childrenRepository.getChild(1)).thenReturn(Result.success(mockChild))
             whenever(analyticsRepository.getTodaySummary(1)).thenReturn(Result.success(mockSummary))
+            whenever(analyticsRepository.getPatternAlerts(1)).thenReturn(Result.success(mockPatternAlerts))
 
             val viewModel =
                 ChildDashboardViewModel(

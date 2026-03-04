@@ -9,6 +9,20 @@ plugins {
     id("com.diffplug.spotless")
 }
 
+// API base URL: 10.0.2.2 = host loopback from emulator (your machine's localhost:8000). Override in local.properties for physical device.
+val localPropertiesFile = rootProject.file("local.properties")
+val apiBaseUrl =
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.readLines()
+            .firstOrNull { it.startsWith("api.base.url=") }
+            ?.substringAfter("=")
+            ?.trim()
+            ?.removeSurrounding("\"")
+            ?: "http://10.0.2.2:8000"
+    } else {
+        "http://10.0.2.2:8000"
+    }
+
 android {
     namespace = "com.poopyfeed.android"
     compileSdk = 35
@@ -22,7 +36,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {
