@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
@@ -24,7 +25,7 @@ sealed interface HomeUiState {
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Loading)
-  val uiState: StateFlow<HomeUiState> = _uiState
+  val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
   private val authRepository: AuthRepository by lazy {
     val apiService = NetworkModule.providePoopyFeedApiService(getApplication())

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import java.util.TimeZone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
@@ -32,7 +33,7 @@ class AccountSettingsViewModel(application: Application) : AndroidViewModel(appl
 
   private val _uiState: MutableStateFlow<AccountSettingsUiState> =
       MutableStateFlow(AccountSettingsUiState.Loading)
-  val uiState: StateFlow<AccountSettingsUiState> = _uiState
+  val uiState: StateFlow<AccountSettingsUiState> = _uiState.asStateFlow()
 
   private val authRepository: AuthRepository by lazy {
     val apiService = NetworkModule.providePoopyFeedApiService(getApplication())

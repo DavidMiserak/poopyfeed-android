@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
@@ -23,7 +24,7 @@ sealed interface LoginUiState {
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
-  val uiState: StateFlow<LoginUiState> = _uiState
+  val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
   private val authRepository: AuthRepository by lazy {
     val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
