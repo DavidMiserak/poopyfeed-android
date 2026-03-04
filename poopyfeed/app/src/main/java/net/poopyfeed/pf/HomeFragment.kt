@@ -38,10 +38,6 @@ class HomeFragment : Fragment() {
             return
         }
 
-        binding.buttonLogout.setOnClickListener {
-            viewModel.logout()
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->

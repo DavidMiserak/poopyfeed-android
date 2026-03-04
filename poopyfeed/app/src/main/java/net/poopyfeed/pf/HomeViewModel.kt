@@ -74,21 +74,4 @@ class HomeViewModel(
             }
         }
     }
-
-    fun logout() {
-        viewModelScope.launch {
-            when (authRepository.logout()) {
-                is ApiResult.Success,
-                is ApiResult.Loading -> {
-                    // ignore
-                }
-
-                is ApiResult.Error -> {
-                    // ignore errors, we'll still clear token and move to Unauthorized
-                }
-            }
-            NetworkModule.clearAuthToken(getApplication())
-            _uiState.value = HomeUiState.Unauthorized
-        }
-    }
 }

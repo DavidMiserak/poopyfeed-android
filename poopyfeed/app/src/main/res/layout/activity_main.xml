@@ -31,10 +31,12 @@
             app:elevation="0dp"
             app:titleTextColor="@color/slate_900">
 
-            <!-- Custom toolbar content: heart + title -->
+            <!-- Custom toolbar content: heart + title (currently hidden in favor of Navigation-driven title) -->
             <LinearLayout
+                android:id="@+id/brand_mark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
