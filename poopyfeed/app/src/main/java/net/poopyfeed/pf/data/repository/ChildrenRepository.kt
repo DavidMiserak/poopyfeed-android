@@ -292,6 +292,16 @@ class AuthRepository(
     }
 
     /**
+     * Update the authenticated user's profile.
+     */
+    suspend fun updateProfile(update: UserProfileUpdate): ApiResult<UserProfile> = try {
+        val profile = apiService.updateProfile(update)
+        ApiResult.Success(profile)
+    } catch (e: Exception) {
+        ApiResult.Error(e.toApiError())
+    }
+
+    /**
      * Logout current browser session.
      */
     suspend fun logout(): ApiResult<Unit> = try {

@@ -254,3 +254,17 @@ data class UserProfile(
     val last_name: String,
     val timezone: String
 )
+
+/**
+ * Partial update payload for the authenticated user's profile.
+ *
+ * Mirrors the web frontend `UserProfileUpdate` shape and allows updating
+ * a subset of fields such as first name, last name, or timezone.
+ */
+@Serializable
+data class UserProfileUpdate(
+    val first_name: String? = null,
+    val last_name: String? = null,
+    val email: String? = null,
+    val timezone: String? = null
+)

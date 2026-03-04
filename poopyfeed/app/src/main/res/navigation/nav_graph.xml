@@ -36,6 +36,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/AccountSettingsFragment"
+        android:name="net.poopyfeed.pf.AccountSettingsFragment"
+        android:label="@string/account_settings_title"
+        tools:layout="@layout/fragment_account_settings" />
+
+    <fragment
         android:id="@+id/SignupFragment"
         android:name="net.poopyfeed.pf.SignupFragment"
         android:label="@string/signup_title"

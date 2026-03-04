@@ -35,4 +35,14 @@
     <string name="home_subtitle">Here is what is happening with your little one today.</string>
     <string name="home_getting_started_title">Getting Started</string>
     <string name="home_getting_started_body">Add your first child to start tracking feedings, diapers, and naps.</string>
+
+    <!-- Account settings -->
+    <string name="account_settings_title">Account settings</string>
+    <string name="account_first_name_label">First name</string>
+    <string name="account_last_name_label">Last name</string>
+    <string name="account_timezone_label">Timezone</string>
+    <string name="account_email_label">Email</string>
+    <string name="account_save_button">Save changes</string>
+    <string name="account_saved_message">Account settings updated.</string>
+    <string name="account_load_error">Unable to load account settings. Please try again.</string>
 </resources>

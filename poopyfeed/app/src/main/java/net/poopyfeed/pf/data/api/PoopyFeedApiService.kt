@@ -56,6 +56,15 @@ interface PoopyFeedApiService {
     suspend fun getProfile(): UserProfile
 
     /**
+     * Partially update the authenticated user's profile.
+     *
+     * Supports updating first name, last name, email, and timezone.
+     */
+    @Headers("Accept: application/json")
+    @PATCH("account/profile/")
+    suspend fun updateProfile(@Body request: UserProfileUpdate): UserProfile
+
+    /**
      * Logout the current session (invalidates session cookie and token).
      */
     @Headers(
