@@ -13,8 +13,14 @@ data class PaginatedResponse<T>(
     val previous: String? = null,
     val results: List<T>
 ) {
+
+  companion object {
+    /** Must match REST_FRAMEWORK["PAGE_SIZE"] in back-end django_project/settings.py. */
+    private const val DEFAULT_PAGE_SIZE = 20
+  }
+
   val totalPages: Int
-    get() = (count + results.size - 1) / results.size.coerceAtLeast(1)
+    get() = if (count <= 0) 0 else (count + DEFAULT_PAGE_SIZE - 1) / DEFAULT_PAGE_SIZE
 }
 
 /** Child profile resource. Represents a baby being tracked in the app. */
