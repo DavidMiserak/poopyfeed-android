@@ -60,7 +60,7 @@ val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
         html.required.set(true)
     }
 
-    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+    val javacDebugTree = fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
         exclude(
             "**/R.class",
             "**/R$*.class",
@@ -71,8 +71,19 @@ val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
         )
     }
 
-    classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files("src/main/java"))
+    val kotlinDebugTree = fileTree("${buildDir}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+        exclude(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "androidx/**/*",
+            "android/**/*"
+        )
+    }
+
+    classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(
         fileTree(buildDir) {
             include(
@@ -86,7 +97,7 @@ val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
 val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerification::class) {
     dependsOn("testDebugUnitTest")
 
-    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+    val javacDebugTree = fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
         exclude(
             "**/R.class",
             "**/R$*.class",
@@ -97,8 +108,19 @@ val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerif
         )
     }
 
-    classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files("src/main/java"))
+    val kotlinDebugTree = fileTree("${buildDir}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+        exclude(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "androidx/**/*",
+            "android/**/*"
+        )
+    }
+
+    classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(
         fileTree(buildDir) {
             include(

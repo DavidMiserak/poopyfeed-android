@@ -93,7 +93,8 @@ coverage:
 	@echo ""
 	@echo "JaCoCo coverage summary (LINE):"
 	@if [ -f "poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml" ]; then \
-		awk -F'"' '/<counter type="LINE"/ {missed=$$4; covered=$$6} END { total=missed+covered; if (total>0) printf "  %.2f%% (%d/%d lines covered)\n", covered*100/total, covered, total; else print "  0.00%% (0/0 lines covered)"; }' poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml; \
+		grep -o '<counter type="LINE"[^>]*/>' poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml | \
+		awk -F'"' '{missed+=$$4; covered+=$$6} END { total=missed+covered; if (total>0) printf "  %.2f%% (%d/%d lines covered)\n", covered*100/total, covered, total; else print "  0.00%% (0/0 lines covered)"; }'; \
 	else \
 		echo "  XML report not found at poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml"; \
 	fi
