@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.DiaperEntity
@@ -66,15 +67,7 @@ class CachedTrackingRepositoriesTest {
     val feedingDao = io.mockk.mockk<FeedingDao>()
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val feeding =
-        Feeding(
-            id = 1,
-            child = 1,
-            feeding_type = "bottle",
-            amount_oz = 4.0,
-            timestamp = "2024-01-15T12:00:00Z",
-            created_at = "2024-01-15T12:00:00Z",
-            updated_at = "2024-01-15T12:00:00Z")
+    val feeding = TestFixtures.mockFeeding()
     io.mockk.coEvery { apiService.listFeedings(1, 1) } returns
         PaginatedResponse(1, results = listOf(feeding))
     val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
@@ -91,19 +84,10 @@ class CachedTrackingRepositoriesTest {
         val feedingDao = io.mockk.mockk<FeedingDao>()
         io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
         val apiService = io.mockk.mockk<PoopyFeedApiService>()
-        val feeding1 =
-            Feeding(
-                id = 1,
-                child = 1,
-                feeding_type = "bottle",
-                amount_oz = 4.0,
-                timestamp = "2024-01-15T12:00:00Z",
-                created_at = "2024-01-15T12:00:00Z",
-                updated_at = "2024-01-15T12:00:00Z")
+        val feeding1 = TestFixtures.mockFeeding()
         val feeding2 =
-            Feeding(
+            TestFixtures.mockFeeding(
                 id = 2,
-                child = 1,
                 feeding_type = "breast",
                 amount_oz = null,
                 timestamp = "2024-01-15T14:00:00Z",
@@ -132,15 +116,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit
     io.mockk.coEvery { feedingDao.deleteFeeding(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val feeding =
-        Feeding(
-            id = 1,
-            child = 1,
-            feeding_type = "bottle",
-            amount_oz = 4.0,
-            timestamp = "2024-01-15T12:00:00Z",
-            created_at = "2024-01-15T12:00:00Z",
-            updated_at = "2024-01-15T12:00:00Z")
+    val feeding = TestFixtures.mockFeeding()
     val request = CreateFeedingRequest("bottle", 4.0, "2024-01-15T12:00:00Z")
     io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
     io.mockk.coEvery { apiService.deleteFeeding(1, 1) } returns Unit
@@ -181,14 +157,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.every { diaperDao.getDiapersFlow(1) } returns flowOf(listOf(entity))
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val diaper =
-        Diaper(
-            id = 1,
-            child = 1,
-            change_type = "wet",
-            timestamp = "2024-01-15T14:00:00Z",
-            created_at = "2024-01-15T14:00:00Z",
-            updated_at = "2024-01-15T14:00:00Z")
+    val diaper = TestFixtures.mockDiaper(change_type = "wet")
     io.mockk.coEvery { apiService.listDiapers(1, 1) } returns
         PaginatedResponse(1, results = listOf(diaper))
     val repo = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
@@ -206,14 +175,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
     io.mockk.coEvery { diaperDao.deleteDiaper(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val diaper =
-        Diaper(
-            id = 1,
-            child = 1,
-            change_type = "dirty",
-            timestamp = "2024-01-15T14:00:00Z",
-            created_at = "2024-01-15T14:00:00Z",
-            updated_at = "2024-01-15T14:00:00Z")
+    val diaper = TestFixtures.mockDiaper(change_type = "dirty")
     val request = CreateDiaperRequest("dirty", "2024-01-15T14:00:00Z")
     io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaper
     io.mockk.coEvery { apiService.deleteDiaper(1, 1) } returns Unit
@@ -239,14 +201,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.every { napDao.getNapsFlow(1) } returns flowOf(listOf(entity))
     io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val nap =
-        Nap(
-            id = 1,
-            child = 1,
-            start_time = "2024-01-15T13:00:00Z",
-            end_time = null,
-            created_at = "2024-01-15T13:00:00Z",
-            updated_at = "2024-01-15T13:00:00Z")
+    val nap = TestFixtures.mockNap(end_time = null, updated_at = "2024-01-15T13:00:00Z")
     io.mockk.coEvery { apiService.listNaps(1, 1) } returns
         PaginatedResponse(1, results = listOf(nap))
     val repo = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
@@ -263,14 +218,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { napDao.upsertNap(any()) } returns Unit
     io.mockk.coEvery { napDao.deleteNap(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val nap =
-        Nap(
-            id = 1,
-            child = 1,
-            start_time = "2024-01-15T13:00:00Z",
-            end_time = "2024-01-15T14:00:00Z",
-            created_at = "2024-01-15T13:00:00Z",
-            updated_at = "2024-01-15T14:00:00Z")
+    val nap = TestFixtures.mockNap()
     val createRequest = CreateNapRequest("2024-01-15T13:00:00Z", null)
     val updateRequest = UpdateNapRequest("2024-01-15T14:00:00Z")
     io.mockk.coEvery { apiService.createNap(1, createRequest) } returns nap

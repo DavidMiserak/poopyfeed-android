@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.*
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -30,19 +31,7 @@ class ChildrenRepositoryTest {
 
   @Test
   fun `listChildren emits Loading then Success`() = runTest {
-    val mockChild =
-        Child(
-            id = 1,
-            name = "Baby Alice",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z",
-            last_feeding = "2024-01-15T12:00:00Z",
-            last_diaper_change = "2024-01-15T14:30:00Z",
-            last_nap = "2024-01-15T13:00:00Z")
-
+    val mockChild = TestFixtures.mockChild()
     val mockResponse = PaginatedResponse(count = 1, results = listOf(mockChild))
 
     coEvery { apiService.listChildren(page = 1) } returns mockResponse
@@ -75,17 +64,15 @@ class ChildrenRepositoryTest {
   @Test
   fun `createChild returns Success`() = runTest {
     val request = CreateChildRequest(name = "Baby Bob", date_of_birth = "2024-06-20", gender = "M")
-
     val mockResponse =
-        Child(
+        TestFixtures.mockChild(
             id = 2,
             name = "Baby Bob",
             date_of_birth = "2024-06-20",
             gender = "M",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
-
+            last_feeding = null,
+            last_diaper_change = null,
+            last_nap = null)
     coEvery { apiService.createChild(request) } returns mockResponse
 
     val result = repository.createChild(request)
@@ -111,17 +98,7 @@ class ChildrenRepositoryTest {
   @Test
   fun `getChild emits Loading then Success`() = runTest {
     val mockChild =
-        Child(
-            id = 1,
-            name = "Baby Alice",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z",
-            last_feeding = null,
-            last_diaper_change = null,
-            last_nap = null)
+        TestFixtures.mockChild(last_feeding = null, last_diaper_change = null, last_nap = null)
     coEvery { apiService.getChild(1) } returns mockChild
 
     val results = repository.getChild(1).toList()
@@ -135,15 +112,7 @@ class ChildrenRepositoryTest {
   @Test
   fun `updateChild returns Success`() = runTest {
     val request = CreateChildRequest("Baby Alice", "2024-01-15", "F")
-    val updated =
-        Child(
-            id = 1,
-            name = "Baby Alice",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T12:00:00Z")
+    val updated = TestFixtures.mockChild(updated_at = "2024-01-15T12:00:00Z")
     coEvery { apiService.updateChild(1, request) } returns updated
 
     val result = repository.updateChild(1, request)

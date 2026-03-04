@@ -5,6 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.*
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -23,17 +24,7 @@ class TrackingRepositoriesTest {
   @Test
   fun `FeedingsRepository listFeedings emits Loading then Success`() = runTest {
     val repository = FeedingsRepository(apiService)
-
-    val feeding =
-        Feeding(
-            id = 1,
-            child = 1,
-            feeding_type = "bottle",
-            amount_oz = 4.0,
-            timestamp = "2024-01-15T12:00:00Z",
-            created_at = "2024-01-15T12:00:00Z",
-            updated_at = "2024-01-15T12:00:00Z")
-
+    val feeding = TestFixtures.mockFeeding()
     val response = PaginatedResponse(count = 1, results = listOf(feeding))
 
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns response
@@ -85,18 +76,8 @@ class TrackingRepositoriesTest {
   @Test
   fun `NapsRepository createNap success returns Success`() = runTest {
     val repository = NapsRepository(apiService)
-
     val request = CreateNapRequest(start_time = "2024-01-15T13:00:00Z", end_time = null)
-
-    val nap =
-        Nap(
-            id = 1,
-            child = 1,
-            start_time = "2024-01-15T13:00:00Z",
-            end_time = null,
-            created_at = "2024-01-15T13:00:00Z",
-            updated_at = "2024-01-15T13:00:00Z")
-
+    val nap = TestFixtures.mockNap(end_time = null, updated_at = "2024-01-15T13:00:00Z")
     io.mockk.coEvery { apiService.createNap(1, request) } returns nap
 
     val result = repository.createNap(1, request)

@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
@@ -45,15 +44,7 @@ class HomeViewModelTest {
   @Test
   fun `when token present and profile loads successfully then Ready state emitted`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
-
-    val profile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "Test",
-            last_name = "User",
-            timezone = "UTC")
-
+    val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
     val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager)

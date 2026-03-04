@@ -8,6 +8,7 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
@@ -131,14 +132,7 @@ class AuthRepositoryTest {
 
   @Test
   fun `getProfile success returns Success with profile`() = runTest {
-    val profile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "Test",
-            last_name = "User",
-            timezone = "UTC")
-
+    val profile = TestFixtures.mockUserProfile()
     io.mockk.coEvery { apiService.getProfile() } returns profile
 
     val result = repository.getProfile()
@@ -164,15 +158,9 @@ class AuthRepositoryTest {
   fun `updateProfile success returns updated profile`() = runTest {
     val update =
         UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin")
-
     val updatedProfile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "New",
-            last_name = "Name",
-            timezone = "Europe/Berlin")
-
+        TestFixtures.mockUserProfile(
+            first_name = "New", last_name = "Name", timezone = "Europe/Berlin")
     io.mockk.coEvery { apiService.updateProfile(update) } returns updatedProfile
 
     val result = repository.updateProfile(update)

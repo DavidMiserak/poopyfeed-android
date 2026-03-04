@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.ChildDao
 import net.poopyfeed.pf.data.db.ChildEntity
@@ -68,15 +69,7 @@ class CachedChildrenRepositoryTest {
 
   @Test
   fun `refreshChildren success upserts and returns Success`() = runTest {
-    val child =
-        Child(
-            id = 1,
-            name = "Baby Alice",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+    val child = TestFixtures.mockChild()
     val response = PaginatedResponse(count = 1, results = listOf(child))
     io.mockk.coEvery { apiService.listChildren(page = 1) } returns response
     io.mockk.coEvery { childDao.upsertChildren(any()) } returns Unit
@@ -90,22 +83,13 @@ class CachedChildrenRepositoryTest {
 
   @Test
   fun `refreshChildren fetches all pages when next is non-null`() = runTest {
-    val child1 =
-        Child(
-            id = 1,
-            name = "Alice",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+    val child1 = TestFixtures.mockChild(id = 1, name = "Alice")
     val child2 =
-        Child(
+        TestFixtures.mockChild(
             id = 2,
             name = "Bob",
             date_of_birth = "2024-06-01",
             gender = "M",
-            user_role = "owner",
             created_at = "2024-06-01T10:00:00Z",
             updated_at = "2024-06-01T10:00:00Z")
     io.mockk.coEvery { apiService.listChildren(page = 1) } returns
@@ -132,15 +116,7 @@ class CachedChildrenRepositoryTest {
     yield()
     assertEquals(listOf(false), syncedValues)
 
-    val child =
-        Child(
-            id = 1,
-            name = "Baby",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+    val child = TestFixtures.mockChild(name = "Baby")
     io.mockk.coEvery { apiService.listChildren(page = 1) } returns
         PaginatedResponse(count = 1, results = listOf(child))
     io.mockk.coEvery { childDao.upsertChildren(any()) } returns Unit
@@ -152,15 +128,7 @@ class CachedChildrenRepositoryTest {
 
   @Test
   fun `hasSyncedFlow emits false after clearCache`() = runTest {
-    val child =
-        Child(
-            id = 1,
-            name = "Baby",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+    val child = TestFixtures.mockChild(name = "Baby")
     io.mockk.coEvery { apiService.listChildren(page = 1) } returns
         PaginatedResponse(count = 1, results = listOf(child))
     io.mockk.coEvery { childDao.upsertChildren(any()) } returns Unit
@@ -214,14 +182,14 @@ class CachedChildrenRepositoryTest {
   fun `createChild success upserts and returns Success`() = runTest {
     val request = CreateChildRequest("Baby Bob", "2024-06-20", "M")
     val child =
-        Child(
+        TestFixtures.mockChild(
             id = 2,
             name = "Baby Bob",
             date_of_birth = "2024-06-20",
             gender = "M",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+            last_feeding = null,
+            last_diaper_change = null,
+            last_nap = null)
     io.mockk.coEvery { apiService.createChild(request) } returns child
     io.mockk.coEvery { childDao.upsertChild(any()) } returns Unit
 
@@ -247,14 +215,7 @@ class CachedChildrenRepositoryTest {
   fun `updateChild success upserts and returns Success`() = runTest {
     val request = CreateChildRequest("Baby Alice Updated", "2024-01-15", "F")
     val child =
-        Child(
-            id = 1,
-            name = "Baby Alice Updated",
-            date_of_birth = "2024-01-15",
-            gender = "F",
-            user_role = "owner",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T12:00:00Z")
+        TestFixtures.mockChild(name = "Baby Alice Updated", updated_at = "2024-01-15T12:00:00Z")
     io.mockk.coEvery { apiService.updateChild(1, request) } returns child
     io.mockk.coEvery { childDao.upsertChild(any()) } returns Unit
 

@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
@@ -47,15 +46,7 @@ class AccountSettingsViewModelTest {
   @Test
   fun `loadProfile success emits Ready with sorted timezones`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
-
-    val profile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "Test",
-            last_name = "User",
-            timezone = "UTC")
-
+    val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
     val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
@@ -117,15 +108,7 @@ class AccountSettingsViewModelTest {
   @Test
   fun `saveProfile from Ready with success emits Saved`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
-
-    val initialProfile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "Old",
-            last_name = "Name",
-            timezone = "UTC")
-
+    val initialProfile = TestFixtures.mockUserProfile(first_name = "Old", last_name = "Name")
     val updatedProfile =
         initialProfile.copy(first_name = "New", last_name = "Name", timezone = "Europe/Berlin")
 
@@ -152,15 +135,7 @@ class AccountSettingsViewModelTest {
   @Test
   fun `saveProfile error emits Error state`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
-
-    val initialProfile =
-        UserProfile(
-            id = 1,
-            email = "user@example.com",
-            first_name = "Old",
-            last_name = "Name",
-            timezone = "UTC")
-
+    val initialProfile = TestFixtures.mockUserProfile(first_name = "Old", last_name = "Name")
     val apiError = ApiError.NetworkError("Network down")
 
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
