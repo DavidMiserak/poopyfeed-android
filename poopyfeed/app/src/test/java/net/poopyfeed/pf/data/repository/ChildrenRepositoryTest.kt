@@ -115,4 +115,48 @@ class ChildrenRepositoryTest {
         assertIs<ApiError.HttpError>(error)
         assertEquals(404, error.statusCode)
     }
+
+    @Test
+    fun `getChild emits Loading then Success`() = runTest {
+        val mockChild = Child(
+            id = 1,
+            name = "Baby Alice",
+            date_of_birth = "2024-01-15",
+            gender = "F",
+            user_role = "owner",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+            last_feeding = null,
+            last_diaper_change = null,
+            last_nap = null
+        )
+        coEvery { apiService.getChild(1) } returns mockChild
+
+        val results = repository.getChild(1).toList()
+
+        assertEquals(2, results.size)
+        assertIs<ApiResult.Loading<*>>(results[0])
+        assertIs<ApiResult.Success<Child>>(results[1])
+        assertEquals("Baby Alice", (results[1] as ApiResult.Success).data.name)
+    }
+
+    @Test
+    fun `updateChild returns Success`() = runTest {
+        val request = CreateChildRequest("Baby Alice", "2024-01-15", "F")
+        val updated = Child(
+            id = 1,
+            name = "Baby Alice",
+            date_of_birth = "2024-01-15",
+            gender = "F",
+            user_role = "owner",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T12:00:00Z"
+        )
+        coEvery { apiService.updateChild(1, request) } returns updated
+
+        val result = repository.updateChild(1, request)
+
+        assertIs<ApiResult.Success<Child>>(result)
+        assertEquals(updated.updated_at, result.data.updated_at)
+    }
 }

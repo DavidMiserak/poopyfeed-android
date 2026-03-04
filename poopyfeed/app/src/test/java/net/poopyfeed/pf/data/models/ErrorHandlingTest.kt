@@ -61,4 +61,14 @@ class ErrorHandlingTest {
 
         assertIs<ApiError.UnknownError>(apiError)
     }
+
+    @Test
+    fun `ApiError getUserMessage for HttpError with null detail returns errorMessage`() {
+        val error = ApiError.HttpError(
+            statusCode = 500,
+            errorMessage = "Internal Server Error",
+            detail = null
+        )
+        assertEquals("Internal Server Error", error.getUserMessage())
+    }
 }
