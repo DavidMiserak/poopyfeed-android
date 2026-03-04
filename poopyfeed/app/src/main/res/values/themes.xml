@@ -29,6 +29,9 @@
 
         <!-- Outline -->
         <item name="colorOutline">@color/rose_200</item>
+
+        <!-- Global font family: DM Sans for body text -->
+        <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
     <!-- Light theme -->
@@ -46,50 +49,112 @@
         <item name="colorSurfaceVariant">@color/slate_700</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/slate_300</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
-    <!-- Button Styles -->
-    <style name="Widget.Pf.Button.Primary" parent="Widget.Material3.Button.ElevatedButton">
+    <!-- ===================== -->
+    <!-- Button Styles         -->
+    <!-- ===================== -->
+
+    <!-- Primary gradient button -->
+    <style name="Widget.Pf.Button.Primary" parent="Widget.Material3.Button.UnelevatedButton">
         <item name="android:textColor">@color/white</item>
-        <item name="backgroundTint">@color/rose_400</item>
-        <item name="elevation">8dp</item>
+        <item name="android:fontFamily">@font/dm_sans_bold</item>
+        <item name="android:textSize">@dimen/text_body_large</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:background">@drawable/bg_button_primary_selector</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">12dp</item>
+        <item name="cornerRadius">@dimen/corner_radius_md</item>
     </style>
 
+    <!-- Secondary outlined button -->
     <style name="Widget.Pf.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textColor">@color/slate_700</item>
+        <item name="android:fontFamily">@font/dm_sans_medium</item>
         <item name="strokeColor">@color/rose_200</item>
         <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">@dimen/corner_radius_md</item>
     </style>
 
-    <!-- FAB Style -->
+    <!-- ===================== -->
+    <!-- FAB Style             -->
+    <!-- ===================== -->
+
     <style name="Widget.Pf.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
         <item name="backgroundTint">@color/rose_400</item>
         <item name="tint">@color/white</item>
         <item name="elevation">12dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Pf.FAB</item>
     </style>
 
-    <!-- Card Style -->
+    <style name="ShapeAppearance.Pf.FAB" parent="">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- ===================== -->
+    <!-- Card Styles           -->
+    <!-- ===================== -->
+
+    <!-- Standard elevated card (24dp corners) -->
     <style name="Widget.Pf.CardView" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/white</item>
         <item name="cardElevation">8dp</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="cardCornerRadius">@dimen/corner_radius_lg</item>
     </style>
 
-    <!-- Text Styles -->
+    <!-- Frosted glass card with rose border -->
+    <style name="Widget.Pf.CardView.Frosted" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/white_95</item>
+        <item name="cardElevation">12dp</item>
+        <item name="cardCornerRadius">@dimen/corner_radius_lg</item>
+        <item name="strokeColor">@color/rose_200</item>
+        <item name="strokeWidth">2dp</item>
+    </style>
+
+    <!-- ===================== -->
+    <!-- Text Styles (Fredoka) -->
+    <!-- ===================== -->
+
     <style name="TextAppearance.Pf.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
         <item name="android:textColor">@color/slate_900</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/fredoka</item>
     </style>
 
     <style name="TextAppearance.Pf.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
         <item name="android:textColor">@color/slate_900</item>
+        <item name="android:fontFamily">@font/fredoka</item>
     </style>
+
+    <style name="TextAppearance.Pf.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+    </style>
+
+    <style name="TextAppearance.Pf.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+    </style>
+
+    <!-- ========================== -->
+    <!-- Text Styles (DM Sans body) -->
+    <!-- ========================== -->
 
     <style name="TextAppearance.Pf.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textColor">@color/slate_700</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
     <style name="TextAppearance.Pf.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/slate_700</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
     </style>
+
+    <style name="TextAppearance.Pf.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">@color/slate_700</item>
+        <item name="android:fontFamily">@font/dm_sans_medium</item>
+    </style>
+
 </resources>

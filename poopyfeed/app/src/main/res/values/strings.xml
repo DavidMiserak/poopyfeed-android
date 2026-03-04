@@ -16,6 +16,8 @@
 
     <!-- Home -->
     <string name="logout_button">Log out</string>
-    <string name="welcome_message">Welcome, %1$s %2$s</string>
+    <string name="welcome_message">👋 Welcome, %1$s %2$s</string>
     <string name="home_subtitle">Here is what is happening with your little one today.</string>
+    <string name="home_getting_started_title">Getting Started</string>
+    <string name="home_getting_started_body">Add your first child to start tracking feedings, diapers, and naps.</string>
 </resources>

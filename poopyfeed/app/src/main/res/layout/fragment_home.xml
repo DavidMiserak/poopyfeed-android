@@ -4,65 +4,151 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/slate_50"
-    android:padding="@dimen/spacing_8"
+    android:background="@drawable/bg_gradient_page"
     android:fillViewport="true"
     tools:context=".HomeFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/spacing_16">
+        android:padding="@dimen/spacing_8">
+
+        <!-- ======================== -->
+        <!-- Decorative background blobs -->
+        <!-- ======================== -->
+
+        <View
+            android:id="@+id/blob_rose"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:background="@drawable/bg_blob_rose"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="-20dp"
+            android:layout_marginEnd="-40dp" />
+
+        <View
+            android:id="@+id/blob_orange"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:background="@drawable/bg_blob_orange"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="-40dp"
+            android:layout_marginStart="-40dp" />
+
+        <!-- ======================== -->
+        <!-- Hero welcome banner (gradient) -->
+        <!-- ======================== -->
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_welcome"
-            style="@style/Widget.Pf.CardView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_8"
-            android:layout_marginBottom="@dimen/spacing_4">
+            android:layout_marginTop="@dimen/spacing_4"
+            app:cardCornerRadius="@dimen/corner_radius_lg"
+            app:cardElevation="@dimen/elevation_12"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/spacing_6">
+                android:background="@drawable/bg_gradient_hero"
+                android:padding="@dimen/spacing_12">
 
+                <!-- Welcome text (white on gradient) -->
                 <TextView
                     android:id="@+id/text_welcome"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Pf.HeadlineMedium"
+                    android:fontFamily="@font/fredoka"
+                    android:textSize="@dimen/text_headline_medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Welcome, Sarah Johnson" />
+                    tools:text="👋 Welcome, Sarah" />
 
+                <!-- Subtitle (light rose on gradient) -->
                 <TextView
                     android:id="@+id/text_home_subtitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_2"
                     android:text="@string/home_subtitle"
-                    android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_body_large"
+                    android:textColor="@color/rose_100"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_welcome" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_logout"
-                    style="@style/Widget.Pf.Button.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/button_height"
-                    android:layout_marginTop="@dimen/spacing_6"
-                    android:text="@string/logout_button"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/text_home_subtitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+        <!-- ======================== -->
+        <!-- Content card (frosted glass) -->
+        <!-- ======================== -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_content"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_welcome">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_12">
+
+                <!-- Getting started prompt -->
+                <TextView
+                    android:id="@+id/text_getting_started_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_getting_started_title"
+                    android:textAppearance="@style/TextAppearance.Pf.TitleLarge"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_getting_started_body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="@string/home_getting_started_body"
+                    android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    android:textColor="@color/slate_600"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_getting_started_title" />
+
+                <!-- Logout button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_logout"
+                    style="@style/Widget.Pf.Button.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/logout_button"
+                    android:fontFamily="@font/dm_sans_medium"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_getting_started_body" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

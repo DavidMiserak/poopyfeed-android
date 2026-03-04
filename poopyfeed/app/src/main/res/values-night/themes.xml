@@ -28,5 +28,8 @@
 
         <!-- Outline -->
         <item name="colorOutline">@color/rose_600</item>
+
+        <!-- Font -->
+        <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 </resources>

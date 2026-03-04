@@ -4,28 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/slate_50"
-    android:padding="@dimen/spacing_8"
+    android:background="@drawable/bg_gradient_page"
     android:fillViewport="true"
     tools:context=".LoginFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_8">
 
-        <TextView
-            android:id="@+id/text_login_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_16"
-            android:text="@string/login_title"
-            android:textAppearance="@style/TextAppearance.Pf.DisplayLarge"
-            android:textColor="@color/rose_400"
-            android:gravity="center_horizontal"
+        <!-- ======================== -->
+        <!-- Decorative background blobs -->
+        <!-- ======================== -->
+
+        <View
+            android:id="@+id/blob_rose"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:background="@drawable/bg_blob_rose"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="-40dp"
+            android:layout_marginStart="-40dp" />
 
+        <View
+            android:id="@+id/blob_orange"
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:background="@drawable/bg_blob_orange"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="-60dp"
+            android:layout_marginEnd="-60dp" />
+
+        <!-- ======================== -->
+        <!-- Brand mark: heart + title -->
+        <!-- ======================== -->
+
+        <LinearLayout
+            android:id="@+id/brand_mark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/spacing_16"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_heart_logo"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_4"
+                android:text="@string/login_title"
+                android:textSize="36sp"
+                android:fontFamily="@font/fredoka"
+                android:textColor="@color/rose_400"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Subtitle -->
         <TextView
             android:id="@+id/text_login_subtitle"
             android:layout_width="0dp"
@@ -34,18 +79,21 @@
             android:text="@string/login_subtitle"
             android:textAppearance="@style/TextAppearance.Pf.BodyLarge"
             android:textAlignment="center"
+            android:paddingHorizontal="@dimen/spacing_8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_login_title" />
+            app:layout_constraintTop_toBottomOf="@id/brand_mark" />
+
+        <!-- ======================== -->
+        <!-- Login card (frosted glass) -->
+        <!-- ======================== -->
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_login"
-            style="@style/Widget.Pf.CardView"
+            style="@style/Widget.Pf.CardView.Frosted"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_12"
-            app:cardCornerRadius="@dimen/corner_radius_lg"
-            app:cardElevation="@dimen/elevation_8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_login_subtitle">
@@ -53,18 +101,20 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/spacing_6">
+                android:padding="@dimen/spacing_12">
 
+                <!-- Card title -->
                 <TextView
                     android:id="@+id/text_login_card_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/login_card_title"
-                    android:textAppearance="@style/TextAppearance.Pf.HeadlineMedium"
+                    android:textAppearance="@style/TextAppearance.Pf.HeadlineSmall"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- Card subtitle -->
                 <TextView
                     android:id="@+id/text_login_card_subtitle"
                     android:layout_width="0dp"
@@ -72,21 +122,25 @@
                     android:layout_marginTop="@dimen/spacing_2"
                     android:text="@string/login_card_subtitle"
                     android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    android:textColor="@color/slate_600"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_login_card_title" />
 
+                <!-- Email input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/input_layout_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_6"
+                    android:layout_marginTop="@dimen/spacing_8"
                     android:hint="@string/login_email_label"
                     app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="@color/rose_400"
+                    app:hintTextColor="@color/rose_400"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_login_card_subtitle">
@@ -96,10 +150,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"
-                        android:imeOptions="actionNext" />
+                        android:imeOptions="actionNext"
+                        android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Password input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/input_layout_password"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -112,6 +168,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="@color/rose_400"
+                    app:hintTextColor="@color/rose_400"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_email">
@@ -121,10 +179,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
-                        android:imeOptions="actionDone" />
+                        android:imeOptions="actionDone"
+                        android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Login button (gradient) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_login"
                     style="@style/Widget.Pf.Button.Primary"
@@ -136,13 +196,16 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_password" />
 
+                <!-- Loading indicator -->
                 <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/progress_login"
-                    style="@style/Widget.MaterialComponents.CircularProgressIndicator.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_4"
+                    android:layout_marginTop="@dimen/spacing_6"
                     android:visibility="gone"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/rose_400"
+                    app:trackColor="@color/rose_100"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button_login" />
