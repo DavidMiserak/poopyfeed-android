@@ -1,7 +1,6 @@
 package net.poopyfeed.pf
 
 import android.os.Bundle
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,8 +72,7 @@ class SignupFragment : Fragment() {
 
     var hasError = false
 
-    // Email format validated with Android's built-in Patterns.EMAIL_ADDRESS (no third-party library).
-    if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+    if (!EmailValidator.isValid(email)) {
       binding.inputLayoutSignupEmail.error = getString(R.string.signup_email_error)
       hasError = true
     } else {
