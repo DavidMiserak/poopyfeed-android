@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlin.jvm.Volatile
 import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.BuildConfig
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -24,21 +25,27 @@ import retrofit2.Retrofit
  */
 object NetworkModule {
 
-  private var sharedPreferences: SharedPreferences? = null
-  private var json: Json? = null
-  private var okHttpClient: OkHttpClient? = null
-  private var retrofit: Retrofit? = null
-  private var apiService: PoopyFeedApiService? = null
+  private val lock = Any()
+
+  @Volatile private var sharedPreferences: SharedPreferences? = null
+  @Volatile private var json: Json? = null
+  @Volatile private var okHttpClient: OkHttpClient? = null
+  @Volatile private var retrofit: Retrofit? = null
+  @Volatile private var apiService: PoopyFeedApiService? = null
 
   fun provideSharedPreferences(context: Context): SharedPreferences {
     return sharedPreferences
-        ?: context.applicationContext
-            .getSharedPreferences("poopyfeed_prefs", Context.MODE_PRIVATE)
-            .also { sharedPreferences = it }
+        ?: synchronized(lock) {
+          sharedPreferences
+              ?: context.applicationContext
+                  .getSharedPreferences("poopyfeed_prefs", Context.MODE_PRIVATE)
+                  .also { sharedPreferences = it }
+        }
   }
 
   fun provideJson(): Json {
-    return json ?: Json { ignoreUnknownKeys = true }.also { json = it }
+    return json
+        ?: synchronized(lock) { json ?: Json { ignoreUnknownKeys = true }.also { json = it } }
   }
 
   private fun getAuthTokenInternal(prefs: SharedPreferences): String? =
@@ -59,42 +66,49 @@ object NetworkModule {
 
   fun provideOkHttpClient(context: Context): OkHttpClient {
     return okHttpClient
-        ?: run {
-          val prefs = provideSharedPreferences(context)
+        ?: synchronized(lock) {
+          okHttpClient
+              ?: run {
+                val prefs = provideSharedPreferences(context)
 
-          val authInterceptor = Interceptor { chain ->
-            val token = getAuthTokenInternal(prefs)
-            val request =
-                if (token != null) {
-                  chain.request().newBuilder().header("Authorization", "Token $token").build()
-                } else {
-                  chain.request()
-                }
-            chain.proceed(request)
-          }
-
-          val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-
-          val cookieJar =
-              object : okhttp3.CookieJar {
-                private val cookies: MutableList<okhttp3.Cookie> = mutableListOf()
-
-                override fun saveFromResponse(url: okhttp3.HttpUrl, cookies: List<okhttp3.Cookie>) {
-                  this.cookies.removeAll { it.matches(url) }
-                  this.cookies.addAll(cookies)
+                val authInterceptor = Interceptor { chain ->
+                  val token = getAuthTokenInternal(prefs)
+                  val request =
+                      if (token != null) {
+                        chain.request().newBuilder().header("Authorization", "Token $token").build()
+                      } else {
+                        chain.request()
+                      }
+                  chain.proceed(request)
                 }
 
-                override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> {
-                  return cookies.filter { it.matches(url) }
-                }
+                val logging =
+                    HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+
+                val cookieJar =
+                    object : okhttp3.CookieJar {
+                      private val cookies: MutableList<okhttp3.Cookie> = mutableListOf()
+
+                      override fun saveFromResponse(
+                          url: okhttp3.HttpUrl,
+                          cookies: List<okhttp3.Cookie>
+                      ) {
+                        this.cookies.removeAll { it.matches(url) }
+                        this.cookies.addAll(cookies)
+                      }
+
+                      override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> {
+                        return cookies.filter { it.matches(url) }
+                      }
+                    }
+
+                OkHttpClient.Builder()
+                    .cookieJar(cookieJar)
+                    .addInterceptor(authInterceptor)
+                    .addInterceptor(logging)
+                    .build()
+                    .also { okHttpClient = it }
               }
-
-          OkHttpClient.Builder()
-              .cookieJar(cookieJar)
-              .addInterceptor(authInterceptor)
-              .addInterceptor(logging)
-              .build()
-              .also { okHttpClient = it }
         }
   }
 
@@ -104,19 +118,27 @@ object NetworkModule {
    */
   fun provideRetrofit(context: Context): Retrofit {
     return retrofit
-        ?: run {
-          val contentType = "application/json".toMediaType()
-          Retrofit.Builder()
-              .baseUrl(BuildConfig.API_BASE_URL)
-              .client(provideOkHttpClient(context))
-              .addConverterFactory(provideJson().asConverterFactory(contentType))
-              .build()
-              .also { retrofit = it }
+        ?: synchronized(lock) {
+          retrofit
+              ?: run {
+                val contentType = "application/json".toMediaType()
+                Retrofit.Builder()
+                    .baseUrl(BuildConfig.API_BASE_URL)
+                    .client(provideOkHttpClient(context))
+                    .addConverterFactory(provideJson().asConverterFactory(contentType))
+                    .build()
+                    .also { retrofit = it }
+              }
         }
   }
 
   fun providePoopyFeedApiService(context: Context): PoopyFeedApiService {
     return apiService
-        ?: provideRetrofit(context).create(PoopyFeedApiService::class.java).also { apiService = it }
+        ?: synchronized(lock) {
+          apiService
+              ?: provideRetrofit(context).create(PoopyFeedApiService::class.java).also {
+                apiService = it
+              }
+        }
   }
 }
