@@ -73,6 +73,7 @@ class SignupFragment : Fragment() {
 
     var hasError = false
 
+    // Email format validated with Android's built-in Patterns.EMAIL_ADDRESS (no third-party library).
     if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
       binding.inputLayoutSignupEmail.error = getString(R.string.signup_email_error)
       hasError = true
