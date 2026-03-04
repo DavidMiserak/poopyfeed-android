@@ -81,6 +81,47 @@ class CachedTrackingRepositoriesTest {
   }
 
   @Test
+  fun `CachedFeedingsRepository refreshFeedings fetches all pages when next is non-null`() =
+      runTest {
+        val feedingDao = io.mockk.mockk<FeedingDao>()
+        io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
+        val apiService = io.mockk.mockk<PoopyFeedApiService>()
+        val feeding1 =
+            Feeding(
+                id = 1,
+                child = 1,
+                feeding_type = "bottle",
+                amount_oz = 4.0,
+                timestamp = "2024-01-15T12:00:00Z",
+                created_at = "2024-01-15T12:00:00Z",
+                updated_at = "2024-01-15T12:00:00Z")
+        val feeding2 =
+            Feeding(
+                id = 2,
+                child = 1,
+                feeding_type = "breast",
+                amount_oz = null,
+                timestamp = "2024-01-15T14:00:00Z",
+                created_at = "2024-01-15T14:00:00Z",
+                updated_at = "2024-01-15T14:00:00Z")
+        io.mockk.coEvery { apiService.listFeedings(1, 1) } returns
+            PaginatedResponse(
+                count = 2, next = "http://api/feedings/?page=2", results = listOf(feeding1))
+        io.mockk.coEvery { apiService.listFeedings(1, 2) } returns
+            PaginatedResponse(count = 2, next = null, results = listOf(feeding2))
+        val repo = CachedFeedingsRepository(apiService, feedingDao)
+
+        val result = repo.refreshFeedings(1)
+
+        assertIs<ApiResult.Success<List<Feeding>>>(result)
+        assertEquals(2, result.data.size)
+        assertEquals("bottle", result.data[0].feeding_type)
+        assertEquals("breast", result.data[1].feeding_type)
+        io.mockk.coVerify { apiService.listFeedings(1, 1) }
+        io.mockk.coVerify { apiService.listFeedings(1, 2) }
+      }
+
+  @Test
   fun `CachedFeedingsRepository createFeeding and deleteFeeding`() = runTest {
     val feedingDao = io.mockk.mockk<FeedingDao>()
     io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit

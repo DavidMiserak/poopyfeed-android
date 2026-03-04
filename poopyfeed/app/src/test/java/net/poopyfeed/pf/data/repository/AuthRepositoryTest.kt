@@ -1,5 +1,7 @@
 package net.poopyfeed.pf.data.repository
 
+import io.mockk.Ordering
+import io.mockk.coVerify
 import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -46,6 +48,31 @@ class AuthRepositoryTest {
   }
 
   @Test
+  fun `login calls sessionLogin then fetchAuthToken in order`() = runTest {
+    io.mockk.coEvery { apiService.sessionLogin(any()) } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery { apiService.fetchAuthToken() } returns
+        AuthTokenResponse(auth_token = "token-xyz")
+
+    repository.login("user@example.com", "password123")
+
+    coVerify(ordering = Ordering.ORDERED) {
+      apiService.sessionLogin(any())
+      apiService.fetchAuthToken()
+    }
+  }
+
+  @Test
+  fun `login token exchange failure returns Error`() = runTest {
+    io.mockk.coEvery { apiService.sessionLogin(any()) } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery { apiService.fetchAuthToken() } throws IOException("Token exchange failed")
+
+    val result = repository.login("user@example.com", "password123")
+
+    assertIs<ApiResult.Error<String>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
   fun `login network error returns Error with NetworkError`() = runTest {
     io.mockk.coEvery { apiService.sessionLogin(any()) } throws IOException("Network down")
 
@@ -71,6 +98,31 @@ class AuthRepositoryTest {
 
     assertIs<ApiResult.Success<String>>(result)
     assertEquals("token-456", result.data)
+  }
+
+  @Test
+  fun `signup calls signup then fetchAuthToken in order`() = runTest {
+    io.mockk.coEvery { apiService.signup(any()) } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery { apiService.fetchAuthToken() } returns
+        AuthTokenResponse(auth_token = "token-789")
+
+    repository.signup("new@example.com", "password123")
+
+    coVerify(ordering = Ordering.ORDERED) {
+      apiService.signup(any())
+      apiService.fetchAuthToken()
+    }
+  }
+
+  @Test
+  fun `signup token exchange failure returns Error`() = runTest {
+    io.mockk.coEvery { apiService.signup(any()) } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery { apiService.fetchAuthToken() } throws IOException("Token exchange failed")
+
+    val result = repository.signup("new@example.com", "password123")
+
+    assertIs<ApiResult.Error<String>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
   }
 
   @Test

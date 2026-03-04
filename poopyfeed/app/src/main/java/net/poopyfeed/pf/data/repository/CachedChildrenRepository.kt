@@ -1,6 +1,8 @@
 package net.poopyfeed.pf.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.ChildDao
@@ -33,6 +35,13 @@ class CachedChildrenRepository(
     private val childDao: ChildDao
 ) {
 
+  private val _hasSynced = MutableStateFlow(false)
+  /**
+   * True after at least one successful [refreshChildren]. Use to distinguish NotSynced vs
+   * Synced(empty).
+   */
+  val hasSyncedFlow: Flow<Boolean> = _hasSynced.asStateFlow()
+
   /**
    * Get all children from local cache as Flow.
    *
@@ -62,13 +71,19 @@ class CachedChildrenRepository(
   /** Manually refresh children from API and update cache. Useful for pull-to-refresh patterns. */
   suspend fun refreshChildren(): ApiResult<List<Child>> =
       try {
-        val response = apiService.listChildren(page = 1)
-        val entities = response.results.map { ChildEntity.fromApiModel(it) }
-
-        // Update local cache
+        val allResults = mutableListOf<Child>()
+        var page = 1
+        var response = apiService.listChildren(page = page)
+        allResults.addAll(response.results)
+        while (response.next != null) {
+          page += 1
+          response = apiService.listChildren(page = page)
+          allResults.addAll(response.results)
+        }
+        val entities = allResults.map { ChildEntity.fromApiModel(it) }
         childDao.upsertChildren(entities)
-
-        ApiResult.Success(response.results)
+        _hasSynced.value = true
+        ApiResult.Success(allResults)
       } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
       }
@@ -109,9 +124,13 @@ class CachedChildrenRepository(
         ApiResult.Error(e.toApiError())
       }
 
-  /** Clear all local cache (e.g., on logout). */
+  /**
+   * Clear all local cache (e.g., on logout). Resets sync status so UI can show NotSynced until next
+   * refresh.
+   */
   suspend fun clearCache() {
     childDao.clearAll()
+    _hasSynced.value = false
   }
 }
 
@@ -120,6 +139,11 @@ class CachedFeedingsRepository(
     private val apiService: PoopyFeedApiService,
     private val feedingDao: FeedingDao
 ) {
+
+  private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
+  /** True for [childId] after at least one successful [refreshFeedings]. */
+  fun hasSyncedFlow(childId: Int): Flow<Boolean> =
+      _syncedChildIds.asStateFlow().map { childId in it }
 
   /** Get all feedings for a child from cache as Flow. Empty cache emits Success(emptyList()). */
   fun listFeedingsCached(childId: Int): Flow<ApiResult<List<Feeding>>> =
@@ -131,13 +155,22 @@ class CachedFeedingsRepository(
         }
       }
 
-  /** Refresh feedings from API. */
+  /** Refresh feedings from API (all pages). */
   suspend fun refreshFeedings(childId: Int): ApiResult<List<Feeding>> =
       try {
-        val response = apiService.listFeedings(childId, page = 1)
-        val entities = response.results.map { FeedingEntity.fromApiModel(it) }
+        val allResults = mutableListOf<Feeding>()
+        var page = 1
+        var response = apiService.listFeedings(childId, page = page)
+        allResults.addAll(response.results)
+        while (response.next != null) {
+          page += 1
+          response = apiService.listFeedings(childId, page = page)
+          allResults.addAll(response.results)
+        }
+        val entities = allResults.map { FeedingEntity.fromApiModel(it) }
         feedingDao.upsertFeedings(entities)
-        ApiResult.Success(response.results)
+        _syncedChildIds.value = _syncedChildIds.value + childId
+        ApiResult.Success(allResults)
       } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
       }
@@ -163,9 +196,10 @@ class CachedFeedingsRepository(
         ApiResult.Error(e.toApiError())
       }
 
-  /** Clear feedings cache for a child. */
+  /** Clear feedings cache for a child. Resets sync status for this child. */
   suspend fun clearChildCache(childId: Int) {
     feedingDao.clearChildFeedings(childId)
+    _syncedChildIds.value = _syncedChildIds.value - childId
   }
 }
 
@@ -174,6 +208,11 @@ class CachedDiapersRepository(
     private val apiService: PoopyFeedApiService,
     private val diaperDao: DiaperDao
 ) {
+
+  private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
+  /** True for [childId] after at least one successful [refreshDiapers]. */
+  fun hasSyncedFlow(childId: Int): Flow<Boolean> =
+      _syncedChildIds.asStateFlow().map { childId in it }
 
   /** Empty cache emits Success(emptyList()). */
   fun listDiapersCached(childId: Int): Flow<ApiResult<List<Diaper>>> =
@@ -185,12 +224,22 @@ class CachedDiapersRepository(
         }
       }
 
+  /** Refresh diapers from API (all pages). */
   suspend fun refreshDiapers(childId: Int): ApiResult<List<Diaper>> =
       try {
-        val response = apiService.listDiapers(childId, page = 1)
-        val entities = response.results.map { DiaperEntity.fromApiModel(it) }
+        val allResults = mutableListOf<Diaper>()
+        var page = 1
+        var response = apiService.listDiapers(childId, page = page)
+        allResults.addAll(response.results)
+        while (response.next != null) {
+          page += 1
+          response = apiService.listDiapers(childId, page = page)
+          allResults.addAll(response.results)
+        }
+        val entities = allResults.map { DiaperEntity.fromApiModel(it) }
         diaperDao.upsertDiapers(entities)
-        ApiResult.Success(response.results)
+        _syncedChildIds.value = _syncedChildIds.value + childId
+        ApiResult.Success(allResults)
       } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
       }
@@ -216,6 +265,7 @@ class CachedDiapersRepository(
 
   suspend fun clearChildCache(childId: Int) {
     diaperDao.clearChildDiapers(childId)
+    _syncedChildIds.value = _syncedChildIds.value - childId
   }
 }
 
@@ -224,6 +274,11 @@ class CachedNapsRepository(
     private val apiService: PoopyFeedApiService,
     private val napDao: NapDao
 ) {
+
+  private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
+  /** True for [childId] after at least one successful [refreshNaps]. */
+  fun hasSyncedFlow(childId: Int): Flow<Boolean> =
+      _syncedChildIds.asStateFlow().map { childId in it }
 
   /** Empty cache emits Success(emptyList()). */
   fun listNapsCached(childId: Int): Flow<ApiResult<List<Nap>>> =
@@ -235,12 +290,22 @@ class CachedNapsRepository(
         }
       }
 
+  /** Refresh naps from API (all pages). */
   suspend fun refreshNaps(childId: Int): ApiResult<List<Nap>> =
       try {
-        val response = apiService.listNaps(childId, page = 1)
-        val entities = response.results.map { NapEntity.fromApiModel(it) }
+        val allResults = mutableListOf<Nap>()
+        var page = 1
+        var response = apiService.listNaps(childId, page = page)
+        allResults.addAll(response.results)
+        while (response.next != null) {
+          page += 1
+          response = apiService.listNaps(childId, page = page)
+          allResults.addAll(response.results)
+        }
+        val entities = allResults.map { NapEntity.fromApiModel(it) }
         napDao.upsertNaps(entities)
-        ApiResult.Success(response.results)
+        _syncedChildIds.value = _syncedChildIds.value + childId
+        ApiResult.Success(allResults)
       } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
       }
@@ -276,5 +341,6 @@ class CachedNapsRepository(
 
   suspend fun clearChildCache(childId: Int) {
     napDao.clearChildNaps(childId)
+    _syncedChildIds.value = _syncedChildIds.value - childId
   }
 }

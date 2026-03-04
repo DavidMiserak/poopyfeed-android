@@ -84,7 +84,11 @@ object NetworkModule {
                 }
 
                 val logging =
-                    HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+                    HttpLoggingInterceptor().apply {
+                      level =
+                          if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                          else HttpLoggingInterceptor.Level.NONE
+                    }
 
                 val cookieJar = PersistentCookieJar(prefs, provideJson())
 
