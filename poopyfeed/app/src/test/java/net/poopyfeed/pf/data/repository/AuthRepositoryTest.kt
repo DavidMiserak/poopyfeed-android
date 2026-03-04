@@ -5,6 +5,8 @@ import io.mockk.coVerify
 import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiError
@@ -18,15 +20,17 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AuthRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var repository: AuthRepository
+  private val testDispatcher = UnconfinedTestDispatcher()
 
   @Before
   fun setup() {
     apiService = io.mockk.mockk()
-    repository = AuthRepository(apiService)
+    repository = AuthRepository(apiService, ioDispatcher = testDispatcher)
   }
 
   @Test

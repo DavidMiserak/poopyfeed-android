@@ -4,7 +4,9 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.*
@@ -13,15 +15,17 @@ import org.junit.Before
 import org.junit.Test
 
 /** Unit tests for ChildrenRepository. */
+@OptIn(ExperimentalCoroutinesApi::class)
 class ChildrenRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var repository: ChildrenRepository
+  private val testDispatcher = UnconfinedTestDispatcher()
 
   @Before
   fun setup() {
     apiService = mockk()
-    repository = ChildrenRepository(apiService)
+    repository = ChildrenRepository(apiService, ioDispatcher = testDispatcher)
   }
 
   @Test

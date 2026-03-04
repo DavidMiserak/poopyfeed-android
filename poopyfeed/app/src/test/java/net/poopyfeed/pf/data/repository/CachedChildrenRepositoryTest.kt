@@ -3,10 +3,12 @@ package net.poopyfeed.pf.data.repository
 import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -17,17 +19,19 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CachedChildrenRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var childDao: ChildDao
   private lateinit var repository: CachedChildrenRepository
+  private val testDispatcher = UnconfinedTestDispatcher()
 
   @Before
   fun setup() {
     apiService = io.mockk.mockk()
     childDao = io.mockk.mockk()
-    repository = CachedChildrenRepository(apiService, childDao)
+    repository = CachedChildrenRepository(apiService, childDao, ioDispatcher = testDispatcher)
   }
 
   @Test
