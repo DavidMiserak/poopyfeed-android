@@ -38,6 +38,12 @@ class SignupViewModelTest {
     }
 
     @Test
+    fun `initial state is Idle`() {
+        val state = viewModel.uiState.value
+        assertIs<SignupUiState.Idle>(state)
+    }
+
+    @Test
     fun `signUp success emits Success state with token`() = runTest {
         val token = "test-token-123"
         coEvery { authRepository.signup(any(), any()) } returns ApiResult.Success(token)
@@ -63,5 +69,23 @@ class SignupViewModelTest {
         val state = viewModel.uiState.value
         assertIs<SignupUiState.Error>(state)
         assertEquals(apiError.getUserMessage(), state.message)
+    }
+
+    @Test
+    fun `clearError from Error returns Idle`() = runTest {
+        val apiError = ApiError.NetworkError("Network down")
+        coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
+
+        viewModel.signUp("test@example.com", "password123")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val errorState = viewModel.uiState.value
+        assertIs<SignupUiState.Error>(errorState)
+
+        viewModel.clearError()
+
+        val idleState = viewModel.uiState.value
+        assertIs<SignupUiState.Idle>(idleState)
     }
 }

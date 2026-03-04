@@ -27,6 +27,7 @@ help:
 	@echo ""
 	@echo "Testing & Quality:"
 	@echo "  make test               Run unit tests"
+	@echo "  make coverage           Run unit tests with JaCoCo and show report path"
 	@echo "  make lint               Run lint checks"
 	@echo "  make lint-fix           Attempt to auto-fix lint issues"
 	@echo ""
@@ -85,6 +86,20 @@ clean:
 test:
 	@echo "Running unit tests..."
 	cd poopyfeed && $(GRADLE) test
+
+coverage:
+	@echo "Running unit tests with coverage..."
+	cd poopyfeed && $(GRADLE) testDebugUnitTest jacocoTestDebugUnitTestReport
+	@echo ""
+	@echo "JaCoCo coverage summary (LINE):"
+	@if [ -f "poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml" ]; then \
+		awk -F'"' '/<counter type="LINE"/ {missed=$$4; covered=$$6} END { total=missed+covered; if (total>0) printf "  %.2f%% (%d/%d lines covered)\n", covered*100/total, covered, total; else print "  0.00%% (0/0 lines covered)"; }' poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml; \
+	else \
+		echo "  XML report not found at poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml"; \
+	fi
+	@echo ""
+	@echo "HTML report:"
+	@echo "  poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/html/index.html"
 
 # Lint
 lint:

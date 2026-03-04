@@ -1,7 +1,12 @@
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    id("jacoco")
 }
 
 android {
@@ -43,6 +48,79 @@ android {
     }
 }
 
+configure<JacocoPluginExtension> {
+    toolVersion = "0.8.10"
+}
+
+val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "androidx/**/*",
+            "android/**/*"
+        )
+    }
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+            )
+        }
+    )
+}
+
+val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerification::class) {
+    dependsOn("testDebugUnitTest")
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "androidx/**/*",
+            "android/**/*"
+        )
+    }
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+            )
+        }
+    )
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.90".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(jacocoTestDebugUnitTestVerification)
+}
+
 dependencies {
     // AndroidX
     implementation(libs.androidx.core.ktx)
@@ -74,6 +152,8 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

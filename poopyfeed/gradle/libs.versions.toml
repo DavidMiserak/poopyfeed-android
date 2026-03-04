@@ -20,6 +20,8 @@ room = "2.7.1"
 mockk = "1.14.2"
 coroutinesTest = "1.10.2"
 lifecycle = "2.9.0"
+robolectric = "4.11.1"
+androidxTestCore = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,8 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # Testing
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
