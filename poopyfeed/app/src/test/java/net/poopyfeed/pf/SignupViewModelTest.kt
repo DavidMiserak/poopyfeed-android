@@ -2,6 +2,8 @@ package net.poopyfeed.pf
 
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -14,78 +16,76 @@ import net.poopyfeed.pf.data.repository.AuthRepository
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignupViewModelTest {
 
-    private lateinit var authRepository: AuthRepository
-    private lateinit var viewModel: SignupViewModel
+  private lateinit var authRepository: AuthRepository
+  private lateinit var viewModel: SignupViewModel
 
-    private val testDispatcher = StandardTestDispatcher()
+  private val testDispatcher = StandardTestDispatcher()
 
-    @Before
-    fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        authRepository = mockk()
-        viewModel = SignupViewModel(authRepository)
-    }
+  @Before
+  fun setup() {
+    Dispatchers.setMain(testDispatcher)
+    authRepository = mockk()
+    viewModel = SignupViewModel(authRepository)
+  }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
+  @After
+  fun tearDown() {
+    Dispatchers.resetMain()
+  }
 
-    @Test
-    fun `initial state is Idle`() {
-        val state = viewModel.uiState.value
-        assertIs<SignupUiState.Idle>(state)
-    }
+  @Test
+  fun `initial state is Idle`() {
+    val state = viewModel.uiState.value
+    assertIs<SignupUiState.Idle>(state)
+  }
 
-    @Test
-    fun `signUp success emits Success state with token`() = runTest {
-        val token = "test-token-123"
-        coEvery { authRepository.signup(any(), any()) } returns ApiResult.Success(token)
+  @Test
+  fun `signUp success emits Success state with token`() = runTest {
+    val token = "test-token-123"
+    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Success(token)
 
-        viewModel.signUp("test@example.com", "password123")
+    viewModel.signUp("test@example.com", "password123")
 
-        testDispatcher.scheduler.advanceUntilIdle()
+    testDispatcher.scheduler.advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertIs<SignupUiState.Success>(state)
-        assertEquals(token, state.token)
-    }
+    val state = viewModel.uiState.value
+    assertIs<SignupUiState.Success>(state)
+    assertEquals(token, state.token)
+  }
 
-    @Test
-    fun `signUp error emits Error state`() = runTest {
-        val apiError = ApiError.NetworkError("Network down")
-        coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
+  @Test
+  fun `signUp error emits Error state`() = runTest {
+    val apiError = ApiError.NetworkError("Network down")
+    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
 
-        viewModel.signUp("test@example.com", "password123")
+    viewModel.signUp("test@example.com", "password123")
 
-        testDispatcher.scheduler.advanceUntilIdle()
+    testDispatcher.scheduler.advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertIs<SignupUiState.Error>(state)
-        assertEquals(apiError.getUserMessage(), state.message)
-    }
+    val state = viewModel.uiState.value
+    assertIs<SignupUiState.Error>(state)
+    assertEquals(apiError.getUserMessage(), state.message)
+  }
 
-    @Test
-    fun `clearError from Error returns Idle`() = runTest {
-        val apiError = ApiError.NetworkError("Network down")
-        coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
+  @Test
+  fun `clearError from Error returns Idle`() = runTest {
+    val apiError = ApiError.NetworkError("Network down")
+    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
 
-        viewModel.signUp("test@example.com", "password123")
+    viewModel.signUp("test@example.com", "password123")
 
-        testDispatcher.scheduler.advanceUntilIdle()
+    testDispatcher.scheduler.advanceUntilIdle()
 
-        val errorState = viewModel.uiState.value
-        assertIs<SignupUiState.Error>(errorState)
+    val errorState = viewModel.uiState.value
+    assertIs<SignupUiState.Error>(errorState)
 
-        viewModel.clearError()
+    viewModel.clearError()
 
-        val idleState = viewModel.uiState.value
-        assertIs<SignupUiState.Idle>(idleState)
-    }
+    val idleState = viewModel.uiState.value
+    assertIs<SignupUiState.Idle>(idleState)
+  }
 }

@@ -3,8 +3,8 @@ package net.poopyfeed.pf.data.models
 import kotlinx.serialization.Serializable
 
 /**
- * API Response wrapper for paginated endpoints.
- * Matches Django REST Framework's default pagination response.
+ * API Response wrapper for paginated endpoints. Matches Django REST Framework's default pagination
+ * response.
  */
 @Serializable
 data class PaginatedResponse<T>(
@@ -13,14 +13,11 @@ data class PaginatedResponse<T>(
     val previous: String? = null,
     val results: List<T>
 ) {
-    val totalPages: Int
-        get() = (count + results.size - 1) / results.size.coerceAtLeast(1)
+  val totalPages: Int
+    get() = (count + results.size - 1) / results.size.coerceAtLeast(1)
 }
 
-/**
- * Child profile resource.
- * Represents a baby being tracked in the app.
- */
+/** Child profile resource. Represents a baby being tracked in the app. */
 @Serializable
 data class Child(
     val id: Int,
@@ -35,19 +32,11 @@ data class Child(
     val last_nap: String? = null // ISO 8601 datetime or null
 )
 
-/**
- * DTO for creating/updating a Child.
- */
+/** DTO for creating/updating a Child. */
 @Serializable
-data class CreateChildRequest(
-    val name: String,
-    val date_of_birth: String,
-    val gender: String
-)
+data class CreateChildRequest(val name: String, val date_of_birth: String, val gender: String)
 
-/**
- * Feeding event - bottle or breastfeeding.
- */
+/** Feeding event - bottle or breastfeeding. */
 @Serializable
 data class Feeding(
     val id: Int,
@@ -59,9 +48,7 @@ data class Feeding(
     val updated_at: String
 )
 
-/**
- * DTO for creating/updating a Feeding.
- */
+/** DTO for creating/updating a Feeding. */
 @Serializable
 data class CreateFeedingRequest(
     val feeding_type: String,
@@ -69,9 +56,7 @@ data class CreateFeedingRequest(
     val timestamp: String
 )
 
-/**
- * Diaper change event.
- */
+/** Diaper change event. */
 @Serializable
 data class Diaper(
     val id: Int,
@@ -82,18 +67,10 @@ data class Diaper(
     val updated_at: String
 )
 
-/**
- * DTO for creating/updating a Diaper change.
- */
-@Serializable
-data class CreateDiaperRequest(
-    val change_type: String,
-    val timestamp: String
-)
+/** DTO for creating/updating a Diaper change. */
+@Serializable data class CreateDiaperRequest(val change_type: String, val timestamp: String)
 
-/**
- * Nap event.
- */
+/** Nap event. */
 @Serializable
 data class Nap(
     val id: Int,
@@ -104,26 +81,13 @@ data class Nap(
     val updated_at: String
 )
 
-/**
- * DTO for creating a Nap.
- */
-@Serializable
-data class CreateNapRequest(
-    val start_time: String,
-    val end_time: String? = null
-)
+/** DTO for creating a Nap. */
+@Serializable data class CreateNapRequest(val start_time: String, val end_time: String? = null)
 
-/**
- * DTO for ending an ongoing nap.
- */
-@Serializable
-data class UpdateNapRequest(
-    val end_time: String
-)
+/** DTO for ending an ongoing nap. */
+@Serializable data class UpdateNapRequest(val end_time: String)
 
-/**
- * Child sharing relationship.
- */
+/** Child sharing relationship. */
 @Serializable
 data class ChildShare(
     val id: Int,
@@ -134,18 +98,10 @@ data class ChildShare(
     val updated_at: String
 )
 
-/**
- * DTO for creating a share invite.
- */
-@Serializable
-data class CreateShareRequest(
-    val email: String,
-    val role: String
-)
+/** DTO for creating a share invite. */
+@Serializable data class CreateShareRequest(val email: String, val role: String)
 
-/**
- * Share invite (pending or accepted).
- */
+/** Share invite (pending or accepted). */
 @Serializable
 data class ShareInvite(
     val id: Int,
@@ -157,46 +113,43 @@ data class ShareInvite(
     val updated_at: String
 )
 
-/**
- * Sealed class for API error responses.
- * Type-safe error handling across the app.
- */
+/** Sealed class for API error responses. Type-safe error handling across the app. */
 sealed class ApiError : Exception() {
-    data class HttpError(
-        val statusCode: Int,
-        val errorMessage: String,
-        val detail: String? = null,
-        val fields: Map<String, List<String>>? = null
-    ) : ApiError()
+  data class HttpError(
+      val statusCode: Int,
+      val errorMessage: String,
+      val detail: String? = null,
+      val fields: Map<String, List<String>>? = null
+  ) : ApiError()
 
-    data class NetworkError(val errorMessage: String) : ApiError()
-    data class SerializationError(val errorMessage: String) : ApiError()
-    data class UnknownError(val errorMessage: String) : ApiError()
+  data class NetworkError(val errorMessage: String) : ApiError()
 
-    /**
-     * Extract user-friendly error message.
-     */
-    fun getUserMessage(): String = when (this) {
+  data class SerializationError(val errorMessage: String) : ApiError()
+
+  data class UnknownError(val errorMessage: String) : ApiError()
+
+  /** Extract user-friendly error message. */
+  fun getUserMessage(): String =
+      when (this) {
         is HttpError -> detail ?: errorMessage
         is NetworkError -> "Network error. Please check your connection."
         is SerializationError -> "Data format error. Please try again."
         is UnknownError -> "Something went wrong. Please try again."
-    }
+      }
 }
 
-/**
- * Sealed class for API result state.
- * Use for loading, success, and error states in UI.
- */
+/** Sealed class for API result state. Use for loading, success, and error states in UI. */
 sealed class ApiResult<out T> {
-    data class Success<T>(val data: T) : ApiResult<T>()
-    class Loading<T> : ApiResult<T>()
-    data class Error<T>(val error: ApiError) : ApiResult<T>()
+  data class Success<T>(val data: T) : ApiResult<T>()
+
+  class Loading<T> : ApiResult<T>()
+
+  data class Error<T>(val error: ApiError) : ApiResult<T>()
 }
 
 /**
- * Session login response from django-allauth headless browser auth.
- * We only care that status is 200; data/meta are ignored.
+ * Session login response from django-allauth headless browser auth. We only care that status is
+ * 200; data/meta are ignored.
  */
 @Serializable
 data class SessionLoginResponse(
@@ -205,17 +158,10 @@ data class SessionLoginResponse(
     val meta: kotlinx.serialization.json.JsonElement? = null
 )
 
-/**
- * User authentication token response from browser token endpoint.
- */
-@Serializable
-data class AuthTokenResponse(
-    val auth_token: String
-)
+/** User authentication token response from browser token endpoint. */
+@Serializable data class AuthTokenResponse(val auth_token: String)
 
-/**
- * Backwards-compatible auth token model (legacy key-based token endpoints).
- */
+/** Backwards-compatible auth token model (legacy key-based token endpoints). */
 @Serializable
 data class AuthToken(
     val key: String // The auth token to use in Authorization header
@@ -224,28 +170,16 @@ data class AuthToken(
 /**
  * User sign-up request for django-allauth headless API.
  *
- * Matches the web frontend `SignupRequest` shape; `re_password` is optional
- * and not required by the backend but kept for parity.
+ * Matches the web frontend `SignupRequest` shape; `re_password` is optional and not required by the
+ * backend but kept for parity.
  */
 @Serializable
-data class SignupRequest(
-    val email: String,
-    val password: String,
-    val re_password: String? = null
-)
+data class SignupRequest(val email: String, val password: String, val re_password: String? = null)
 
-/**
- * User login request.
- */
-@Serializable
-data class LoginRequest(
-    val email: String,
-    val password: String
-)
+/** User login request. */
+@Serializable data class LoginRequest(val email: String, val password: String)
 
-/**
- * Authenticated user profile response.
- */
+/** Authenticated user profile response. */
 @Serializable
 data class UserProfile(
     val id: Int,
@@ -258,8 +192,8 @@ data class UserProfile(
 /**
  * Partial update payload for the authenticated user's profile.
  *
- * Mirrors the web frontend `UserProfileUpdate` shape and allows updating
- * a subset of fields such as first name, last name, or timezone.
+ * Mirrors the web frontend `UserProfileUpdate` shape and allows updating a subset of fields such as
+ * first name, last name, or timezone.
  */
 @Serializable
 data class UserProfileUpdate(

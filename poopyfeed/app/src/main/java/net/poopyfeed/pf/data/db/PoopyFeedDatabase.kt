@@ -15,36 +15,33 @@ import androidx.room.RoomDatabase
  * - naps table (foreign key to children, cascade delete)
  */
 @Database(
-    entities = [
-        ChildEntity::class,
-        FeedingEntity::class,
-        DiaperEntity::class,
-        NapEntity::class
-    ],
+    entities = [ChildEntity::class, FeedingEntity::class, DiaperEntity::class, NapEntity::class],
     version = 1,
-    exportSchema = true
-)
+    exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
-    abstract fun childDao(): ChildDao
-    abstract fun feedingDao(): FeedingDao
-    abstract fun diaperDao(): DiaperDao
-    abstract fun napDao(): NapDao
+  abstract fun childDao(): ChildDao
 
-    companion object {
-        private const val DATABASE_NAME = "poopyfeed_db"
+  abstract fun feedingDao(): FeedingDao
 
-        @Volatile
-        private var instance: PoopyFeedDatabase? = null
+  abstract fun diaperDao(): DiaperDao
 
-        fun getInstance(context: Context): PoopyFeedDatabase {
-            return instance ?: synchronized(this) {
-                instance ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    PoopyFeedDatabase::class.java,
-                    DATABASE_NAME
-                ).build().also { instance = it }
-            }
-        }
+  abstract fun napDao(): NapDao
+
+  companion object {
+    private const val DATABASE_NAME = "poopyfeed_db"
+
+    @Volatile private var instance: PoopyFeedDatabase? = null
+
+    fun getInstance(context: Context): PoopyFeedDatabase {
+      return instance
+          ?: synchronized(this) {
+            instance
+                ?: Room.databaseBuilder(
+                        context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
+                    .build()
+                    .also { instance = it }
+          }
     }
+  }
 }

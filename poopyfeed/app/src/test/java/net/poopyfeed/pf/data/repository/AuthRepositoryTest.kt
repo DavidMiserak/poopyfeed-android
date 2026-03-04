@@ -1,5 +1,8 @@
 package net.poopyfeed.pf.data.repository
 
+import java.io.IOException
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiError
@@ -12,149 +15,132 @@ import net.poopyfeed.pf.data.models.UserProfileUpdate
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-import java.io.IOException
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class AuthRepositoryTest {
 
-    private lateinit var apiService: PoopyFeedApiService
-    private lateinit var repository: AuthRepository
+  private lateinit var apiService: PoopyFeedApiService
+  private lateinit var repository: AuthRepository
 
-    @Before
-    fun setup() {
-        apiService = io.mockk.mockk()
-        repository = AuthRepository(apiService)
-    }
+  @Before
+  fun setup() {
+    apiService = io.mockk.mockk()
+    repository = AuthRepository(apiService)
+  }
 
-    @Test
-    fun `login success returns token in Success`() = runTest {
-        val email = "user@example.com"
-        val password = "password123"
+  @Test
+  fun `login success returns token in Success`() = runTest {
+    val email = "user@example.com"
+    val password = "password123"
 
-        io.mockk.coEvery {
-            apiService.sessionLogin(
-                net.poopyfeed.pf.data.models.LoginRequest(email, password)
-            )
-        } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery {
+      apiService.sessionLogin(net.poopyfeed.pf.data.models.LoginRequest(email, password))
+    } returns SessionLoginResponse(status = 200)
 
-        io.mockk.coEvery { apiService.fetchAuthToken() } returns AuthTokenResponse(
-            auth_token = "token-123"
-        )
+    io.mockk.coEvery { apiService.fetchAuthToken() } returns
+        AuthTokenResponse(auth_token = "token-123")
 
-        val result = repository.login(email, password)
+    val result = repository.login(email, password)
 
-        assertIs<ApiResult.Success<String>>(result)
-        assertEquals("token-123", result.data)
-    }
+    assertIs<ApiResult.Success<String>>(result)
+    assertEquals("token-123", result.data)
+  }
 
-    @Test
-    fun `login network error returns Error with NetworkError`() = runTest {
-        io.mockk.coEvery {
-            apiService.sessionLogin(any())
-        } throws IOException("Network down")
+  @Test
+  fun `login network error returns Error with NetworkError`() = runTest {
+    io.mockk.coEvery { apiService.sessionLogin(any()) } throws IOException("Network down")
 
-        val result = repository.login("user@example.com", "password123")
+    val result = repository.login("user@example.com", "password123")
 
-        assertIs<ApiResult.Error<String>>(result)
-        assertIs<ApiError.NetworkError>(result.error)
-    }
+    assertIs<ApiResult.Error<String>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
 
-    @Test
-    fun `signup success returns token in Success`() = runTest {
-        val email = "user@example.com"
-        val password = "password123"
+  @Test
+  fun `signup success returns token in Success`() = runTest {
+    val email = "user@example.com"
+    val password = "password123"
 
-        io.mockk.coEvery {
-            apiService.signup(SignupRequest(email = email, password = password))
-        } returns SessionLoginResponse(status = 200)
+    io.mockk.coEvery {
+      apiService.signup(SignupRequest(email = email, password = password))
+    } returns SessionLoginResponse(status = 200)
 
-        io.mockk.coEvery { apiService.fetchAuthToken() } returns AuthTokenResponse(
-            auth_token = "token-456"
-        )
+    io.mockk.coEvery { apiService.fetchAuthToken() } returns
+        AuthTokenResponse(auth_token = "token-456")
 
-        val result = repository.signup(email, password)
+    val result = repository.signup(email, password)
 
-        assertIs<ApiResult.Success<String>>(result)
-        assertEquals("token-456", result.data)
-    }
+    assertIs<ApiResult.Success<String>>(result)
+    assertEquals("token-456", result.data)
+  }
 
-    @Test
-    fun `getProfile success returns Success with profile`() = runTest {
-        val profile = UserProfile(
+  @Test
+  fun `getProfile success returns Success with profile`() = runTest {
+    val profile =
+        UserProfile(
             id = 1,
             email = "user@example.com",
             first_name = "Test",
             last_name = "User",
-            timezone = "UTC"
-        )
+            timezone = "UTC")
 
-        io.mockk.coEvery { apiService.getProfile() } returns profile
+    io.mockk.coEvery { apiService.getProfile() } returns profile
 
-        val result = repository.getProfile()
+    val result = repository.getProfile()
 
-        assertIs<ApiResult.Success<UserProfile>>(result)
-        assertEquals(profile, result.data)
-    }
+    assertIs<ApiResult.Success<UserProfile>>(result)
+    assertEquals(profile, result.data)
+  }
 
-    @Test
-    fun `getProfile http error returns Error with HttpError`() = runTest {
-        val errorResponse = retrofit2.Response.error<UserProfile>(
-            404,
-            "Not Found".toResponseBody(null)
-        )
+  @Test
+  fun `getProfile http error returns Error with HttpError`() = runTest {
+    val errorResponse = retrofit2.Response.error<UserProfile>(404, "Not Found".toResponseBody(null))
 
-        io.mockk.coEvery { apiService.getProfile() } throws retrofit2.HttpException(
-            errorResponse
-        )
+    io.mockk.coEvery { apiService.getProfile() } throws retrofit2.HttpException(errorResponse)
 
-        val result = repository.getProfile()
+    val result = repository.getProfile()
 
-        assertIs<ApiResult.Error<UserProfile>>(result)
-        assertIs<ApiError.HttpError>(result.error)
-        assertEquals(404, (result.error as ApiError.HttpError).statusCode)
-    }
+    assertIs<ApiResult.Error<UserProfile>>(result)
+    assertIs<ApiError.HttpError>(result.error)
+    assertEquals(404, (result.error as ApiError.HttpError).statusCode)
+  }
 
-    @Test
-    fun `updateProfile success returns updated profile`() = runTest {
-        val update = UserProfileUpdate(
-            first_name = "New",
-            last_name = "Name",
-            timezone = "Europe/Berlin"
-        )
+  @Test
+  fun `updateProfile success returns updated profile`() = runTest {
+    val update =
+        UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin")
 
-        val updatedProfile = UserProfile(
+    val updatedProfile =
+        UserProfile(
             id = 1,
             email = "user@example.com",
             first_name = "New",
             last_name = "Name",
-            timezone = "Europe/Berlin"
-        )
+            timezone = "Europe/Berlin")
 
-        io.mockk.coEvery { apiService.updateProfile(update) } returns updatedProfile
+    io.mockk.coEvery { apiService.updateProfile(update) } returns updatedProfile
 
-        val result = repository.updateProfile(update)
+    val result = repository.updateProfile(update)
 
-        assertIs<ApiResult.Success<UserProfile>>(result)
-        assertEquals(updatedProfile, result.data)
-    }
+    assertIs<ApiResult.Success<UserProfile>>(result)
+    assertEquals(updatedProfile, result.data)
+  }
 
-    @Test
-    fun `logout success returns Success Unit`() = runTest {
-        io.mockk.coEvery { apiService.logoutSession() } returns Unit
+  @Test
+  fun `logout success returns Success Unit`() = runTest {
+    io.mockk.coEvery { apiService.logoutSession() } returns Unit
 
-        val result = repository.logout()
+    val result = repository.logout()
 
-        assertIs<ApiResult.Success<Unit>>(result)
-    }
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
 
-    @Test
-    fun `logout network error returns Error`() = runTest {
-        io.mockk.coEvery { apiService.logoutSession() } throws IOException("Network down")
+  @Test
+  fun `logout network error returns Error`() = runTest {
+    io.mockk.coEvery { apiService.logoutSession() } throws IOException("Network down")
 
-        val result = repository.logout()
+    val result = repository.logout()
 
-        assertIs<ApiResult.Error<Unit>>(result)
-        assertIs<ApiError.NetworkError>(result.error)
-    }
+    assertIs<ApiResult.Error<Unit>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
 }

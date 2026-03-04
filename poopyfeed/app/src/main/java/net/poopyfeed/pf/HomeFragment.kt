@@ -16,67 +16,58 @@ import net.poopyfeed.pf.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentHomeBinding? = null
+  private val binding
+    get() = _binding!!
 
-    private val viewModel: HomeViewModel by viewModels()
+  private val viewModel: HomeViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentHomeBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    if (!viewModel.hasToken()) {
+      navigateToLogin()
+      return
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        if (!viewModel.hasToken()) {
-            navigateToLogin()
-            return
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    when (state) {
-                        is HomeUiState.Loading -> {
-                            // optional: show loading UI
-                        }
-
-                        is HomeUiState.Ready -> {
-                            binding.textWelcome.text = getString(
-                                R.string.welcome_message,
-                                state.email
-                            )
-                        }
-
-                        is HomeUiState.Unauthorized -> {
-                            navigateToLogin()
-                        }
-
-                        is HomeUiState.Error -> {
-                            Snackbar.make(
-                                binding.root,
-                                state.message,
-                                Snackbar.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.uiState.collect { state ->
+          when (state) {
+            is HomeUiState.Loading -> {
+              // optional: show loading UI
             }
+            is HomeUiState.Ready -> {
+              binding.textWelcome.text = getString(R.string.welcome_message, state.email)
+            }
+            is HomeUiState.Unauthorized -> {
+              navigateToLogin()
+            }
+            is HomeUiState.Error -> {
+              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            }
+          }
         }
+      }
     }
+  }
 
-    private fun navigateToLogin() {
-        val navController = findNavController()
-        navController.navigate(R.id.action_homeFragment_to_loginFragment)
-    }
+  private fun navigateToLogin() {
+    val navController = findNavController()
+    navController.navigate(R.id.action_homeFragment_to_loginFragment)
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

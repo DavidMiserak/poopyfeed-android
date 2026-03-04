@@ -17,106 +17,98 @@ import net.poopyfeed.pf.databinding.FragmentLoginBinding
 
 class LoginFragment : Fragment() {
 
-    private var _binding: FragmentLoginBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentLoginBinding? = null
+  private val binding
+    get() = _binding!!
 
-    private val viewModel: LoginViewModel by viewModels()
+  private val viewModel: LoginViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentLoginBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    if (viewModel.checkExistingToken()) {
+      navigateToHome()
+      return
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        if (viewModel.checkExistingToken()) {
-            navigateToHome()
-            return
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    when (state) {
-                        is LoginUiState.Idle -> {
-                            setLoading(false)
-                        }
-
-                        is LoginUiState.Loading -> {
-                            setLoading(true)
-                        }
-
-                        is LoginUiState.Success -> {
-                            setLoading(false)
-                            navigateToHome()
-                        }
-
-                        is LoginUiState.Error -> {
-                            setLoading(false)
-                            Snackbar.make(
-                                binding.root,
-                                state.message,
-                                Snackbar.LENGTH_LONG
-                            ).show()
-                            viewModel.clearError()
-                        }
-                    }
-                }
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.uiState.collect { state ->
+          when (state) {
+            is LoginUiState.Idle -> {
+              setLoading(false)
             }
+            is LoginUiState.Loading -> {
+              setLoading(true)
+            }
+            is LoginUiState.Success -> {
+              setLoading(false)
+              navigateToHome()
+            }
+            is LoginUiState.Error -> {
+              setLoading(false)
+              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+              viewModel.clearError()
+            }
+          }
         }
-
-        binding.buttonLogin.setOnClickListener {
-            attemptLogin()
-        }
-
-        binding.textGoToSignup.setOnClickListener {
-            val navController = findNavController()
-            navController.navigate(R.id.action_loginFragment_to_signupFragment)
-        }
+      }
     }
 
-    private fun attemptLogin() {
-        val email = binding.editTextEmail.text?.toString()?.trim().orEmpty()
-        val password = binding.editTextPassword.text?.toString().orEmpty()
+    binding.buttonLogin.setOnClickListener { attemptLogin() }
 
-        var hasError = false
+    binding.textGoToSignup.setOnClickListener {
+      val navController = findNavController()
+      navController.navigate(R.id.action_loginFragment_to_signupFragment)
+    }
+  }
 
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.inputLayoutEmail.error = getString(R.string.login_email_error)
-            hasError = true
-        } else {
-            binding.inputLayoutEmail.error = null
-        }
+  private fun attemptLogin() {
+    val email = binding.editTextEmail.text?.toString()?.trim().orEmpty()
+    val password = binding.editTextPassword.text?.toString().orEmpty()
 
-        if (password.isEmpty()) {
-            binding.inputLayoutPassword.error = getString(R.string.login_password_error)
-            hasError = true
-        } else {
-            binding.inputLayoutPassword.error = null
-        }
+    var hasError = false
 
-        if (hasError) return
-
-        viewModel.login(email, password)
+    if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+      binding.inputLayoutEmail.error = getString(R.string.login_email_error)
+      hasError = true
+    } else {
+      binding.inputLayoutEmail.error = null
     }
 
-    private fun setLoading(loading: Boolean) {
-        binding.buttonLogin.isEnabled = !loading
-        binding.progressLogin.visibility = if (loading) View.VISIBLE else View.GONE
+    if (password.isEmpty()) {
+      binding.inputLayoutPassword.error = getString(R.string.login_password_error)
+      hasError = true
+    } else {
+      binding.inputLayoutPassword.error = null
     }
 
-    private fun navigateToHome() {
-        val navController = findNavController()
-        navController.navigate(R.id.action_loginFragment_to_homeFragment)
-    }
+    if (hasError) return
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    viewModel.login(email, password)
+  }
+
+  private fun setLoading(loading: Boolean) {
+    binding.buttonLogin.isEnabled = !loading
+    binding.progressLogin.visibility = if (loading) View.VISIBLE else View.GONE
+  }
+
+  private fun navigateToHome() {
+    val navController = findNavController()
+    navController.navigate(R.id.action_loginFragment_to_homeFragment)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }
