@@ -28,15 +28,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.HomeFragment))
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        // FragmentContainerView creates NavHostFragment asynchronously; defer nav setup
+        // until the host fragment exists (see FragmentTagUsage → FragmentContainerView).
+        binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
+            val navController = findNavController(R.id.nav_host_fragment_content_main)
+            appBarConfiguration = AppBarConfiguration(setOf(R.id.HomeFragment))
+            setupActionBarWithNavController(navController, appBarConfiguration)
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val isAuthDestination =
-                destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
-            binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
-            binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                val isAuthDestination =
+                    destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
+                binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+                binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+            }
         }
     }
 
