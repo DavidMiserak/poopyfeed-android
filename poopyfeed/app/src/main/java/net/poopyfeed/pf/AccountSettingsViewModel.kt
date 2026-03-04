@@ -1,8 +1,10 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +38,7 @@ class AccountSettingsViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<AccountSettingsUiState> =
@@ -68,7 +71,7 @@ constructor(
             tokenManager.clearToken()
             _uiState.value = AccountSettingsUiState.Unauthorized
           } else {
-            _uiState.value = AccountSettingsUiState.Error(error.getUserMessage())
+            _uiState.value = AccountSettingsUiState.Error(error.getUserMessage(context))
           }
         }
         is ApiResult.Loading -> {
@@ -97,7 +100,7 @@ constructor(
               AccountSettingsUiState.Saved(profile = updatedProfile, timezones = allTimezones)
         }
         is ApiResult.Error -> {
-          _uiState.value = AccountSettingsUiState.Error(result.error.getUserMessage())
+          _uiState.value = AccountSettingsUiState.Error(result.error.getUserMessage(context))
         }
         is ApiResult.Loading -> {
           // no-op

@@ -1,5 +1,6 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
@@ -30,10 +31,17 @@ class LoginViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private val mockContext: Context = mockk(relaxed = true)
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
+    every { mockContext.getString(R.string.error_network) } returns
+        "Network error. Please check your connection."
+    every { mockContext.getString(R.string.error_serialization) } returns
+        "Data format error. Please try again."
+    every { mockContext.getString(R.string.error_unknown) } returns
+        "Something went wrong. Please try again."
   }
 
   @After
@@ -47,7 +55,7 @@ class LoginViewModelTest {
   fun `checkExistingToken returns true when token present`() {
     every { mockTokenManager.getToken() } returns "test-token"
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     assertTrue(viewModel.checkExistingToken())
   }
@@ -56,7 +64,7 @@ class LoginViewModelTest {
   fun `checkExistingToken returns false when token null`() {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     assertFalse(viewModel.checkExistingToken())
   }
@@ -65,7 +73,7 @@ class LoginViewModelTest {
   fun `initial state is Idle`() {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
   }
@@ -76,7 +84,7 @@ class LoginViewModelTest {
     every { mockTokenManager.saveToken(any()) } returns Unit
     coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
     viewModel.login("user@example.com", "password123")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -91,14 +99,14 @@ class LoginViewModelTest {
     val apiError = ApiError.NetworkError("Network down")
     coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Error(apiError)
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
     viewModel.login("user@example.com", "wrong")
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<LoginUiState.Error>(state)
-    assertEquals(apiError.getUserMessage(), state.message)
+    assertEquals(apiError.getUserMessage(mockContext), state.message)
   }
 
   @Test
@@ -107,7 +115,7 @@ class LoginViewModelTest {
     coEvery { mockAuthRepository.login(any(), any()) } returns
         ApiResult.Error(ApiError.NetworkError("err"))
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
     viewModel.login("a@b.com", "p")
     testDispatcher.scheduler.advanceUntilIdle()
     assertIs<LoginUiState.Error>(viewModel.uiState.value)
@@ -120,7 +128,7 @@ class LoginViewModelTest {
   fun `clearError when not Error state leaves state unchanged`() {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
     viewModel.clearError()
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)

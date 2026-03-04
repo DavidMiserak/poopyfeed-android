@@ -1,8 +1,10 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +30,7 @@ class LoginViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
@@ -45,7 +48,7 @@ constructor(
           _uiState.value = LoginUiState.Success
         }
         is ApiResult.Error -> {
-          _uiState.value = LoginUiState.Error(result.error.getUserMessage())
+          _uiState.value = LoginUiState.Error(result.error.getUserMessage(context))
         }
         is ApiResult.Loading -> {
           // no-op; repository does not currently emit Loading, we manage it here

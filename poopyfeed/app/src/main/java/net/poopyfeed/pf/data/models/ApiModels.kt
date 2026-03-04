@@ -1,6 +1,8 @@
 package net.poopyfeed.pf.data.models
 
+import android.content.Context
 import kotlinx.serialization.Serializable
+import net.poopyfeed.pf.R
 
 /**
  * API Response wrapper for paginated endpoints. Matches Django REST Framework's default pagination
@@ -134,13 +136,13 @@ sealed class ApiError : Exception() {
 
   data class UnknownError(val errorMessage: String) : ApiError()
 
-  /** Extract user-friendly error message. */
-  fun getUserMessage(): String =
+  /** Extract user-friendly error message. Requires [Context] for i18n string resources. */
+  fun getUserMessage(context: Context): String =
       when (this) {
         is HttpError -> detail ?: errorMessage
-        is NetworkError -> "Network error. Please check your connection."
-        is SerializationError -> "Data format error. Please try again."
-        is UnknownError -> "Something went wrong. Please try again."
+        is NetworkError -> context.getString(R.string.error_network)
+        is SerializationError -> context.getString(R.string.error_serialization)
+        is UnknownError -> context.getString(R.string.error_unknown)
       }
 }
 

@@ -1,5 +1,6 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
@@ -28,12 +29,19 @@ class SignupViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private val mockContext: Context = mockk(relaxed = true)
   private lateinit var viewModel: SignupViewModel
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    viewModel = SignupViewModel(mockAuthRepository, mockTokenManager)
+    every { mockContext.getString(R.string.error_network) } returns
+        "Network error. Please check your connection."
+    every { mockContext.getString(R.string.error_serialization) } returns
+        "Data format error. Please try again."
+    every { mockContext.getString(R.string.error_unknown) } returns
+        "Something went wrong. Please try again."
+    viewModel = SignupViewModel(mockAuthRepository, mockTokenManager, mockContext)
   }
 
   @After
@@ -74,7 +82,7 @@ class SignupViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<SignupUiState.Error>(state)
-    assertEquals(apiError.getUserMessage(), state.message)
+    assertEquals(apiError.getUserMessage(mockContext), state.message)
   }
 
   @Test

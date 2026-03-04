@@ -38,7 +38,7 @@ constructor(
    *         when (result) {
    *             is ApiResult.Loading -> showLoader()
    *             is ApiResult.Success -> showChildren(result.data.results)
-   *             is ApiResult.Error -> showError(result.error.getUserMessage())
+   *             is ApiResult.Error -> showError(result.error.getUserMessage(context))
    *         }
    *     }
    * ```

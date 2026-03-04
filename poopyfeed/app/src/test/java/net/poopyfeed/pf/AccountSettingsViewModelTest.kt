@@ -1,5 +1,6 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
@@ -30,10 +31,17 @@ class AccountSettingsViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private val mockContext: Context = mockk(relaxed = true)
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
+    every { mockContext.getString(R.string.error_network) } returns
+        "Network error. Please check your connection."
+    every { mockContext.getString(R.string.error_serialization) } returns
+        "Data format error. Please try again."
+    every { mockContext.getString(R.string.error_unknown) } returns
+        "Something went wrong. Please try again."
   }
 
   @After
@@ -49,7 +57,7 @@ class AccountSettingsViewModelTest {
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -64,7 +72,7 @@ class AccountSettingsViewModelTest {
   fun `loadProfile with missing token emits Unauthorized`() = runTest {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -80,7 +88,7 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(httpError)
     every { mockTokenManager.clearToken() } returns Unit
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -96,13 +104,13 @@ class AccountSettingsViewModelTest {
     val networkError = ApiError.NetworkError("Network down")
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.Error>(state)
-    assertEquals(networkError.getUserMessage(), state.message)
+    assertEquals(networkError.getUserMessage(mockContext), state.message)
   }
 
   @Test
@@ -118,7 +126,7 @@ class AccountSettingsViewModelTest {
           UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin"))
     } returns ApiResult.Success(updatedProfile)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -141,7 +149,7 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.updateProfile(any()) } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -151,6 +159,6 @@ class AccountSettingsViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.Error>(state)
-    assertEquals(apiError.getUserMessage(), state.message)
+    assertEquals(apiError.getUserMessage(mockContext), state.message)
   }
 }

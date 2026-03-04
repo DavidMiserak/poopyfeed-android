@@ -1,8 +1,10 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +31,7 @@ class HomeViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Loading)
@@ -60,7 +63,7 @@ constructor(
             tokenManager.clearToken()
             _uiState.value = HomeUiState.Unauthorized
           } else {
-            _uiState.value = HomeUiState.Error(error.getUserMessage())
+            _uiState.value = HomeUiState.Error(error.getUserMessage(context))
           }
         }
         is ApiResult.Loading -> {

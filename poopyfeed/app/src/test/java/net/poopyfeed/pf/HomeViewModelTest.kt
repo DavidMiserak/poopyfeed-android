@@ -1,5 +1,6 @@
 package net.poopyfeed.pf
 
+import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
@@ -28,10 +29,17 @@ class HomeViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private val mockContext: Context = mockk(relaxed = true)
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
+    every { mockContext.getString(R.string.error_network) } returns
+        "Network error. Please check your connection."
+    every { mockContext.getString(R.string.error_serialization) } returns
+        "Data format error. Please try again."
+    every { mockContext.getString(R.string.error_unknown) } returns
+        "Something went wrong. Please try again."
   }
 
   @After
@@ -47,7 +55,7 @@ class HomeViewModelTest {
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
-    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -61,7 +69,7 @@ class HomeViewModelTest {
       runTest {
         every { mockTokenManager.getToken() } returns null
 
-        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager)
+        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -78,7 +86,7 @@ class HomeViewModelTest {
         coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(httpError)
         every { mockTokenManager.clearToken() } returns Unit
 
-        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager)
+        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -94,13 +102,13 @@ class HomeViewModelTest {
     val networkError = ApiError.NetworkError("Network down")
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
-    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager)
+    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<HomeUiState.Error>(state)
-    assertEquals(networkError.getUserMessage(), state.message)
+    assertEquals(networkError.getUserMessage(mockContext), state.message)
     verify(exactly = 0) { mockTokenManager.clearToken() }
   }
 }
