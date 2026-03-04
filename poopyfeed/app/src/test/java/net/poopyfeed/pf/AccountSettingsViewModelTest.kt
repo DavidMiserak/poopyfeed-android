@@ -156,6 +156,8 @@ class AccountSettingsViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.Saved>(state)
+    assertEquals(updatedProfile, state.profile)
+    assertTrue(state.timezones.isNotEmpty())
   }
 
   @Test

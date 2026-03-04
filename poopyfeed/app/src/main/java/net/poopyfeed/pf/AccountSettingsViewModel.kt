@@ -25,7 +25,7 @@ sealed interface AccountSettingsUiState {
 
   data object Saving : AccountSettingsUiState
 
-  data object Saved : AccountSettingsUiState
+  data class Saved(val profile: UserProfile, val timezones: List<String>) : AccountSettingsUiState
 }
 
 class AccountSettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -92,8 +92,7 @@ class AccountSettingsViewModel(application: Application) : AndroidViewModel(appl
         is ApiResult.Success -> {
           val updatedProfile = result.data
           _uiState.value =
-              AccountSettingsUiState.Ready(profile = updatedProfile, timezones = allTimezones)
-          _uiState.value = AccountSettingsUiState.Saved
+              AccountSettingsUiState.Saved(profile = updatedProfile, timezones = allTimezones)
         }
         is ApiResult.Error -> {
           _uiState.value = AccountSettingsUiState.Error(result.error.getUserMessage())

@@ -14,6 +14,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.databinding.FragmentAccountSettingsBinding
 
 class AccountSettingsFragment : Fragment() {
@@ -58,7 +59,10 @@ class AccountSettingsFragment : Fragment() {
             }
             is AccountSettingsUiState.Ready -> {
               setLoading(false)
-              bindProfile(state)
+              if (!hasPopulatedFields) {
+                bindProfile(state.profile, state.timezones)
+                hasPopulatedFields = true
+              }
             }
             is AccountSettingsUiState.Saved -> {
               setLoading(false)
@@ -66,7 +70,7 @@ class AccountSettingsFragment : Fragment() {
                       binding.root, getString(R.string.account_saved_message), Snackbar.LENGTH_LONG)
                   .show()
               hasPopulatedFields = false
-              viewModel.loadProfile()
+              bindProfile(state.profile, state.timezones)
             }
             is AccountSettingsUiState.Error -> {
               setLoading(false)
@@ -86,20 +90,14 @@ class AccountSettingsFragment : Fragment() {
     }
   }
 
-  private fun bindProfile(state: AccountSettingsUiState.Ready) {
-    if (!hasPopulatedFields) {
-      val profile = state.profile
-      binding.editTextAccountEmail.setText(profile.email)
-      binding.editTextAccountFirstName.setText(profile.first_name)
-      binding.editTextAccountLastName.setText(profile.last_name)
-      binding.autoCompleteAccountTimezone.setText(profile.timezone, false)
+  private fun bindProfile(profile: UserProfile, timezones: List<String>) {
+    binding.editTextAccountEmail.setText(profile.email)
+    binding.editTextAccountFirstName.setText(profile.first_name)
+    binding.editTextAccountLastName.setText(profile.last_name)
+    binding.autoCompleteAccountTimezone.setText(profile.timezone, false)
 
-      val adapter =
-          ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, state.timezones)
-      binding.autoCompleteAccountTimezone.setAdapter(adapter)
-
-      hasPopulatedFields = true
-    }
+    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, timezones)
+    binding.autoCompleteAccountTimezone.setAdapter(adapter)
   }
 
   private fun setLoading(loading: Boolean) {
