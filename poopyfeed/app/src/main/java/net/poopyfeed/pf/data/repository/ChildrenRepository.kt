@@ -255,16 +255,33 @@ class AuthRepository(
     private val apiService: PoopyFeedApiService
 ) {
 
-    suspend fun register(email: String, password: String): ApiResult<AuthToken> = try {
-        val token = apiService.register(RegisterRequest(email, password))
-        ApiResult.Success(token)
+    /**
+     * Perform two-step browser login and return the auth token string.
+     */
+    suspend fun login(email: String, password: String): ApiResult<String> = try {
+        apiService.sessionLogin(LoginRequest(email, password))
+        val tokenResponse = apiService.fetchAuthToken()
+        ApiResult.Success(tokenResponse.auth_token)
     } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
     }
 
-    suspend fun login(email: String, password: String): ApiResult<AuthToken> = try {
-        val token = apiService.login(LoginRequest(email, password))
-        ApiResult.Success(token)
+    /**
+     * Fetch the authenticated user's profile.
+     */
+    suspend fun getProfile(): ApiResult<UserProfile> = try {
+        val profile = apiService.getProfile()
+        ApiResult.Success(profile)
+    } catch (e: Exception) {
+        ApiResult.Error(e.toApiError())
+    }
+
+    /**
+     * Logout current browser session.
+     */
+    suspend fun logout(): ApiResult<Unit> = try {
+        apiService.logoutSession()
+        ApiResult.Success(Unit)
     } catch (e: Exception) {
         ApiResult.Error(e.toApiError())
     }

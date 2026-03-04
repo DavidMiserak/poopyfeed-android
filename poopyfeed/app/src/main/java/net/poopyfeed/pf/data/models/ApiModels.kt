@@ -195,7 +195,26 @@ sealed class ApiResult<out T> {
 }
 
 /**
- * User authentication token response.
+ * Session login response from django-allauth headless browser auth.
+ * We only care that status is 200; data/meta are ignored.
+ */
+@Serializable
+data class SessionLoginResponse(
+    val status: Int,
+    val data: kotlinx.serialization.json.JsonElement? = null,
+    val meta: kotlinx.serialization.json.JsonElement? = null
+)
+
+/**
+ * User authentication token response from browser token endpoint.
+ */
+@Serializable
+data class AuthTokenResponse(
+    val auth_token: String
+)
+
+/**
+ * Backwards-compatible auth token model (legacy key-based token endpoints).
  */
 @Serializable
 data class AuthToken(
@@ -218,4 +237,16 @@ data class RegisterRequest(
 data class LoginRequest(
     val email: String,
     val password: String
+)
+
+/**
+ * Authenticated user profile response.
+ */
+@Serializable
+data class UserProfile(
+    val id: Int,
+    val email: String,
+    val first_name: String,
+    val last_name: String,
+    val timezone: String
 )

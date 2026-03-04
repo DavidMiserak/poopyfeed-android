@@ -16,16 +16,43 @@ interface PoopyFeedApiService {
     // ========================
 
     /**
-     * Register a new user account.
+     * Step 1: Session login with email and password.
+     * Uses django-allauth headless browser login endpoint.
      */
-    @POST("auth/register/")
-    suspend fun register(@Body request: RegisterRequest): AuthToken
+    @Headers(
+        "Accept: application/json",
+        "X-Requested-With: XMLHttpRequest"
+    )
+    @POST("browser/v1/auth/login")
+    suspend fun sessionLogin(@Body request: LoginRequest): SessionLoginResponse
 
     /**
-     * Login with email and password.
+     * Step 2: Exchange authenticated session for an auth token.
+     * Requires session cookie from step 1 to be present.
      */
-    @POST("auth/login/")
-    suspend fun login(@Body request: LoginRequest): AuthToken
+    @Headers(
+        "Accept: application/json",
+        "X-Requested-With: XMLHttpRequest"
+    )
+    @POST("browser/v1/auth/token/")
+    suspend fun fetchAuthToken(): AuthTokenResponse
+
+    /**
+     * Get the authenticated user's profile (name, email, timezone).
+     */
+    @Headers("Accept: application/json")
+    @GET("account/profile/")
+    suspend fun getProfile(): UserProfile
+
+    /**
+     * Logout the current session (invalidates session cookie and token).
+     */
+    @Headers(
+        "Accept: application/json",
+        "X-Requested-With: XMLHttpRequest"
+    )
+    @DELETE("browser/v1/auth/session")
+    suspend fun logoutSession()
 
     // ========================
     // Child Endpoints

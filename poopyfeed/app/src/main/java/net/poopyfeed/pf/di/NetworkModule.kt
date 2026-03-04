@@ -42,12 +42,28 @@ object NetworkModule {
         }.also { json = it }
     }
 
+    private fun getAuthTokenInternal(prefs: SharedPreferences): String? =
+        prefs.getString("auth_token", null)
+
+    fun saveAuthToken(context: Context, token: String) {
+        val prefs = provideSharedPreferences(context)
+        prefs.edit().putString("auth_token", token).apply()
+    }
+
+    fun getAuthToken(context: Context): String? =
+        getAuthTokenInternal(provideSharedPreferences(context))
+
+    fun clearAuthToken(context: Context) {
+        val prefs = provideSharedPreferences(context)
+        prefs.edit().remove("auth_token").apply()
+    }
+
     fun provideOkHttpClient(context: Context): OkHttpClient {
         return okHttpClient ?: run {
             val prefs = provideSharedPreferences(context)
 
             val authInterceptor = Interceptor { chain ->
-                val token = prefs.getString("auth_token", null)
+                val token = getAuthTokenInternal(prefs)
                 val request = if (token != null) {
                     chain.request().newBuilder()
                         .header("Authorization", "Token $token")
@@ -62,7 +78,24 @@ object NetworkModule {
                 level = HttpLoggingInterceptor.Level.BODY
             }
 
+            val cookieJar = object : okhttp3.CookieJar {
+                private val cookies: MutableList<okhttp3.Cookie> = mutableListOf()
+
+                override fun saveFromResponse(
+                    url: okhttp3.HttpUrl,
+                    cookies: List<okhttp3.Cookie>
+                ) {
+                    this.cookies.removeAll { it.matches(url) }
+                    this.cookies.addAll(cookies)
+                }
+
+                override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> {
+                    return cookies.filter { it.matches(url) }
+                }
+            }
+
             OkHttpClient.Builder()
+                .cookieJar(cookieJar)
                 .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
                 .build()
