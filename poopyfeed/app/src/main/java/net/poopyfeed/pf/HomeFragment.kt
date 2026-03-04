@@ -5,20 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import net.poopyfeed.pf.data.models.ApiError
-import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.databinding.FragmentHomeBinding
-import net.poopyfeed.pf.di.NetworkModule
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,65 +33,45 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val token = NetworkModule.getAuthToken(requireContext())
-        if (token == null) {
+        if (!viewModel.hasToken()) {
             navigateToLogin()
             return
         }
 
-        val apiService = NetworkModule.providePoopyFeedApiService(requireContext())
-        val authRepository = AuthRepository(apiService)
-
         binding.buttonLogout.setOnClickListener {
-            performLogout(authRepository)
+            viewModel.logout()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            when (val result = authRepository.getProfile()) {
-                is ApiResult.Loading -> {
-                    // no-op
-                }
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when (state) {
+                        is HomeUiState.Loading -> {
+                            // optional: show loading UI
+                        }
 
-                is ApiResult.Success -> {
-                    val profile = result.data
-                    binding.textWelcome.text = getString(
-                        R.string.welcome_message,
-                        profile.first_name,
-                        profile.last_name
-                    )
-                }
+                        is HomeUiState.Ready -> {
+                            binding.textWelcome.text = getString(
+                                R.string.welcome_message,
+                                state.firstName,
+                                state.lastName
+                            )
+                        }
 
-                is ApiResult.Error -> {
-                    val error = result.error
-                    if (error is ApiError.HttpError && error.statusCode == 401) {
-                        NetworkModule.clearAuthToken(requireContext())
-                        navigateToLogin()
-                    } else {
-                        Snackbar.make(
-                            binding.root,
-                            error.getUserMessage(),
-                            Snackbar.LENGTH_LONG
-                        ).show()
+                        is HomeUiState.Unauthorized -> {
+                            navigateToLogin()
+                        }
+
+                        is HomeUiState.Error -> {
+                            Snackbar.make(
+                                binding.root,
+                                state.message,
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
-        }
-    }
-
-    private fun performLogout(authRepository: AuthRepository) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            when (authRepository.logout()) {
-                is ApiResult.Success,
-                is ApiResult.Loading -> {
-                    // ignore
-                }
-
-                is ApiResult.Error -> {
-                    // ignore errors, we'll still clear locally
-                }
-            }
-            NetworkModule.clearAuthToken(requireContext())
-            navigateToLogin()
         }
     }
 

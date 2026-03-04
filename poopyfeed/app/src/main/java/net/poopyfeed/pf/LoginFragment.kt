@@ -6,19 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.databinding.FragmentLoginBinding
-import net.poopyfeed.pf.di.NetworkModule
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,10 +34,40 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val existingToken = NetworkModule.getAuthToken(requireContext())
-        if (existingToken != null) {
+        if (viewModel.checkExistingToken()) {
             navigateToHome()
             return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when (state) {
+                        is LoginUiState.Idle -> {
+                            setLoading(false)
+                        }
+
+                        is LoginUiState.Loading -> {
+                            setLoading(true)
+                        }
+
+                        is LoginUiState.Success -> {
+                            setLoading(false)
+                            navigateToHome()
+                        }
+
+                        is LoginUiState.Error -> {
+                            setLoading(false)
+                            Snackbar.make(
+                                binding.root,
+                                state.message,
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                            viewModel.clearError()
+                        }
+                    }
+                }
+            }
         }
 
         binding.buttonLogin.setOnClickListener {
@@ -65,33 +97,7 @@ class LoginFragment : Fragment() {
 
         if (hasError) return
 
-        val apiService = NetworkModule.providePoopyFeedApiService(requireContext())
-        val authRepository = AuthRepository(apiService)
-
-        setLoading(true)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            when (val result = authRepository.login(email, password)) {
-                is ApiResult.Loading -> {
-                    // no-op, we manage loading state locally
-                }
-
-                is ApiResult.Success -> {
-                    NetworkModule.saveAuthToken(requireContext(), result.data)
-                    setLoading(false)
-                    navigateToHome()
-                }
-
-                is ApiResult.Error -> {
-                    setLoading(false)
-                    Snackbar.make(
-                        binding.root,
-                        result.error.getUserMessage(),
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
+        viewModel.login(email, password)
     }
 
     private fun setLoading(loading: Boolean) {
