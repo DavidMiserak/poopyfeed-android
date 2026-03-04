@@ -1,7 +1,13 @@
 package net.poopyfeed.pf
 
+import android.app.Application
+import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +19,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.di.NetworkModule
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -20,20 +27,27 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignupViewModelTest {
 
-  private lateinit var authRepository: AuthRepository
-  private lateinit var viewModel: SignupViewModel
-
   private val testDispatcher = StandardTestDispatcher()
+
+  private lateinit var application: Application
+  private lateinit var viewModel: SignupViewModel
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    authRepository = mockk()
-    viewModel = SignupViewModel(authRepository)
+    MockKAnnotations.init(this, relaxUnitFun = true)
+    application = mockk(relaxed = true)
+
+    mockkObject(NetworkModule)
+    mockkConstructor(AuthRepository::class)
+
+    viewModel = SignupViewModel(application)
   }
 
   @After
   fun tearDown() {
+    clearAllMocks()
+    unmockkAll()
     Dispatchers.resetMain()
   }
 
@@ -46,7 +60,8 @@ class SignupViewModelTest {
   @Test
   fun `signUp success emits Success state with token`() = runTest {
     val token = "test-token-123"
-    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Success(token)
+    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
+        ApiResult.Success(token)
 
     viewModel.signUp("test@example.com", "password123")
 
@@ -60,7 +75,8 @@ class SignupViewModelTest {
   @Test
   fun `signUp error emits Error state`() = runTest {
     val apiError = ApiError.NetworkError("Network down")
-    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
+    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
+        ApiResult.Error(apiError)
 
     viewModel.signUp("test@example.com", "password123")
 
@@ -74,7 +90,8 @@ class SignupViewModelTest {
   @Test
   fun `clearError from Error returns Idle`() = runTest {
     val apiError = ApiError.NetworkError("Network down")
-    coEvery { authRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
+    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
+        ApiResult.Error(apiError)
 
     viewModel.signUp("test@example.com", "password123")
 

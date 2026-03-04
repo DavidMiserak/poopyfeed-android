@@ -8,14 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.databinding.FragmentSignupBinding
 import net.poopyfeed.pf.di.NetworkModule
 
@@ -25,17 +22,7 @@ class SignupFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private val viewModel: SignupViewModel by viewModels {
-    object : ViewModelProvider.Factory {
-      @Suppress("UNCHECKED_CAST")
-      override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val context = requireContext().applicationContext
-        val apiService = NetworkModule.providePoopyFeedApiService(context)
-        val authRepository = AuthRepository(apiService)
-        return SignupViewModel(authRepository) as T
-      }
-    }
-  }
+  private val viewModel: SignupViewModel by viewModels()
 
   override fun onCreateView(
       inflater: LayoutInflater,

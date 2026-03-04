@@ -1,12 +1,14 @@
 package net.poopyfeed.pf
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.di.NetworkModule
 
 sealed interface SignupUiState {
   data object Idle : SignupUiState
@@ -18,10 +20,15 @@ sealed interface SignupUiState {
   data class Error(val message: String) : SignupUiState
 }
 
-class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() {
+class SignupViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState.Idle)
   val uiState: StateFlow<SignupUiState> = _uiState
+
+  private val authRepository: AuthRepository by lazy {
+    val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
+    AuthRepository(apiService)
+  }
 
   fun signUp(email: String, password: String) {
     viewModelScope.launch {
