@@ -21,16 +21,18 @@ class CachedTrackingRepositoriesTest {
   // --- CachedFeedingsRepository ---
 
   @Test
-  fun `CachedFeedingsRepository listFeedingsCached emits Loading when empty`() = runTest {
-    val feedingDao = io.mockk.mockk<FeedingDao>()
-    io.mockk.every { feedingDao.getFeedingsFlow(1) } returns flowOf(emptyList())
-    val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val repo = CachedFeedingsRepository(apiService, feedingDao)
+  fun `CachedFeedingsRepository listFeedingsCached emits Success with empty list when empty`() =
+      runTest {
+        val feedingDao = io.mockk.mockk<FeedingDao>()
+        io.mockk.every { feedingDao.getFeedingsFlow(1) } returns flowOf(emptyList())
+        val apiService = io.mockk.mockk<PoopyFeedApiService>()
+        val repo = CachedFeedingsRepository(apiService, feedingDao)
 
-    val results = repo.listFeedingsCached(1).toList()
+        val results = repo.listFeedingsCached(1).toList()
 
-    assertIs<ApiResult.Loading<*>>(results[0])
-  }
+        assertIs<ApiResult.Success<List<Feeding>>>(results[0])
+        assertEquals(0, (results[0] as ApiResult.Success).data.size)
+      }
 
   @Test
   fun `CachedFeedingsRepository listFeedingsCached emits Success when has data`() = runTest {

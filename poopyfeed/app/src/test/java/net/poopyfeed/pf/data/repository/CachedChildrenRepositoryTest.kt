@@ -28,13 +28,14 @@ class CachedChildrenRepositoryTest {
   }
 
   @Test
-  fun `listChildrenCached emits Loading when cache empty`() = runTest {
+  fun `listChildrenCached emits Success with empty list when cache empty`() = runTest {
     io.mockk.coEvery { childDao.getAllChildrenFlow() } returns flowOf(emptyList())
 
     val results = repository.listChildrenCached().toList()
 
     assertEquals(1, results.size)
-    assertIs<ApiResult.Loading<*>>(results[0])
+    assertIs<ApiResult.Success<List<Child>>>(results[0])
+    assertEquals(0, (results[0] as ApiResult.Success).data.size)
   }
 
   @Test

@@ -37,20 +37,23 @@ class CachedChildrenRepository(
    * Get all children from local cache as Flow.
    *
    * Returns:
-   * - Local data immediately
+   * - Local data immediately (or Success(emptyList()) when cache is empty)
    * - Refreshes from API in background if stale
    * - Updates Flow when new data arrives
+   *
+   * Empty cache emits Success(emptyList()); call [refreshChildren] to fetch from network and show
+   * loading during that call if you need to distinguish "not yet synced" from "synced and empty".
    *
    * Usage:
    * ```
    * repo.listChildrenCached()
-   *     .collect { children -> showChildren(children) }
+   *     .collect { result -> when (result) { is Success -> showChildren(result.data) ... } }
    * ```
    */
   fun listChildrenCached(): Flow<ApiResult<List<Child>>> =
       childDao.getAllChildrenFlow().map { entities ->
         if (entities.isEmpty()) {
-          ApiResult.Loading()
+          ApiResult.Success(emptyList())
         } else {
           ApiResult.Success(entities.map { it.toApiModel() })
         }
@@ -118,11 +121,11 @@ class CachedFeedingsRepository(
     private val feedingDao: FeedingDao
 ) {
 
-  /** Get all feedings for a child from cache as Flow. */
+  /** Get all feedings for a child from cache as Flow. Empty cache emits Success(emptyList()). */
   fun listFeedingsCached(childId: Int): Flow<ApiResult<List<Feeding>>> =
       feedingDao.getFeedingsFlow(childId).map { entities ->
         if (entities.isEmpty()) {
-          ApiResult.Loading()
+          ApiResult.Success(emptyList())
         } else {
           ApiResult.Success(entities.map { it.toApiModel() })
         }
@@ -172,10 +175,11 @@ class CachedDiapersRepository(
     private val diaperDao: DiaperDao
 ) {
 
+  /** Empty cache emits Success(emptyList()). */
   fun listDiapersCached(childId: Int): Flow<ApiResult<List<Diaper>>> =
       diaperDao.getDiapersFlow(childId).map { entities ->
         if (entities.isEmpty()) {
-          ApiResult.Loading()
+          ApiResult.Success(emptyList())
         } else {
           ApiResult.Success(entities.map { it.toApiModel() })
         }
@@ -221,10 +225,11 @@ class CachedNapsRepository(
     private val napDao: NapDao
 ) {
 
+  /** Empty cache emits Success(emptyList()). */
   fun listNapsCached(childId: Int): Flow<ApiResult<List<Nap>>> =
       napDao.getNapsFlow(childId).map { entities ->
         if (entities.isEmpty()) {
-          ApiResult.Loading()
+          ApiResult.Success(emptyList())
         } else {
           ApiResult.Success(entities.map { it.toApiModel() })
         }
