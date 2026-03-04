@@ -134,17 +134,6 @@
     </issue>
 
     <issue
-        id="FragmentTagUsage"
-        message="Replace the &lt;fragment> tag with FragmentContainerView."
-        errorLine1="    &lt;fragment"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_main.xml"
-            line="9"
-            column="6"/>
-    </issue>
-
-    <issue
         id="AndroidGradlePluginVersion"
         message="A newer version of Gradle than 9.2.1 is available: 9.4.0"
         errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip"
@@ -710,39 +699,6 @@
             file="src/main/res/values/themes.xml"
             line="155"
             column="12"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `SharedPreferences.edit` instead?"
-        errorLine1="        prefs.edit().putString(&quot;auth_token&quot;, token).apply()"
-        errorLine2="        ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/net/poopyfeed/pf/di/NetworkModule.kt"
-            line="50"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `SharedPreferences.edit` instead?"
-        errorLine1="        prefs.edit().remove(&quot;auth_token&quot;).apply()"
-        errorLine2="        ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/net/poopyfeed/pf/di/NetworkModule.kt"
-            line="58"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="LabelFor"
-        message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
-        errorLine1="                    &lt;AutoCompleteTextView"
-        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_account_settings.xml"
-            line="167"
-            column="22"/>
     </issue>
 
 </issues>

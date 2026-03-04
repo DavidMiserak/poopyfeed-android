@@ -153,6 +153,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_4"
                     android:hint="@string/account_timezone_label"
+                    android:labelFor="@+id/auto_complete_account_timezone"
                     app:endIconMode="dropdown_menu"
                     app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"

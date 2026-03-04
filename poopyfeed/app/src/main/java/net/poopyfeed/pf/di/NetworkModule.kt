@@ -2,6 +2,7 @@ package net.poopyfeed.pf.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.BuildConfig
@@ -47,7 +48,7 @@ object NetworkModule {
 
     fun saveAuthToken(context: Context, token: String) {
         val prefs = provideSharedPreferences(context)
-        prefs.edit().putString("auth_token", token).apply()
+        prefs.edit { putString("auth_token", token) }
     }
 
     fun getAuthToken(context: Context): String? =
@@ -55,7 +56,7 @@ object NetworkModule {
 
     fun clearAuthToken(context: Context) {
         val prefs = provideSharedPreferences(context)
-        prefs.edit().remove("auth_token").apply()
+        prefs.edit { remove("auth_token") }
     }
 
     fun provideOkHttpClient(context: Context): OkHttpClient {
