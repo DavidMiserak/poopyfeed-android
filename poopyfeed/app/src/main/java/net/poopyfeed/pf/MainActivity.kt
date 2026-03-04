@@ -4,22 +4,25 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.databinding.ActivityMainBinding
-import net.poopyfeed.pf.di.NetworkModule
 
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
   private lateinit var appBarConfiguration: AppBarConfiguration
+
+  private val viewModel: MainActivityViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -27,6 +30,12 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
+
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() }
+      }
+    }
 
     // FragmentContainerView creates NavHostFragment asynchronously; defer nav setup
     // until the host fragment exists (see FragmentTagUsage → FragmentContainerView).
@@ -70,26 +79,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun performLogout() {
-    lifecycleScope.launch {
-      val apiService = NetworkModule.providePoopyFeedApiService(this@MainActivity)
-      val authRepository = AuthRepository(apiService)
+    viewModel.logout()
+  }
 
-      when (authRepository.logout()) {
-        is ApiResult.Success,
-        is ApiResult.Loading -> {
-          // ignore
-        }
-        is ApiResult.Error -> {
-          // ignore errors, we'll still clear locally
-        }
-      }
-
-      NetworkModule.clearAuthToken(this@MainActivity)
-
-      val navController = findNavController(R.id.nav_host_fragment_content_main)
-      val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
-
-      navController.navigate(R.id.LoginFragment, null, navOptions)
-    }
+  private fun navigateToLoginAfterLogout() {
+    val navController = findNavController(R.id.nav_host_fragment_content_main)
+    val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
+    navController.navigate(R.id.LoginFragment, null, navOptions)
   }
 }
