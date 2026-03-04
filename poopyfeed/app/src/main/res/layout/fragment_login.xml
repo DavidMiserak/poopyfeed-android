@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/slate_50"
     android:padding="@dimen/spacing_8"
+    android:fillViewport="true"
     tools:context=".LoginFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,9 +17,11 @@
             android:id="@+id/text_login_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_16"
             android:text="@string/login_title"
             android:textAppearance="@style/TextAppearance.Pf.DisplayLarge"
             android:textColor="@color/rose_400"
+            android:gravity="center_horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -27,9 +30,10 @@
             android:id="@+id/text_login_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_2"
+            android:layout_marginTop="@dimen/spacing_4"
             android:text="@string/login_subtitle"
-            android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+            android:textAppearance="@style/TextAppearance.Pf.BodyLarge"
+            android:textAlignment="center"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_login_title" />
@@ -39,8 +43,9 @@
             style="@style/Widget.Pf.CardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_4"
-            app:cardCornerRadius="12dp"
+            android:layout_marginTop="@dimen/spacing_12"
+            app:cardCornerRadius="@dimen/corner_radius_lg"
+            app:cardElevation="@dimen/elevation_8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_login_subtitle">
@@ -48,21 +53,43 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/spacing_4">
+                android:padding="@dimen/spacing_6">
+
+                <TextView
+                    android:id="@+id/text_login_card_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_card_title"
+                    android:textAppearance="@style/TextAppearance.Pf.HeadlineMedium"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_login_card_subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="@string/login_card_subtitle"
+                    android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_login_card_title" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/input_layout_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_6"
                     android:hint="@string/login_email_label"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/text_login_card_subtitle">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_email"
@@ -81,10 +108,10 @@
                     android:layout_marginTop="@dimen/spacing_4"
                     android:hint="@string/login_password_label"
                     app:endIconMode="password_toggle"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_email">
@@ -103,7 +130,7 @@
                     style="@style/Widget.Pf.Button.Primary"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/button_height"
-                    android:layout_marginTop="@dimen/spacing_4"
+                    android:layout_marginTop="@dimen/spacing_8"
                     android:text="@string/login_button"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -114,7 +141,7 @@
                     style="@style/Widget.MaterialComponents.CircularProgressIndicator.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_2"
+                    android:layout_marginTop="@dimen/spacing_4"
                     android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

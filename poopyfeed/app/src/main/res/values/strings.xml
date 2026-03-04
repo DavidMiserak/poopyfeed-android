@@ -6,6 +6,8 @@
     <!-- Login -->
     <string name="login_title">PoopyFeed</string>
     <string name="login_subtitle">Track feedings, diapers, and naps with your partner and caregivers.</string>
+    <string name="login_card_title">Sign in to your village</string>
+    <string name="login_card_subtitle">Stay in sync with the people who love your baby.</string>
     <string name="login_email_label">Email</string>
     <string name="login_password_label">Password</string>
     <string name="login_button">Log in</string>
@@ -15,4 +17,5 @@
     <!-- Home -->
     <string name="logout_button">Log out</string>
     <string name="welcome_message">Welcome, %1$s %2$s</string>
+    <string name="home_subtitle">Here is what is happening with your little one today.</string>
 </resources>
