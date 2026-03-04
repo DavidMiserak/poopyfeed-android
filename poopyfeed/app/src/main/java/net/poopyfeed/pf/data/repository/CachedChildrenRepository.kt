@@ -1,5 +1,6 @@
 package net.poopyfeed.pf.data.repository
 
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,7 @@ import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
 import net.poopyfeed.pf.data.models.*
 import net.poopyfeed.pf.data.models.toApiError
+import net.poopyfeed.pf.di.IoDispatcher
 
 /**
  * Enhanced repository with local Room caching.
@@ -34,10 +36,12 @@ import net.poopyfeed.pf.data.models.toApiError
  * - Instant UI updates from cache
  * - Background sync in the future
  */
-class CachedChildrenRepository(
+class CachedChildrenRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
     private val childDao: ChildDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _hasSynced = MutableStateFlow(false)
@@ -151,10 +155,12 @@ class CachedChildrenRepository(
 }
 
 /** Cached Feedings Repository with local Room support. */
-class CachedFeedingsRepository(
+class CachedFeedingsRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
     private val feedingDao: FeedingDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
@@ -230,10 +236,12 @@ class CachedFeedingsRepository(
 }
 
 /** Cached Diapers Repository with local Room support. */
-class CachedDiapersRepository(
+class CachedDiapersRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
     private val diaperDao: DiaperDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
@@ -306,10 +314,12 @@ class CachedDiapersRepository(
 }
 
 /** Cached Naps Repository with local Room support. */
-class CachedNapsRepository(
+class CachedNapsRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
     private val napDao: NapDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())

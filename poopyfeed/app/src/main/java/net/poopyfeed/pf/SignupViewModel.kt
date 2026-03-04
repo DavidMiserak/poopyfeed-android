@@ -1,35 +1,37 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 
 sealed interface SignupUiState {
   data object Idle : SignupUiState
 
   data object Loading : SignupUiState
 
-  data class Success(val token: String) : SignupUiState
+  data object Success : SignupUiState
 
   data class Error(val message: String) : SignupUiState
 }
 
-class SignupViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class SignupViewModel
+@Inject
+constructor(
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager,
+) : ViewModel() {
 
   private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState.Idle)
   val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
-
-  private val authRepository: AuthRepository by lazy {
-    val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
-    AuthRepository(apiService)
-  }
 
   fun signUp(email: String, password: String) {
     viewModelScope.launch {
@@ -37,7 +39,8 @@ class SignupViewModel(application: Application) : AndroidViewModel(application) 
 
       when (val result = authRepository.signup(email, password)) {
         is ApiResult.Success -> {
-          _uiState.value = SignupUiState.Success(result.data)
+          tokenManager.saveToken(result.data)
+          _uiState.value = SignupUiState.Success
         }
         is ApiResult.Error -> {
           _uiState.value = SignupUiState.Error(result.error.getUserMessage())

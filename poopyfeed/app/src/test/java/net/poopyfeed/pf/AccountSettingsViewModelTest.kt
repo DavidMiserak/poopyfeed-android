@@ -1,13 +1,9 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
-import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlin.test.assertEquals
@@ -24,7 +20,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -33,17 +29,12 @@ import org.junit.Test
 class AccountSettingsViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
-
-  private lateinit var application: Application
+  private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockTokenManager: TokenManager = mockk(relaxed = true)
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    MockKAnnotations.init(this, relaxUnitFun = true)
-    application = mockk(relaxed = true)
-
-    mockkObject(NetworkModule)
-    mockkConstructor(AuthRepository::class)
   }
 
   @After
@@ -55,7 +46,7 @@ class AccountSettingsViewModelTest {
 
   @Test
   fun `loadProfile success emits Ready with sorted timezones`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
     val profile =
         UserProfile(
@@ -65,9 +56,9 @@ class AccountSettingsViewModelTest {
             last_name = "User",
             timezone = "UTC")
 
-    coEvery { anyConstructed<AuthRepository>().getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -80,9 +71,9 @@ class AccountSettingsViewModelTest {
 
   @Test
   fun `loadProfile with missing token emits Unauthorized`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns null
+    every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -92,29 +83,29 @@ class AccountSettingsViewModelTest {
 
   @Test
   fun `loadProfile with 401 error clears token and emits Unauthorized`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
     val httpError = ApiError.HttpError(statusCode = 401, errorMessage = "Unauthorized")
-    coEvery { anyConstructed<AuthRepository>().getProfile() } returns ApiResult.Error(httpError)
-    every { NetworkModule.clearAuthToken(any()) } returns Unit
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(httpError)
+    every { mockTokenManager.clearToken() } returns Unit
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.Unauthorized>(state)
-    verify(exactly = 1) { NetworkModule.clearAuthToken(any()) }
+    verify(exactly = 1) { mockTokenManager.clearToken() }
   }
 
   @Test
   fun `loadProfile with non-401 error emits Error`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
     val networkError = ApiError.NetworkError("Network down")
-    coEvery { anyConstructed<AuthRepository>().getProfile() } returns ApiResult.Error(networkError)
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -125,7 +116,7 @@ class AccountSettingsViewModelTest {
 
   @Test
   fun `saveProfile from Ready with success emits Saved`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
     val initialProfile =
         UserProfile(
@@ -138,15 +129,13 @@ class AccountSettingsViewModelTest {
     val updatedProfile =
         initialProfile.copy(first_name = "New", last_name = "Name", timezone = "Europe/Berlin")
 
-    coEvery { anyConstructed<AuthRepository>().getProfile() } returns
-        ApiResult.Success(initialProfile)
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery {
-      anyConstructed<AuthRepository>()
-          .updateProfile(
-              UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin"))
+      mockAuthRepository.updateProfile(
+          UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin"))
     } returns ApiResult.Success(updatedProfile)
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -162,7 +151,7 @@ class AccountSettingsViewModelTest {
 
   @Test
   fun `saveProfile error emits Error state`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
     val initialProfile =
         UserProfile(
@@ -174,12 +163,10 @@ class AccountSettingsViewModelTest {
 
     val apiError = ApiError.NetworkError("Network down")
 
-    coEvery { anyConstructed<AuthRepository>().getProfile() } returns
-        ApiResult.Success(initialProfile)
-    coEvery { anyConstructed<AuthRepository>().updateProfile(any()) } returns
-        ApiResult.Error(apiError)
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
+    coEvery { mockAuthRepository.updateProfile(any()) } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(application)
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager)
 
     testDispatcher.scheduler.advanceUntilIdle()
 

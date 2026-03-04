@@ -1,8 +1,9 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +11,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 
 sealed interface HomeUiState {
   data object Loading : HomeUiState
@@ -22,24 +23,22 @@ sealed interface HomeUiState {
   data class Error(val message: String) : HomeUiState
 }
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class HomeViewModel
+@Inject
+constructor(
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager,
+) : ViewModel() {
 
   private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Loading)
   val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-  private val authRepository: AuthRepository by lazy {
-    val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
-    AuthRepository(apiService)
-  }
 
   init {
     loadProfile()
   }
 
-  fun hasToken(): Boolean {
-    val token = NetworkModule.getAuthToken(getApplication())
-    return token != null
-  }
+  fun hasToken(): Boolean = tokenManager.getToken() != null
 
   fun loadProfile() {
     viewModelScope.launch {
@@ -58,7 +57,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         is ApiResult.Error -> {
           val error = result.error
           if (error is ApiError.HttpError && error.statusCode == 401) {
-            NetworkModule.clearAuthToken(getApplication())
+            tokenManager.clearToken()
             _uiState.value = HomeUiState.Unauthorized
           } else {
             _uiState.value = HomeUiState.Error(error.getUserMessage())

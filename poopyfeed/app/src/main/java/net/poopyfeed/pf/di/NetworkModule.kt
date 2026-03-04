@@ -2,9 +2,15 @@ package net.poopyfeed.pf.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlin.jvm.Volatile
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.BuildConfig
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -14,121 +20,77 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
+private const val PREFS_NAME = "poopyfeed_prefs"
+
 /**
- * Manual DI provider for network dependencies. Provides Retrofit, OkHttpClient, and the API
- * service.
+ * Hilt module for network dependencies. Provides Retrofit, OkHttpClient, and the API service.
  *
- * Token authentication:
- * - Token is stored in SharedPreferences under key "auth_token"
- * - AuthInterceptor reads it on every request and adds "Authorization: Token <value>"
- * - BaseUrl: http://10.0.2.2:8000/api/v1/ (Android emulator -> host localhost)
+ * Token authentication: Auth interceptor reads token from SharedPreferences (same prefs as
+ * [TokenManager]) and adds "Authorization: Token <value>".
  */
+@Module
+@InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-  private val lock = Any()
+  @Provides
+  @Singleton
+  fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
+      context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-  @Volatile private var sharedPreferences: SharedPreferences? = null
-  @Volatile private var json: Json? = null
-  @Volatile private var okHttpClient: OkHttpClient? = null
-  @Volatile private var retrofit: Retrofit? = null
-  @Volatile private var apiService: PoopyFeedApiService? = null
+  @Provides @Singleton fun provideJson(): Json = Json { ignoreUnknownKeys = true }
 
-  fun provideSharedPreferences(context: Context): SharedPreferences {
-    return sharedPreferences
-        ?: synchronized(lock) {
-          sharedPreferences
-              ?: context.applicationContext
-                  .getSharedPreferences("poopyfeed_prefs", Context.MODE_PRIVATE)
-                  .also { sharedPreferences = it }
+  @Provides
+  @Singleton
+  internal fun providePersistentCookieJar(
+      prefs: SharedPreferences,
+      json: Json,
+  ): PersistentCookieJar = PersistentCookieJar(prefs, json)
+
+  @Provides
+  @Singleton
+  internal fun provideOkHttpClient(
+      prefs: SharedPreferences,
+      json: Json,
+      cookieJar: PersistentCookieJar,
+  ): OkHttpClient {
+    val authInterceptor = Interceptor { chain ->
+      val token = prefs.getString("auth_token", null)
+      val request =
+          if (token != null) {
+            chain.request().newBuilder().header("Authorization", "Token $token").build()
+          } else {
+            chain.request()
+          }
+      chain.proceed(request)
+    }
+    val logging =
+        HttpLoggingInterceptor().apply {
+          level =
+              if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+              else HttpLoggingInterceptor.Level.NONE
         }
+    return OkHttpClient.Builder()
+        .cookieJar(cookieJar)
+        .addInterceptor(authInterceptor)
+        .addInterceptor(logging)
+        .build()
   }
 
-  fun provideJson(): Json {
-    return json
-        ?: synchronized(lock) { json ?: Json { ignoreUnknownKeys = true }.also { json = it } }
+  @Provides
+  @Singleton
+  fun provideRetrofit(client: OkHttpClient, json: Json): Retrofit {
+    val contentType = "application/json".toMediaType()
+    return Retrofit.Builder()
+        .baseUrl(BuildConfig.API_BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory(contentType))
+        .build()
   }
 
-  private fun getAuthTokenInternal(prefs: SharedPreferences): String? =
-      prefs.getString("auth_token", null)
+  @Provides
+  @Singleton
+  fun providePoopyFeedApiService(retrofit: Retrofit): PoopyFeedApiService =
+      retrofit.create(PoopyFeedApiService::class.java)
 
-  fun saveAuthToken(context: Context, token: String) {
-    val prefs = provideSharedPreferences(context)
-    prefs.edit { putString("auth_token", token) }
-  }
-
-  fun getAuthToken(context: Context): String? =
-      getAuthTokenInternal(provideSharedPreferences(context))
-
-  fun clearAuthToken(context: Context) {
-    val prefs = provideSharedPreferences(context)
-    prefs.edit { remove("auth_token") }
-    PersistentCookieJar.clear(prefs)
-  }
-
-  fun provideOkHttpClient(context: Context): OkHttpClient {
-    return okHttpClient
-        ?: synchronized(lock) {
-          okHttpClient
-              ?: run {
-                val prefs = provideSharedPreferences(context)
-
-                val authInterceptor = Interceptor { chain ->
-                  val token = getAuthTokenInternal(prefs)
-                  val request =
-                      if (token != null) {
-                        chain.request().newBuilder().header("Authorization", "Token $token").build()
-                      } else {
-                        chain.request()
-                      }
-                  chain.proceed(request)
-                }
-
-                val logging =
-                    HttpLoggingInterceptor().apply {
-                      level =
-                          if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-                          else HttpLoggingInterceptor.Level.NONE
-                    }
-
-                val cookieJar = PersistentCookieJar(prefs, provideJson())
-
-                OkHttpClient.Builder()
-                    .cookieJar(cookieJar)
-                    .addInterceptor(authInterceptor)
-                    .addInterceptor(logging)
-                    .build()
-                    .also { okHttpClient = it }
-              }
-        }
-  }
-
-  /**
-   * Retrofit instance for PoopyFeed API. Uses 10.0.2.2 which is the Android emulator alias for host
-   * localhost.
-   */
-  fun provideRetrofit(context: Context): Retrofit {
-    return retrofit
-        ?: synchronized(lock) {
-          retrofit
-              ?: run {
-                val contentType = "application/json".toMediaType()
-                Retrofit.Builder()
-                    .baseUrl(BuildConfig.API_BASE_URL)
-                    .client(provideOkHttpClient(context))
-                    .addConverterFactory(provideJson().asConverterFactory(contentType))
-                    .build()
-                    .also { retrofit = it }
-              }
-        }
-  }
-
-  fun providePoopyFeedApiService(context: Context): PoopyFeedApiService {
-    return apiService
-        ?: synchronized(lock) {
-          apiService
-              ?: provideRetrofit(context).create(PoopyFeedApiService::class.java).also {
-                apiService = it
-              }
-        }
-  }
+  @Provides @Singleton @IoDispatcher fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

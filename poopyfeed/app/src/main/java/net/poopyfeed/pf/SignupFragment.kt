@@ -12,10 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentSignupBinding
-import net.poopyfeed.pf.di.NetworkModule
 
+@AndroidEntryPoint
 class SignupFragment : Fragment() {
 
   private var _binding: FragmentSignupBinding? = null
@@ -48,8 +49,6 @@ class SignupFragment : Fragment() {
             }
             is SignupUiState.Success -> {
               setLoading(false)
-              val context = requireContext().applicationContext
-              NetworkModule.saveAuthToken(context, state.token)
               navigateToHome()
             }
             is SignupUiState.Error -> {

@@ -1,25 +1,33 @@
 package net.poopyfeed.pf.di
 
 import android.content.Context
-import net.poopyfeed.pf.data.db.*
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+import net.poopyfeed.pf.data.db.ChildDao
+import net.poopyfeed.pf.data.db.DiaperDao
+import net.poopyfeed.pf.data.db.FeedingDao
+import net.poopyfeed.pf.data.db.NapDao
+import net.poopyfeed.pf.data.db.PoopyFeedDatabase
 
-/**
- * Manual DI provider for Room database dependencies. Provides database instance and DAO singletons.
- */
+/** Hilt module for Room database and DAOs. */
+@Module
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-  private var database: PoopyFeedDatabase? = null
+  @Provides
+  @Singleton
+  fun provideDatabase(@ApplicationContext context: Context): PoopyFeedDatabase =
+      PoopyFeedDatabase.getInstance(context.applicationContext)
 
-  fun provideDatabase(context: Context): PoopyFeedDatabase {
-    return database
-        ?: PoopyFeedDatabase.getInstance(context.applicationContext).also { database = it }
-  }
+  @Provides @Singleton fun provideChildDao(db: PoopyFeedDatabase): ChildDao = db.childDao()
 
-  fun provideChildDao(context: Context): ChildDao = provideDatabase(context).childDao()
+  @Provides @Singleton fun provideFeedingDao(db: PoopyFeedDatabase): FeedingDao = db.feedingDao()
 
-  fun provideFeedingDao(context: Context): FeedingDao = provideDatabase(context).feedingDao()
+  @Provides @Singleton fun provideDiaperDao(db: PoopyFeedDatabase): DiaperDao = db.diaperDao()
 
-  fun provideDiaperDao(context: Context): DiaperDao = provideDatabase(context).diaperDao()
-
-  fun provideNapDao(context: Context): NapDao = provideDatabase(context).napDao()
+  @Provides @Singleton fun provideNapDao(db: PoopyFeedDatabase): NapDao = db.napDao()
 }

@@ -1,21 +1,23 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
-
-  private val authRepository: AuthRepository by lazy {
-    val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
-    AuthRepository(apiService)
-  }
+@HiltViewModel
+class MainActivityViewModel
+@Inject
+constructor(
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager,
+) : ViewModel() {
 
   private val _logoutNavigateToLogin = MutableSharedFlow<Unit>(replay = 0)
   val logoutNavigateToLogin: SharedFlow<Unit> = _logoutNavigateToLogin.asSharedFlow()
@@ -23,7 +25,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   fun logout() {
     viewModelScope.launch {
       authRepository.logout() // best-effort; ignore result
-      NetworkModule.clearAuthToken(getApplication())
+      tokenManager.clearToken()
       _logoutNavigateToLogin.emit(Unit)
     }
   }

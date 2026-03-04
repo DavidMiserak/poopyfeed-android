@@ -1,5 +1,6 @@
 package net.poopyfeed.pf.data.repository
 
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.*
 import net.poopyfeed.pf.data.models.toApiError
+import net.poopyfeed.pf.di.IoDispatcher
 
 /**
  * Repository for child profile operations.
@@ -19,9 +21,11 @@ import net.poopyfeed.pf.data.models.toApiError
  * - Type-safe error results
  * - Single source of truth pattern
  */
-class ChildrenRepository(
+class ChildrenRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   /**
@@ -99,9 +103,11 @@ class ChildrenRepository(
 }
 
 /** Repository for feeding operations. */
-class FeedingsRepository(
+class FeedingsRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listFeedings(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Feeding>>> =
@@ -152,9 +158,11 @@ class FeedingsRepository(
 }
 
 /** Repository for diaper change operations. */
-class DiapersRepository(
+class DiapersRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listDiapers(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Diaper>>> =
@@ -191,9 +199,11 @@ class DiapersRepository(
 }
 
 /** Repository for nap operations. */
-class NapsRepository(
+class NapsRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listNaps(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Nap>>> =
@@ -240,9 +250,11 @@ class NapsRepository(
 }
 
 /** Repository for sharing operations. */
-class SharingRepository(
+class SharingRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   suspend fun listShares(childId: Int): ApiResult<List<ChildShare>> =
@@ -287,9 +299,11 @@ class SharingRepository(
 }
 
 /** Repository for authentication operations. */
-class AuthRepository(
+class AuthRepository
+@Inject
+constructor(
     private val apiService: PoopyFeedApiService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   /** Perform two-step browser login and return the auth token string. */

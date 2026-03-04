@@ -1,12 +1,9 @@
 package net.poopyfeed.pf
 
-import android.app.Application
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
-import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlin.test.assertEquals
@@ -22,7 +19,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -31,14 +28,12 @@ import org.junit.Test
 class LoginViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
-  private lateinit var application: Application
+  private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockTokenManager: TokenManager = mockk(relaxed = true)
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    application = mockk(relaxed = true)
-    mockkObject(NetworkModule)
-    mockkConstructor(AuthRepository::class)
   }
 
   @After
@@ -50,55 +45,53 @@ class LoginViewModelTest {
 
   @Test
   fun `checkExistingToken returns true when token present`() {
-    every { NetworkModule.getAuthToken(any()) } returns "test-token"
+    every { mockTokenManager.getToken() } returns "test-token"
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
 
     assertTrue(viewModel.checkExistingToken())
   }
 
   @Test
   fun `checkExistingToken returns false when token null`() {
-    every { NetworkModule.getAuthToken(any()) } returns null
+    every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
 
     assertFalse(viewModel.checkExistingToken())
   }
 
   @Test
   fun `initial state is Idle`() {
-    every { NetworkModule.getAuthToken(any()) } returns null
+    every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
   }
 
   @Test
   fun `login success saves token and emits Success`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns null
-    every { NetworkModule.saveAuthToken(any(), any()) } returns Unit
-    coEvery { anyConstructed<AuthRepository>().login(any(), any()) } returns
-        ApiResult.Success("token-123")
+    every { mockTokenManager.getToken() } returns null
+    every { mockTokenManager.saveToken(any()) } returns Unit
+    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
     viewModel.login("user@example.com", "password123")
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<LoginUiState.Success>(viewModel.uiState.value)
-    verify(exactly = 1) { NetworkModule.saveAuthToken(any(), "token-123") }
+    verify(exactly = 1) { mockTokenManager.saveToken("token-123") }
   }
 
   @Test
   fun `login error emits Error state with message`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns null
+    every { mockTokenManager.getToken() } returns null
     val apiError = ApiError.NetworkError("Network down")
-    coEvery { anyConstructed<AuthRepository>().login(any(), any()) } returns
-        ApiResult.Error(apiError)
+    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Error(apiError)
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
     viewModel.login("user@example.com", "wrong")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -110,11 +103,11 @@ class LoginViewModelTest {
 
   @Test
   fun `clearError from Error state sets Idle`() = runTest {
-    every { NetworkModule.getAuthToken(any()) } returns null
-    coEvery { anyConstructed<AuthRepository>().login(any(), any()) } returns
+    every { mockTokenManager.getToken() } returns null
+    coEvery { mockAuthRepository.login(any(), any()) } returns
         ApiResult.Error(ApiError.NetworkError("err"))
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
     viewModel.login("a@b.com", "p")
     testDispatcher.scheduler.advanceUntilIdle()
     assertIs<LoginUiState.Error>(viewModel.uiState.value)
@@ -125,9 +118,9 @@ class LoginViewModelTest {
 
   @Test
   fun `clearError when not Error state leaves state unchanged`() {
-    every { NetworkModule.getAuthToken(any()) } returns null
+    every { mockTokenManager.getToken() } returns null
 
-    val viewModel = LoginViewModel(application)
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager)
     viewModel.clearError()
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)

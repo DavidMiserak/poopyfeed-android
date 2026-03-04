@@ -1,13 +1,11 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
-import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +17,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,20 +26,14 @@ import org.junit.Test
 class SignupViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
-
-  private lateinit var application: Application
+  private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private lateinit var viewModel: SignupViewModel
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    MockKAnnotations.init(this, relaxUnitFun = true)
-    application = mockk(relaxed = true)
-
-    mockkObject(NetworkModule)
-    mockkConstructor(AuthRepository::class)
-
-    viewModel = SignupViewModel(application)
+    viewModel = SignupViewModel(mockAuthRepository, mockTokenManager)
   }
 
   @After
@@ -58,25 +50,23 @@ class SignupViewModelTest {
   }
 
   @Test
-  fun `signUp success emits Success state with token`() = runTest {
+  fun `signUp success saves token and emits Success`() = runTest {
     val token = "test-token-123"
-    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
-        ApiResult.Success(token)
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Success(token)
+    every { mockTokenManager.saveToken(token) } returns Unit
 
     viewModel.signUp("test@example.com", "password123")
 
     testDispatcher.scheduler.advanceUntilIdle()
 
-    val state = viewModel.uiState.value
-    assertIs<SignupUiState.Success>(state)
-    assertEquals(token, state.token)
+    assertIs<SignupUiState.Success>(viewModel.uiState.value)
+    verify(exactly = 1) { mockTokenManager.saveToken(token) }
   }
 
   @Test
   fun `signUp error emits Error state`() = runTest {
     val apiError = ApiError.NetworkError("Network down")
-    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
-        ApiResult.Error(apiError)
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
 
     viewModel.signUp("test@example.com", "password123")
 
@@ -90,8 +80,7 @@ class SignupViewModelTest {
   @Test
   fun `clearError from Error returns Idle`() = runTest {
     val apiError = ApiError.NetworkError("Network down")
-    coEvery { anyConstructed<AuthRepository>().signup(any(), any()) } returns
-        ApiResult.Error(apiError)
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Error(apiError)
 
     viewModel.signUp("test@example.com", "password123")
 

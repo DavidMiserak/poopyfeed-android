@@ -1,9 +1,10 @@
 package net.poopyfeed.pf
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.TimeZone
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
-import net.poopyfeed.pf.di.NetworkModule
+import net.poopyfeed.pf.di.TokenManager
 
 sealed interface AccountSettingsUiState {
   data object Loading : AccountSettingsUiState
@@ -29,16 +30,17 @@ sealed interface AccountSettingsUiState {
   data class Saved(val profile: UserProfile, val timezones: List<String>) : AccountSettingsUiState
 }
 
-class AccountSettingsViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class AccountSettingsViewModel
+@Inject
+constructor(
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager,
+) : ViewModel() {
 
   private val _uiState: MutableStateFlow<AccountSettingsUiState> =
       MutableStateFlow(AccountSettingsUiState.Loading)
   val uiState: StateFlow<AccountSettingsUiState> = _uiState.asStateFlow()
-
-  private val authRepository: AuthRepository by lazy {
-    val apiService = NetworkModule.providePoopyFeedApiService(getApplication())
-    AuthRepository(apiService)
-  }
 
   private val allTimezones: List<String> by lazy { TimeZone.getAvailableIDs().toList().sorted() }
 
@@ -48,8 +50,7 @@ class AccountSettingsViewModel(application: Application) : AndroidViewModel(appl
 
   fun loadProfile() {
     viewModelScope.launch {
-      val token = NetworkModule.getAuthToken(getApplication())
-      if (token == null) {
+      if (tokenManager.getToken() == null) {
         _uiState.value = AccountSettingsUiState.Unauthorized
         return@launch
       }
@@ -64,7 +65,7 @@ class AccountSettingsViewModel(application: Application) : AndroidViewModel(appl
         is ApiResult.Error -> {
           val error = result.error
           if (error is ApiError.HttpError && error.statusCode == 401) {
-            NetworkModule.clearAuthToken(getApplication())
+            tokenManager.clearToken()
             _uiState.value = AccountSettingsUiState.Unauthorized
           } else {
             _uiState.value = AccountSettingsUiState.Error(error.getUserMessage())
