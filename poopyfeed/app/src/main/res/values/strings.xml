@@ -13,10 +13,25 @@
     <string name="login_button">Log in</string>
     <string name="login_email_error">Enter a valid email address.</string>
     <string name="login_password_error">Password is required.</string>
+    <string name="login_go_to_signup">Need an account? Create one</string>
+
+    <!-- Signup -->
+    <string name="signup_title">PoopyFeed</string>
+    <string name="signup_subtitle">Create your account to start tracking your little ones day.</string>
+    <string name="signup_card_title">Join your village</string>
+    <string name="signup_card_subtitle">Invite partners and caregivers to stay in sync.</string>
+    <string name="signup_email_label">Email</string>
+    <string name="signup_password_label">Password</string>
+    <string name="signup_confirm_password_label">Confirm password</string>
+    <string name="signup_button">Create account</string>
+    <string name="signup_email_error">Enter a valid email address.</string>
+    <string name="signup_password_error">Password must be at least 8 characters.</string>
+    <string name="signup_confirm_password_error">Passwords must match.</string>
+    <string name="signup_go_to_login">Already have an account? Log in</string>
 
     <!-- Home -->
     <string name="logout_button">Log out</string>
-    <string name="welcome_message">👋 Welcome, %1$s %2$s</string>
+    <string name="welcome_message">👋 Welcome, %1$s</string>
     <string name="home_subtitle">Here is what is happening with your little one today.</string>
     <string name="home_getting_started_title">Getting Started</string>
     <string name="home_getting_started_body">Add your first child to start tracking feedings, diapers, and naps.</string>

@@ -27,6 +27,17 @@ interface PoopyFeedApiService {
     suspend fun sessionLogin(@Body request: LoginRequest): SessionLoginResponse
 
     /**
+     * Sign up a new user with email and password.
+     * Uses django-allauth headless signup endpoint.
+     */
+    @Headers(
+        "Accept: application/json",
+        "X-Requested-With: XMLHttpRequest"
+    )
+    @POST("browser/v1/auth/signup")
+    suspend fun signup(@Body request: SignupRequest): SessionLoginResponse
+
+    /**
      * Step 2: Exchange authenticated session for an auth token.
      * Requires session cookie from step 1 to be present.
      */

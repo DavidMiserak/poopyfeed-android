@@ -13,7 +13,7 @@ import net.poopyfeed.pf.di.NetworkModule
 
 sealed interface HomeUiState {
     data object Loading : HomeUiState
-    data class Ready(val firstName: String, val lastName: String) : HomeUiState
+    data class Ready(val email: String) : HomeUiState
     data object Unauthorized : HomeUiState
     data class Error(val message: String) : HomeUiState
 }
@@ -53,8 +53,7 @@ class HomeViewModel(
                 is ApiResult.Success -> {
                     val profile = result.data
                     _uiState.value = HomeUiState.Ready(
-                        firstName = profile.first_name,
-                        lastName = profile.last_name
+                        email = profile.email
                     )
                 }
 

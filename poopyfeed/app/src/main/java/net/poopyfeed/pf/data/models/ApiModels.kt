@@ -222,12 +222,16 @@ data class AuthToken(
 )
 
 /**
- * User registration request.
+ * User sign-up request for django-allauth headless API.
+ *
+ * Matches the web frontend `SignupRequest` shape; `re_password` is optional
+ * and not required by the backend but kept for parity.
  */
 @Serializable
-data class RegisterRequest(
+data class SignupRequest(
     val email: String,
-    val password: String
+    val password: String,
+    val re_password: String? = null
 )
 
 /**

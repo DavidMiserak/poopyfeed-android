@@ -73,6 +73,11 @@ class LoginFragment : Fragment() {
         binding.buttonLogin.setOnClickListener {
             attemptLogin()
         }
+
+        binding.textGoToSignup.setOnClickListener {
+            val navController = findNavController()
+            navController.navigate(R.id.action_loginFragment_to_signupFragment)
+        }
     }
 
     private fun attemptLogin() {

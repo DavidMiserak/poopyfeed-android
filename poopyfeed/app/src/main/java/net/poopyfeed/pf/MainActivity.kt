@@ -33,9 +33,10 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val isLogin = destination.id == R.id.LoginFragment
-            binding.appBar.visibility = if (isLogin) View.GONE else View.VISIBLE
-            binding.fab.visibility = if (isLogin) View.GONE else View.VISIBLE
+            val isAuthDestination =
+                destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
+            binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+            binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
         }
     }
 

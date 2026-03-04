@@ -49,8 +49,7 @@ class HomeFragment : Fragment() {
                         is HomeUiState.Ready -> {
                             binding.textWelcome.text = getString(
                                 R.string.welcome_message,
-                                state.firstName,
-                                state.lastName
+                                state.email
                             )
                         }
 

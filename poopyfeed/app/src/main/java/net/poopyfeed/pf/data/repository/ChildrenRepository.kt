@@ -260,11 +260,26 @@ class AuthRepository(
      */
     suspend fun login(email: String, password: String): ApiResult<String> = try {
         apiService.sessionLogin(LoginRequest(email, password))
-        val tokenResponse = apiService.fetchAuthToken()
-        ApiResult.Success(tokenResponse.auth_token)
-    } catch (e: Exception) {
-        ApiResult.Error(e.toApiError())
-    }
+            val tokenResponse = apiService.fetchAuthToken()
+            ApiResult.Success(tokenResponse.auth_token)
+        } catch (e: Exception) {
+            ApiResult.Error(e.toApiError())
+        }
+
+        /**
+         * Sign up a new user and return the auth token string.
+         *
+         * Mirrors the web frontend flow:
+         * 1) POST browser/v1/auth/signup
+         * 2) POST browser/v1/auth/token/ to obtain auth_token
+         */
+        suspend fun signup(email: String, password: String): ApiResult<String> = try {
+            apiService.signup(SignupRequest(email = email, password = password))
+            val tokenResponse = apiService.fetchAuthToken()
+            ApiResult.Success(tokenResponse.auth_token)
+        } catch (e: Exception) {
+            ApiResult.Error(e.toApiError())
+        }
 
     /**
      * Fetch the authenticated user's profile.
