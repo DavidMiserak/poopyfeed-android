@@ -1,7 +1,32 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Pf" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+    <!-- Dark theme for PoopyFeed -->
+    <style name="Base.Theme.Pf" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Primary Colors (Rose) -->
+        <item name="colorPrimary">@color/rose_400</item>
+        <item name="colorPrimaryContainer">@color/rose_600</item>
+
+        <!-- Secondary Colors (Amber/Orange) -->
+        <item name="colorSecondary">@color/orange_500</item>
+        <item name="colorSecondaryContainer">@color/orange_400</item>
+
+        <!-- Tertiary Colors -->
+        <item name="colorTertiary">@color/emerald_500</item>
+        <item name="colorTertiaryContainer">@color/emerald_50</item>
+
+        <!-- Error/Semantic -->
+        <item name="colorError">@color/red_500</item>
+        <item name="colorErrorContainer">@color/red_50</item>
+
+        <!-- Surface Colors -->
+        <item name="colorSurface">@color/slate_900</item>
+        <item name="colorSurfaceVariant">@color/slate_700</item>
+
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/slate_300</item>
+
+        <!-- Outline -->
+        <item name="colorOutline">@color/rose_600</item>
     </style>
 </resources>
