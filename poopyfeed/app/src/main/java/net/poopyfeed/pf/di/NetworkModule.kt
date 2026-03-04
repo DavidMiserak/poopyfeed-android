@@ -62,6 +62,7 @@ object NetworkModule {
   fun clearAuthToken(context: Context) {
     val prefs = provideSharedPreferences(context)
     prefs.edit { remove("auth_token") }
+    PersistentCookieJar.clear(prefs)
   }
 
   fun provideOkHttpClient(context: Context): OkHttpClient {
@@ -85,22 +86,7 @@ object NetworkModule {
                 val logging =
                     HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
-                val cookieJar =
-                    object : okhttp3.CookieJar {
-                      private val cookies: MutableList<okhttp3.Cookie> = mutableListOf()
-
-                      override fun saveFromResponse(
-                          url: okhttp3.HttpUrl,
-                          cookies: List<okhttp3.Cookie>
-                      ) {
-                        this.cookies.removeAll { it.matches(url) }
-                        this.cookies.addAll(cookies)
-                      }
-
-                      override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> {
-                        return cookies.filter { it.matches(url) }
-                      }
-                    }
+                val cookieJar = PersistentCookieJar(prefs, provideJson())
 
                 OkHttpClient.Builder()
                     .cookieJar(cookieJar)
