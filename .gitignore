@@ -64,6 +64,7 @@ kls_database.db
 CLAUDE.md
 memory/
 .cursor/
+.claude/
 
 # Node (e.g. for tooling)
 node_modules/

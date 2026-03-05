@@ -193,17 +193,62 @@ class AccountSettingsFragment : Fragment() {
     binding.editTextPasswordCurrent.text?.clear()
     binding.editTextPasswordNew.text?.clear()
     binding.editTextPasswordConfirm.text?.clear()
+    clearPasswordFieldErrors()
+  }
+
+  private fun clearPasswordFieldErrors() {
+    binding.inputLayoutPasswordCurrent.error = null
+    binding.inputLayoutPasswordNew.error = null
+    binding.inputLayoutPasswordConfirm.error = null
   }
 
   private fun showPasswordChangeDialog() {
+    val currentPassword = binding.editTextPasswordCurrent.text?.toString().orEmpty()
+    val newPassword = binding.editTextPasswordNew.text?.toString().orEmpty()
+    val confirmPassword = binding.editTextPasswordConfirm.text?.toString().orEmpty()
+
+    // Validate before showing dialog
+    var hasErrors = false
+    clearPasswordFieldErrors()
+
+    if (currentPassword.isBlank()) {
+      binding.inputLayoutPasswordCurrent.error =
+          getString(R.string.account_current_password_label) + " required"
+      hasErrors = true
+    }
+    if (newPassword.isBlank()) {
+      binding.inputLayoutPasswordNew.error =
+          getString(R.string.account_new_password_label) + " required"
+      hasErrors = true
+    } else if (newPassword.length < 8) {
+      binding.inputLayoutPasswordNew.error =
+          getString(R.string.account_password_validation_error_short)
+      hasErrors = true
+    }
+    if (confirmPassword.isBlank()) {
+      binding.inputLayoutPasswordConfirm.error =
+          getString(R.string.account_confirm_password_label) + " required"
+      hasErrors = true
+    } else if (newPassword != confirmPassword) {
+      binding.inputLayoutPasswordConfirm.error =
+          getString(R.string.account_password_validation_error_mismatch)
+      hasErrors = true
+    }
+
+    if (hasErrors) {
+      Snackbar.make(
+              binding.root,
+              getString(R.string.account_password_validation_error_short),
+              Snackbar.LENGTH_LONG)
+          .show()
+      return
+    }
+
+    // All validation passed, show confirmation dialog
     MaterialAlertDialogBuilder(requireContext())
         .setTitle(R.string.account_password_change_dialog_title)
         .setMessage(R.string.account_password_change_dialog_message)
         .setPositiveButton(R.string.account_password_change_dialog_confirm) { _, _ ->
-          val currentPassword = binding.editTextPasswordCurrent.text?.toString().orEmpty()
-          val newPassword = binding.editTextPasswordNew.text?.toString().orEmpty()
-          val confirmPassword = binding.editTextPasswordConfirm.text?.toString().orEmpty()
-
           viewModel.changePassword(currentPassword, newPassword, confirmPassword)
         }
         .setNegativeButton(android.R.string.cancel, null)
@@ -215,7 +260,8 @@ class AccountSettingsFragment : Fragment() {
     val passwordInput = EditText(requireContext()).apply {
       inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
       hint = getString(R.string.account_current_password_label)
-      setPadding(16, 16, 16, 16)
+      setPadding(48, 32, 48, 32)
+      textSize = 16f
     }
 
     MaterialAlertDialogBuilder(requireContext())
@@ -225,14 +271,19 @@ class AccountSettingsFragment : Fragment() {
         .setPositiveButton(R.string.account_delete_confirm_button) { _, _ ->
           val password = passwordInput.text?.toString().orEmpty()
           if (password.isNotBlank()) {
-            // Step 2: Final confirmation dialog
+            // Step 2: Final confirmation dialog (very explicit warning)
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.account_delete_dialog_title)
-                .setMessage("${getString(R.string.account_delete_dialog_message)}\n\n${getString(R.string.account_delete_warning)}")
+                .setMessage(
+                    getString(R.string.account_delete_warning)
+                        + "\n\n"
+                        + getString(R.string.account_delete_dialog_message)
+                )
                 .setPositiveButton(R.string.account_delete_confirm_button) { _, _ ->
                   viewModel.deleteAccount(password)
                 }
                 .setNegativeButton(android.R.string.cancel, null)
+                .setCancelable(false)
                 .show()
           } else {
             Snackbar.make(

@@ -231,6 +231,19 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- Password requirements hint -->
+                <TextView
+                    android:id="@+id/text_password_hint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="@string/account_password_validation_error_short"
+                    android:textAppearance="@style/TextAppearance.Pf.BodySmall"
+                    android:textColor="@color/slate_700"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_password_title" />
+
                 <!-- Current password -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/input_layout_password_current"
@@ -247,7 +260,7 @@
                     app:hintTextColor="@color/rose_400"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/text_password_title">
+                    app:layout_constraintTop_toBottomOf="@id/text_password_hint">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_password_current"

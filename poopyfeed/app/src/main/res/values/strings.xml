@@ -71,6 +71,10 @@
     <string name="account_deleted_message">Account deleted successfully. You will be logged out.</string>
     <string name="account_delete_error">Failed to delete account. Please check your password and try again.</string>
 
+    <!-- Form validation helpers -->
+    <string name="account_password_requirements">Password must be at least 8 characters</string>
+    <string name="account_password_strength_weak">Use a mix of uppercase, lowercase, numbers, and symbols for a stronger password</string>
+
     <!-- API error messages (ErrorMapper / ApiError.getUserMessage) -->
     <string name="error_network">Network error. Please check your connection.</string>
     <string name="error_serialization">Data format error. Please try again.</string>
