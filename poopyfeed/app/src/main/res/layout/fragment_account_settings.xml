@@ -47,9 +47,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Account settings card (frosted glass) -->
+        <!-- SECTION 1: Profile Settings Card -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_account"
+            android:id="@+id/card_profile"
             style="@style/Widget.Pf.CardView.Frosted"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -199,6 +199,220 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button_account_save" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SECTION 2: Password Change Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_password"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_profile">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_12">
+
+                <!-- Section title -->
+                <TextView
+                    android:id="@+id/text_password_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_password_section_title"
+                    android:textAppearance="@style/TextAppearance.Pf.LabelMedium"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- Current password -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_password_current"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:hint="@string/account_current_password_label"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="@color/rose_400"
+                    app:hintTextColor="@color/rose_400"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_password_title">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_password_current"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionNext"
+                        android:fontFamily="@font/dm_sans" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- New password -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_password_new"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:hint="@string/account_new_password_label"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="@color/rose_400"
+                    app:hintTextColor="@color/rose_400"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_layout_password_current">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_password_new"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionNext"
+                        android:fontFamily="@font/dm_sans" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Confirm password -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_password_confirm"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:hint="@string/account_confirm_password_label"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="@color/rose_400"
+                    app:hintTextColor="@color/rose_400"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_layout_password_new">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_password_confirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionDone"
+                        android:fontFamily="@font/dm_sans" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Change password button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_change_password"
+                    style="@style/Widget.Pf.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/account_change_password_button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_layout_password_confirm" />
+
+                <!-- Loading indicator for password change -->
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_6"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/rose_400"
+                    app:trackColor="@color/rose_100"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/button_change_password" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SECTION 3: Delete Account Card (Danger Zone) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_delete"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginBottom="@dimen/spacing_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_password">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_12">
+
+                <!-- Section title (in red) -->
+                <TextView
+                    android:id="@+id/text_delete_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_delete_section_title"
+                    android:textAppearance="@style/TextAppearance.Pf.LabelMedium"
+                    android:textColor="@color/red_500"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- Warning text -->
+                <TextView
+                    android:id="@+id/text_delete_warning"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/account_delete_warning"
+                    android:textAppearance="@style/TextAppearance.Pf.BodySmall"
+                    android:textColor="@color/red_500"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_delete_title" />
+
+                <!-- Delete account button (red, destructive) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_delete_account"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/account_delete_button"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/red_500"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_delete_warning" />
+
+                <!-- Loading indicator for account deletion -->
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_6"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/red_500"
+                    app:trackColor="@color/red_200"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/button_delete_account" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
