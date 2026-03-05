@@ -74,7 +74,6 @@ class ChildrenListFragment : Fragment() {
               binding.recyclerChildren.visibility = View.VISIBLE
               binding.layoutEmptyState.visibility = View.GONE
               binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = false
               adapter.submitList(state.children)
             }
             is ChildrenListUiState.Empty -> {
@@ -82,19 +81,28 @@ class ChildrenListFragment : Fragment() {
               binding.recyclerChildren.visibility = View.GONE
               binding.layoutEmptyState.visibility = View.VISIBLE
               binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = false
             }
             is ChildrenListUiState.Error -> {
               binding.progressLoading.visibility = View.GONE
               binding.recyclerChildren.visibility = View.GONE
               binding.layoutEmptyState.visibility = View.GONE
               binding.layoutErrorState.visibility = View.VISIBLE
-              binding.swipeRefresh.isRefreshing = false
               binding.layoutErrorState
                   .findViewById<android.widget.TextView>(R.id.text_error_message)
                   .text = state.message
             }
           }
+        }
+      }
+    }
+
+    // Drive SwipeRefreshLayout spinner from isRefreshing so pull-to-refresh stops when refresh
+    // completes even when uiState does not change (e.g. same list data).
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.isRefreshing.collect { refreshing ->
+          binding.swipeRefresh.isRefreshing =
+              refreshing || viewModel.uiState.value is ChildrenListUiState.Loading
         }
       }
     }

@@ -51,6 +51,13 @@ constructor(
   private val _deleteError: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
   val deleteError = _deleteError.asSharedFlow()
 
+  /**
+   * True while a pull-to-refresh (or explicit refresh) is in progress. Stops SwipeRefreshLayout
+   * spinner when done.
+   */
+  private val _isRefreshing = MutableStateFlow(false)
+  val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
   init {
     observeChildren()
     refresh()
@@ -80,13 +87,19 @@ constructor(
 
   /**
    * Refreshes children from API and updates cache. Only emits Error if still in Loading state (to
-   * avoid clobbering Ready state during pull-to-refresh).
+   * avoid clobbering Ready state during pull-to-refresh). Sets [isRefreshing] so the fragment can
+   * stop the SwipeRefreshLayout spinner when done (even when uiState does not change).
    */
   fun refresh() {
     viewModelScope.launch {
-      val result = repo.refreshChildren()
-      if (result is ApiResult.Error && _uiState.value is ChildrenListUiState.Loading) {
-        _uiState.value = ChildrenListUiState.Error(result.error.getUserMessage(context))
+      _isRefreshing.value = true
+      try {
+        val result = repo.refreshChildren()
+        if (result is ApiResult.Error && _uiState.value is ChildrenListUiState.Loading) {
+          _uiState.value = ChildrenListUiState.Error(result.error.getUserMessage(context))
+        }
+      } finally {
+        _isRefreshing.value = false
       }
     }
   }
