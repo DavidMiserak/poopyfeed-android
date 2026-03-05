@@ -93,3 +93,37 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+
+kover {
+    reports {
+        // Filters for all report types of all build variants
+        filters {
+            excludes {
+                // Exclude Android-generated classes like view/data binding, R, etc.
+                androidGeneratedClasses()
+
+                // Exclude Hilt aggregated wiring
+                packages("hilt_aggregated_deps")
+
+                // Exclude dependency injection and network wiring (matches JaCoCo setup)
+                packages(
+                    "net.poopyfeed.pf.di",
+                    "net.poopyfeed.pf.data.api",
+                )
+
+                // Exclude UI shell classes
+                classes(
+                    "net.poopyfeed.pf.MainActivity",
+                    "net.poopyfeed.pf.*Fragment",
+                    "net.poopyfeed.pf.PoopyFeedApplication",
+                )
+
+                // Exclude Room database wiring (but not entities)
+                classes(
+                    "net.poopyfeed.pf.data.db.PoopyFeedDatabase*",
+                    "net.poopyfeed.pf.data.db.*Dao*",
+                )
+            }
+        }
+    }
+}
