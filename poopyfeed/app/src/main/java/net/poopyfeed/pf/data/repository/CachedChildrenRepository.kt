@@ -1,6 +1,7 @@
 package net.poopyfeed.pf.data.repository
 
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -97,6 +98,8 @@ constructor(
           childDao.upsertChildren(entities)
           _hasSynced.value = true
           ApiResult.Success(allResults)
+        } catch (e: CancellationException) {
+          throw e  // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -198,6 +201,8 @@ constructor(
           feedingDao.upsertFeedings(entities)
           _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Success(allResults)
+        } catch (e: CancellationException) {
+          throw e  // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -279,6 +284,8 @@ constructor(
           diaperDao.upsertDiapers(entities)
           _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Success(allResults)
+        } catch (e: CancellationException) {
+          throw e  // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -357,6 +364,8 @@ constructor(
           napDao.upsertNaps(entities)
           _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Success(allResults)
+        } catch (e: CancellationException) {
+          throw e  // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

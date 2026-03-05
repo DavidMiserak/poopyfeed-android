@@ -2,7 +2,9 @@ package net.poopyfeed.pf.data.repository
 
 import java.io.IOException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -147,6 +149,15 @@ class CachedChildrenRepositoryTest {
 
     assertIs<ApiResult.Error<List<Child>>>(result)
     assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `refreshChildren re-throws CancellationException`() = runTest {
+    io.mockk.coEvery { apiService.listChildren(page = 1) } throws CancellationException("test cancel")
+
+    assertFailsWith<CancellationException> {
+      repository.refreshChildren()
+    }
   }
 
   @Test
