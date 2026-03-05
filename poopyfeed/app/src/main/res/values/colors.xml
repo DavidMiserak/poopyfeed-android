@@ -11,6 +11,7 @@
 
     <!-- Accent Colors (Warm Amber/Orange) -->
     <color name="amber_400">#fbbf24</color>
+    <color name="amber_600">#d97706</color>
     <color name="orange_400">#fb923c</color>
     <color name="orange_500">#f97316</color>
 
@@ -31,6 +32,7 @@
 
     <!-- Background tints -->
     <color name="amber_50">#fffbeb</color>
+    <color name="amber_200">#fde68a</color>
     <color name="orange_50">#fff7ed</color>
 
     <!-- Translucent overlays -->

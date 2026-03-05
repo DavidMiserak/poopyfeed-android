@@ -42,47 +42,128 @@
             app:layout_constraintTop_toBottomOf="@id/text_child_name"
             tools:text="3 months • Girl" />
 
-        <!-- Last activities -->
-        <LinearLayout
+        <!-- Activity badges container (3-column grid) -->
+        <GridLayout
             android:id="@+id/layout_activities"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_2"
-            android:orientation="vertical"
+            android:columnCount="3"
+            android:rowCount="1"
+            android:useDefaultMargins="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chip_role"
             app:layout_constraintTop_toBottomOf="@id/text_age_gender">
 
-            <TextView
-                android:id="@+id/text_last_feeding"
-                android:layout_width="wrap_content"
+            <!-- Feeding badge -->
+            <LinearLayout
+                android:id="@+id/badge_feeding"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
-                android:textSize="@dimen/text_body_small"
-                android:textColor="@color/slate_600"
-                tools:text="Last feeding: 4 minutes ago" />
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_2"
+                android:background="@drawable/bg_badge_feeding"
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/text_last_diaper"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/icon_feeding"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🍼"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/text_last_feeding"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_label_small"
+                    android:textColor="@color/slate_700"
+                    android:gravity="center"
+                    android:lines="2"
+                    tools:text="4m ago" />
+
+            </LinearLayout>
+
+            <!-- Diaper badge -->
+            <LinearLayout
+                android:id="@+id/badge_diaper"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_1"
-                android:fontFamily="@font/dm_sans"
-                android:textSize="@dimen/text_body_small"
-                android:textColor="@color/slate_600"
-                tools:text="Last diaper: 22 hours ago" />
+                android:layout_row="0"
+                android:layout_column="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_2"
+                android:background="@drawable/bg_badge_diaper"
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/text_last_nap"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/icon_diaper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🚼"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/text_last_diaper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_label_small"
+                    android:textColor="@color/slate_700"
+                    android:gravity="center"
+                    android:lines="2"
+                    tools:text="22h ago" />
+
+            </LinearLayout>
+
+            <!-- Nap badge -->
+            <LinearLayout
+                android:id="@+id/badge_nap"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_1"
-                android:fontFamily="@font/dm_sans"
-                android:textSize="@dimen/text_body_small"
-                android:textColor="@color/slate_600"
-                tools:text="Last nap: 8 hours ago" />
+                android:layout_row="0"
+                android:layout_column="2"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_2"
+                android:background="@drawable/bg_badge_nap"
+                android:gravity="center_horizontal">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/icon_nap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="😴"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/text_last_nap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_label_small"
+                    android:textColor="@color/slate_700"
+                    android:gravity="center"
+                    android:lines="2"
+                    tools:text="8h ago" />
+
+            </LinearLayout>
+
+        </GridLayout>
 
         <!-- Role badge (hidden for owner) -->
         <com.google.android.material.chip.Chip
