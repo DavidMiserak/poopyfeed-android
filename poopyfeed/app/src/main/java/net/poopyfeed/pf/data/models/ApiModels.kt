@@ -185,6 +185,40 @@ data class AuthToken(
 )
 
 /**
+ * Request for changing authenticated user's password.
+ *
+ * All three fields are required. Backend validates password strength and token rotation.
+ */
+@Serializable
+data class ChangePasswordRequest(
+    val current_password: String,
+    val new_password: String,
+    val new_password_confirm: String
+)
+
+/**
+ * Response from password change endpoint. Includes detail message and new auth token.
+ *
+ * The new token must be stored to replace the old one (token rotation).
+ */
+@Serializable
+data class ChangePasswordResponse(
+    val detail: String,
+    val auth_token: String
+)
+
+/**
+ * Request for deleting authenticated user's account.
+ *
+ * Requires password confirmation for security. Backend will delete the user and all related data
+ * irreversibly.
+ */
+@Serializable
+data class DeleteAccountRequest(
+    val current_password: String
+)
+
+/**
  * User sign-up request for django-allauth headless API.
  *
  * Matches the web frontend `SignupRequest` shape; `re_password` is optional and not required by the

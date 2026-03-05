@@ -46,6 +46,31 @@
     <string name="account_saved_message">Account settings updated.</string>
     <string name="account_load_error">Unable to load account settings. Please try again.</string>
 
+    <!-- Password change section -->
+    <string name="account_password_section_title">Security</string>
+    <string name="account_current_password_label">Current password</string>
+    <string name="account_new_password_label">New password</string>
+    <string name="account_confirm_password_label">Confirm new password</string>
+    <string name="account_change_password_button">Change Password</string>
+    <string name="account_password_changed_message">Password changed successfully. You remain logged in.</string>
+    <string name="account_password_validation_error_short">Password must be at least 8 characters.</string>
+    <string name="account_password_validation_error_mismatch">Passwords do not match.</string>
+    <string name="account_password_change_dialog_title">Change Password?</string>
+    <string name="account_password_change_dialog_message">You\'ll be logged out and need to log in with your new password.</string>
+    <string name="account_password_change_dialog_confirm">Change</string>
+    <string name="account_password_change_error">Failed to change password. Please check your current password and try again.</string>
+
+    <!-- Account deletion section -->
+    <string name="account_delete_section_title">Danger Zone</string>
+    <string name="account_delete_warning">Deleting your account is permanent and cannot be undone. All data will be lost.</string>
+    <string name="account_delete_button">Delete Account</string>
+    <string name="account_delete_dialog_title">Delete Account?</string>
+    <string name="account_delete_dialog_message">This is permanent and cannot be undone. All data will be lost.\n\nEnter your password to confirm deletion.</string>
+    <string name="account_delete_confirm_button">Permanently Delete</string>
+    <string name="account_delete_cancelled_message">Account deletion cancelled.</string>
+    <string name="account_deleted_message">Account deleted successfully. You will be logged out.</string>
+    <string name="account_delete_error">Failed to delete account. Please check your password and try again.</string>
+
     <!-- API error messages (ErrorMapper / ApiError.getUserMessage) -->
     <string name="error_network">Network error. Please check your connection.</string>
     <string name="error_serialization">Data format error. Please try again.</string>

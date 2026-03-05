@@ -50,6 +50,26 @@ interface PoopyFeedApiService {
   @PATCH("account/profile/")
   suspend fun updateProfile(@Body request: UserProfileUpdate): UserProfile
 
+  /**
+   * Change the authenticated user's password.
+   *
+   * Validates current password, confirms new passwords match, and enforces password strength rules.
+   * Returns new auth token that must replace the old one (token rotation).
+   */
+  @Headers("Accept: application/json")
+  @POST("account/password/")
+  suspend fun changePassword(@Body request: ChangePasswordRequest): ChangePasswordResponse
+
+  /**
+   * Delete the authenticated user's account.
+   *
+   * Requires password confirmation for security. This is a permanent operation; all user data
+   * and associated child profiles will be deleted. Returns HTTP 204 No Content on success.
+   */
+  @Headers("Accept: application/json")
+  @POST("account/delete/")
+  suspend fun deleteAccount(@Body request: DeleteAccountRequest)
+
   /** Logout the current session (invalidates session cookie and token). */
   @Headers("Accept: application/json", "X-Requested-With: XMLHttpRequest")
   @DELETE("browser/v1/auth/session")

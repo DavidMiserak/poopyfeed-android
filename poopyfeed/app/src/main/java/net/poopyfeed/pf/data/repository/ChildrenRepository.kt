@@ -368,4 +368,48 @@ constructor(
           ApiResult.Error(e.toApiError())
         }
       }
+
+  /**
+   * Change the authenticated user's password.
+   *
+   * Validates current password and enforces new password strength. Returns new auth token that
+   * must be stored (token rotation). User remains authenticated with new token.
+   */
+  suspend fun changePassword(
+      currentPassword: String,
+      newPassword: String
+  ): ApiResult<String> =
+      withContext(ioDispatcher) {
+        try {
+          val request =
+              ChangePasswordRequest(
+                  current_password = currentPassword,
+                  new_password = newPassword,
+                  new_password_confirm = newPassword
+              )
+          val response = apiService.changePassword(request)
+          ApiResult.Success(response.auth_token)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /**
+   * Delete the authenticated user's account permanently.
+   *
+   * This is an irreversible operation that deletes the user and all associated data (children,
+   * feedings, diapers, naps, shares, etc.). Requires password confirmation.
+   *
+   * On success, caller should clear token, clear cache, and navigate to login.
+   */
+  suspend fun deleteAccount(password: String): ApiResult<Unit> =
+      withContext(ioDispatcher) {
+        try {
+          val request = DeleteAccountRequest(current_password = password)
+          apiService.deleteAccount(request)
+          ApiResult.Success(Unit)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
 }

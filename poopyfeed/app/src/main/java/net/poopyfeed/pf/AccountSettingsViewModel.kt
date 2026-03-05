@@ -20,6 +20,7 @@ import net.poopyfeed.pf.di.TokenManager
 
 /** UI state for the account settings screen. */
 sealed interface AccountSettingsUiState {
+  // Profile Section States
   /** Profile is loading. */
   data object Loading : AccountSettingsUiState
 
@@ -32,11 +33,31 @@ sealed interface AccountSettingsUiState {
   /** Load or save failed; [message] is user-facing. */
   data class Error(val message: String) : AccountSettingsUiState
 
-  /** Save in progress. */
+  /** Profile save in progress. */
   data object Saving : AccountSettingsUiState
 
-  /** Save succeeded; [profile] and [timezones] updated. */
+  /** Profile save succeeded; [profile] and [timezones] updated. */
   data class Saved(val profile: UserProfile, val timezones: List<String>) : AccountSettingsUiState
+
+  // Password Change Section States
+  /** Password change in progress. */
+  data object ChangingPassword : AccountSettingsUiState
+
+  /** Password changed successfully. */
+  data object PasswordChanged : AccountSettingsUiState
+
+  /** Password change failed; [message] is user-facing. */
+  data class PasswordChangeError(val message: String) : AccountSettingsUiState
+
+  // Account Deletion Section States
+  /** Account deletion in progress. */
+  data object DeletingAccount : AccountSettingsUiState
+
+  /** Account deleted successfully; navigate to login. */
+  data object AccountDeleted : AccountSettingsUiState
+
+  /** Account deletion failed; [message] is user-facing. */
+  data class DeletionError(val message: String) : AccountSettingsUiState
 }
 
 /**
