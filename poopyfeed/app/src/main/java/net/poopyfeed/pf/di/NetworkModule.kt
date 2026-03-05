@@ -52,7 +52,9 @@ object NetworkModule {
       prefs: SharedPreferences,
       json: Json,
       cookieJar: PersistentCookieJar,
+      @ApplicationContext context: Context,
   ): OkHttpClient {
+    val connectivityInterceptor = ConnectivityInterceptor(context)
     val authInterceptor = Interceptor { chain ->
       val token = prefs.getString("auth_token", null)
       val request =
@@ -71,6 +73,7 @@ object NetworkModule {
         }
     return OkHttpClient.Builder()
         .cookieJar(cookieJar)
+        .addInterceptor(connectivityInterceptor)
         .addInterceptor(authInterceptor)
         .addInterceptor(logging)
         .build()
