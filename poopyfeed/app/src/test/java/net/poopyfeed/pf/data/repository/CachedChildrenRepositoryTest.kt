@@ -153,11 +153,10 @@ class CachedChildrenRepositoryTest {
 
   @Test
   fun `refreshChildren re-throws CancellationException`() = runTest {
-    io.mockk.coEvery { apiService.listChildren(page = 1) } throws CancellationException("test cancel")
+    io.mockk.coEvery { apiService.listChildren(page = 1) } throws
+        CancellationException("test cancel")
 
-    assertFailsWith<CancellationException> {
-      repository.refreshChildren()
-    }
+    assertFailsWith<CancellationException> { repository.refreshChildren() }
   }
 
   @Test

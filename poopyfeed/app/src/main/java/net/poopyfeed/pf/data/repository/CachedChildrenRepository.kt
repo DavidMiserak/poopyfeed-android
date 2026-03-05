@@ -4,6 +4,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -85,21 +86,23 @@ constructor(
   suspend fun refreshChildren(): ApiResult<List<Child>> =
       withContext(ioDispatcher) {
         try {
-          val allResults = mutableListOf<Child>()
-          var page = 1
-          var response = apiService.listChildren(page = page)
-          allResults.addAll(response.results)
-          while (response.next != null) {
-            page += 1
-            response = apiService.listChildren(page = page)
+          coroutineScope {
+            val allResults = mutableListOf<Child>()
+            var page = 1
+            var response = apiService.listChildren(page = page)
             allResults.addAll(response.results)
+            while (response.next != null) {
+              page += 1
+              response = apiService.listChildren(page = page)
+              allResults.addAll(response.results)
+            }
+            val entities = allResults.map { ChildEntity.fromApiModel(it) }
+            childDao.upsertChildren(entities)
+            _hasSynced.value = true
+            ApiResult.Success(allResults)
           }
-          val entities = allResults.map { ChildEntity.fromApiModel(it) }
-          childDao.upsertChildren(entities)
-          _hasSynced.value = true
-          ApiResult.Success(allResults)
         } catch (e: CancellationException) {
-          throw e  // preserve structured concurrency
+          throw e // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -188,21 +191,23 @@ constructor(
   suspend fun refreshFeedings(childId: Int): ApiResult<List<Feeding>> =
       withContext(ioDispatcher) {
         try {
-          val allResults = mutableListOf<Feeding>()
-          var page = 1
-          var response = apiService.listFeedings(childId, page = page)
-          allResults.addAll(response.results)
-          while (response.next != null) {
-            page += 1
-            response = apiService.listFeedings(childId, page = page)
+          coroutineScope {
+            val allResults = mutableListOf<Feeding>()
+            var page = 1
+            var response = apiService.listFeedings(childId, page = page)
             allResults.addAll(response.results)
+            while (response.next != null) {
+              page += 1
+              response = apiService.listFeedings(childId, page = page)
+              allResults.addAll(response.results)
+            }
+            val entities = allResults.map { FeedingEntity.fromApiModel(it) }
+            feedingDao.upsertFeedings(entities)
+            _syncedChildIds.value = _syncedChildIds.value + childId
+            ApiResult.Success(allResults)
           }
-          val entities = allResults.map { FeedingEntity.fromApiModel(it) }
-          feedingDao.upsertFeedings(entities)
-          _syncedChildIds.value = _syncedChildIds.value + childId
-          ApiResult.Success(allResults)
         } catch (e: CancellationException) {
-          throw e  // preserve structured concurrency
+          throw e // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -271,21 +276,23 @@ constructor(
   suspend fun refreshDiapers(childId: Int): ApiResult<List<Diaper>> =
       withContext(ioDispatcher) {
         try {
-          val allResults = mutableListOf<Diaper>()
-          var page = 1
-          var response = apiService.listDiapers(childId, page = page)
-          allResults.addAll(response.results)
-          while (response.next != null) {
-            page += 1
-            response = apiService.listDiapers(childId, page = page)
+          coroutineScope {
+            val allResults = mutableListOf<Diaper>()
+            var page = 1
+            var response = apiService.listDiapers(childId, page = page)
             allResults.addAll(response.results)
+            while (response.next != null) {
+              page += 1
+              response = apiService.listDiapers(childId, page = page)
+              allResults.addAll(response.results)
+            }
+            val entities = allResults.map { DiaperEntity.fromApiModel(it) }
+            diaperDao.upsertDiapers(entities)
+            _syncedChildIds.value = _syncedChildIds.value + childId
+            ApiResult.Success(allResults)
           }
-          val entities = allResults.map { DiaperEntity.fromApiModel(it) }
-          diaperDao.upsertDiapers(entities)
-          _syncedChildIds.value = _syncedChildIds.value + childId
-          ApiResult.Success(allResults)
         } catch (e: CancellationException) {
-          throw e  // preserve structured concurrency
+          throw e // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -351,21 +358,23 @@ constructor(
   suspend fun refreshNaps(childId: Int): ApiResult<List<Nap>> =
       withContext(ioDispatcher) {
         try {
-          val allResults = mutableListOf<Nap>()
-          var page = 1
-          var response = apiService.listNaps(childId, page = page)
-          allResults.addAll(response.results)
-          while (response.next != null) {
-            page += 1
-            response = apiService.listNaps(childId, page = page)
+          coroutineScope {
+            val allResults = mutableListOf<Nap>()
+            var page = 1
+            var response = apiService.listNaps(childId, page = page)
             allResults.addAll(response.results)
+            while (response.next != null) {
+              page += 1
+              response = apiService.listNaps(childId, page = page)
+              allResults.addAll(response.results)
+            }
+            val entities = allResults.map { NapEntity.fromApiModel(it) }
+            napDao.upsertNaps(entities)
+            _syncedChildIds.value = _syncedChildIds.value + childId
+            ApiResult.Success(allResults)
           }
-          val entities = allResults.map { NapEntity.fromApiModel(it) }
-          napDao.upsertNaps(entities)
-          _syncedChildIds.value = _syncedChildIds.value + childId
-          ApiResult.Success(allResults)
         } catch (e: CancellationException) {
-          throw e  // preserve structured concurrency
+          throw e // preserve structured concurrency
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
