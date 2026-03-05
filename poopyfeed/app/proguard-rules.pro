@@ -17,11 +17,18 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
-# Kotlinx serialization (@Serializable models used by Retrofit)
--keepattributes *Annotation*, InnerClasses
+# Kotlinx serialization (@Serializable models used by Retrofit converter)
+# kotlinx-serialization-core bundles rules in META-INF/proguard/kotlinx-serialization.pro,
+# but we add explicit project-level rules to protect model serializers under R8 full mode.
 -dontwarn kotlinx.serialization.**
+
+# Keep generated $$serializer objects for all model classes (includedescriptorclasses
+# also keeps referenced type descriptor classes, required for generic types like PaginatedResponse<T>)
 -keep,includedescriptorclasses class net.poopyfeed.pf.data.models.**$$serializer { *; }
--keepclassmembers class net.poopyfeed.pf.data.models.** {
-  *** Companion;
-  *** serializer();
+
+# Modern conditional approach: keep Companion and serializer() only on @Serializable classes
+-if @kotlinx.serialization.Serializable class net.poopyfeed.pf.data.models.**
+-keepclassmembers class net.poopyfeed.pf.data.models.<1> {
+    static net.poopyfeed.pf.data.models.<1>$Companion Companion;
+    kotlinx.serialization.KSerializer serializer(...);
 }
