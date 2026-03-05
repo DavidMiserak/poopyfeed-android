@@ -135,7 +135,7 @@ class AccountSettingsFragment : Fragment() {
                       Snackbar.LENGTH_LONG)
                   .show()
               // Navigate to login after brief delay
-              view?.postDelayed(
+              view.postDelayed(
                   {
                     viewModel.clearDeletionState()
                     navigateToLogin()

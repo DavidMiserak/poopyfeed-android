@@ -121,6 +121,6 @@ class TrackingRepositoriesTest {
 
     assertIs<ApiResult.Error<ShareInvite>>(result)
     assertIs<ApiError.HttpError>(result.error)
-    assertEquals(400, (result.error as ApiError.HttpError).statusCode)
+    assertEquals(400, result.error.statusCode)
   }
 }

@@ -151,7 +151,7 @@ class AuthRepositoryTest {
 
     assertIs<ApiResult.Error<UserProfile>>(result)
     assertIs<ApiError.HttpError>(result.error)
-    assertEquals(404, (result.error as ApiError.HttpError).statusCode)
+    assertEquals(404, result.error.statusCode)
   }
 
   @Test

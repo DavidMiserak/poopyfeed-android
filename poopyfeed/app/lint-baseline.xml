@@ -300,28 +300,6 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlin.android than 2.1.20 is available: 2.3.10"
-        errorLine1="kotlin = &quot;2.1.20&quot;"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="3"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 2.1.20 is available: 2.3.10"
-        errorLine1="kotlin = &quot;2.1.20&quot;"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="3"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
         message="A newer version of com.squareup.retrofit2:retrofit than 2.11.0 is available: 3.0.0"
         errorLine1="retrofit = &quot;2.11.0&quot;"
         errorLine2="           ~~~~~~~~">
@@ -384,39 +362,6 @@
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
             line="26"
             column="12"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger.hilt.android than 2.56 is available: 2.59.2"
-        errorLine1="hilt = &quot;2.56&quot;"
-        errorLine2="       ~~~~~~">
-        <location
-            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="27"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger:hilt-android than 2.56 is available: 2.59.2"
-        errorLine1="hilt = &quot;2.56&quot;"
-        errorLine2="       ~~~~~~">
-        <location
-            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="27"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger:hilt-android-compiler than 2.56 is available: 2.59.2"
-        errorLine1="hilt = &quot;2.56&quot;"
-        errorLine2="       ~~~~~~">
-        <location
-            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="27"
-            column="8"/>
     </issue>
 
     <issue
@@ -554,7 +499,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="9"
+            line="10"
             column="12"/>
     </issue>
 
@@ -565,7 +510,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="10"
+            line="11"
             column="12"/>
     </issue>
 
@@ -576,7 +521,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="15"
+            line="16"
             column="12"/>
     </issue>
 
@@ -587,7 +532,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="18"
+            line="19"
             column="12"/>
     </issue>
 
@@ -598,7 +543,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="20"
+            line="21"
             column="12"/>
     </issue>
 
@@ -609,7 +554,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="21"
+            line="22"
             column="12"/>
     </issue>
 
@@ -620,7 +565,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="23"
+            line="24"
             column="12"/>
     </issue>
 
@@ -631,7 +576,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="24"
+            line="25"
             column="12"/>
     </issue>
 
@@ -642,7 +587,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="27"
+            line="28"
             column="12"/>
     </issue>
 
@@ -653,7 +598,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="31"
+            line="32"
             column="12"/>
     </issue>
 
@@ -664,7 +609,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="34"
+            line="35"
             column="12"/>
     </issue>
 
@@ -675,7 +620,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="36"
+            line="37"
             column="12"/>
     </issue>
 
@@ -753,6 +698,17 @@
         <location
             file="src/main/res/values/themes.xml"
             line="41"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.style.Widget_Pf_Button_Secondary` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.Pf.Button.Secondary&quot; parent=&quot;Widget.Material3.Button.OutlinedButton&quot;>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/themes.xml"
+            line="73"
             column="12"/>
     </issue>
 

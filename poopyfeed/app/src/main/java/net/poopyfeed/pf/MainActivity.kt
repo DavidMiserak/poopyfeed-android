@@ -65,13 +65,11 @@ class MainActivity : AppCompatActivity() {
                   when (state) {
                     is TimezoneBannerState.Visible -> state.deviceTimezone
                     is TimezoneBannerState.Saving -> state.deviceTimezone
-                    else -> ""
                   }
               val profileTz =
                   when (state) {
                     is TimezoneBannerState.Visible -> state.profileTimezone
                     is TimezoneBannerState.Saving -> state.profileTimezone
-                    else -> ""
                   }
               binding.textTimezoneMismatch.text =
                   getString(R.string.timezone_mismatch_message, deviceTz, profileTz)
