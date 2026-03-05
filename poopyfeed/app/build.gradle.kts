@@ -146,9 +146,8 @@ val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerif
     violationRules {
         rule {
             limit {
-                // Target 80%; current ~52% after excluding UI/di/api/db wiring.
-                // Increase as more ViewModel/repository/model tests are added.
-                minimum = "0.50".toBigDecimal()
+                // Target 80%; enforce 55% minimum line coverage as the current quality gate.
+                minimum = "0.55".toBigDecimal()
             }
         }
     }

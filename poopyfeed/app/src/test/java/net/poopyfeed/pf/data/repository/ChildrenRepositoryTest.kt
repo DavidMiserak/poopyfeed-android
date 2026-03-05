@@ -96,6 +96,15 @@ class ChildrenRepositoryTest {
   }
 
   @Test
+  fun `deleteChild success returns Success Unit`() = runTest {
+    coEvery { apiService.deleteChild(1) } returns Unit
+
+    val result = repository.deleteChild(1)
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
   fun `getChild emits Loading then Success`() = runTest {
     val mockChild =
         TestFixtures.mockChild(last_feeding = null, last_diaper_change = null, last_nap = null)

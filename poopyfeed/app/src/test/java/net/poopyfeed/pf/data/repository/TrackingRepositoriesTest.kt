@@ -53,6 +53,55 @@ class TrackingRepositoriesTest {
   }
 
   @Test
+  fun `FeedingsRepository createFeeding success returns Success`() = runTest {
+    val repository = FeedingsRepository(apiService)
+
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle", amount_oz = 4.0, timestamp = "2024-01-15T12:00:00Z")
+    val feeding = TestFixtures.mockFeeding()
+
+    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
+
+    val result = repository.createFeeding(1, request)
+
+    assertIs<ApiResult.Success<Feeding>>(result)
+    assertEquals(feeding, result.data)
+  }
+
+  @Test
+  fun `FeedingsRepository updateFeeding success returns updated Feeding`() = runTest {
+    val repository = FeedingsRepository(apiService)
+
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle", amount_oz = 5.0, timestamp = "2024-01-15T12:30:00Z")
+    val updated =
+        TestFixtures.mockFeeding(
+            amount_oz = 5.0,
+            timestamp = "2024-01-15T12:30:00Z",
+            updated_at = "2024-01-15T12:31:00Z")
+
+    io.mockk.coEvery { apiService.updateFeeding(1, 10, request) } returns updated
+
+    val result = repository.updateFeeding(1, 10, request)
+
+    assertIs<ApiResult.Success<Feeding>>(result)
+    assertEquals(updated, result.data)
+  }
+
+  @Test
+  fun `FeedingsRepository deleteFeeding success returns Success Unit`() = runTest {
+    val repository = FeedingsRepository(apiService)
+
+    io.mockk.coEvery { apiService.deleteFeeding(1, 10) } returns Unit
+
+    val result = repository.deleteFeeding(1, 10)
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
   fun `DiapersRepository listDiapers emits Loading then Error on http 500`() = runTest {
     val repository = DiapersRepository(apiService)
 
@@ -74,6 +123,47 @@ class TrackingRepositoriesTest {
   }
 
   @Test
+  fun `DiapersRepository listDiapers emits Loading then Success`() = runTest {
+    val repository = DiapersRepository(apiService)
+    val diaper = TestFixtures.mockDiaper()
+    val response = PaginatedResponse(count = 1, results = listOf(diaper))
+
+    io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 1) } returns response
+
+    val results = repository.listDiapers(childId = 1, page = 1).toList()
+
+    assertEquals(2, results.size)
+    assertIs<ApiResult.Loading<*>>(results[0])
+    assertIs<ApiResult.Success<*>>(results[1])
+  }
+
+  @Test
+  fun `DiapersRepository createDiaper success returns Success`() = runTest {
+    val repository = DiapersRepository(apiService)
+
+    val request = CreateDiaperRequest(change_type = "wet", timestamp = "2024-01-15T14:00:00Z")
+    val diaper = TestFixtures.mockDiaper(change_type = "wet")
+
+    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaper
+
+    val result = repository.createDiaper(1, request)
+
+    assertIs<ApiResult.Success<Diaper>>(result)
+    assertEquals(diaper, result.data)
+  }
+
+  @Test
+  fun `DiapersRepository deleteDiaper success returns Success Unit`() = runTest {
+    val repository = DiapersRepository(apiService)
+
+    io.mockk.coEvery { apiService.deleteDiaper(1, 5) } returns Unit
+
+    val result = repository.deleteDiaper(1, 5)
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
   fun `NapsRepository createNap success returns Success`() = runTest {
     val repository = NapsRepository(apiService)
     val request = CreateNapRequest(start_time = "2024-01-15T13:00:00Z", end_time = null)
@@ -84,6 +174,48 @@ class TrackingRepositoriesTest {
 
     assertIs<ApiResult.Success<Nap>>(result)
     assertEquals(nap, result.data)
+  }
+
+  @Test
+  fun `NapsRepository listNaps emits Loading then Success`() = runTest {
+    val repository = NapsRepository(apiService)
+    val nap = TestFixtures.mockNap()
+    val response = PaginatedResponse(count = 1, results = listOf(nap))
+
+    io.mockk.coEvery { apiService.listNaps(childId = 1, page = 1) } returns response
+
+    val results = repository.listNaps(childId = 1, page = 1).toList()
+
+    assertEquals(2, results.size)
+    assertIs<ApiResult.Loading<*>>(results[0])
+    assertIs<ApiResult.Success<*>>(results[1])
+  }
+
+  @Test
+  fun `NapsRepository updateNap success returns updated Nap`() = runTest {
+    val repository = NapsRepository(apiService)
+
+    val request = UpdateNapRequest(end_time = "2024-01-15T14:00:00Z")
+    val updated =
+        TestFixtures.mockNap(end_time = "2024-01-15T14:00:00Z", updated_at = "2024-01-15T14:01:00Z")
+
+    io.mockk.coEvery { apiService.updateNap(1, 3, request) } returns updated
+
+    val result = repository.updateNap(1, 3, request)
+
+    assertIs<ApiResult.Success<Nap>>(result)
+    assertEquals(updated, result.data)
+  }
+
+  @Test
+  fun `NapsRepository deleteNap success returns Success Unit`() = runTest {
+    val repository = NapsRepository(apiService)
+
+    io.mockk.coEvery { apiService.deleteNap(1, 3) } returns Unit
+
+    val result = repository.deleteNap(1, 3)
+
+    assertIs<ApiResult.Success<Unit>>(result)
   }
 
   @Test
@@ -109,6 +241,52 @@ class TrackingRepositoriesTest {
   }
 
   @Test
+  fun `SharingRepository createShare success returns ShareInvite`() = runTest {
+    val repository = SharingRepository(apiService)
+
+    val request = CreateShareRequest(email = "friend@example.com", role = "co-parent")
+    val invite =
+        ShareInvite(
+            id = 10,
+            child = 1,
+            invited_email = "friend@example.com",
+            role = "co-parent",
+            status = "pending",
+            created_at = "2024-01-15T10:05:00Z",
+            updated_at = "2024-01-15T10:05:00Z")
+
+    io.mockk.coEvery { apiService.createShare(1, request) } returns invite
+
+    val result = repository.createShare(1, request)
+
+    assertIs<ApiResult.Success<ShareInvite>>(result)
+    assertEquals(invite, result.data)
+  }
+
+  @Test
+  fun `SharingRepository getPendingInvites success returns list`() = runTest {
+    val repository = SharingRepository(apiService)
+
+    val invite =
+        ShareInvite(
+            id = 11,
+            child = 1,
+            invited_email = "pending@example.com",
+            role = "caregiver",
+            status = "pending",
+            created_at = "2024-01-15T11:00:00Z",
+            updated_at = "2024-01-15T11:00:00Z")
+
+    io.mockk.coEvery { apiService.getPendingInvites() } returns listOf(invite)
+
+    val result = repository.getPendingInvites()
+
+    assertIs<ApiResult.Success<List<ShareInvite>>>(result)
+    assertEquals(1, result.data.size)
+    assertEquals("pending@example.com", result.data.first().invited_email)
+  }
+
+  @Test
   fun `SharingRepository acceptInvite http error returns Error`() = runTest {
     val repository = SharingRepository(apiService)
 
@@ -122,5 +300,27 @@ class TrackingRepositoriesTest {
     assertIs<ApiResult.Error<ShareInvite>>(result)
     assertIs<ApiError.HttpError>(result.error)
     assertEquals(400, result.error.statusCode)
+  }
+
+  @Test
+  fun `SharingRepository acceptInvite success returns updated invite`() = runTest {
+    val repository = SharingRepository(apiService)
+
+    val invite =
+        ShareInvite(
+            id = 42,
+            child = 1,
+            invited_email = "friend@example.com",
+            role = "co-parent",
+            status = "accepted",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:10:00Z")
+
+    io.mockk.coEvery { apiService.acceptInvite(42) } returns invite
+
+    val result = repository.acceptInvite(42)
+
+    assertIs<ApiResult.Success<ShareInvite>>(result)
+    assertEquals(invite, result.data)
   }
 }
