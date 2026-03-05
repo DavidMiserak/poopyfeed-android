@@ -21,6 +21,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
@@ -35,6 +36,7 @@ class AccountSettingsViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
 
@@ -62,7 +64,9 @@ class AccountSettingsViewModelTest {
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -77,7 +81,9 @@ class AccountSettingsViewModelTest {
   fun `loadProfile with missing token emits Unauthorized`() = runTest {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -86,20 +92,22 @@ class AccountSettingsViewModelTest {
   }
 
   @Test
-  fun `loadProfile with 401 error clears token and emits Unauthorized`() = runTest {
+  fun `loadProfile with 401 error invokes clear session and emits Unauthorized`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
 
     val httpError = ApiError.HttpError(statusCode = 401, errorMessage = "Unauthorized")
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(httpError)
-    every { mockTokenManager.clearToken() } returns Unit
+    coEvery { mockClearSessionUseCase() } returns Unit
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.Unauthorized>(state)
-    verify(exactly = 1) { mockTokenManager.clearToken() }
+    coVerify(exactly = 1) { mockClearSessionUseCase() }
   }
 
   @Test
@@ -109,7 +117,9 @@ class AccountSettingsViewModelTest {
     val networkError = ApiError.NetworkError("Network down")
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -131,7 +141,9 @@ class AccountSettingsViewModelTest {
           UserProfileUpdate(first_name = "New", last_name = "Name", timezone = "Europe/Berlin"))
     } returns ApiResult.Success(updatedProfile)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -154,7 +166,9 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.updateProfile(any()) } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -178,7 +192,9 @@ class AccountSettingsViewModelTest {
         ApiResult.Success(NEW_TOKEN)
     every { mockTokenManager.saveToken(NEW_TOKEN) } returns Unit
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -197,7 +213,9 @@ class AccountSettingsViewModelTest {
     every { mockContext.getString(R.string.account_password_validation_error_mismatch) } returns
         "Passwords do not match."
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, "different-password")
@@ -216,7 +234,9 @@ class AccountSettingsViewModelTest {
     every { mockContext.getString(R.string.account_password_validation_error_short) } returns
         "Password must be at least 8 characters."
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, "short", "short")
@@ -235,7 +255,9 @@ class AccountSettingsViewModelTest {
     every { mockContext.getString(R.string.account_current_password_label) } returns
         "Current password"
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword("", NEW_PASSWORD, NEW_PASSWORD)
@@ -257,7 +279,9 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
         ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -271,14 +295,16 @@ class AccountSettingsViewModelTest {
   // ========== ACCOUNT DELETION TESTS ==========
 
   @Test
-  fun `deleteAccount success clears token and emits AccountDeleted`() = runTest {
+  fun `deleteAccount success invokes clear session and emits AccountDeleted`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
     val initialProfile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Success(Unit)
-    every { mockTokenManager.clearToken() } returns Unit
+    coEvery { mockClearSessionUseCase() } returns Unit
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -286,7 +312,7 @@ class AccountSettingsViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.AccountDeleted>(state)
-    verify(exactly = 1) { mockTokenManager.clearToken() }
+    coVerify(exactly = 1) { mockClearSessionUseCase() }
   }
 
   @Test
@@ -297,7 +323,9 @@ class AccountSettingsViewModelTest {
     every { mockContext.getString(R.string.account_current_password_label) } returns
         "Current password"
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("")
@@ -320,7 +348,9 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.deleteAccount("wrong-password") } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("wrong-password")
@@ -340,7 +370,9 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -362,7 +394,9 @@ class AccountSettingsViewModelTest {
         ApiResult.Success(NEW_TOKEN)
     every { mockTokenManager.saveToken(NEW_TOKEN) } returns Unit
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Transition to PasswordChanged state
@@ -380,7 +414,9 @@ class AccountSettingsViewModelTest {
   fun `changePassword no-op when not in Ready state`() = runTest {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -394,7 +430,9 @@ class AccountSettingsViewModelTest {
   fun `deleteAccount no-op when not in Ready state`() = runTest {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -417,7 +455,9 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Error(apiError)
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -434,7 +474,9 @@ class AccountSettingsViewModelTest {
   fun `clearDeletionState no-op when not in DeletionError state`() = runTest {
     every { mockTokenManager.getToken() } returns null
 
-    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)

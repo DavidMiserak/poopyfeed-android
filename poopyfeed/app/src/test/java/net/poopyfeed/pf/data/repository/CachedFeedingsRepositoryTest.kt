@@ -6,6 +6,7 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -185,5 +186,21 @@ class CachedFeedingsRepositoryTest {
 
     assertIs<ApiResult.Error<Unit>>(result)
     assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `clearSessionCache resets sync state so hasSyncedFlow emits false`() = runTest {
+    val feeding = TestFixtures.mockFeeding()
+    io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
+        PaginatedResponse(count = 1, results = listOf(feeding))
+    io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
+
+    repository.refreshFeedings(childId = 1)
+    val syncedAfterRefresh = repository.hasSyncedFlow(1).take(1).toList().single()
+    kotlin.test.assertTrue(syncedAfterRefresh)
+
+    repository.clearSessionCache()
+    val syncedAfterClear = repository.hasSyncedFlow(1).take(1).toList().single()
+    kotlin.test.assertFalse(syncedAfterClear)
   }
 }

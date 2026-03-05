@@ -243,6 +243,14 @@ constructor(
     withContext(ioDispatcher) { feedingDao.clearChildFeedings(childId) }
     _syncedChildIds.value = _syncedChildIds.value - childId
   }
+
+  /**
+   * Reset in-memory sync state (e.g. on logout). Table data is cleared by CASCADE when children are
+   * cleared; this ensures hasSyncedFlow reflects no synced children.
+   */
+  fun clearSessionCache() {
+    _syncedChildIds.value = emptySet()
+  }
 }
 
 /** Cached Diapers Repository with local Room support. */
@@ -324,6 +332,14 @@ constructor(
   suspend fun clearChildCache(childId: Int) {
     withContext(ioDispatcher) { diaperDao.clearChildDiapers(childId) }
     _syncedChildIds.value = _syncedChildIds.value - childId
+  }
+
+  /**
+   * Reset in-memory sync state (e.g. on logout). Table data is cleared by CASCADE when children are
+   * cleared; this ensures hasSyncedFlow reflects no synced children.
+   */
+  fun clearSessionCache() {
+    _syncedChildIds.value = emptySet()
   }
 }
 
@@ -418,5 +434,13 @@ constructor(
   suspend fun clearChildCache(childId: Int) {
     withContext(ioDispatcher) { napDao.clearChildNaps(childId) }
     _syncedChildIds.value = _syncedChildIds.value - childId
+  }
+
+  /**
+   * Reset in-memory sync state (e.g. on logout). Table data is cleared by CASCADE when children are
+   * cleared; this ensures hasSyncedFlow reflects no synced children.
+   */
+  fun clearSessionCache() {
+    _syncedChildIds.value = emptySet()
   }
 }

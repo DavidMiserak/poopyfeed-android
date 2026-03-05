@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
 /** Banner state for timezone mismatch between device and profile. */
@@ -40,6 +41,7 @@ class MainActivityViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
+    private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -59,11 +61,11 @@ constructor(
   private val _bannerError = MutableSharedFlow<String>(replay = 0)
   val bannerError: SharedFlow<String> = _bannerError.asSharedFlow()
 
-  /** Performs logout (API session + local token/cookies) and triggers navigation to Login. */
+  /** Performs logout (API session + local cache + token) and triggers navigation to Login. */
   fun logout() {
     viewModelScope.launch {
       authRepository.logout() // best-effort; ignore result
-      tokenManager.clearToken()
+      clearSessionUseCase()
       _logoutNavigateToLogin.emit(Unit)
     }
   }

@@ -3,10 +3,10 @@ package net.poopyfeed.pf
 import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
-import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
@@ -28,6 +29,7 @@ class HomeViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
 
@@ -55,7 +57,8 @@ class HomeViewModelTest {
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
 
-    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        HomeViewModel(mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -69,7 +72,9 @@ class HomeViewModelTest {
       runTest {
         every { mockTokenManager.getToken() } returns null
 
-        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
+        val viewModel =
+            HomeViewModel(
+                mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -78,21 +83,23 @@ class HomeViewModelTest {
       }
 
   @Test
-  fun `when profile request returns 401 then token cleared and Unauthorized state emitted`() =
+  fun `when profile request returns 401 then clear session invoked and Unauthorized state emitted`() =
       runTest {
         every { mockTokenManager.getToken() } returns "test-token"
 
         val httpError = ApiError.HttpError(statusCode = 401, errorMessage = "Unauthorized")
         coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(httpError)
-        every { mockTokenManager.clearToken() } returns Unit
+        coEvery { mockClearSessionUseCase() } returns Unit
 
-        val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
+        val viewModel =
+            HomeViewModel(
+                mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertIs<HomeUiState.Unauthorized>(state)
-        verify(exactly = 1) { mockTokenManager.clearToken() }
+        coVerify(exactly = 1) { mockClearSessionUseCase() }
       }
 
   @Test
@@ -102,13 +109,14 @@ class HomeViewModelTest {
     val networkError = ApiError.NetworkError("Network down")
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
-    val viewModel = HomeViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    val viewModel =
+        HomeViewModel(mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.value
     assertIs<HomeUiState.Error>(state)
     assertEquals(networkError.getUserMessage(mockContext), state.message)
-    verify(exactly = 0) { mockTokenManager.clearToken() }
+    coVerify(exactly = 0) { mockClearSessionUseCase() }
   }
 }

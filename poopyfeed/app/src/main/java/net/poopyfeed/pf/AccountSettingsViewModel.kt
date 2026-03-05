@@ -16,6 +16,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
 /** UI state for the account settings screen. */
@@ -69,6 +70,7 @@ class AccountSettingsViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
+    private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -102,7 +104,7 @@ constructor(
         is ApiResult.Error -> {
           val error = result.error
           if (error is ApiError.HttpError && error.statusCode == 401) {
-            tokenManager.clearToken()
+            clearSessionUseCase()
             _uiState.value = AccountSettingsUiState.Unauthorized
           } else {
             _uiState.value = AccountSettingsUiState.Error(error.getUserMessage(context))
@@ -234,8 +236,7 @@ constructor(
 
       when (val result = authRepository.deleteAccount(password)) {
         is ApiResult.Success -> {
-          // Account deleted successfully; caller should handle cleanup
-          tokenManager.clearToken()
+          clearSessionUseCase()
           _uiState.value = AccountSettingsUiState.AccountDeleted
         }
         is ApiResult.Error -> {

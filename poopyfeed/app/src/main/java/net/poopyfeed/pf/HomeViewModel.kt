@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
 /** UI state for the home screen. */
@@ -39,6 +40,7 @@ class HomeViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
+    private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -71,7 +73,7 @@ constructor(
         is ApiResult.Error -> {
           val error = result.error
           if (error is ApiError.HttpError && error.statusCode == 401) {
-            tokenManager.clearToken()
+            clearSessionUseCase()
             _uiState.value = HomeUiState.Unauthorized
           } else {
             _uiState.value = HomeUiState.Error(error.getUserMessage(context))
