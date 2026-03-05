@@ -45,6 +45,11 @@ class HomeFragment : Fragment() {
       return
     }
 
+    // Setup "My Children" card click listener
+    binding.cardMyChildren.setOnClickListener {
+      findNavController().navigate(R.id.action_homeFragment_to_childrenList)
+    }
+
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.uiState.collect { state ->

@@ -1,0 +1,103 @@
+package net.poopyfeed.pf
+
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.Child
+import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+
+/** UI state for the children list screen. */
+sealed interface ChildrenListUiState {
+  /** Loading initial data. */
+  data object Loading : ChildrenListUiState
+
+  /** Children loaded and displayed; may be empty. */
+  data class Ready(val children: List<Child>) : ChildrenListUiState
+
+  /** Cache is empty and never synced; show empty state. */
+  data object Empty : ChildrenListUiState
+
+  /** Failed to load children; [message] is user-facing. */
+  data class Error(val message: String) : ChildrenListUiState
+}
+
+/**
+ * ViewModel for [ChildrenListFragment]. Loads and displays a list of children with pull-to-refresh
+ * support. Emits [uiState] and one-shot events via [deleteError].
+ */
+@HiltViewModel
+class ChildrenListViewModel
+@Inject
+constructor(
+    private val repo: CachedChildrenRepository,
+    @param:ApplicationContext private val context: Context,
+) : ViewModel() {
+
+  private val _uiState: MutableStateFlow<ChildrenListUiState> =
+      MutableStateFlow(ChildrenListUiState.Loading)
+  val uiState: StateFlow<ChildrenListUiState> = _uiState.asStateFlow()
+
+  private val _deleteError: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
+  val deleteError = _deleteError.asSharedFlow()
+
+  init {
+    observeChildren()
+    refresh()
+  }
+
+  /**
+   * Observes children from cache and synced status. Combines both flows to produce the UI state:
+   * - Loading: if not yet synced
+   * - Empty: if synced but no children
+   * - Ready: if children present
+   */
+  private fun observeChildren() {
+    viewModelScope.launch {
+      combine(repo.listChildrenCached(), repo.hasSyncedFlow) { result, hasSynced ->
+            when {
+              !hasSynced -> ChildrenListUiState.Loading
+              result is ApiResult.Success && result.data.isEmpty() -> ChildrenListUiState.Empty
+              result is ApiResult.Success -> ChildrenListUiState.Ready(result.data)
+              result is ApiResult.Error ->
+                  ChildrenListUiState.Error(result.error.getUserMessage(context))
+              else -> ChildrenListUiState.Loading
+            }
+          }
+          .collect { newState -> _uiState.value = newState }
+    }
+  }
+
+  /**
+   * Refreshes children from API and updates cache. Only emits Error if still in Loading state (to
+   * avoid clobbering Ready state during pull-to-refresh).
+   */
+  fun refresh() {
+    viewModelScope.launch {
+      val result = repo.refreshChildren()
+      if (result is ApiResult.Error && _uiState.value is ChildrenListUiState.Loading) {
+        _uiState.value = ChildrenListUiState.Error(result.error.getUserMessage(context))
+      }
+    }
+  }
+
+  /** Deletes a child from the API and cache. Emits error to [deleteError] on failure. */
+  fun deleteChild(childId: Int) {
+    viewModelScope.launch {
+      val result = repo.deleteChild(childId)
+      if (result is ApiResult.Error) {
+        _deleteError.emit(result.error.getUserMessage(context))
+      }
+    }
+  }
+}

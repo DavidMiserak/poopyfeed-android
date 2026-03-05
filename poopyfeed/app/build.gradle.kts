@@ -83,6 +83,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    // UI Components
+    implementation(libs.androidx.swiperefreshlayout)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))

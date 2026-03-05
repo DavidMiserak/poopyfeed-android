@@ -1,5 +1,6 @@
 <resources>
     <!-- Spacing Scale (PoopyFeed Design System) -->
+    <dimen name="spacing_1">2dp</dimen>
     <dimen name="spacing_2">4dp</dimen>
     <dimen name="spacing_3">6dp</dimen>
     <dimen name="spacing_4">8dp</dimen>
@@ -23,6 +24,7 @@
     <dimen name="text_body_large">16sp</dimen>
     <dimen name="text_body_medium">14sp</dimen>
     <dimen name="text_body_small">12sp</dimen>
+    <dimen name="text_label_small">11sp</dimen>
 
     <!-- FAB Margin -->
     <dimen name="fab_margin">@dimen/spacing_8</dimen>

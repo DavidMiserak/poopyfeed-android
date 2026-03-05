@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.Pf.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/spacing_4"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_8">
+
+        <!-- Child name -->
+        <TextView
+            android:id="@+id/text_child_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fredoka"
+            android:textSize="@dimen/text_headline_small"
+            android:textColor="@color/slate_900"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chip_role"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            tools:text="Baby Alice" />
+
+        <!-- Age and gender line -->
+        <TextView
+            android:id="@+id/text_age_gender"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_1"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_medium"
+            android:textColor="@color/slate_700"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chip_role"
+            app:layout_constraintTop_toBottomOf="@id/text_child_name"
+            tools:text="3 months • Girl" />
+
+        <!-- Last activity summary -->
+        <TextView
+            android:id="@+id/text_last_activity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_2"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_small"
+            android:textColor="@color/slate_600"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chip_role"
+            app:layout_constraintTop_toBottomOf="@id/text_age_gender"
+            tools:text="Active 2h ago" />
+
+        <!-- Role badge (hidden for owner) -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_role"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_4"
+            android:text="@string/child_role_badge"
+            android:textSize="@dimen/text_label_small"
+            app:chipBackgroundColor="@color/rose_100"
+            app:chipIcon="@drawable/ic_person"
+            app:chipIconSize="@dimen/spacing_4"
+            app:layout_constraintEnd_toStartOf="@id/icon_chevron"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone" />
+
+        <!-- Chevron icon -->
+        <ImageView
+            android:id="@+id/icon_chevron"
+            android:layout_width="@dimen/spacing_6"
+            android:layout_height="@dimen/spacing_6"
+            android:layout_marginStart="@dimen/spacing_4"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_chevron_right"
+            android:contentDescription="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/slate_600" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

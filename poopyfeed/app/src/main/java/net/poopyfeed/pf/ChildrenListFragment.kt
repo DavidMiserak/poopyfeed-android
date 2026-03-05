@@ -1,0 +1,142 @@
+package net.poopyfeed.pf
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import net.poopyfeed.pf.databinding.FragmentChildrenListBinding
+
+/**
+ * Displays a list of children with pull-to-refresh support. Allows tapping a child to view details.
+ * Shows loading, empty, and error states.
+ */
+@AndroidEntryPoint
+class ChildrenListFragment : Fragment() {
+
+  private var _binding: FragmentChildrenListBinding? = null
+  private val binding
+    get() = _binding!!
+
+  private val viewModel: ChildrenListViewModel by viewModels()
+  private lateinit var adapter: ChildAdapter
+
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentChildrenListBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    // Setup adapter
+    adapter = ChildAdapter { child -> navigateToChildDetail(child.id) }
+
+    // Setup RecyclerView
+    binding.recyclerChildren.adapter = adapter
+    binding.recyclerChildren.layoutManager = LinearLayoutManager(requireContext())
+
+    // Setup SwipeRefreshLayout
+    binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
+
+    // Setup retry button
+    binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
+      viewModel.refresh()
+    }
+
+    // Collect UI state
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.uiState.collect { state ->
+          when (state) {
+            is ChildrenListUiState.Loading -> {
+              binding.progressLoading.visibility = View.VISIBLE
+              binding.recyclerChildren.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.swipeRefresh.isRefreshing = true
+            }
+            is ChildrenListUiState.Ready -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.recyclerChildren.visibility = View.VISIBLE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.swipeRefresh.isRefreshing = false
+              adapter.submitList(state.children)
+            }
+            is ChildrenListUiState.Empty -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.recyclerChildren.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.VISIBLE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.swipeRefresh.isRefreshing = false
+            }
+            is ChildrenListUiState.Error -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.recyclerChildren.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.VISIBLE
+              binding.swipeRefresh.isRefreshing = false
+              binding.layoutErrorState
+                  .findViewById<android.widget.TextView>(R.id.text_error_message)
+                  .text = state.message
+            }
+          }
+        }
+      }
+    }
+
+    // Collect delete error events
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.deleteError.collect { message ->
+          Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+      }
+    }
+
+    // Listen for child_created event from CreateChildBottomSheetFragment
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("child_created", false)
+            ?.collect { created ->
+              if (created) {
+                // Refresh to show the newly created child
+                viewModel.refresh()
+                // Clear the flag
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("child_created", false)
+              }
+            }
+      }
+    }
+  }
+
+  private fun navigateToChildDetail(childId: Int) {
+    val bundle = android.os.Bundle().apply { putInt("childId", childId) }
+    findNavController().navigate(R.id.action_childrenList_to_childDetail, bundle)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+}

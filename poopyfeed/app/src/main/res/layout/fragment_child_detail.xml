@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_page"
+    android:fillViewport="true"
+    tools:context=".ChildDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_8">
+
+        <!-- Hero banner card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_hero"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_4"
+            app:cardCornerRadius="@dimen/corner_radius_lg"
+            app:cardElevation="@dimen/elevation_12"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_gradient_hero"
+                android:padding="@dimen/spacing_12">
+
+                <!-- Child name -->
+                <TextView
+                    android:id="@+id/text_child_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/fredoka"
+                    android:textSize="@dimen/text_headline_medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/chip_role"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Baby Alice" />
+
+                <!-- Age and gender -->
+                <TextView
+                    android:id="@+id/text_age_gender"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_body_large"
+                    android:textColor="@color/rose_100"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/chip_role"
+                    app:layout_constraintTop_toBottomOf="@id/text_child_name"
+                    tools:text="3 months • Girl" />
+
+                <!-- Role badge (hidden for owner) -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_4"
+                    android:text="Co-parent"
+                    android:textSize="@dimen/text_label_small"
+                    app:chipBackgroundColor="@color/rose_100"
+                    app:chipIcon="@drawable/ic_person"
+                    app:chipIconSize="@dimen/spacing_4"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="gone" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Last activities card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_activities"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_hero">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_12">
+
+                <!-- Last feeding -->
+                <TextView
+                    android:id="@+id/label_feeding"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/child_detail_last_feeding"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/slate_600"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Last feeding: 2h ago" />
+
+                <!-- Last diaper -->
+                <TextView
+                    android:id="@+id/label_diaper"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="@string/child_detail_last_diaper"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/slate_600"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/label_feeding"
+                    tools:text="Last diaper: 30m ago" />
+
+                <!-- Last nap -->
+                <TextView
+                    android:id="@+id/label_nap"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="@string/child_detail_last_nap"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/slate_600"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/label_diaper"
+                    tools:text="Last nap: 1h ago" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tracking shortcuts (disabled placeholders) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_tracking"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            android:alpha="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_activities">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_8">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_feedings"
+                    style="@style/Widget.Pf.Button.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/child_detail_feedings"
+                    android:enabled="false"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/button_diapers"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginEnd="@dimen/spacing_2" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_diapers"
+                    style="@style/Widget.Pf.Button.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/child_detail_diapers"
+                    android:enabled="false"
+                    app:layout_constraintStart_toEndOf="@id/button_feedings"
+                    app:layout_constraintEnd_toStartOf="@id/button_naps"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="@dimen/spacing_2"
+                    android:layout_marginEnd="@dimen/spacing_2" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_naps"
+                    style="@style/Widget.Pf.Button.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/child_detail_naps"
+                    android:enabled="false"
+                    app:layout_constraintStart_toEndOf="@id/button_diapers"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="@dimen/spacing_2" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action buttons (owner-only) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_edit"
+            style="@style/Widget.Pf.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            android:text="@string/child_detail_edit_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_tracking"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_4"
+            android:text="@string/child_detail_delete_button"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/red_500"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_edit"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

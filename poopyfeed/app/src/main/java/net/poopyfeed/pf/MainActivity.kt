@@ -99,6 +99,15 @@ class MainActivity : AppCompatActivity() {
         binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
         binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
 
+        // Configure FAB action based on current destination
+        binding.fab.setOnClickListener {
+          when (destination.id) {
+            R.id.ChildrenListFragment -> {
+              navController.navigate(R.id.createChildBottomSheet)
+            }
+          }
+        }
+
         // Re-check timezone mismatch on every navigation (e.g. after login caches the timezone)
         if (!isAuthDestination) {
           viewModel.checkTimezoneMismatch()

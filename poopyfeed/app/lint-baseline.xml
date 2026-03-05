@@ -299,6 +299,17 @@
     </issue>
 
     <issue
+        id="GradleDependency"
+        message="A newer version of androidx.swiperefreshlayout:swiperefreshlayout than 1.1.0 is available: 1.2.0"
+        errorLine1="swiperefreshlayout = &quot;1.1.0&quot;"
+        errorLine2="                     ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="28"
+            column="22"/>
+    </issue>
+
+    <issue
         id="NewerVersionAvailable"
         message="A newer version of com.squareup.retrofit2:retrofit than 2.11.0 is available: 3.0.0"
         errorLine1="retrofit = &quot;2.11.0&quot;"
@@ -499,7 +510,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="10"
+            line="11"
             column="12"/>
     </issue>
 
@@ -510,7 +521,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="11"
+            line="12"
             column="12"/>
     </issue>
 
@@ -521,7 +532,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="16"
+            line="17"
             column="12"/>
     </issue>
 
@@ -532,51 +543,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="19"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.text_headline_small` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;text_headline_small&quot;>24sp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="21"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.text_title_large` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;text_title_large&quot;>22sp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="22"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.text_body_medium` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;text_body_medium&quot;>14sp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="24"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.text_body_small` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;text_body_small&quot;>12sp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="25"
+            line="20"
             column="12"/>
     </issue>
 
@@ -587,7 +554,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="28"
+            line="30"
             column="12"/>
     </issue>
 
@@ -598,7 +565,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="32"
+            line="34"
             column="12"/>
     </issue>
 
@@ -609,7 +576,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="35"
+            line="37"
             column="12"/>
     </issue>
 
@@ -620,7 +587,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="37"
+            line="39"
             column="12"/>
     </issue>
 
@@ -633,6 +600,28 @@
             file="src/main/res/drawable/poopyfeed_logo.xml"
             line="6"
             column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.home_getting_started_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;home_getting_started_title&quot;>Getting Started&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="36"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.home_getting_started_body` appears to be unused"
+        errorLine1="    &lt;string name=&quot;home_getting_started_body&quot;>Add your first child to start tracking feedings, diapers, and naps.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="37"
+            column="13"/>
     </issue>
 
     <issue
@@ -692,34 +681,111 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.children_list_error_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;children_list_error_title&quot;>Unable to load children&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="93"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.children_list_add_button` appears to be unused"
+        errorLine1="    &lt;string name=&quot;children_list_add_button&quot;>Add Child&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="95"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_title&quot;>%1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="99"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_age` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_age&quot;>%1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="100"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_gender_male` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_gender_male&quot;>Boy&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="101"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_gender_female` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_gender_female&quot;>Girl&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="102"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_delete_success` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_delete_success&quot;>Child deleted successfully.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="115"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_child_gender_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_child_gender_error&quot;>Gender is required.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="124"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_child_saving` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_child_saving&quot;>Saving…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="128"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.style.Theme_Pf_Dark` appears to be unused"
         errorLine1="    &lt;style name=&quot;Theme.Pf.Dark&quot; parent=&quot;Theme.Material3.Dark.NoActionBar&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
             line="41"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.style.Widget_Pf_Button_Secondary` appears to be unused"
-        errorLine1="    &lt;style name=&quot;Widget.Pf.Button.Secondary&quot; parent=&quot;Widget.Material3.Button.OutlinedButton&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/themes.xml"
-            line="73"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.style.Widget_Pf_CardView` appears to be unused"
-        errorLine1="    &lt;style name=&quot;Widget.Pf.CardView&quot; parent=&quot;Widget.Material3.CardView.Elevated&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/themes.xml"
-            line="101"
             column="12"/>
     </issue>
 
@@ -743,6 +809,39 @@
             file="src/main/res/values/themes.xml"
             line="126"
             column="12"/>
+    </issue>
+
+    <issue
+        id="KeyboardInaccessibleWidget"
+        message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
+        errorLine1="            android:clickable=&quot;true&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_create_child_bottom_sheet.xml"
+            line="72"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="      binding.textAgeGender.text = &quot;$ageFormatted • $genderFormatted&quot;"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/ChildAdapter.kt"
+            line="43"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Co-parent&quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;Co-parent&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_child_detail.xml"
+            line="69"
+            column="21"/>
     </issue>
 
 </issues>

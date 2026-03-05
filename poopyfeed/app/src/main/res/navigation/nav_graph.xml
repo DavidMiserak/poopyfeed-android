@@ -33,7 +33,39 @@
             app:destination="@id/LoginFragment"
             app:popUpTo="@id/HomeFragment"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_childrenList"
+            app:destination="@id/ChildrenListFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/ChildrenListFragment"
+        android:name="net.poopyfeed.pf.ChildrenListFragment"
+        android:label="@string/children_list_title"
+        tools:layout="@layout/fragment_children_list">
+
+        <action
+            android:id="@+id/action_childrenList_to_childDetail"
+            app:destination="@id/ChildDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ChildDetailFragment"
+        android:name="net.poopyfeed.pf.ChildDetailFragment"
+        android:label="@string/children_list_title"
+        tools:layout="@layout/fragment_child_detail">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/createChildBottomSheet"
+        android:name="net.poopyfeed.pf.CreateChildBottomSheetFragment"
+        android:label="@string/create_child_title"
+        tools:layout="@layout/fragment_create_child_bottom_sheet" />
 
     <fragment
         android:id="@+id/AccountSettingsFragment"

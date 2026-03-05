@@ -92,15 +92,16 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- ======================== -->
-        <!-- Content card (frosted glass) -->
+        <!-- My Children card -->
         <!-- ======================== -->
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_content"
+            android:id="@+id/card_my_children"
             style="@style/Widget.Pf.CardView.Frosted"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_8"
+            android:foreground="?attr/selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/card_welcome">
@@ -110,28 +111,40 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/spacing_12">
 
-                <!-- Getting started prompt -->
                 <TextView
-                    android:id="@+id/text_getting_started_title"
+                    android:id="@+id/text_my_children_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_getting_started_title"
+                    android:text="@string/home_children_card_title"
                     android:textAppearance="@style/TextAppearance.Pf.TitleLarge"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/icon_children_chevron"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/text_getting_started_body"
+                    android:id="@+id/text_my_children_body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_2"
-                    android:text="@string/home_getting_started_body"
+                    android:text="@string/home_children_card_body"
                     android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
                     android:textColor="@color/slate_600"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/icon_children_chevron"
+                    app:layout_constraintTop_toBottomOf="@id/text_my_children_title" />
+
+                <ImageView
+                    android:id="@+id/icon_children_chevron"
+                    android:layout_width="@dimen/spacing_6"
+                    android:layout_height="@dimen/spacing_6"
+                    android:layout_marginStart="@dimen/spacing_4"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_chevron_right"
+                    android:contentDescription="@null"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/text_getting_started_title" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/slate_600" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
