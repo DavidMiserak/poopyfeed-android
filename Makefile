@@ -88,19 +88,19 @@ test:
 	cd poopyfeed && $(GRADLE) test
 
 coverage:
-	@echo "Running unit tests with coverage..."
-	cd poopyfeed && $(GRADLE) testDebugUnitTest jacocoTestDebugUnitTestReport
+	@echo "Running unit tests with coverage (Kover)..."
+	cd poopyfeed && $(GRADLE) koverXmlReport
 	@echo ""
-	@echo "JaCoCo coverage summary (LINE):"
-	@if [ -f "poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml" ]; then \
-		grep -o '<counter type="LINE"[^>]*/>' poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml | \
+	@echo "Kover coverage summary (LINE):"
+	@if [ -f "poopyfeed/poopyfeed/build/reports/kover/report.xml" ]; then \
+		grep -o '<counter type="LINE"[^>]*/>' poopyfeed/poopyfeed/build/reports/kover/report.xml | \
 		awk -F'"' '{missed+=$$4; covered+=$$6} END { total=missed+covered; if (total>0) printf "  %.2f%% (%d/%d lines covered)\n", covered*100/total, covered, total; else print "  0.00%% (0/0 lines covered)"; }'; \
 	else \
-		echo "  XML report not found at poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/jacocoTestDebugUnitTestReport.xml"; \
+		echo "  XML report not found at poopyfeed/poopyfeed/build/reports/kover/report.xml"; \
 	fi
 	@echo ""
-	@echo "HTML report:"
-	@echo "  poopyfeed/app/build/reports/jacoco/jacocoTestDebugUnitTestReport/html/index.html"
+	@echo "HTML report (if generated via Gradle):"
+	@echo "  (not configured yet for Kover)"
 
 # Lint
 lint:

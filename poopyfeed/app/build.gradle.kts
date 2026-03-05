@@ -1,12 +1,8 @@
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    id("jacoco")
 }
 
 android {
@@ -55,107 +51,7 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
-configure<JacocoPluginExtension> {
-    toolVersion = "0.8.10"
-}
-
-val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
-    dependsOn("testDebugUnitTest")
-
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-
-    val sharedExcludes = listOf(
-        "**/R.class",
-        "**/R\$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "androidx/**/*",
-        "android/**/*",
-        "**/*_Impl.class",
-        "**/*_Impl\$*.class",
-        "**/*Fragment.class",
-        "**/*Activity.class",
-        "**/di/**",
-        "**/data/api/*.class",
-        "**/data/db/PoopyFeedDatabase*.class",
-        "**/data/db/PoopyFeedDao*.class"
-    )
-
-    val javacDebugTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
-        exclude(sharedExcludes)
-    }
-
-    val kotlinDebugTree = fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
-        exclude(sharedExcludes)
-    }
-
-    classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include(
-                "jacoco/testDebugUnitTest.exec",
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-            )
-        }
-    )
-}
-
-val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerification::class) {
-    dependsOn("testDebugUnitTest")
-
-    val verificationExcludes = listOf(
-        "**/R.class",
-        "**/R\$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "androidx/**/*",
-        "android/**/*",
-        "**/*_Impl.class",
-        "**/*_Impl\$*.class",
-        "**/*Fragment.class",
-        "**/*Activity.class",
-        "**/di/**",
-        "**/data/api/*.class",
-        "**/data/db/PoopyFeedDatabase*.class",
-        "**/data/db/PoopyFeedDao*.class"
-    )
-
-    val javacDebugTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
-        exclude(verificationExcludes)
-    }
-
-    val kotlinDebugTree = fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
-        exclude(verificationExcludes)
-    }
-
-    classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include(
-                "jacoco/testDebugUnitTest.exec",
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-            )
-        }
-    )
-
-    violationRules {
-        rule {
-            limit {
-                // Target 80%; enforce 55% minimum line coverage as the current quality gate.
-                minimum = "0.55".toBigDecimal()
-            }
-        }
-    }
-}
-
-tasks.named("check") {
-    dependsOn(jacocoTestDebugUnitTestVerification)
-}
+// Kover is configured in the root build script.
 
 dependencies {
     // AndroidX
