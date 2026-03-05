@@ -58,14 +58,10 @@ class AccountSettingsFragment : Fragment() {
     }
 
     // SECTION 2: Security - Change password button (shows confirmation dialog)
-    binding.buttonChangePassword.setOnClickListener {
-      showPasswordChangeDialog()
-    }
+    binding.buttonChangePassword.setOnClickListener { showPasswordChangeDialog() }
 
     // SECTION 3: Danger Zone - Delete account button (shows confirmation dialog)
-    binding.buttonDeleteAccount.setOnClickListener {
-      showDeleteAccountDialog()
-    }
+    binding.buttonDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -144,8 +140,7 @@ class AccountSettingsFragment : Fragment() {
                     viewModel.clearDeletionState()
                     navigateToLogin()
                   },
-                  1500
-              )
+                  1500)
             }
             is AccountSettingsUiState.DeletionError -> {
               setDeleteLoading(false)
@@ -257,12 +252,13 @@ class AccountSettingsFragment : Fragment() {
 
   private fun showDeleteAccountDialog() {
     // Step 1: Initial warning dialog with password field
-    val passwordInput = EditText(requireContext()).apply {
-      inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-      hint = getString(R.string.account_current_password_label)
-      setPadding(48, 32, 48, 32)
-      textSize = 16f
-    }
+    val passwordInput =
+        EditText(requireContext()).apply {
+          inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+          hint = getString(R.string.account_current_password_label)
+          setPadding(48, 32, 48, 32)
+          textSize = 16f
+        }
 
     MaterialAlertDialogBuilder(requireContext())
         .setTitle(R.string.account_delete_dialog_title)
@@ -275,10 +271,9 @@ class AccountSettingsFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.account_delete_dialog_title)
                 .setMessage(
-                    getString(R.string.account_delete_warning)
-                        + "\n\n"
-                        + getString(R.string.account_delete_dialog_message)
-                )
+                    getString(R.string.account_delete_warning) +
+                        "\n\n" +
+                        getString(R.string.account_delete_dialog_message))
                 .setPositiveButton(R.string.account_delete_confirm_button) { _, _ ->
                   viewModel.deleteAccount(password)
                 }

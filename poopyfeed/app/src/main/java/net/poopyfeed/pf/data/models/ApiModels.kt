@@ -201,11 +201,7 @@ data class ChangePasswordRequest(
  *
  * The new token must be stored to replace the old one (token rotation).
  */
-@Serializable
-data class ChangePasswordResponse(
-    val detail: String,
-    val auth_token: String
-)
+@Serializable data class ChangePasswordResponse(val detail: String, val auth_token: String)
 
 /**
  * Request for deleting authenticated user's account.
@@ -213,10 +209,7 @@ data class ChangePasswordResponse(
  * Requires password confirmation for security. Backend will delete the user and all related data
  * irreversibly.
  */
-@Serializable
-data class DeleteAccountRequest(
-    val current_password: String
-)
+@Serializable data class DeleteAccountRequest(val current_password: String)
 
 /**
  * User sign-up request for django-allauth headless API.

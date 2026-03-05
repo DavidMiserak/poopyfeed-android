@@ -3,6 +3,7 @@ package net.poopyfeed.pf
 import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -175,7 +176,7 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
         ApiResult.Success(NEW_TOKEN)
-    every { mockTokenManager.setToken(NEW_TOKEN) } returns Unit
+    every { mockTokenManager.saveToken(NEW_TOKEN) } returns Unit
 
     val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -185,7 +186,7 @@ class AccountSettingsViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.PasswordChanged>(state)
-    verify(exactly = 1) { mockTokenManager.setToken(NEW_TOKEN) }
+    verify(exactly = 1) { mockTokenManager.saveToken(NEW_TOKEN) }
   }
 
   @Test
@@ -249,7 +250,8 @@ class AccountSettingsViewModelTest {
     every { mockTokenManager.getToken() } returns "test-token"
     val initialProfile = TestFixtures.mockUserProfile()
     val apiError =
-        ApiError.HttpError(statusCode = 400, errorMessage = "Bad Request", detail = "Invalid password")
+        ApiError.HttpError(
+            statusCode = 400, errorMessage = "Bad Request", detail = "Invalid password")
 
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
@@ -313,12 +315,10 @@ class AccountSettingsViewModelTest {
         ApiError.HttpError(
             statusCode = 400,
             errorMessage = "Bad Request",
-            detail = "Current password is incorrect."
-        )
+            detail = "Current password is incorrect.")
 
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
-    coEvery { mockAuthRepository.deleteAccount("wrong-password") } returns
-        ApiResult.Error(apiError)
+    coEvery { mockAuthRepository.deleteAccount("wrong-password") } returns ApiResult.Error(apiError)
 
     val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -358,15 +358,22 @@ class AccountSettingsViewModelTest {
     every { mockTokenManager.getToken() } returns "test-token"
     val initialProfile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
+    coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
+        ApiResult.Success(NEW_TOKEN)
+    every { mockTokenManager.saveToken(NEW_TOKEN) } returns Unit
 
     val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
-    // Simulate reaching PasswordChanged state
+    // Transition to PasswordChanged state
+    viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Clear state should reload profile
     viewModel.clearPasswordChangeState()
     testDispatcher.scheduler.advanceUntilIdle()
 
-    verify(atLeast = 2) { mockAuthRepository.getProfile() }
+    coVerify(atLeast = 2) { mockAuthRepository.getProfile() }
   }
 
   @Test
@@ -380,7 +387,7 @@ class AccountSettingsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
-    verify(exactly = 0) { mockAuthRepository.changePassword(any(), any()) }
+    coVerify(exactly = 0) { mockAuthRepository.changePassword(any(), any()) }
   }
 
   @Test
@@ -394,6 +401,6 @@ class AccountSettingsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
-    verify(exactly = 0) { mockAuthRepository.deleteAccount(any()) }
+    coVerify(exactly = 0) { mockAuthRepository.deleteAccount(any()) }
   }
 }

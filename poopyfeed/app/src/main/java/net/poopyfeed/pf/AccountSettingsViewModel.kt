@@ -150,8 +150,8 @@ constructor(
    * Change the authenticated user's password.
    *
    * Validates that passwords match and have minimum length before API call. Transitions to
-   * ChangingPassword, then PasswordChanged or PasswordChangeError. Returns new token silently
-   * (no logout). No-op if not in Ready state.
+   * ChangingPassword, then PasswordChanged or PasswordChangeError. Returns new token silently (no
+   * logout). No-op if not in Ready state.
    */
   fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
     val currentState = _uiState.value
@@ -164,29 +164,25 @@ constructor(
       currentPassword.isBlank() -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_current_password_label) + " required"
-            )
+                context.getString(R.string.account_current_password_label) + " required")
         return
       }
       newPassword.isBlank() -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_new_password_label) + " required"
-            )
+                context.getString(R.string.account_new_password_label) + " required")
         return
       }
       newPassword.length < 8 -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_password_validation_error_short)
-            )
+                context.getString(R.string.account_password_validation_error_short))
         return
       }
       newPassword != confirmPassword -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_password_validation_error_mismatch)
-            )
+                context.getString(R.string.account_password_validation_error_mismatch))
         return
       }
     }
@@ -197,7 +193,7 @@ constructor(
       when (val result = authRepository.changePassword(currentPassword, newPassword)) {
         is ApiResult.Success -> {
           // Token rotation: store new token (user remains logged in)
-          tokenManager.setToken(result.data)
+          tokenManager.saveToken(result.data)
           _uiState.value = AccountSettingsUiState.PasswordChanged
         }
         is ApiResult.Error -> {
@@ -214,9 +210,8 @@ constructor(
   /**
    * Delete the authenticated user's account permanently.
    *
-   * Irreversible operation. Transitions to DeletingAccount, then AccountDeleted or
-   * DeletionError. On success, caller should handle navigation to login. No-op if not in Ready
-   * state.
+   * Irreversible operation. Transitions to DeletingAccount, then AccountDeleted or DeletionError.
+   * On success, caller should handle navigation to login. No-op if not in Ready state.
    */
   fun deleteAccount(password: String) {
     val currentState = _uiState.value
@@ -228,8 +223,7 @@ constructor(
     if (password.isBlank()) {
       _uiState.value =
           AccountSettingsUiState.DeletionError(
-              context.getString(R.string.account_current_password_label) + " required"
-          )
+              context.getString(R.string.account_current_password_label) + " required")
       return
     }
 
@@ -261,8 +255,7 @@ constructor(
       return
     }
     if (currentState is AccountSettingsUiState.PasswordChanged ||
-        currentState is AccountSettingsUiState.PasswordChangeError
-    ) {
+        currentState is AccountSettingsUiState.PasswordChangeError) {
       // Reload profile to ensure Ready state
       loadProfile()
     }

@@ -63,8 +63,8 @@ interface PoopyFeedApiService {
   /**
    * Delete the authenticated user's account.
    *
-   * Requires password confirmation for security. This is a permanent operation; all user data
-   * and associated child profiles will be deleted. Returns HTTP 204 No Content on success.
+   * Requires password confirmation for security. This is a permanent operation; all user data and
+   * associated child profiles will be deleted. Returns HTTP 204 No Content on success.
    */
   @Headers("Accept: application/json")
   @POST("account/delete/")

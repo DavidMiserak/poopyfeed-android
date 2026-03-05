@@ -372,21 +372,17 @@ constructor(
   /**
    * Change the authenticated user's password.
    *
-   * Validates current password and enforces new password strength. Returns new auth token that
-   * must be stored (token rotation). User remains authenticated with new token.
+   * Validates current password and enforces new password strength. Returns new auth token that must
+   * be stored (token rotation). User remains authenticated with new token.
    */
-  suspend fun changePassword(
-      currentPassword: String,
-      newPassword: String
-  ): ApiResult<String> =
+  suspend fun changePassword(currentPassword: String, newPassword: String): ApiResult<String> =
       withContext(ioDispatcher) {
         try {
           val request =
               ChangePasswordRequest(
                   current_password = currentPassword,
                   new_password = newPassword,
-                  new_password_confirm = newPassword
-              )
+                  new_password_confirm = newPassword)
           val response = apiService.changePassword(request)
           ApiResult.Success(response.auth_token)
         } catch (e: Exception) {
