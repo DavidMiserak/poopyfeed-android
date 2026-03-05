@@ -42,17 +42,19 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
           else binding.root.context.getString(R.string.create_child_gender_male)
       binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
 
-      // Last activity summary: use the most recent non-null timestamp
-      val recentTimestamp =
-          listOfNotNull(child.last_feeding, child.last_diaper_change, child.last_nap).maxOrNull()
-      binding.textLastActivity.text =
-          if (recentTimestamp != null) {
-            binding.root.context.getString(
-                R.string.child_detail_last_feeding,
-                formatRelativeTime(binding.root.context, recentTimestamp))
-          } else {
-            binding.root.context.getString(R.string.child_detail_never)
-          }
+      // Last activities: show all three
+      binding.textLastFeeding.text =
+          binding.root.context.getString(
+              R.string.child_detail_last_feeding,
+              formatRelativeTime(binding.root.context, child.last_feeding))
+      binding.textLastDiaper.text =
+          binding.root.context.getString(
+              R.string.child_detail_last_diaper,
+              formatRelativeTime(binding.root.context, child.last_diaper_change))
+      binding.textLastNap.text =
+          binding.root.context.getString(
+              R.string.child_detail_last_nap,
+              formatRelativeTime(binding.root.context, child.last_nap))
 
       // Show role badge only for non-owners
       binding.chipRole.visibility = if (child.user_role == "owner") View.GONE else View.VISIBLE

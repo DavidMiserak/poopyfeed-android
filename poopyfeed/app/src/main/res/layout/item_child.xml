@@ -42,19 +42,47 @@
             app:layout_constraintTop_toBottomOf="@id/text_child_name"
             tools:text="3 months • Girl" />
 
-        <!-- Last activity summary -->
-        <TextView
-            android:id="@+id/text_last_activity"
+        <!-- Last activities -->
+        <LinearLayout
+            android:id="@+id/layout_activities"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_2"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_small"
-            android:textColor="@color/slate_600"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chip_role"
-            app:layout_constraintTop_toBottomOf="@id/text_age_gender"
-            tools:text="Active 2h ago" />
+            app:layout_constraintTop_toBottomOf="@id/text_age_gender">
+
+            <TextView
+                android:id="@+id/text_last_feeding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/slate_600"
+                tools:text="Last feeding: 4 minutes ago" />
+
+            <TextView
+                android:id="@+id/text_last_diaper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/slate_600"
+                tools:text="Last diaper: 22 hours ago" />
+
+            <TextView
+                android:id="@+id/text_last_nap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/slate_600"
+                tools:text="Last nap: 8 hours ago" />
+
+        </LinearLayout>
 
         <!-- Role badge (hidden for owner) -->
         <com.google.android.material.chip.Chip
