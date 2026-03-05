@@ -63,7 +63,7 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
     }
   }
 
-  private class ChildDiffCallback : DiffUtil.ItemCallback<Child>() {
+  internal class ChildDiffCallback : DiffUtil.ItemCallback<Child>() {
     override fun areItemsTheSame(oldItem: Child, newItem: Child): Boolean {
       return oldItem.id == newItem.id
     }

@@ -43,6 +43,11 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     lint {
         baseline = file("lint-baseline.xml")
     }
@@ -94,6 +99,10 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.fragment.testing)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.androidx.navigation.testing)
+    kspTest(libs.hilt.compiler)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
@@ -119,7 +128,6 @@ kover {
                 // Exclude UI shell classes
                 classes(
                     "net.poopyfeed.pf.MainActivity",
-                    "net.poopyfeed.pf.*Fragment",
                     "net.poopyfeed.pf.PoopyFeedApplication",
                     // Hilt/Dagger generated wiring in app package
                     "net.poopyfeed.pf.*_Factory",
