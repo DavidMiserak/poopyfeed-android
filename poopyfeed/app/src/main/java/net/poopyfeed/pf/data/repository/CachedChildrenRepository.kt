@@ -43,7 +43,7 @@ class CachedChildrenRepository
 constructor(
     private val apiService: PoopyFeedApiService,
     private val childDao: ChildDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _hasSynced = MutableStateFlow(false)
@@ -166,7 +166,7 @@ class CachedFeedingsRepository
 constructor(
     private val apiService: PoopyFeedApiService,
     private val feedingDao: FeedingDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
@@ -251,7 +251,7 @@ class CachedDiapersRepository
 constructor(
     private val apiService: PoopyFeedApiService,
     private val diaperDao: DiaperDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())
@@ -333,7 +333,7 @@ class CachedNapsRepository
 constructor(
     private val apiService: PoopyFeedApiService,
     private val napDao: NapDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   private val _syncedChildIds = MutableStateFlow<Set<Int>>(emptySet())

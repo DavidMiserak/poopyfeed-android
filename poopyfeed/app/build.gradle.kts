@@ -54,6 +54,10 @@ android {
     }
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
 }
@@ -87,18 +91,18 @@ val jacocoTestDebugUnitTestReport by tasks.registering(JacocoReport::class) {
         "**/data/db/PoopyFeedDao*.class"
     )
 
-    val javacDebugTree = fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+    val javacDebugTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
         exclude(sharedExcludes)
     }
 
-    val kotlinDebugTree = fileTree("${buildDir}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+    val kotlinDebugTree = fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
         exclude(sharedExcludes)
     }
 
     classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(
-        fileTree(buildDir) {
+        fileTree(layout.buildDirectory) {
             include(
                 "jacoco/testDebugUnitTest.exec",
                 "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
@@ -127,18 +131,18 @@ val jacocoTestDebugUnitTestVerification by tasks.registering(JacocoCoverageVerif
         "**/data/db/PoopyFeedDao*.class"
     )
 
-    val javacDebugTree = fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+    val javacDebugTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
         exclude(verificationExcludes)
     }
 
-    val kotlinDebugTree = fileTree("${buildDir}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+    val kotlinDebugTree = fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
         exclude(verificationExcludes)
     }
 
     classDirectories.setFrom(files(javacDebugTree, kotlinDebugTree))
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(
-        fileTree(buildDir) {
+        fileTree(layout.buildDirectory) {
             include(
                 "jacoco/testDebugUnitTest.exec",
                 "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"

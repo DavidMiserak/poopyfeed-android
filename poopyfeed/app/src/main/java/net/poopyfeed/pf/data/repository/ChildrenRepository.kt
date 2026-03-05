@@ -25,7 +25,7 @@ class ChildrenRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   /**
@@ -107,7 +107,7 @@ class FeedingsRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listFeedings(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Feeding>>> =
@@ -162,7 +162,7 @@ class DiapersRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listDiapers(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Diaper>>> =
@@ -203,7 +203,7 @@ class NapsRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   fun listNaps(childId: Int, page: Int = 1): Flow<ApiResult<PaginatedResponse<Nap>>> =
@@ -254,7 +254,7 @@ class SharingRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   suspend fun listShares(childId: Int): ApiResult<List<ChildShare>> =
@@ -303,7 +303,7 @@ class AuthRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
   /** Perform two-step browser login and return the auth token string. */

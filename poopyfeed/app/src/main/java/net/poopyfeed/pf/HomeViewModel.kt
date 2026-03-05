@@ -40,7 +40,7 @@ class HomeViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Loading)

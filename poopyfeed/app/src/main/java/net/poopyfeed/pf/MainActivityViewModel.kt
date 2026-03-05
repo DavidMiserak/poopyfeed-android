@@ -41,7 +41,7 @@ class MainActivityViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
   /**
