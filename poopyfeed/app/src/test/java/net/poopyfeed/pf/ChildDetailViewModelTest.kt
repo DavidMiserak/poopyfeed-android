@@ -34,6 +34,7 @@ class ChildDetailViewModelTest {
   fun `deleteChild calls repository delete`() = runTest {
     val mockChild = TestFixtures.mockChild()
     coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+    coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
     coEvery { mockRepository.deleteChild(1) } returns ApiResult.Success(Unit)
 
     val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)

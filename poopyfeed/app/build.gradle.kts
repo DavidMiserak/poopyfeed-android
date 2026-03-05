@@ -70,7 +70,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp.logging)
 
-    // Kotlinx Serialization
+    // Kotlinx
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization)
 

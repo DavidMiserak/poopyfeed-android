@@ -63,6 +63,14 @@ constructor(
 
   init {
     observeChild()
+    refresh()
+  }
+
+  /**
+   * Refresh child data from API to sync with latest changes (e.g., new feedings added elsewhere).
+   */
+  fun refresh() {
+    viewModelScope.launch { repo.refreshChildren() }
   }
 
   /** Observes the child from cache and formats data for display. */

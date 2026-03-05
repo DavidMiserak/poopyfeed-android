@@ -14,6 +14,7 @@ navigationUiKtx = "2.8.9"
 coroutines = "1.10.2"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
+kotlinxDatetime = "0.6.2"
 kotlinxSerialization = "1.8.0"
 retrofitSerializationConverter = "1.0.0"
 room = "2.7.1"
@@ -48,7 +49,8 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
-# Kotlinx Serialization
+# Kotlinx
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitSerializationConverter" }
 
