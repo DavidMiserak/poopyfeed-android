@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("org.jetbrains.kotlinx.kover") version "0.9.7"
 }
 
 android {
@@ -50,8 +51,6 @@ android {
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
-
-// Kover is configured in the root build script.
 
 dependencies {
     // AndroidX

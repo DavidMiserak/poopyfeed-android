@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.spotless)
-    id("org.jetbrains.kotlinx.kover") version "0.8.3"
 }
 
 spotless {
@@ -14,5 +13,3 @@ spotless {
         ktfmt() // Format only; no lint rules (use ktlint() for full style enforcement)
     }
 }
-
-kover {}
