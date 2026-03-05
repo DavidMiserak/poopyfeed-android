@@ -47,7 +47,7 @@ constructor(
 
   /**
    * Attempts signup with [email] and [password]; updates [uiState] to Loading then Success or
-   * Error.
+   * Error. On success, also populates the timezone cache for the app-wide timezone mismatch banner.
    */
   fun signUp(email: String, password: String) {
     viewModelScope.launch {
@@ -56,6 +56,15 @@ constructor(
       when (val result = authRepository.signup(email, password)) {
         is ApiResult.Success -> {
           tokenManager.saveToken(result.data)
+          // Populate timezone cache for app-wide timezone mismatch banner
+          when (val profileResult = authRepository.getProfile()) {
+            is ApiResult.Success -> {
+              tokenManager.saveProfileTimezone(profileResult.data.timezone)
+            }
+            else -> {
+              // Best-effort; ignore profile fetch errors, user will see banner later
+            }
+          }
           _uiState.value = SignupUiState.Success
         }
         is ApiResult.Error -> {

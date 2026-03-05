@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gradient background for timezone banner: amber to orange for warmth and urgency -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="45"
+        android:startColor="#FCD34D"
+        android:centerColor="#FBBC04"
+        android:endColor="#FB923C"
+        android:gradientRadius="500" />
+</shape>

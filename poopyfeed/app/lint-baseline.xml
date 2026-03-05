@@ -278,12 +278,23 @@
 
     <issue
         id="GradleDependency"
+        message="A newer version of androidx.activity:activity-ktx than 1.9.3 is available: 1.12.4"
+        errorLine1="activity = &quot;1.9.3&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="23"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
         message="A newer version of androidx.test:core than 1.6.1 is available: 1.7.0"
         errorLine1="androidxTestCore = &quot;1.6.1&quot;"
         errorLine2="                   ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="24"
+            line="25"
             column="20"/>
     </issue>
 
@@ -360,7 +371,7 @@
         errorLine2="              ~~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="23"
+            line="24"
             column="15"/>
     </issue>
 
@@ -371,8 +382,41 @@
         errorLine2="           ~~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="25"
+            line="26"
             column="12"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger.hilt.android than 2.56 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.56&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="27"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-android than 2.56 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.56&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="27"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-android-compiler than 2.56 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.56&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="27"
+            column="8"/>
     </issue>
 
     <issue
@@ -648,23 +692,67 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.account_password_change_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;account_password_change_error&quot;>Failed to change password. Please check your current password and try again.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="61"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.account_delete_cancelled_message` appears to be unused"
+        errorLine1="    &lt;string name=&quot;account_delete_cancelled_message&quot;>Account deletion cancelled.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="70"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.account_delete_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;account_delete_error&quot;>Failed to delete account. Please check your password and try again.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="72"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.account_password_requirements` appears to be unused"
+        errorLine1="    &lt;string name=&quot;account_password_requirements&quot;>Password must be at least 8 characters&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="75"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.account_password_strength_weak` appears to be unused"
+        errorLine1="    &lt;string name=&quot;account_password_strength_weak&quot;>Use a mix of uppercase, lowercase, numbers, and symbols for a stronger password&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="76"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.style.Theme_Pf_Dark` appears to be unused"
         errorLine1="    &lt;style name=&quot;Theme.Pf.Dark&quot; parent=&quot;Theme.Material3.Dark.NoActionBar&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
             line="41"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.style.Widget_Pf_Button_Secondary` appears to be unused"
-        errorLine1="    &lt;style name=&quot;Widget.Pf.Button.Secondary&quot; parent=&quot;Widget.Material3.Button.OutlinedButton&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/themes.xml"
-            line="73"
             column="12"/>
     </issue>
 
@@ -698,17 +786,6 @@
         <location
             file="src/main/res/values/themes.xml"
             line="126"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.style.TextAppearance_Pf_LabelLarge` appears to be unused"
-        errorLine1="    &lt;style name=&quot;TextAppearance.Pf.LabelLarge&quot; parent=&quot;TextAppearance.Material3.LabelLarge&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/themes.xml"
-            line="155"
             column="12"/>
     </issue>
 

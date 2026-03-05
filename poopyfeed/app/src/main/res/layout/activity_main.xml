@@ -60,6 +60,102 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <!-- Timezone mismatch banner — bold, refined design with gradient + left accent -->
+        <LinearLayout
+            android:id="@+id/banner_timezone_mismatch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:background="@drawable/bg_banner_timezone_gradient"
+            android:orientation="horizontal"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/spacing_8"
+            android:paddingTop="@dimen/spacing_6"
+            android:paddingBottom="@dimen/spacing_6"
+            android:gravity="center_vertical">
+
+            <!-- Left accent stripe (rose to orange gradient) -->
+            <View
+                android:layout_width="4dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_banner_accent_stripe" />
+
+            <!-- Main content container -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/spacing_8"
+                android:paddingVertical="@dimen/spacing_4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/timezone_mismatch_title"
+                    android:fontFamily="@font/fredoka"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/slate_900" />
+
+                <TextView
+                    android:id="@+id/text_timezone_mismatch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/dm_sans"
+                    android:textSize="12sp"
+                    android:textColor="@color/slate_700"
+                    android:lineSpacingMultiplier="1.2" />
+            </LinearLayout>
+
+            <!-- Action buttons container (horizontal) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:spacing="@dimen/spacing_4">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_timezone_banner"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/slate_900"
+                    app:trackColor="@android:color/transparent"
+                    app:indicatorSize="20dp" />
+
+                <!-- Primary action button (prominent) -->
+                <Button
+                    android:id="@+id/button_use_device_timezone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/spacing_6"
+                    android:paddingVertical="@dimen/spacing_3"
+                    android:text="@string/timezone_use_device"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/dm_sans"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_timezone_primary" />
+
+                <!-- Secondary action button (subtle) -->
+                <Button
+                    android:id="@+id/button_dismiss_timezone_banner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/spacing_4"
+                    android:paddingVertical="@dimen/spacing_3"
+                    android:text="@string/dismiss"
+                    android:textSize="11sp"
+                    android:fontFamily="@font/dm_sans"
+                    android:textColor="@color/slate_700"
+                    android:background="@android:color/transparent"
+                    android:foreground="?attr/selectableItemBackground" />
+            </LinearLayout>
+        </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_main" />

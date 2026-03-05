@@ -1,6 +1,7 @@
 <resources>
     <!-- Spacing Scale (PoopyFeed Design System) -->
     <dimen name="spacing_2">4dp</dimen>
+    <dimen name="spacing_3">6dp</dimen>
     <dimen name="spacing_4">8dp</dimen>
     <dimen name="spacing_6">12dp</dimen>
     <dimen name="spacing_8">16dp</dimen>

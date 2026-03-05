@@ -96,6 +96,7 @@ constructor(
       when (val result = authRepository.getProfile()) {
         is ApiResult.Success -> {
           val profile = result.data
+          tokenManager.saveProfileTimezone(profile.timezone)
           _uiState.value = AccountSettingsUiState.Ready(profile = profile, timezones = allTimezones)
         }
         is ApiResult.Error -> {
@@ -133,6 +134,7 @@ constructor(
       when (val result = authRepository.updateProfile(update)) {
         is ApiResult.Success -> {
           val updatedProfile = result.data
+          tokenManager.saveProfileTimezone(updatedProfile.timezone)
           _uiState.value =
               AccountSettingsUiState.Saved(profile = updatedProfile, timezones = allTimezones)
         }

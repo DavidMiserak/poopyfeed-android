@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,6 +14,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -38,9 +40,51 @@ class MainActivity : AppCompatActivity() {
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
 
+    // Wire timezone banner button listeners (once, on create)
+    binding.buttonUseDeviceTimezone.setOnClickListener { viewModel.useDeviceTimezone() }
+    binding.buttonDismissTimezoneBanner.setOnClickListener { viewModel.dismissTimezoneBanner() }
+
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() }
+        // Re-check timezone mismatch on every app resume (synchronous, no network call)
+        viewModel.checkTimezoneMismatch()
+
+        // Collect logout events
+        launch { viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() } }
+
+        // Collect timezone banner state updates
+        launch {
+          viewModel.timezoneBanner.collect { state ->
+            val saving = state is TimezoneBannerState.Saving
+            binding.bannerTimezoneMismatch.isVisible = state !is TimezoneBannerState.Hidden
+            binding.progressTimezoneBanner.isVisible = saving
+            binding.buttonUseDeviceTimezone.isEnabled = !saving
+
+            if (state is TimezoneBannerState.Visible || state is TimezoneBannerState.Saving) {
+              val deviceTz =
+                  when (state) {
+                    is TimezoneBannerState.Visible -> state.deviceTimezone
+                    is TimezoneBannerState.Saving -> state.deviceTimezone
+                    else -> ""
+                  }
+              val profileTz =
+                  when (state) {
+                    is TimezoneBannerState.Visible -> state.profileTimezone
+                    is TimezoneBannerState.Saving -> state.profileTimezone
+                    else -> ""
+                  }
+              binding.textTimezoneMismatch.text =
+                  getString(R.string.timezone_mismatch_message, deviceTz, profileTz)
+            }
+          }
+        }
+
+        // Collect one-shot error events
+        launch {
+          viewModel.bannerError.collect { message ->
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+          }
+        }
       }
     }
 
@@ -56,6 +100,11 @@ class MainActivity : AppCompatActivity() {
             destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
         binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
         binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+
+        // Re-check timezone mismatch on every navigation (e.g. after login caches the timezone)
+        if (!isAuthDestination) {
+          viewModel.checkTimezoneMismatch()
+        }
       }
     }
   }
