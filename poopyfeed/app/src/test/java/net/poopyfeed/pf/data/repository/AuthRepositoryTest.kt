@@ -13,6 +13,7 @@ import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.AuthTokenResponse
+import net.poopyfeed.pf.data.models.ChangePasswordResponse
 import net.poopyfeed.pf.data.models.SessionLoginResponse
 import net.poopyfeed.pf.data.models.SignupRequest
 import net.poopyfeed.pf.data.models.UserProfile
@@ -183,6 +184,54 @@ class AuthRepositoryTest {
     io.mockk.coEvery { apiService.logoutSession() } throws IOException("Network down")
 
     val result = repository.logout()
+
+    assertIs<ApiResult.Error<Unit>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `changePassword success returns new auth token`() = runTest {
+    val currentPassword = "old-password"
+    val newPassword = "new-strong-password"
+
+    io.mockk.coEvery { apiService.changePassword(any()) } returns
+        ChangePasswordResponse(detail = "Password changed", auth_token = "rotated-token-123")
+
+    val result = repository.changePassword(currentPassword, newPassword)
+
+    assertIs<ApiResult.Success<String>>(result)
+    assertEquals("rotated-token-123", result.data)
+  }
+
+  @Test
+  fun `changePassword http error returns HttpError`() = runTest {
+    val errorResponse =
+        retrofit2.Response.error<ChangePasswordResponse>(400, "Bad request".toResponseBody(null))
+
+    io.mockk.coEvery { apiService.changePassword(any()) } throws
+        retrofit2.HttpException(errorResponse)
+
+    val result = repository.changePassword("old-password", "new-password")
+
+    assertIs<ApiResult.Error<String>>(result)
+    assertIs<ApiError.HttpError>(result.error)
+    assertEquals(400, result.error.statusCode)
+  }
+
+  @Test
+  fun `deleteAccount success returns Success Unit`() = runTest {
+    io.mockk.coEvery { apiService.deleteAccount(any()) } returns Unit
+
+    val result = repository.deleteAccount("super-secret-password")
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
+  fun `deleteAccount network error returns Error with NetworkError`() = runTest {
+    io.mockk.coEvery { apiService.deleteAccount(any()) } throws IOException("Network down")
+
+    val result = repository.deleteAccount("super-secret-password")
 
     assertIs<ApiResult.Error<Unit>>(result)
     assertIs<ApiError.NetworkError>(result.error)
