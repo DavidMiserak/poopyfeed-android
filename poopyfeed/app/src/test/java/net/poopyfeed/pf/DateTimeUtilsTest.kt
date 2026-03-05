@@ -17,6 +17,7 @@ class DateTimeUtilsTest {
   fun setup() {
     mockContext = mockk()
     every { mockContext.getString(R.string.child_detail_never) } returns "Never"
+    every { mockContext.getString(R.string.child_detail_just_now) } returns "Just now"
   }
 
   // === Instant.parse tests (verifying kotlinx-datetime handles our API formats) ===
@@ -57,6 +58,15 @@ class DateTimeUtilsTest {
 
     val result = formatRelativeTime(mockContext, eventTime, nowMillis)
     assert(result.isNotEmpty()) { "Expected relative time string, got empty result" }
+  }
+
+  @Test
+  fun `formatRelativeTime with less than 1 minute ago returns Just now`() {
+    val nowMillis = 1705226430000L // 30 seconds after the event
+    val eventTime = "2024-01-14T10:00:00Z" // 1705226400000L
+
+    val result = formatRelativeTime(mockContext, eventTime, nowMillis)
+    assertEquals("Just now", result)
   }
 
   @Test

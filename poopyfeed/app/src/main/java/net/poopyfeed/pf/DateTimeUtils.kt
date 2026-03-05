@@ -33,7 +33,12 @@ fun formatRelativeTime(
 
   return try {
     val millis = Instant.parse(isoString).toEpochMilliseconds()
-    DateUtils.getRelativeTimeSpanString(millis, nowMillis, DateUtils.MINUTE_IN_MILLIS).toString()
+    val diffMs = nowMillis - millis
+    if (diffMs in 0 until DateUtils.MINUTE_IN_MILLIS) {
+      context.getString(R.string.child_detail_just_now)
+    } else {
+      DateUtils.getRelativeTimeSpanString(millis, nowMillis, DateUtils.MINUTE_IN_MILLIS).toString()
+    }
   } catch (e: Exception) {
     context.getString(R.string.child_detail_never)
   }

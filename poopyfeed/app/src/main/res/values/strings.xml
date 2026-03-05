@@ -104,6 +104,7 @@
     <string name="child_detail_last_diaper">Last diaper: %1$s</string>
     <string name="child_detail_last_nap">Last nap: %1$s</string>
     <string name="child_detail_never">Never</string>
+    <string name="child_detail_just_now">Just now</string>
     <string name="child_detail_feedings">Feedings</string>
     <string name="child_detail_diapers">Diapers</string>
     <string name="child_detail_naps">Naps</string>
