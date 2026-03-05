@@ -403,4 +403,45 @@ class AccountSettingsViewModelTest {
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
     coVerify(exactly = 0) { mockAuthRepository.deleteAccount(any()) }
   }
+
+  @Test
+  fun `clearDeletionState from DeletionError reloads profile`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val initialProfile = TestFixtures.mockUserProfile()
+    val apiError =
+        ApiError.HttpError(
+            statusCode = 400,
+            errorMessage = "Bad Request",
+            detail = "Current password is incorrect.")
+
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
+    coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Error(apiError)
+
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.deleteAccount(VALID_PASSWORD)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertIs<AccountSettingsUiState.DeletionError>(viewModel.uiState.value)
+
+    viewModel.clearDeletionState()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify(atLeast = 2) { mockAuthRepository.getProfile() }
+  }
+
+  @Test
+  fun `clearDeletionState no-op when not in DeletionError state`() = runTest {
+    every { mockTokenManager.getToken() } returns null
+
+    val viewModel = AccountSettingsViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
+
+    viewModel.clearDeletionState()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify(exactly = 0) { mockAuthRepository.getProfile() }
+  }
 }

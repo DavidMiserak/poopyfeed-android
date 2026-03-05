@@ -109,6 +109,7 @@ kover {
                 packages(
                     "net.poopyfeed.pf.di",
                     "net.poopyfeed.pf.data.api",
+                    "net.poopyfeed.pf.data.models",
                 )
 
                 // Exclude UI shell classes
@@ -116,6 +117,9 @@ kover {
                     "net.poopyfeed.pf.MainActivity",
                     "net.poopyfeed.pf.*Fragment",
                     "net.poopyfeed.pf.PoopyFeedApplication",
+                    // Hilt/Dagger generated wiring in app package
+                    "net.poopyfeed.pf.*_Factory",
+                    "net.poopyfeed.pf.*_HiltModules*",
                 )
 
                 // Exclude Room database wiring (but not entities)
@@ -123,6 +127,13 @@ kover {
                     "net.poopyfeed.pf.data.db.PoopyFeedDatabase*",
                     "net.poopyfeed.pf.data.db.*Dao*",
                 )
+            }
+        }
+
+        // Global coverage verification threshold (LINE)
+        verify {
+            rule {
+                minBound(85)
             }
         }
     }
