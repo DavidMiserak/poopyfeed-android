@@ -46,6 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:textColor="@color/slate_900"
             android:fontFamily="@font/dm_sans" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -70,6 +71,7 @@
             android:inputType="date"
             android:focusable="false"
             android:clickable="true"
+            android:textColor="@color/slate_900"
             android:fontFamily="@font/dm_sans" />
 
     </com.google.android.material.textfield.TextInputLayout>
