@@ -15,8 +15,7 @@ frontend.
 - **DI**: Hilt 2.59.2
 - **Networking**: Retrofit + OkHttp + kotlinx.serialization
 - **Local Storage**: Room database with cached repositories
-- **Testing**: JUnit 4 + MockK + Robolectric + Kover
-  (95.98% coverage)
+- **Testing**: JUnit 4 + MockK + Robolectric + Kover (85% minimum enforced)
 
 ## Features
 
@@ -40,9 +39,12 @@ frontend.
 
 ### Setup
 
+From the **android** directory (where the Makefile lives):
+
 ```bash
 # Clone (if not already part of the monorepo)
 git clone <repo-url>
+cd android
 
 # Build debug APK
 make build-debug
@@ -64,15 +66,25 @@ the API base URL to your machine's IP.
 
 ```bash
 make build-debug    # Build debug APK
+make build-release  # Build release APK (unsigned)
+make install        # Install debug APK (builds if needed)
+make run            # Build, install, and start app
+make start          # Start app (requires installed APK)
+make clean          # Clean build artifacts
+
 make test           # Run unit tests
 make coverage       # Kover coverage report (85% minimum enforced)
 make lint           # Run Android lint
 make lint-fix       # Update lint baseline
 make format         # Format Kotlin code (Spotless/ktfmt)
+
+make devices        # List connected devices/emulators
 make logs           # adb logcat filtered to net.poopyfeed.pf
 ```
 
 ### Running Specific Tests
+
+From the android directory:
 
 ```bash
 cd poopyfeed
@@ -98,8 +110,10 @@ LF line endings, and no private keys.
 
 ## Project Structure
 
+Paths below are relative to the **poopyfeed** app module (`poopyfeed/app/`):
+
 ```text
-app/src/main/java/net/poopyfeed/pf/
+poopyfeed/app/src/main/java/net/poopyfeed/pf/
 ├── data/
 │   ├── api/           # Retrofit API service
 │   ├── db/            # Room database, DAOs, entities
@@ -145,4 +159,4 @@ Types: feat, fix, docs, style, refactor, test, chore
 
 ## License
 
-<!-- Add license information -->
+See repository root for license information.
