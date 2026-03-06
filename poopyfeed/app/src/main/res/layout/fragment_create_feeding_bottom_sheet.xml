@@ -143,6 +143,16 @@
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_right"
             android:textSize="@dimen/text_body_medium" />
+
+        <RadioButton
+            android:id="@+id/radio_side_both"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/rose_400"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/create_feeding_side_both"
+            android:textSize="@dimen/text_body_medium" />
     </RadioGroup>
 
     <TextView

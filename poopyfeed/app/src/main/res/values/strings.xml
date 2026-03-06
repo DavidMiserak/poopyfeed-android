@@ -184,6 +184,7 @@
     <string name="create_feeding_side_error">Select side for breast feeding.</string>
     <string name="create_feeding_side_left">Left</string>
     <string name="create_feeding_side_right">Right</string>
+    <string name="create_feeding_side_both">Both</string>
     <string name="create_feeding_type_error">Select feeding type.</string>
     <string name="create_feeding_time_label">Time</string>
     <string name="create_feeding_change_time">Change time</string>

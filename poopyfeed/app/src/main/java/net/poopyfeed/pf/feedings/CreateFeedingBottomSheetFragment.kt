@@ -156,6 +156,7 @@ class CreateFeedingBottomSheetFragment : BottomSheetDialogFragment() {
         when (binding.radioSide.checkedRadioButtonId) {
           R.id.radio_side_left -> "left"
           R.id.radio_side_right -> "right"
+          R.id.radio_side_both -> "both"
           else -> ""
         }
     viewModel.createFeeding(type, amount, minutes, side, selectedTimestamp)

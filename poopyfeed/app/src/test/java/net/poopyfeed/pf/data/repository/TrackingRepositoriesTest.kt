@@ -92,9 +92,7 @@ class TrackingRepositoriesTest {
         )
     val updatedResponse =
         TestFixtures.mockFeedingListResponse(
-            amount_oz = "5.0",
-            fed_at = "2024-01-15T12:30:00Z",
-            updated_at = "2024-01-15T12:31:00Z")
+            amount_oz = "5.0", fed_at = "2024-01-15T12:30:00Z", updated_at = "2024-01-15T12:31:00Z")
 
     io.mockk.coEvery { apiService.updateFeeding(1, 10, request) } returns updatedResponse
 
@@ -155,7 +153,9 @@ class TrackingRepositoriesTest {
     val repository = DiapersRepository(apiService)
 
     val request = CreateDiaperRequest(change_type = "wet", timestamp = "2024-01-15T14:00:00Z")
-    val diaperResponse = TestFixtures.mockDiaperListResponse(change_type = "wet", changed_at = "2024-01-15T14:00:00Z")
+    val diaperResponse =
+        TestFixtures.mockDiaperListResponse(
+            change_type = "wet", changed_at = "2024-01-15T14:00:00Z")
 
     io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
 
@@ -179,7 +179,8 @@ class TrackingRepositoriesTest {
   fun `NapsRepository createNap success returns Success`() = runTest {
     val repository = NapsRepository(apiService)
     val request = CreateNapRequest(start_time = "2024-01-15T13:00:00Z", end_time = null)
-    val napResponse = TestFixtures.mockNapListResponse(ended_at = null, updated_at = "2024-01-15T13:00:00Z")
+    val napResponse =
+        TestFixtures.mockNapListResponse(ended_at = null, updated_at = "2024-01-15T13:00:00Z")
     io.mockk.coEvery { apiService.createNap(1, request) } returns napResponse
 
     val result = repository.createNap(1, request)
@@ -208,7 +209,8 @@ class TrackingRepositoriesTest {
 
     val request = UpdateNapRequest(end_time = "2024-01-15T14:00:00Z")
     val updatedResponse =
-        TestFixtures.mockNapListResponse(ended_at = "2024-01-15T14:00:00Z", updated_at = "2024-01-15T14:01:00Z")
+        TestFixtures.mockNapListResponse(
+            ended_at = "2024-01-15T14:00:00Z", updated_at = "2024-01-15T14:01:00Z")
 
     io.mockk.coEvery { apiService.updateNap(1, 3, request) } returns updatedResponse
 

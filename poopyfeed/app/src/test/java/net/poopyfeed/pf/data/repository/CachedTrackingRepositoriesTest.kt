@@ -182,7 +182,9 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
     io.mockk.coEvery { diaperDao.deleteDiaper(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val diaperResponse = TestFixtures.mockDiaperListResponse(change_type = "dirty", changed_at = "2024-01-15T14:00:00Z")
+    val diaperResponse =
+        TestFixtures.mockDiaperListResponse(
+            change_type = "dirty", changed_at = "2024-01-15T14:00:00Z")
     val request = CreateDiaperRequest("dirty", "2024-01-15T14:00:00Z")
     io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
     io.mockk.coEvery { apiService.deleteDiaper(1, 1) } returns Unit

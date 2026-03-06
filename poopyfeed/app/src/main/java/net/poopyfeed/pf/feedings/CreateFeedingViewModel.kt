@@ -69,7 +69,7 @@ constructor(
         } else null
     val sideError =
         if (feedingType.equals("breast", ignoreCase = true) &&
-            (side != "left" && side != "right")) {
+            (side != "left" && side != "right" && side != "both")) {
           "Select side for breast feeding."
         } else null
 
