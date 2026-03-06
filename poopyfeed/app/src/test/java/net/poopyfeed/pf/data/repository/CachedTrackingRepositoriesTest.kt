@@ -117,7 +117,14 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { feedingDao.deleteFeeding(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     val feeding = TestFixtures.mockFeeding()
-    val request = CreateFeedingRequest("bottle", 4.0, "2024-01-15T12:00:00Z")
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T12:00:00Z",
+        )
     io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
     io.mockk.coEvery { apiService.deleteFeeding(1, 1) } returns Unit
     val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)

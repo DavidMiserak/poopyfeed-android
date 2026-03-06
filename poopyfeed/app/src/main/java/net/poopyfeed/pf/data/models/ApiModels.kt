@@ -77,11 +77,16 @@ data class FeedingListResponse(
           updated_at = updated_at)
 }
 
-/** DTO for creating/updating a Feeding. Backend expects [fed_at] for the timestamp. */
+/**
+ * DTO for creating/updating a Feeding. Backend expects [fed_at]. Breast requires [duration_minutes]
+ * and [side].
+ */
 @Serializable
 data class CreateFeedingRequest(
     val feeding_type: String,
     val amount_oz: Double? = null,
+    @SerialName("duration_minutes") val durationMinutes: Int? = null,
+    val side: String? = null,
     @SerialName("fed_at") val timestamp: String
 )
 

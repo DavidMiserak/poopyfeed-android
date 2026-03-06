@@ -28,6 +28,8 @@ sealed interface CreateFeedingUiState {
   data class ValidationError(
       val typeError: String? = null,
       val amountError: String? = null,
+      val minutesError: String? = null,
+      val sideError: String? = null,
   ) : CreateFeedingUiState
 }
 
@@ -47,17 +49,38 @@ constructor(
       MutableStateFlow(CreateFeedingUiState.Idle)
   val uiState: StateFlow<CreateFeedingUiState> = _uiState.asStateFlow()
 
-  fun createFeeding(feedingType: String, amountOz: Double?, timestamp: String) {
+  fun createFeeding(
+      feedingType: String,
+      amountOz: Double?,
+      durationMinutes: Int?,
+      side: String,
+      timestamp: String
+  ) {
     val typeError = if (feedingType.isBlank()) "Select feeding type." else null
     val amountError =
         if (feedingType.equals("bottle", ignoreCase = true) &&
             (amountOz == null || amountOz <= 0)) {
           "Enter amount for bottle feeding."
         } else null
+    val minutesError =
+        if (feedingType.equals("breast", ignoreCase = true) &&
+            (durationMinutes == null || durationMinutes <= 0)) {
+          "Enter minutes for breast feeding."
+        } else null
+    val sideError =
+        if (feedingType.equals("breast", ignoreCase = true) &&
+            (side != "left" && side != "right")) {
+          "Select side for breast feeding."
+        } else null
 
-    if (typeError != null || amountError != null) {
+    if (typeError != null || amountError != null || minutesError != null || sideError != null) {
       _uiState.value =
-          CreateFeedingUiState.ValidationError(typeError = typeError, amountError = amountError)
+          CreateFeedingUiState.ValidationError(
+              typeError = typeError,
+              amountError = amountError,
+              minutesError = minutesError,
+              sideError = sideError,
+          )
       return
     }
 
@@ -67,6 +90,9 @@ constructor(
           CreateFeedingRequest(
               feeding_type = feedingType.trim(),
               amount_oz = if (feedingType.equals("bottle", ignoreCase = true)) amountOz else null,
+              durationMinutes =
+                  if (feedingType.equals("breast", ignoreCase = true)) durationMinutes else null,
+              side = if (feedingType.equals("breast", ignoreCase = true)) side else null,
               timestamp = timestamp,
           )
       val result = repo.createFeeding(childId, request)

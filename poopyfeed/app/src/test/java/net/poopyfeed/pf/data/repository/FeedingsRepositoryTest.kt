@@ -69,6 +69,8 @@ class FeedingsRepositoryTest {
         CreateFeedingRequest(
             feeding_type = "bottle",
             amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
             timestamp = "2024-01-15T10:00:00Z",
         )
     val feeding =
@@ -91,6 +93,8 @@ class FeedingsRepositoryTest {
         CreateFeedingRequest(
             feeding_type = "bottle",
             amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
             timestamp = "2024-01-15T10:00:00Z",
         )
     val errorResponse = retrofit2.Response.error<Feeding>(400, "Bad Request".toResponseBody(null))
@@ -109,6 +113,8 @@ class FeedingsRepositoryTest {
         CreateFeedingRequest(
             feeding_type = "breast",
             amount_oz = null,
+            durationMinutes = 15,
+            side = "left",
             timestamp = "2024-01-15T11:00:00Z",
         )
     val feeding =

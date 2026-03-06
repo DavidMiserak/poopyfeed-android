@@ -48,10 +48,17 @@ class CreateFeedingBottomSheetFragment : BottomSheetDialogFragment() {
     super.onViewCreated(view, savedInstanceState)
     updateTimestampDisplay()
     binding.radioFeedingType.setOnCheckedChangeListener { _, checkedId ->
-      binding.layoutAmount.visibility =
-          if (checkedId == R.id.radio_bottle) View.VISIBLE else View.GONE
+      val isBottle = checkedId == R.id.radio_bottle
+      binding.layoutAmount.visibility = if (isBottle) View.VISIBLE else View.GONE
+      binding.layoutMinutes.visibility = if (isBottle) View.GONE else View.VISIBLE
+      binding.labelSide.visibility = if (isBottle) View.GONE else View.VISIBLE
+      binding.radioSide.visibility = if (isBottle) View.GONE else View.VISIBLE
     }
-    binding.layoutAmount.visibility = if (binding.radioBottle.isChecked) View.VISIBLE else View.GONE
+    val isBottle = binding.radioBottle.isChecked
+    binding.layoutAmount.visibility = if (isBottle) View.VISIBLE else View.GONE
+    binding.layoutMinutes.visibility = if (isBottle) View.GONE else View.VISIBLE
+    binding.labelSide.visibility = if (isBottle) View.GONE else View.VISIBLE
+    binding.radioSide.visibility = if (isBottle) View.GONE else View.VISIBLE
     binding.buttonChangeTime.setOnClickListener { showDateTimePickers() }
     binding.buttonSave.setOnClickListener { saveFeeding() }
 
@@ -88,6 +95,8 @@ class CreateFeedingBottomSheetFragment : BottomSheetDialogFragment() {
               binding.progressSaving.visibility = View.GONE
               state.typeError?.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show() }
               binding.layoutAmount.error = state.amountError
+              binding.layoutMinutes.error = state.minutesError
+              state.sideError?.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show() }
             }
           }
         }
@@ -141,7 +150,15 @@ class CreateFeedingBottomSheetFragment : BottomSheetDialogFragment() {
         }
     val amountStr = binding.inputAmount.text?.toString()?.trim()
     val amount = amountStr?.toDoubleOrNull()
-    viewModel.createFeeding(type, amount, selectedTimestamp)
+    val minutesStr = binding.inputMinutes.text?.toString()?.trim()
+    val minutes = minutesStr?.toIntOrNull()
+    val side =
+        when (binding.radioSide.checkedRadioButtonId) {
+          R.id.radio_side_left -> "left"
+          R.id.radio_side_right -> "right"
+          else -> ""
+        }
+    viewModel.createFeeding(type, amount, minutes, side, selectedTimestamp)
   }
 
   override fun onDestroyView() {

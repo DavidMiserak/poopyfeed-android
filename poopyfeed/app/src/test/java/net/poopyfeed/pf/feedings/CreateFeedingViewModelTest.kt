@@ -48,7 +48,7 @@ class CreateFeedingViewModelTest {
 
   @Test
   fun `createFeeding with empty type sets ValidationError and does not call repo`() {
-    viewModel.createFeeding("", null, "2024-01-15T12:00:00Z")
+    viewModel.createFeeding("", null, null, "", "2024-01-15T12:00:00Z")
 
     assertIs<CreateFeedingUiState.ValidationError>(viewModel.uiState.value)
     coVerify(exactly = 0) { mockRepository.createFeeding(any(), any()) }
@@ -56,19 +56,27 @@ class CreateFeedingViewModelTest {
 
   @Test
   fun `createFeeding bottle with zero amount sets ValidationError`() {
-    viewModel.createFeeding("bottle", 0.0, "2024-01-15T12:00:00Z")
+    viewModel.createFeeding("bottle", 0.0, null, "", "2024-01-15T12:00:00Z")
 
     assertIs<CreateFeedingUiState.ValidationError>(viewModel.uiState.value)
     coVerify(exactly = 0) { mockRepository.createFeeding(any(), any()) }
   }
 
   @Test
-  fun `createFeeding happy path calls repo and emits Success`() =
+  fun `createFeeding breast without minutes sets ValidationError`() {
+    viewModel.createFeeding("breast", null, null, "", "2024-01-15T12:00:00Z")
+
+    assertIs<CreateFeedingUiState.ValidationError>(viewModel.uiState.value)
+    coVerify(exactly = 0) { mockRepository.createFeeding(any(), any()) }
+  }
+
+  @Test
+  fun `createFeeding happy path bottle calls repo and emits Success`() =
       runTest(testDispatcher) {
         coEvery { mockRepository.createFeeding(1, any()) } returns
             ApiResult.Success(TestFixtures.mockFeeding())
 
-        viewModel.createFeeding("bottle", 4.0, "2024-01-15T12:00:00Z")
+        viewModel.createFeeding("bottle", 4.0, null, "", "2024-01-15T12:00:00Z")
         advanceUntilIdle()
 
         coVerify { mockRepository.createFeeding(1, any()) }
@@ -81,7 +89,7 @@ class CreateFeedingViewModelTest {
         coEvery { mockRepository.createFeeding(1, any()) } returns
             ApiResult.Error(ApiError.NetworkError("fail"))
 
-        viewModel.createFeeding("breast", null, "2024-01-15T12:00:00Z")
+        viewModel.createFeeding("breast", null, 15, "left", "2024-01-15T12:00:00Z")
         advanceUntilIdle()
 
         assertIs<CreateFeedingUiState.Error>(viewModel.uiState.value)

@@ -42,7 +42,12 @@ class TrackingRepositoriesTest {
 
     val request =
         CreateFeedingRequest(
-            feeding_type = "bottle", amount_oz = 4.0, timestamp = "2024-01-15T12:00:00Z")
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T12:00:00Z",
+        )
 
     io.mockk.coEvery { apiService.createFeeding(1, request) } throws IOException("Network down")
 
@@ -58,7 +63,12 @@ class TrackingRepositoriesTest {
 
     val request =
         CreateFeedingRequest(
-            feeding_type = "bottle", amount_oz = 4.0, timestamp = "2024-01-15T12:00:00Z")
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T12:00:00Z",
+        )
     val feeding = TestFixtures.mockFeeding()
 
     io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
@@ -75,7 +85,12 @@ class TrackingRepositoriesTest {
 
     val request =
         CreateFeedingRequest(
-            feeding_type = "bottle", amount_oz = 5.0, timestamp = "2024-01-15T12:30:00Z")
+            feeding_type = "bottle",
+            amount_oz = 5.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T12:30:00Z",
+        )
     val updated =
         TestFixtures.mockFeeding(
             amount_oz = 5.0,
