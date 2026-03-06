@@ -142,6 +142,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"
                         android:imeOptions="actionNext"
+                        android:textColor="@color/slate_900"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -171,6 +172,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:imeOptions="actionNext"
+                        android:textColor="@color/slate_900"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -200,6 +202,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:imeOptions="actionDone"
+                        android:textColor="@color/slate_900"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
