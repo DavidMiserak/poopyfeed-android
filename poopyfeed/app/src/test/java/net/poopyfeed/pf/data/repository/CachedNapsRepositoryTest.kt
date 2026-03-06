@@ -136,13 +136,13 @@ class CachedNapsRepositoryTest {
             start_time = "2024-01-15T10:00:00Z",
             end_time = null,
         )
-    val nap =
-        TestFixtures.mockNap(
+    val napResponse =
+        TestFixtures.mockNapListResponse(
             id = 2,
-            start_time = "2024-01-15T10:00:00Z",
-            end_time = null,
+            napped_at = "2024-01-15T10:00:00Z",
+            ended_at = null,
         )
-    io.mockk.coEvery { apiService.createNap(1, request) } returns nap
+    io.mockk.coEvery { apiService.createNap(1, request) } returns napResponse
     io.mockk.coEvery { napDao.upsertNap(any()) } returns Unit
 
     val result = repository.createNap(childId = 1, request = request)
@@ -172,13 +172,13 @@ class CachedNapsRepositoryTest {
   @Test
   fun `updateNap success upserts and returns Success`() = runTest {
     val request = UpdateNapRequest(end_time = "2024-01-15T11:00:00Z")
-    val nap =
-        TestFixtures.mockNap(
+    val napResponse =
+        TestFixtures.mockNapListResponse(
             id = 2,
-            start_time = "2024-01-15T10:00:00Z",
-            end_time = "2024-01-15T11:00:00Z",
+            napped_at = "2024-01-15T10:00:00Z",
+            ended_at = "2024-01-15T11:00:00Z",
         )
-    io.mockk.coEvery { apiService.updateNap(1, 2, request) } returns nap
+    io.mockk.coEvery { apiService.updateNap(1, 2, request) } returns napResponse
     io.mockk.coEvery { napDao.upsertNap(any()) } returns Unit
 
     val result = repository.updateNap(childId = 1, napId = 2, request = request)

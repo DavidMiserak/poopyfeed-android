@@ -70,12 +70,12 @@ class NapsRepositoryTest {
             start_time = "2024-01-15T10:00:00Z",
             end_time = null,
         )
-    val nap =
-        TestFixtures.mockNap(
-            start_time = "2024-01-15T10:00:00Z",
-            end_time = null,
+    val napResponse =
+        TestFixtures.mockNapListResponse(
+            napped_at = "2024-01-15T10:00:00Z",
+            ended_at = null,
         )
-    coEvery { apiService.createNap(childId = 1, request = request) } returns nap
+    coEvery { apiService.createNap(childId = 1, request = request) } returns napResponse
 
     val result = repository.createNap(childId = 1, request = request)
 
@@ -103,13 +103,13 @@ class NapsRepositoryTest {
   @Test
   fun `updateNap success returns Success`() = runTest {
     val request = UpdateNapRequest(end_time = "2024-01-15T11:00:00Z")
-    val nap =
-        TestFixtures.mockNap(
+    val napResponse =
+        TestFixtures.mockNapListResponse(
             id = 2,
-            start_time = "2024-01-15T10:00:00Z",
-            end_time = "2024-01-15T11:00:00Z",
+            napped_at = "2024-01-15T10:00:00Z",
+            ended_at = "2024-01-15T11:00:00Z",
         )
-    coEvery { apiService.updateNap(childId = 1, napId = 2, request = request) } returns nap
+    coEvery { apiService.updateNap(childId = 1, napId = 2, request = request) } returns napResponse
 
     val result = repository.updateNap(childId = 1, napId = 2, request = request)
 

@@ -42,13 +42,12 @@ data class Child(
 data class CreateChildRequest(val name: String, val date_of_birth: String, val gender: String)
 
 /** Feeding event - bottle or breastfeeding. */
-@Serializable
 data class Feeding(
     val id: Int,
     val child: Int,
     val feeding_type: String, // 'bottle' or 'breast'
     val amount_oz: Double? = null, // Only for bottle feeding
-    @SerialName("fed_at") val timestamp: String, // ISO 8601 datetime
+    val timestamp: String, // ISO 8601 datetime
     val created_at: String,
     val updated_at: String
 )
@@ -91,12 +90,11 @@ data class CreateFeedingRequest(
 )
 
 /** Diaper change event. */
-@Serializable
 data class Diaper(
     val id: Int,
     val child: Int,
     val change_type: String, // 'wet', 'dirty', 'both'
-    @SerialName("changed_at") val timestamp: String, // ISO 8601 datetime
+    val timestamp: String, // ISO 8601 datetime
     val created_at: String,
     val updated_at: String
 )
@@ -134,12 +132,11 @@ data class DiaperListResponse(
 }
 
 /** Nap event. */
-@Serializable
 data class Nap(
     val id: Int,
     val child: Int,
-    @SerialName("napped_at") val start_time: String, // ISO 8601 datetime
-    @SerialName("ended_at") val end_time: String? = null, // ISO 8601 datetime or null (if nap is ongoing)
+    val start_time: String, // ISO 8601 datetime
+    val end_time: String? = null, // ISO 8601 datetime or null (if nap is ongoing)
     val created_at: String,
     val updated_at: String
 )

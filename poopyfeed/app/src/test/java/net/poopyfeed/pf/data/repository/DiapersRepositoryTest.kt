@@ -70,12 +70,12 @@ class DiapersRepositoryTest {
             change_type = "wet",
             timestamp = "2024-01-15T10:00:00Z",
         )
-    val diaper =
-        TestFixtures.mockDiaper(
+    val diaperResponse =
+        TestFixtures.mockDiaperListResponse(
             change_type = "wet",
-            timestamp = "2024-01-15T10:00:00Z",
+            changed_at = "2024-01-15T10:00:00Z",
         )
-    coEvery { apiService.createDiaper(childId = 1, request = request) } returns diaper
+    coEvery { apiService.createDiaper(childId = 1, request = request) } returns diaperResponse
 
     val result = repository.createDiaper(childId = 1, request = request)
 

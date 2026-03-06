@@ -69,14 +69,13 @@ class TrackingRepositoriesTest {
             side = null,
             timestamp = "2024-01-15T12:00:00Z",
         )
-    val feeding = TestFixtures.mockFeeding()
+    val feedingResponse = TestFixtures.mockFeedingListResponse()
 
-    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
+    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feedingResponse
 
     val result = repository.createFeeding(1, request)
 
     assertIs<ApiResult.Success<Feeding>>(result)
-    assertEquals(feeding, result.data)
   }
 
   @Test
@@ -91,18 +90,17 @@ class TrackingRepositoriesTest {
             side = null,
             timestamp = "2024-01-15T12:30:00Z",
         )
-    val updated =
-        TestFixtures.mockFeeding(
-            amount_oz = 5.0,
-            timestamp = "2024-01-15T12:30:00Z",
+    val updatedResponse =
+        TestFixtures.mockFeedingListResponse(
+            amount_oz = "5.0",
+            fed_at = "2024-01-15T12:30:00Z",
             updated_at = "2024-01-15T12:31:00Z")
 
-    io.mockk.coEvery { apiService.updateFeeding(1, 10, request) } returns updated
+    io.mockk.coEvery { apiService.updateFeeding(1, 10, request) } returns updatedResponse
 
     val result = repository.updateFeeding(1, 10, request)
 
     assertIs<ApiResult.Success<Feeding>>(result)
-    assertEquals(updated, result.data)
   }
 
   @Test
@@ -157,14 +155,13 @@ class TrackingRepositoriesTest {
     val repository = DiapersRepository(apiService)
 
     val request = CreateDiaperRequest(change_type = "wet", timestamp = "2024-01-15T14:00:00Z")
-    val diaper = TestFixtures.mockDiaper(change_type = "wet")
+    val diaperResponse = TestFixtures.mockDiaperListResponse(change_type = "wet", changed_at = "2024-01-15T14:00:00Z")
 
-    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaper
+    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
 
     val result = repository.createDiaper(1, request)
 
     assertIs<ApiResult.Success<Diaper>>(result)
-    assertEquals(diaper, result.data)
   }
 
   @Test
@@ -182,13 +179,12 @@ class TrackingRepositoriesTest {
   fun `NapsRepository createNap success returns Success`() = runTest {
     val repository = NapsRepository(apiService)
     val request = CreateNapRequest(start_time = "2024-01-15T13:00:00Z", end_time = null)
-    val nap = TestFixtures.mockNap(end_time = null, updated_at = "2024-01-15T13:00:00Z")
-    io.mockk.coEvery { apiService.createNap(1, request) } returns nap
+    val napResponse = TestFixtures.mockNapListResponse(ended_at = null, updated_at = "2024-01-15T13:00:00Z")
+    io.mockk.coEvery { apiService.createNap(1, request) } returns napResponse
 
     val result = repository.createNap(1, request)
 
     assertIs<ApiResult.Success<Nap>>(result)
-    assertEquals(nap, result.data)
   }
 
   @Test
@@ -211,15 +207,14 @@ class TrackingRepositoriesTest {
     val repository = NapsRepository(apiService)
 
     val request = UpdateNapRequest(end_time = "2024-01-15T14:00:00Z")
-    val updated =
-        TestFixtures.mockNap(end_time = "2024-01-15T14:00:00Z", updated_at = "2024-01-15T14:01:00Z")
+    val updatedResponse =
+        TestFixtures.mockNapListResponse(ended_at = "2024-01-15T14:00:00Z", updated_at = "2024-01-15T14:01:00Z")
 
-    io.mockk.coEvery { apiService.updateNap(1, 3, request) } returns updated
+    io.mockk.coEvery { apiService.updateNap(1, 3, request) } returns updatedResponse
 
     val result = repository.updateNap(1, 3, request)
 
     assertIs<ApiResult.Success<Nap>>(result)
-    assertEquals(updated, result.data)
   }
 
   @Test

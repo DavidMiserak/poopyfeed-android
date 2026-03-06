@@ -218,7 +218,8 @@ constructor(
   suspend fun createFeeding(childId: Int, request: CreateFeedingRequest): ApiResult<Feeding> =
       withContext(ioDispatcher) {
         try {
-          val feeding = apiService.createFeeding(childId, request)
+          val response = apiService.createFeeding(childId, request)
+          val feeding = response.toFeeding(childId)
           val entity = FeedingEntity.fromApiModel(feeding)
           feedingDao.upsertFeeding(entity)
           ApiResult.Success(feeding)
@@ -311,7 +312,8 @@ constructor(
   suspend fun createDiaper(childId: Int, request: CreateDiaperRequest): ApiResult<Diaper> =
       withContext(ioDispatcher) {
         try {
-          val diaper = apiService.createDiaper(childId, request)
+          val response = apiService.createDiaper(childId, request)
+          val diaper = response.toDiaper(childId)
           val entity = DiaperEntity.fromApiModel(diaper)
           diaperDao.upsertDiaper(entity)
           ApiResult.Success(diaper)
@@ -402,7 +404,8 @@ constructor(
   suspend fun createNap(childId: Int, request: CreateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {
         try {
-          val nap = apiService.createNap(childId, request)
+          val response = apiService.createNap(childId, request)
+          val nap = response.toNap(childId)
           val entity = NapEntity.fromApiModel(nap)
           napDao.upsertNap(entity)
           ApiResult.Success(nap)
@@ -414,7 +417,8 @@ constructor(
   suspend fun updateNap(childId: Int, napId: Int, request: UpdateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {
         try {
-          val nap = apiService.updateNap(childId, napId, request)
+          val response = apiService.updateNap(childId, napId, request)
+          val nap = response.toNap(childId)
           val entity = NapEntity.fromApiModel(nap)
           napDao.upsertNap(entity)
           ApiResult.Success(nap)

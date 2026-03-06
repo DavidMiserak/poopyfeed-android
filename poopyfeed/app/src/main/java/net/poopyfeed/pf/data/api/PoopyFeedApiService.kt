@@ -106,16 +106,12 @@ interface PoopyFeedApiService {
       @Query("page") page: Int = 1
   ): PaginatedResponse<FeedingListResponse>
 
-  /** Get a specific feeding by ID. GET /api/v1/children/{childId}/feedings/{feedingId}/ */
-  @GET("children/{childId}/feedings/{feedingId}/")
-  suspend fun getFeeding(@Path("childId") childId: Int, @Path("feedingId") feedingId: Int): Feeding
-
   /** Create a new feeding record. POST /api/v1/children/{childId}/feedings/ */
   @POST("children/{childId}/feedings/")
   suspend fun createFeeding(
       @Path("childId") childId: Int,
       @Body request: CreateFeedingRequest
-  ): Feeding
+  ): FeedingListResponse
 
   /** Update a feeding record. PATCH /api/v1/children/{childId}/feedings/{feedingId}/ */
   @PATCH("children/{childId}/feedings/{feedingId}/")
@@ -123,7 +119,7 @@ interface PoopyFeedApiService {
       @Path("childId") childId: Int,
       @Path("feedingId") feedingId: Int,
       @Body request: CreateFeedingRequest
-  ): Feeding
+  ): FeedingListResponse
 
   /** Delete a feeding record. DELETE /api/v1/children/{childId}/feedings/{feedingId}/ */
   @DELETE("children/{childId}/feedings/{feedingId}/")
@@ -145,7 +141,7 @@ interface PoopyFeedApiService {
   suspend fun createDiaper(
       @Path("childId") childId: Int,
       @Body request: CreateDiaperRequest
-  ): Diaper
+  ): DiaperListResponse
 
   /** Delete a diaper change record. DELETE /api/v1/children/{childId}/diapers/{diaperId}/ */
   @DELETE("children/{childId}/diapers/{diaperId}/")
@@ -164,7 +160,10 @@ interface PoopyFeedApiService {
 
   /** Create a new nap record. POST /api/v1/children/{childId}/naps/ */
   @POST("children/{childId}/naps/")
-  suspend fun createNap(@Path("childId") childId: Int, @Body request: CreateNapRequest): Nap
+  suspend fun createNap(
+      @Path("childId") childId: Int,
+      @Body request: CreateNapRequest
+  ): NapListResponse
 
   /** Update a nap record (e.g., set end_time). PATCH /api/v1/children/{childId}/naps/{napId}/ */
   @PATCH("children/{childId}/naps/{napId}/")
@@ -172,7 +171,7 @@ interface PoopyFeedApiService {
       @Path("childId") childId: Int,
       @Path("napId") napId: Int,
       @Body request: UpdateNapRequest
-  ): Nap
+  ): NapListResponse
 
   /** Delete a nap record. DELETE /api/v1/children/{childId}/naps/{napId}/ */
   @DELETE("children/{childId}/naps/{napId}/")

@@ -132,8 +132,8 @@ constructor(
   suspend fun createFeeding(childId: Int, request: CreateFeedingRequest): ApiResult<Feeding> =
       withContext(ioDispatcher) {
         try {
-          val feeding = apiService.createFeeding(childId, request)
-          ApiResult.Success(feeding)
+          val response = apiService.createFeeding(childId, request)
+          ApiResult.Success(response.toFeeding(childId))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -146,8 +146,8 @@ constructor(
   ): ApiResult<Feeding> =
       withContext(ioDispatcher) {
         try {
-          val feeding = apiService.updateFeeding(childId, feedingId, request)
-          ApiResult.Success(feeding)
+          val response = apiService.updateFeeding(childId, feedingId, request)
+          ApiResult.Success(response.toFeeding(childId))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -194,8 +194,8 @@ constructor(
   suspend fun createDiaper(childId: Int, request: CreateDiaperRequest): ApiResult<Diaper> =
       withContext(ioDispatcher) {
         try {
-          val diaper = apiService.createDiaper(childId, request)
-          ApiResult.Success(diaper)
+          val response = apiService.createDiaper(childId, request)
+          ApiResult.Success(response.toDiaper(childId))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -242,8 +242,8 @@ constructor(
   suspend fun createNap(childId: Int, request: CreateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {
         try {
-          val nap = apiService.createNap(childId, request)
-          ApiResult.Success(nap)
+          val response = apiService.createNap(childId, request)
+          ApiResult.Success(response.toNap(childId))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -252,8 +252,8 @@ constructor(
   suspend fun updateNap(childId: Int, napId: Int, request: UpdateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {
         try {
-          val nap = apiService.updateNap(childId, napId, request)
-          ApiResult.Success(nap)
+          val response = apiService.updateNap(childId, napId, request)
+          ApiResult.Success(response.toNap(childId))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

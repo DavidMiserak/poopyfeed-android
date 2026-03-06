@@ -135,14 +135,14 @@ class CachedFeedingsRepositoryTest {
             side = null,
             timestamp = "2024-01-15T10:00:00Z",
         )
-    val feeding =
-        TestFixtures.mockFeeding(
+    val feedingResponse =
+        TestFixtures.mockFeedingListResponse(
             id = 2,
             feeding_type = "bottle",
-            amount_oz = 4.0,
-            timestamp = "2024-01-15T10:00:00Z",
+            amount_oz = "4.0",
+            fed_at = "2024-01-15T10:00:00Z",
         )
-    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
+    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feedingResponse
     io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit
 
     val result = repository.createFeeding(childId = 1, request = request)

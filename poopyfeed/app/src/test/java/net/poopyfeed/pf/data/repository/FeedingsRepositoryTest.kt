@@ -73,13 +73,13 @@ class FeedingsRepositoryTest {
             side = null,
             timestamp = "2024-01-15T10:00:00Z",
         )
-    val feeding =
-        TestFixtures.mockFeeding(
+    val feedingResponse =
+        TestFixtures.mockFeedingListResponse(
             feeding_type = "bottle",
-            amount_oz = 4.0,
-            timestamp = "2024-01-15T10:00:00Z",
+            amount_oz = "4.0",
+            fed_at = "2024-01-15T10:00:00Z",
         )
-    coEvery { apiService.createFeeding(childId = 1, request = request) } returns feeding
+    coEvery { apiService.createFeeding(childId = 1, request = request) } returns feedingResponse
 
     val result = repository.createFeeding(childId = 1, request = request)
 
@@ -117,14 +117,14 @@ class FeedingsRepositoryTest {
             side = "left",
             timestamp = "2024-01-15T11:00:00Z",
         )
-    val feeding =
-        TestFixtures.mockFeeding(
+    val feedingResponse =
+        TestFixtures.mockFeedingListResponse(
             id = 2,
             feeding_type = "breast",
             amount_oz = null,
-            timestamp = "2024-01-15T11:00:00Z",
+            fed_at = "2024-01-15T11:00:00Z",
         )
-    coEvery { apiService.updateFeeding(1, 2, request) } returns feeding
+    coEvery { apiService.updateFeeding(1, 2, request) } returns feedingResponse
 
     val result = repository.updateFeeding(childId = 1, feedingId = 2, request = request)
 

@@ -130,13 +130,13 @@ class CachedDiapersRepositoryTest {
             change_type = "wet",
             timestamp = "2024-01-15T10:00:00Z",
         )
-    val diaper =
-        TestFixtures.mockDiaper(
+    val diaperResponse =
+        TestFixtures.mockDiaperListResponse(
             id = 2,
             change_type = "wet",
-            timestamp = "2024-01-15T10:00:00Z",
+            changed_at = "2024-01-15T10:00:00Z",
         )
-    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaper
+    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
     io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
 
     val result = repository.createDiaper(childId = 1, request = request)

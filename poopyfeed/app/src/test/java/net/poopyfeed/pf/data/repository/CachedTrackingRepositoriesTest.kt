@@ -116,7 +116,7 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit
     io.mockk.coEvery { feedingDao.deleteFeeding(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val feeding = TestFixtures.mockFeeding()
+    val feedingResponse = TestFixtures.mockFeedingListResponse()
     val request =
         CreateFeedingRequest(
             feeding_type = "bottle",
@@ -125,7 +125,7 @@ class CachedTrackingRepositoriesTest {
             side = null,
             timestamp = "2024-01-15T12:00:00Z",
         )
-    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feeding
+    io.mockk.coEvery { apiService.createFeeding(1, request) } returns feedingResponse
     io.mockk.coEvery { apiService.deleteFeeding(1, 1) } returns Unit
     val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
 
@@ -182,9 +182,9 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
     io.mockk.coEvery { diaperDao.deleteDiaper(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val diaper = TestFixtures.mockDiaper(change_type = "dirty")
+    val diaperResponse = TestFixtures.mockDiaperListResponse(change_type = "dirty", changed_at = "2024-01-15T14:00:00Z")
     val request = CreateDiaperRequest("dirty", "2024-01-15T14:00:00Z")
-    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaper
+    io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
     io.mockk.coEvery { apiService.deleteDiaper(1, 1) } returns Unit
     val repo = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
 
@@ -226,11 +226,11 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { napDao.upsertNap(any()) } returns Unit
     io.mockk.coEvery { napDao.deleteNap(1) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val nap = TestFixtures.mockNap()
+    val napResponse = TestFixtures.mockNapListResponse()
     val createRequest = CreateNapRequest("2024-01-15T13:00:00Z", null)
     val updateRequest = UpdateNapRequest("2024-01-15T14:00:00Z")
-    io.mockk.coEvery { apiService.createNap(1, createRequest) } returns nap
-    io.mockk.coEvery { apiService.updateNap(1, 1, updateRequest) } returns nap
+    io.mockk.coEvery { apiService.createNap(1, createRequest) } returns napResponse
+    io.mockk.coEvery { apiService.updateNap(1, 1, updateRequest) } returns napResponse
     io.mockk.coEvery { apiService.deleteNap(1, 1) } returns Unit
     val repo = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
 
