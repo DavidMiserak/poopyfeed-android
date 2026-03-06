@@ -42,65 +42,43 @@ class ChildDetailFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    // Setup delete button click listener
     binding.buttonDelete.setOnClickListener { showDeleteConfirmationDialog() }
+    collectFlows()
+  }
 
-    // Collect UI state
+  private fun collectFlows() {
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is ChildDetailUiState.Loading -> {
-              // optional: show loading UI
-            }
-            is ChildDetailUiState.Ready -> {
-              // Update toolbar title with child name
-              (activity as? AppCompatActivity)?.supportActionBar?.title = state.child.name
-              binding.textChildName.text = state.child.name
-              binding.textAgeGender.text = state.ageFormatted
-
-              // Update activity labels with formatted times
-              binding.labelFeeding.text =
-                  getString(R.string.child_detail_last_feeding, state.lastFeedingFormatted)
-              binding.labelDiaper.text =
-                  getString(R.string.child_detail_last_diaper, state.lastDiaperFormatted)
-              binding.labelNap.text =
-                  getString(R.string.child_detail_last_nap, state.lastNapFormatted)
-
-              // Show/hide role badge for non-owners
-              binding.chipRole.visibility = if (state.isOwner) View.GONE else View.VISIBLE
-              if (!state.isOwner) {
-                binding.chipRole.text =
-                    state.child.user_role.replaceFirstChar { it.uppercaseChar() }
-              }
-
-              // Show delete and edit buttons for owner
-              binding.buttonDelete.visibility = if (state.isOwner) View.VISIBLE else View.GONE
-              binding.buttonEdit.visibility = if (state.isOwner) View.VISIBLE else View.GONE
-            }
-            is ChildDetailUiState.Error -> {
-              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-            }
-          }
-        }
-      }
-    }
-
-    // Collect navigate back event
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.navigateBack.collect { findNavController().popBackStack() }
-      }
-    }
-
-    // Collect delete error events
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.deleteError.collect { message ->
+        launch { viewModel.uiState.collect { updateUiState(it) } }
+        launch { viewModel.navigateBack.collect { findNavController().popBackStack() } }
+        launch { viewModel.deleteError.collect { message ->
           Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        }
+        } }
       }
     }
+  }
+
+  private fun updateUiState(state: ChildDetailUiState) {
+    when (state) {
+      is ChildDetailUiState.Loading -> Unit
+      is ChildDetailUiState.Ready -> bindReadyState(state)
+      is ChildDetailUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+    }
+  }
+
+  private fun bindReadyState(state: ChildDetailUiState.Ready) {
+    (activity as? AppCompatActivity)?.supportActionBar?.title = state.child.name
+    binding.textChildName.text = state.child.name
+    binding.textAgeGender.text = state.ageFormatted
+    binding.labelFeeding.text = getString(R.string.child_detail_last_feeding, state.lastFeedingFormatted)
+    binding.labelDiaper.text = getString(R.string.child_detail_last_diaper, state.lastDiaperFormatted)
+    binding.labelNap.text = getString(R.string.child_detail_last_nap, state.lastNapFormatted)
+    binding.chipRole.visibility = if (state.isOwner) View.GONE else View.VISIBLE
+    if (!state.isOwner) {
+      binding.chipRole.text = state.child.user_role.replaceFirstChar { it.uppercaseChar() }
+    }
+    binding.buttonDelete.visibility = if (state.isOwner) View.VISIBLE else View.GONE
+    binding.buttonEdit.visibility = if (state.isOwner) View.VISIBLE else View.GONE
   }
 
   private fun showDeleteConfirmationDialog() {

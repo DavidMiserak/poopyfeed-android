@@ -40,44 +40,19 @@ class MainActivity : AppCompatActivity() {
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
 
-    // Wire timezone banner button listeners (once, on create)
     binding.buttonUseDeviceTimezone.setOnClickListener { viewModel.useDeviceTimezone() }
     binding.buttonDismissTimezoneBanner.setOnClickListener { viewModel.dismissTimezoneBanner() }
 
+    setupLifecycleObservers()
+    setupNavigation()
+  }
+
+  private fun setupLifecycleObservers() {
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        // Re-check timezone mismatch on every app resume (synchronous, no network call)
         viewModel.checkTimezoneMismatch()
-
-        // Collect logout events
         launch { viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() } }
-
-        // Collect timezone banner state updates
-        launch {
-          viewModel.timezoneBanner.collect { state ->
-            val saving = state is TimezoneBannerState.Saving
-            binding.bannerTimezoneMismatch.isVisible = state !is TimezoneBannerState.Hidden
-            binding.progressTimezoneBanner.isVisible = saving
-            binding.buttonUseDeviceTimezone.isEnabled = !saving
-
-            if (state is TimezoneBannerState.Visible || state is TimezoneBannerState.Saving) {
-              val deviceTz =
-                  when (state) {
-                    is TimezoneBannerState.Visible -> state.deviceTimezone
-                    is TimezoneBannerState.Saving -> state.deviceTimezone
-                  }
-              val profileTz =
-                  when (state) {
-                    is TimezoneBannerState.Visible -> state.profileTimezone
-                    is TimezoneBannerState.Saving -> state.profileTimezone
-                  }
-              binding.textTimezoneMismatch.text =
-                  getString(R.string.timezone_mismatch_message, deviceTz, profileTz)
-            }
-          }
-        }
-
-        // Collect one-shot error events
+        launch { viewModel.timezoneBanner.collect { bindTimezoneBannerState(it) } }
         launch {
           viewModel.bannerError.collect { message ->
             Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
@@ -85,34 +60,57 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
+  }
 
-    // FragmentContainerView creates NavHostFragment asynchronously; defer nav setup
-    // until the host fragment exists (see FragmentTagUsage → FragmentContainerView).
+  private fun bindTimezoneBannerState(state: TimezoneBannerState) {
+    val saving = state is TimezoneBannerState.Saving
+    binding.bannerTimezoneMismatch.isVisible = state !is TimezoneBannerState.Hidden
+    binding.progressTimezoneBanner.isVisible = saving
+    binding.buttonUseDeviceTimezone.isEnabled = !saving
+
+    if (state is TimezoneBannerState.Visible || state is TimezoneBannerState.Saving) {
+      val deviceTz =
+          when (state) {
+            is TimezoneBannerState.Visible -> state.deviceTimezone
+            is TimezoneBannerState.Saving -> state.deviceTimezone
+          }
+      val profileTz =
+          when (state) {
+            is TimezoneBannerState.Visible -> state.profileTimezone
+            is TimezoneBannerState.Saving -> state.profileTimezone
+          }
+      binding.textTimezoneMismatch.text =
+          getString(R.string.timezone_mismatch_message, deviceTz, profileTz)
+    }
+  }
+
+  private fun setupNavigation() {
     binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
       val navController = findNavController(R.id.nav_host_fragment_content_main)
       appBarConfiguration = AppBarConfiguration(setOf(R.id.HomeFragment))
       setupActionBarWithNavController(navController, appBarConfiguration)
-
       navController.addOnDestinationChangedListener { _, destination, _ ->
-        val isAuthDestination =
-            destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
-        binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
-        binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+        onDestinationChanged(navController, destination)
+      }
+    }
+  }
 
-        // Configure FAB action based on current destination
-        binding.fab.setOnClickListener {
-          when (destination.id) {
-            R.id.ChildrenListFragment -> {
-              navController.navigate(R.id.createChildBottomSheet)
-            }
-          }
-        }
+  private fun onDestinationChanged(navController: androidx.navigation.NavController, destination: androidx.navigation.NavDestination) {
+    val isAuthDestination =
+        destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
+    binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+    binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
 
-        // Re-check timezone mismatch on every navigation (e.g. after login caches the timezone)
-        if (!isAuthDestination) {
-          viewModel.checkTimezoneMismatch()
+    binding.fab.setOnClickListener {
+      when (destination.id) {
+        R.id.ChildrenListFragment -> {
+          navController.navigate(R.id.createChildBottomSheet)
         }
       }
+    }
+
+    if (!isAuthDestination) {
+      viewModel.checkTimezoneMismatch()
     }
   }
 

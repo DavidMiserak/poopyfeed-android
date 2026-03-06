@@ -81,6 +81,10 @@ constructor(
 
   private val allTimezones: List<String> by lazy { TimeZone.getAvailableIDs().toList().sorted() }
 
+  companion object {
+    private const val FIELD_REQUIRED_SUFFIX = " required"
+  }
+
   init {
     loadProfile()
   }
@@ -168,13 +172,13 @@ constructor(
       currentPassword.isBlank() -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_current_password_label) + " required")
+                context.getString(R.string.account_current_password_label) + FIELD_REQUIRED_SUFFIX)
         return
       }
       newPassword.isBlank() -> {
         _uiState.value =
             AccountSettingsUiState.PasswordChangeError(
-                context.getString(R.string.account_new_password_label) + " required")
+                context.getString(R.string.account_new_password_label) + FIELD_REQUIRED_SUFFIX)
         return
       }
       newPassword.length < 8 -> {
@@ -227,7 +231,7 @@ constructor(
     if (password.isBlank()) {
       _uiState.value =
           AccountSettingsUiState.DeletionError(
-              context.getString(R.string.account_current_password_label) + " required")
+              context.getString(R.string.account_current_password_label) + FIELD_REQUIRED_SUFFIX)
       return
     }
 

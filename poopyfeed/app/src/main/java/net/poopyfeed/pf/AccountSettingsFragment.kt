@@ -36,6 +36,10 @@ class AccountSettingsFragment : Fragment() {
 
   private var hasPopulatedFields: Boolean = false
 
+  companion object {
+    private const val FIELD_REQUIRED_SUFFIX = " required"
+  }
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -208,12 +212,12 @@ class AccountSettingsFragment : Fragment() {
 
     if (currentPassword.isBlank()) {
       binding.inputLayoutPasswordCurrent.error =
-          getString(R.string.account_current_password_label) + " required"
+          getString(R.string.account_current_password_label) + FIELD_REQUIRED_SUFFIX
       hasErrors = true
     }
     if (newPassword.isBlank()) {
       binding.inputLayoutPasswordNew.error =
-          getString(R.string.account_new_password_label) + " required"
+          getString(R.string.account_new_password_label) + FIELD_REQUIRED_SUFFIX
       hasErrors = true
     } else if (newPassword.length < 8) {
       binding.inputLayoutPasswordNew.error =
@@ -222,7 +226,7 @@ class AccountSettingsFragment : Fragment() {
     }
     if (confirmPassword.isBlank()) {
       binding.inputLayoutPasswordConfirm.error =
-          getString(R.string.account_confirm_password_label) + " required"
+          getString(R.string.account_confirm_password_label) + FIELD_REQUIRED_SUFFIX
       hasErrors = true
     } else if (newPassword != confirmPassword) {
       binding.inputLayoutPasswordConfirm.error =
@@ -283,7 +287,7 @@ class AccountSettingsFragment : Fragment() {
           } else {
             Snackbar.make(
                     binding.root,
-                    getString(R.string.account_current_password_label) + " required",
+                    getString(R.string.account_current_password_label) + FIELD_REQUIRED_SUFFIX,
                     Snackbar.LENGTH_LONG)
                 .show()
           }
