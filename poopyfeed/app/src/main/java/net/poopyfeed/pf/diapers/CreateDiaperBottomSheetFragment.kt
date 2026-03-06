@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateDiaperBottomSheetBinding
-import net.poopyfeed.pf.formatTimestampForDisplay
+import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
  * Bottom sheet for logging a diaper change. Supports wet/dirty/both and optional timestamp. On

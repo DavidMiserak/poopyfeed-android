@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateNapBottomSheetBinding
-import net.poopyfeed.pf.formatTimestampForDisplay
+import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
  * Bottom sheet for starting a nap. Start time defaults to now; user can change it. On success

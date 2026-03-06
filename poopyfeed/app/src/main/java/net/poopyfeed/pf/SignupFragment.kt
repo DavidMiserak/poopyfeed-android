@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentSignupBinding
+import net.poopyfeed.pf.util.EmailValidator
 
 /**
  * Signup screen. Collects email/password, validates with [EmailValidator], and delegates

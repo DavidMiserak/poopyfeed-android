@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.util
 
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

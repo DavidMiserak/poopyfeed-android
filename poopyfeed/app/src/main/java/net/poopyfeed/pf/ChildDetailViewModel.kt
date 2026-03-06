@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.util.formatAge
+import net.poopyfeed.pf.util.formatRelativeTime
 
 /** UI state for the child detail screen. */
 sealed interface ChildDetailUiState {

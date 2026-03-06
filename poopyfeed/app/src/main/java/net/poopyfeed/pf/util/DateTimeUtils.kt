@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.util
 
 import android.content.Context
 import android.text.format.DateUtils
@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import net.poopyfeed.pf.R
 
 /**
  * Utility functions for formatting dates and times. All functions handle ISO 8601 strings from the

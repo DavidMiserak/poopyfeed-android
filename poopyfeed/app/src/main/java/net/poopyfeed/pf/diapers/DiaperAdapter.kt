@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.databinding.ItemDiaperBinding
-import net.poopyfeed.pf.formatRelativeTime
+import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of diaper changes. Shows change type (Wet/Dirty/Both)

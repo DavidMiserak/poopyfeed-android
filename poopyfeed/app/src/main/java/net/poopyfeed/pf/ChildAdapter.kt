@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.databinding.ItemChildBinding
+import net.poopyfeed.pf.util.formatAge
+import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of children. Shows child name, age, gender, and last

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.databinding.ItemFeedingBinding
-import net.poopyfeed.pf.formatRelativeTime
+import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of feedings. Shows type (Bottle/Breast), amount for

@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.databinding.ItemNapBinding
-import net.poopyfeed.pf.formatNapDuration
-import net.poopyfeed.pf.formatRelativeTime
+import net.poopyfeed.pf.util.formatNapDuration
+import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of naps. Shows start time, duration or "In progress",

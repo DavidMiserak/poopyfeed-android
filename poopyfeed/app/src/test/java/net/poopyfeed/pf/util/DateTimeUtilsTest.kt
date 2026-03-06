@@ -1,10 +1,11 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.util
 
 import android.content.Context
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
+import net.poopyfeed.pf.R
 import org.junit.Before
 import org.junit.Test
 
