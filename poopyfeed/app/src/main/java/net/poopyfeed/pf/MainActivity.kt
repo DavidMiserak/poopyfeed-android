@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,8 +88,11 @@ class MainActivity : AppCompatActivity() {
   private fun setupNavigation() {
     binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
       val navController = findNavController(R.id.nav_host_fragment_content_main)
-      appBarConfiguration = AppBarConfiguration(setOf(R.id.HomeFragment))
+      appBarConfiguration =
+          AppBarConfiguration(
+              setOf(R.id.HomeFragment, R.id.ChildrenListFragment, R.id.AccountSettingsFragment))
       setupActionBarWithNavController(navController, appBarConfiguration)
+      NavigationUI.setupWithNavController(binding.bottomNav, navController)
       navController.addOnDestinationChangedListener { _, destination, _ ->
         onDestinationChanged(navController, destination)
       }
@@ -101,8 +105,18 @@ class MainActivity : AppCompatActivity() {
   ) {
     val isAuthDestination =
         destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
-    binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
-    binding.fab.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
+    binding.appBar.isVisible = !isAuthDestination
+    binding.bottomNav.isVisible = !isAuthDestination
+
+    // Show FAB only on list screens (children, feedings, diapers, naps)
+    val isFabDestination =
+        destination.id in
+            setOf(
+                R.id.ChildrenListFragment,
+                R.id.FeedingsListFragment,
+                R.id.DiapersListFragment,
+                R.id.NapsListFragment)
+    binding.fab.isVisible = isFabDestination
 
     binding.fab.setOnClickListener {
       when (destination.id) {
@@ -152,11 +166,6 @@ class MainActivity : AppCompatActivity() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.action_settings -> {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        navController.navigate(R.id.AccountSettingsFragment)
-        true
-      }
       R.id.action_logout -> {
         performLogout()
         true

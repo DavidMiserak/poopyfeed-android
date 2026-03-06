@@ -3,6 +3,11 @@
     <string name="action_settings">Settings</string>
     <string name="fab_description">Action button</string>
 
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_children">Children</string>
+    <string name="nav_account">Account</string>
+
     <!-- Login -->
     <string name="login_title">PoopyFeed</string>
     <string name="login_subtitle">Track feedings, diapers, and naps with your partner and caregivers.</string>
