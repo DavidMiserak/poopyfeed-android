@@ -95,6 +95,11 @@
     <string name="children_list_add_button">Add Child</string>
     <string name="child_role_badge">%1$s</string>
 
+    <!-- Child card badges (emoji icons for feeding / diaper / nap) -->
+    <string name="badge_icon_feeding">🍼</string>
+    <string name="badge_icon_diaper">🚼</string>
+    <string name="badge_icon_nap">😴</string>
+
     <!-- Child Detail -->
     <string name="child_detail_title">%1$s</string>
     <string name="child_detail_age">%1$s</string>
@@ -149,9 +154,9 @@
     <string name="diapers_list_empty_title">No diaper changes yet</string>
     <string name="diapers_list_empty_body">Tap + to log a diaper change.</string>
     <string name="diapers_list_retry_button">Retry</string>
-    <string name="diaper_change_wet">Wet</string>
-    <string name="diaper_change_dirty">Dirty</string>
-    <string name="diaper_change_both">Both</string>
+    <string name="diaper_change_wet">💧 Wet</string>
+    <string name="diaper_change_dirty">💩 Dirty</string>
+    <string name="diaper_change_both">💧💩 Both</string>
     <string name="diapers_delete_confirm_title">Delete diaper change?</string>
     <string name="diapers_delete_confirm_message">This entry will be removed.</string>
     <string name="diapers_delete_confirm">Delete</string>
