@@ -1,6 +1,7 @@
 package net.poopyfeed.pf.data.models
 
 import android.content.Context
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.poopyfeed.pf.R
 
@@ -76,12 +77,12 @@ data class FeedingListResponse(
           updated_at = updated_at)
 }
 
-/** DTO for creating/updating a Feeding. */
+/** DTO for creating/updating a Feeding. Backend expects [fed_at] for the timestamp. */
 @Serializable
 data class CreateFeedingRequest(
     val feeding_type: String,
     val amount_oz: Double? = null,
-    val timestamp: String
+    @SerialName("fed_at") val timestamp: String
 )
 
 /** Diaper change event. */
@@ -95,8 +96,15 @@ data class Diaper(
     val updated_at: String
 )
 
-/** DTO for creating a diaper change. [change_type]: `"wet"`, `"dirty"`, or `"both"`. */
-@Serializable data class CreateDiaperRequest(val change_type: String, val timestamp: String)
+/**
+ * DTO for creating a diaper change. Backend expects [changed_at]. [change_type]: `"wet"`,
+ * `"dirty"`, or `"both"`.
+ */
+@Serializable
+data class CreateDiaperRequest(
+    val change_type: String,
+    @SerialName("changed_at") val timestamp: String
+)
 
 /**
  * Backend list response for diapers. API returns [changed_at]; [child] is omitted. Map to [Diaper]
@@ -131,11 +139,18 @@ data class Nap(
     val updated_at: String
 )
 
-/** DTO for creating a nap. [end_time] is null when the nap is ongoing. */
-@Serializable data class CreateNapRequest(val start_time: String, val end_time: String? = null)
+/**
+ * DTO for creating a nap. Backend expects [napped_at] and [ended_at]. [end_time] is null when the
+ * nap is ongoing.
+ */
+@Serializable
+data class CreateNapRequest(
+    @SerialName("napped_at") val start_time: String,
+    @SerialName("ended_at") val end_time: String? = null
+)
 
-/** DTO for ending an ongoing nap (PATCH with [end_time]). */
-@Serializable data class UpdateNapRequest(val end_time: String)
+/** DTO for ending an ongoing nap (PATCH with [ended_at]). */
+@Serializable data class UpdateNapRequest(@SerialName("ended_at") val end_time: String)
 
 /**
  * Backend list response for naps. API returns [napped_at] and [ended_at]; [child] is omitted. Map
