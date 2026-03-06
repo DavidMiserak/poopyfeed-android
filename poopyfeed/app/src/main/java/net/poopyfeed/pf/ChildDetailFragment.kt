@@ -51,9 +51,11 @@ class ChildDetailFragment : Fragment() {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         launch { viewModel.uiState.collect { updateUiState(it) } }
         launch { viewModel.navigateBack.collect { findNavController().popBackStack() } }
-        launch { viewModel.deleteError.collect { message ->
-          Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        } }
+        launch {
+          viewModel.deleteError.collect { message ->
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+          }
+        }
       }
     }
   }
@@ -62,7 +64,8 @@ class ChildDetailFragment : Fragment() {
     when (state) {
       is ChildDetailUiState.Loading -> Unit
       is ChildDetailUiState.Ready -> bindReadyState(state)
-      is ChildDetailUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+      is ChildDetailUiState.Error ->
+          Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
     }
   }
 
@@ -70,8 +73,10 @@ class ChildDetailFragment : Fragment() {
     (activity as? AppCompatActivity)?.supportActionBar?.title = state.child.name
     binding.textChildName.text = state.child.name
     binding.textAgeGender.text = state.ageFormatted
-    binding.labelFeeding.text = getString(R.string.child_detail_last_feeding, state.lastFeedingFormatted)
-    binding.labelDiaper.text = getString(R.string.child_detail_last_diaper, state.lastDiaperFormatted)
+    binding.labelFeeding.text =
+        getString(R.string.child_detail_last_feeding, state.lastFeedingFormatted)
+    binding.labelDiaper.text =
+        getString(R.string.child_detail_last_diaper, state.lastDiaperFormatted)
     binding.labelNap.text = getString(R.string.child_detail_last_nap, state.lastNapFormatted)
     binding.chipRole.visibility = if (state.isOwner) View.GONE else View.VISIBLE
     if (!state.isOwner) {

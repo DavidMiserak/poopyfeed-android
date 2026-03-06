@@ -95,7 +95,10 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun onDestinationChanged(navController: androidx.navigation.NavController, destination: androidx.navigation.NavDestination) {
+  private fun onDestinationChanged(
+      navController: androidx.navigation.NavController,
+      destination: androidx.navigation.NavDestination
+  ) {
     val isAuthDestination =
         destination.id == R.id.LoginFragment || destination.id == R.id.SignupFragment
     binding.appBar.visibility = if (isAuthDestination) View.GONE else View.VISIBLE
