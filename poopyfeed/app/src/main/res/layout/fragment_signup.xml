@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_page"
     android:fillViewport="true"
-    tools:context=".SignupFragment">
+    tools:context="net.poopyfeed.pf.accounts.SignupFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

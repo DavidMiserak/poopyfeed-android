@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.accounts
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -14,27 +14,27 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
 
-/** UI state for the login screen. */
-sealed interface LoginUiState {
+/** UI state for the signup screen. */
+sealed interface SignupUiState {
   /** Initial state; form is editable. */
-  data object Idle : LoginUiState
+  data object Idle : SignupUiState
 
-  /** Login request in progress. */
-  data object Loading : LoginUiState
+  /** Signup request in progress. */
+  data object Loading : SignupUiState
 
-  /** Login succeeded; navigate to home. */
-  data object Success : LoginUiState
+  /** Signup succeeded; navigate to home. */
+  data object Success : SignupUiState
 
-  /** Login failed; [message] is user-facing. */
-  data class Error(val message: String) : LoginUiState
+  /** Signup failed; [message] is user-facing. */
+  data class Error(val message: String) : SignupUiState
 }
 
 /**
- * ViewModel for [LoginFragment]. Performs two-step auth (session login then token exchange),
- * persists token via [TokenManager], and exposes [uiState] for the UI.
+ * ViewModel for [SignupFragment]. Registers the user via [AuthRepository], persists token via
+ * [TokenManager], and exposes [uiState] for the UI.
  */
 @HiltViewModel
-class LoginViewModel
+class SignupViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
@@ -42,21 +42,18 @@ constructor(
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
-  private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
-  val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-
-  /** True if a token is already stored (skip login and go to home). */
-  fun checkExistingToken(): Boolean = tokenManager.getToken() != null
+  private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState.Idle)
+  val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
   /**
-   * Attempts login with [email] and [password]; updates [uiState] to Loading then Success or Error.
-   * On success, also populates the timezone cache for the app-wide timezone mismatch banner.
+   * Attempts signup with [email] and [password]; updates [uiState] to Loading then Success or
+   * Error. On success, also populates the timezone cache for the app-wide timezone mismatch banner.
    */
-  fun login(email: String, password: String) {
+  fun signUp(email: String, password: String) {
     viewModelScope.launch {
-      _uiState.value = LoginUiState.Loading
+      _uiState.value = SignupUiState.Loading
 
-      when (val result = authRepository.login(email, password)) {
+      when (val result = authRepository.signup(email, password)) {
         is ApiResult.Success -> {
           tokenManager.saveToken(result.data)
           // Populate timezone cache for app-wide timezone mismatch banner
@@ -68,13 +65,13 @@ constructor(
               // Best-effort; ignore profile fetch errors, user will see banner later
             }
           }
-          _uiState.value = LoginUiState.Success
+          _uiState.value = SignupUiState.Success
         }
         is ApiResult.Error -> {
-          _uiState.value = LoginUiState.Error(result.error.getUserMessage(context))
+          _uiState.value = SignupUiState.Error(result.error.getUserMessage(context))
         }
         is ApiResult.Loading -> {
-          // no-op; repository does not currently emit Loading, we manage it here
+          // no-op; repository does not emit Loading for this call
         }
       }
     }
@@ -82,8 +79,8 @@ constructor(
 
   /** Resets UI state from Error back to Idle (e.g. after showing Snackbar). */
   fun clearError() {
-    if (_uiState.value is LoginUiState.Error) {
-      _uiState.value = LoginUiState.Idle
+    if (_uiState.value is SignupUiState.Error) {
+      _uiState.value = SignupUiState.Idle
     }
   }
 }
