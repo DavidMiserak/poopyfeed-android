@@ -48,7 +48,7 @@ data class Feeding(
     val child: Int,
     val feeding_type: String, // 'bottle' or 'breast'
     val amount_oz: Double? = null, // Only for bottle feeding
-    val timestamp: String, // ISO 8601 datetime
+    @SerialName("fed_at") val timestamp: String, // ISO 8601 datetime
     val created_at: String,
     val updated_at: String
 )
@@ -96,7 +96,7 @@ data class Diaper(
     val id: Int,
     val child: Int,
     val change_type: String, // 'wet', 'dirty', 'both'
-    val timestamp: String, // ISO 8601 datetime
+    @SerialName("changed_at") val timestamp: String, // ISO 8601 datetime
     val created_at: String,
     val updated_at: String
 )
@@ -138,8 +138,8 @@ data class DiaperListResponse(
 data class Nap(
     val id: Int,
     val child: Int,
-    val start_time: String, // ISO 8601 datetime
-    val end_time: String? = null, // ISO 8601 datetime or null (if nap is ongoing)
+    @SerialName("napped_at") val start_time: String, // ISO 8601 datetime
+    @SerialName("ended_at") val end_time: String? = null, // ISO 8601 datetime or null (if nap is ongoing)
     val created_at: String,
     val updated_at: String
 )
