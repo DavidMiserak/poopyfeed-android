@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.databinding.ItemNapBinding
 import net.poopyfeed.pf.util.formatNapDuration
@@ -38,7 +39,8 @@ class NapAdapter(
 
     fun bind(nap: Nap) {
       val ctx = binding.root.context
-      binding.textStartTime.text = formatRelativeTime(ctx, nap.start_time)
+      binding.textStartTime.text =
+          ctx.getString(R.string.nap_record_start, formatRelativeTime(ctx, nap.start_time))
       if (nap.end_time == null) {
         binding.textDuration.visibility = View.GONE
         binding.labelInProgress.visibility = View.VISIBLE

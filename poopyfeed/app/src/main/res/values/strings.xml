@@ -143,8 +143,8 @@
     <string name="feedings_list_empty_title">No feedings yet</string>
     <string name="feedings_list_empty_body">Tap + to log a feeding.</string>
     <string name="feedings_list_retry_button">Retry</string>
-    <string name="feeding_type_bottle">Bottle</string>
-    <string name="feeding_type_breast">Breast</string>
+    <string name="feeding_type_bottle">🍼 Bottle</string>
+    <string name="feeding_type_breast">🤱 Breast</string>
     <string name="feedings_delete_confirm_title">Delete feeding?</string>
     <string name="feedings_delete_confirm_message">This feeding will be removed.</string>
     <string name="feedings_delete_confirm">Delete</string>
@@ -166,7 +166,8 @@
     <string name="naps_list_empty_title">No naps yet</string>
     <string name="naps_list_empty_body">Tap + to start a nap.</string>
     <string name="naps_list_retry_button">Retry</string>
-    <string name="nap_in_progress">In progress</string>
+    <string name="nap_record_start">😴 %1$s</string>
+    <string name="nap_in_progress">😴 In progress</string>
     <string name="nap_end_button">End Nap</string>
     <string name="naps_delete_confirm_title">Delete nap?</string>
     <string name="naps_delete_confirm_message">This nap will be removed.</string>
