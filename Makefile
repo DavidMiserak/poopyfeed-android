@@ -27,7 +27,7 @@ help:
 	@echo ""
 	@echo "Testing & Quality:"
 	@echo "  make test               Run unit tests"
-	@echo "  make coverage           Run unit tests with JaCoCo and show report path"
+	@echo "  make coverage           Run unit tests with Kover coverage report (85% minimum)"
 	@echo "  make lint               Run lint checks"
 	@echo "  make lint-fix           Attempt to auto-fix lint issues"
 	@echo ""
