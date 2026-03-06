@@ -71,8 +71,8 @@ class CachedDiapersRepositoryTest {
 
   @Test
   fun `refreshDiapers success upserts and returns Success`() = runTest {
-    val diaper = TestFixtures.mockDiaper()
-    val response = PaginatedResponse(count = 1, results = listOf(diaper))
+    val listItem = TestFixtures.mockDiaperListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 1) } returns response
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
 
@@ -80,22 +80,22 @@ class CachedDiapersRepositoryTest {
 
     assertIs<ApiResult.Success<List<Diaper>>>(result)
     assertEquals(1, result.data.size)
-    assertEquals(diaper.id, result.data.first().id)
+    assertEquals(listItem.id, result.data.first().id)
   }
 
   @Test
   fun `refreshDiapers fetches all pages when next non-null`() = runTest {
-    val diaper1 = TestFixtures.mockDiaper(id = 1)
-    val diaper2 = TestFixtures.mockDiaper(id = 2, timestamp = "2024-01-15T11:00:00Z")
+    val list1 = TestFixtures.mockDiaperListResponse(id = 1)
+    val list2 = TestFixtures.mockDiaperListResponse(id = 2, changed_at = "2024-01-15T11:00:00Z")
 
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 1) } returns
         PaginatedResponse(
             count = 2,
             next = "http://api/children/1/diapers/?page=2",
-            results = listOf(diaper1),
+            results = listOf(list1),
         )
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 2) } returns
-        PaginatedResponse(count = 2, next = null, results = listOf(diaper2))
+        PaginatedResponse(count = 2, next = null, results = listOf(list2))
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
 
     val result = repository.refreshDiapers(childId = 1)

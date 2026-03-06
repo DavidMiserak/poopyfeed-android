@@ -43,6 +43,20 @@ class ChildDetailFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     binding.buttonDelete.setOnClickListener { showDeleteConfirmationDialog() }
+
+    binding.buttonFeedings.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_feedingsList, bundle)
+    }
+    binding.buttonDiapers.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_diapersList, bundle)
+    }
+    binding.buttonNaps.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_napsList, bundle)
+    }
+
     collectFlows()
   }
 

@@ -24,8 +24,8 @@ class TrackingRepositoriesTest {
   @Test
   fun `FeedingsRepository listFeedings emits Loading then Success`() = runTest {
     val repository = FeedingsRepository(apiService)
-    val feeding = TestFixtures.mockFeeding()
-    val response = PaginatedResponse(count = 1, results = listOf(feeding))
+    val listItem = TestFixtures.mockFeedingListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns response
 
@@ -125,8 +125,8 @@ class TrackingRepositoriesTest {
   @Test
   fun `DiapersRepository listDiapers emits Loading then Success`() = runTest {
     val repository = DiapersRepository(apiService)
-    val diaper = TestFixtures.mockDiaper()
-    val response = PaginatedResponse(count = 1, results = listOf(diaper))
+    val listItem = TestFixtures.mockDiaperListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 1) } returns response
 
@@ -179,8 +179,8 @@ class TrackingRepositoriesTest {
   @Test
   fun `NapsRepository listNaps emits Loading then Success`() = runTest {
     val repository = NapsRepository(apiService)
-    val nap = TestFixtures.mockNap()
-    val response = PaginatedResponse(count = 1, results = listOf(nap))
+    val listItem = TestFixtures.mockNapListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     io.mockk.coEvery { apiService.listNaps(childId = 1, page = 1) } returns response
 

@@ -104,7 +104,7 @@ interface PoopyFeedApiService {
   suspend fun listFeedings(
       @Path("childId") childId: Int,
       @Query("page") page: Int = 1
-  ): PaginatedResponse<Feeding>
+  ): PaginatedResponse<FeedingListResponse>
 
   /** Get a specific feeding by ID. GET /api/v1/children/{childId}/feedings/{feedingId}/ */
   @GET("children/{childId}/feedings/{feedingId}/")
@@ -138,7 +138,7 @@ interface PoopyFeedApiService {
   suspend fun listDiapers(
       @Path("childId") childId: Int,
       @Query("page") page: Int = 1
-  ): PaginatedResponse<Diaper>
+  ): PaginatedResponse<DiaperListResponse>
 
   /** Create a new diaper change record. POST /api/v1/children/{childId}/diapers/ */
   @POST("children/{childId}/diapers/")
@@ -160,7 +160,7 @@ interface PoopyFeedApiService {
   suspend fun listNaps(
       @Path("childId") childId: Int,
       @Query("page") page: Int = 1
-  ): PaginatedResponse<Nap>
+  ): PaginatedResponse<NapListResponse>
 
   /** Create a new nap record. POST /api/v1/children/{childId}/naps/ */
   @POST("children/{childId}/naps/")

@@ -82,3 +82,38 @@ fun formatAge(dobString: String, nowMillis: Long = System.currentTimeMillis()): 
     ""
   }
 }
+
+/**
+ * Formats nap duration between two ISO 8601 datetimes (e.g. "1h 30m").
+ *
+ * @param context Context for localization (reserved for future i18n)
+ * @param startIso Start time ISO 8601 string
+ * @param endIso End time ISO 8601 string
+ * @return Human-readable duration (e.g. "1h 30m", "45m")
+ */
+fun formatNapDuration(context: Context, startIso: String, endIso: String): String {
+  return try {
+    val startMs = Instant.parse(startIso).toEpochMilliseconds()
+    val endMs = Instant.parse(endIso).toEpochMilliseconds()
+    val diffMs = endMs - startMs
+    val totalMinutes = (diffMs / (60 * 1000)).toInt()
+    when {
+      totalMinutes < 60 -> "${totalMinutes}m"
+      totalMinutes % 60 == 0 -> "${totalMinutes / 60}h"
+      else -> "${totalMinutes / 60}h ${totalMinutes % 60}m"
+    }
+  } catch (e: Exception) {
+    ""
+  }
+}
+
+/** Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM"). */
+fun formatTimestampForDisplay(context: Context, isoString: String): String {
+  return try {
+    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val dateFlags = DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
+    DateUtils.formatDateTime(context, millis, dateFlags)
+  } catch (e: Exception) {
+    isoString
+  }
+}

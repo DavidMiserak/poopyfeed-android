@@ -35,8 +35,8 @@ class NapsRepositoryTest {
 
   @Test
   fun `listNaps emits Loading then Success`() = runTest {
-    val nap = TestFixtures.mockNap()
-    val response = PaginatedResponse(count = 1, results = listOf(nap))
+    val listItem = TestFixtures.mockNapListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     coEvery { apiService.listNaps(childId = 1, page = 1) } returns response
 
@@ -47,7 +47,7 @@ class NapsRepositoryTest {
     assertIs<ApiResult.Success<PaginatedResponse<Nap>>>(results[1])
     val success = results[1] as ApiResult.Success
     assertEquals(1, success.data.count)
-    assertEquals(nap.id, success.data.results.first().id)
+    assertEquals(listItem.id, success.data.results.first().id)
   }
 
   @Test

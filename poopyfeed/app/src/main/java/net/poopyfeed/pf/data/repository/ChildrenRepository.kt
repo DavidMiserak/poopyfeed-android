@@ -115,7 +115,14 @@ constructor(
             emit(ApiResult.Loading())
             try {
               val response = apiService.listFeedings(childId, page)
-              emit(ApiResult.Success(response))
+              val feedings = response.results.map { it.toFeeding(childId) }
+              emit(
+                  ApiResult.Success(
+                      PaginatedResponse(
+                          count = response.count,
+                          next = response.next,
+                          previous = response.previous,
+                          results = feedings)))
             } catch (e: Exception) {
               emit(ApiResult.Error(e.toApiError()))
             }
@@ -170,7 +177,14 @@ constructor(
             emit(ApiResult.Loading())
             try {
               val response = apiService.listDiapers(childId, page)
-              emit(ApiResult.Success(response))
+              val diapers = response.results.map { it.toDiaper(childId) }
+              emit(
+                  ApiResult.Success(
+                      PaginatedResponse(
+                          count = response.count,
+                          next = response.next,
+                          previous = response.previous,
+                          results = diapers)))
             } catch (e: Exception) {
               emit(ApiResult.Error(e.toApiError()))
             }
@@ -211,7 +225,14 @@ constructor(
             emit(ApiResult.Loading())
             try {
               val response = apiService.listNaps(childId, page)
-              emit(ApiResult.Success(response))
+              val naps = response.results.map { it.toNap(childId) }
+              emit(
+                  ApiResult.Success(
+                      PaginatedResponse(
+                          count = response.count,
+                          next = response.next,
+                          previous = response.previous,
+                          results = naps)))
             } catch (e: Exception) {
               emit(ApiResult.Error(e.toApiError()))
             }

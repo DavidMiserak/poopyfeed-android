@@ -49,7 +49,7 @@ constructor(
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
-  private val childId: Int = checkNotNull(savedStateHandle["childId"])
+  val childId: Int = checkNotNull(savedStateHandle["childId"])
 
   private val _uiState: MutableStateFlow<ChildDetailUiState> =
       MutableStateFlow(ChildDetailUiState.Loading)

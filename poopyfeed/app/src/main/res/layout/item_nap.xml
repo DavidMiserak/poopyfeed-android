@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.Pf.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/spacing_4"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_8">
+
+        <TextView
+            android:id="@+id/text_start_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fredoka"
+            android:textSize="@dimen/text_headline_small"
+            android:textColor="@color/slate_900"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_end_nap"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1h ago" />
+
+        <TextView
+            android:id="@+id/text_duration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_1"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_medium"
+            android:textColor="@color/slate_700"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_end_nap"
+            app:layout_constraintTop_toBottomOf="@id/text_start_time"
+            tools:text="1h 30m" />
+
+        <TextView
+            android:id="@+id/label_in_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_1"
+            android:text="@string/nap_in_progress"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_medium"
+            android:textColor="@color/rose_500"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_end_nap"
+            app:layout_constraintTop_toBottomOf="@id/text_start_time" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_end_nap"
+            style="@style/Widget.Pf.Button.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nap_end_button"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

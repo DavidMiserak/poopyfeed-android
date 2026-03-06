@@ -52,6 +52,30 @@ data class Feeding(
     val updated_at: String
 )
 
+/**
+ * Backend list response for feedings. API returns [fed_at] and [amount_oz] as string; [child] is
+ * omitted (known from URL). Map to [Feeding] in the repository with [childId].
+ */
+@Serializable
+data class FeedingListResponse(
+    val id: Int,
+    val feeding_type: String,
+    @kotlinx.serialization.SerialName("fed_at") val fed_at: String,
+    val amount_oz: String? = null,
+    val created_at: String,
+    val updated_at: String
+) {
+  fun toFeeding(childId: Int): Feeding =
+      Feeding(
+          id = id,
+          child = childId,
+          feeding_type = feeding_type,
+          amount_oz = amount_oz?.toDoubleOrNull(),
+          timestamp = fed_at,
+          created_at = created_at,
+          updated_at = updated_at)
+}
+
 /** DTO for creating/updating a Feeding. */
 @Serializable
 data class CreateFeedingRequest(
@@ -74,6 +98,28 @@ data class Diaper(
 /** DTO for creating a diaper change. [change_type]: `"wet"`, `"dirty"`, or `"both"`. */
 @Serializable data class CreateDiaperRequest(val change_type: String, val timestamp: String)
 
+/**
+ * Backend list response for diapers. API returns [changed_at]; [child] is omitted. Map to [Diaper]
+ * in the repository with [childId].
+ */
+@Serializable
+data class DiaperListResponse(
+    val id: Int,
+    val change_type: String,
+    @kotlinx.serialization.SerialName("changed_at") val changed_at: String,
+    val created_at: String,
+    val updated_at: String
+) {
+  fun toDiaper(childId: Int): Diaper =
+      Diaper(
+          id = id,
+          child = childId,
+          change_type = change_type,
+          timestamp = changed_at,
+          created_at = created_at,
+          updated_at = updated_at)
+}
+
 /** Nap event. */
 @Serializable
 data class Nap(
@@ -90,6 +136,28 @@ data class Nap(
 
 /** DTO for ending an ongoing nap (PATCH with [end_time]). */
 @Serializable data class UpdateNapRequest(val end_time: String)
+
+/**
+ * Backend list response for naps. API returns [napped_at] and [ended_at]; [child] is omitted. Map
+ * to [Nap] in the repository with [childId].
+ */
+@Serializable
+data class NapListResponse(
+    val id: Int,
+    @kotlinx.serialization.SerialName("napped_at") val napped_at: String,
+    @kotlinx.serialization.SerialName("ended_at") val ended_at: String? = null,
+    val created_at: String,
+    val updated_at: String
+) {
+  fun toNap(childId: Int): Nap =
+      Nap(
+          id = id,
+          child = childId,
+          start_time = napped_at,
+          end_time = ended_at,
+          created_at = created_at,
+          updated_at = updated_at)
+}
 
 /** Child sharing relationship. */
 @Serializable

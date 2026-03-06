@@ -73,8 +73,8 @@ class CachedFeedingsRepositoryTest {
 
   @Test
   fun `refreshFeedings success upserts and returns Success`() = runTest {
-    val feeding = TestFixtures.mockFeeding()
-    val response = PaginatedResponse(count = 1, results = listOf(feeding))
+    val listItem = TestFixtures.mockFeedingListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns response
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
@@ -82,22 +82,22 @@ class CachedFeedingsRepositoryTest {
 
     assertIs<ApiResult.Success<List<Feeding>>>(result)
     assertEquals(1, result.data.size)
-    assertEquals(feeding.id, result.data.first().id)
+    assertEquals(listItem.id, result.data.first().id)
   }
 
   @Test
   fun `refreshFeedings fetches all pages when next non-null`() = runTest {
-    val feeding1 = TestFixtures.mockFeeding(id = 1)
-    val feeding2 = TestFixtures.mockFeeding(id = 2, timestamp = "2024-01-15T11:00:00Z")
+    val list1 = TestFixtures.mockFeedingListResponse(id = 1)
+    val list2 = TestFixtures.mockFeedingListResponse(id = 2, fed_at = "2024-01-15T11:00:00Z")
 
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
         PaginatedResponse(
             count = 2,
             next = "http://api/children/1/feedings/?page=2",
-            results = listOf(feeding1),
+            results = listOf(list1),
         )
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 2) } returns
-        PaginatedResponse(count = 2, next = null, results = listOf(feeding2))
+        PaginatedResponse(count = 2, next = null, results = listOf(list2))
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
     val result = repository.refreshFeedings(childId = 1)
@@ -190,9 +190,9 @@ class CachedFeedingsRepositoryTest {
 
   @Test
   fun `clearSessionCache resets sync state so hasSyncedFlow emits false`() = runTest {
-    val feeding = TestFixtures.mockFeeding()
+    val listItem = TestFixtures.mockFeedingListResponse()
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
-        PaginatedResponse(count = 1, results = listOf(feeding))
+        PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
     repository.refreshFeedings(childId = 1)

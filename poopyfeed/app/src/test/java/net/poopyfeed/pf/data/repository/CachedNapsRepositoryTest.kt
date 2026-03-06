@@ -72,8 +72,8 @@ class CachedNapsRepositoryTest {
 
   @Test
   fun `refreshNaps success upserts and returns Success`() = runTest {
-    val nap = TestFixtures.mockNap()
-    val response = PaginatedResponse(count = 1, results = listOf(nap))
+    val listItem = TestFixtures.mockNapListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { apiService.listNaps(childId = 1, page = 1) } returns response
     io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
 
@@ -81,27 +81,27 @@ class CachedNapsRepositoryTest {
 
     assertIs<ApiResult.Success<List<Nap>>>(result)
     assertEquals(1, result.data.size)
-    assertEquals(nap.id, result.data.first().id)
+    assertEquals(listItem.id, result.data.first().id)
   }
 
   @Test
   fun `refreshNaps fetches all pages when next non-null`() = runTest {
-    val nap1 = TestFixtures.mockNap(id = 1)
-    val nap2 =
-        TestFixtures.mockNap(
+    val list1 = TestFixtures.mockNapListResponse(id = 1)
+    val list2 =
+        TestFixtures.mockNapListResponse(
             id = 2,
-            start_time = "2024-01-15T11:00:00Z",
-            end_time = "2024-01-15T12:00:00Z",
+            napped_at = "2024-01-15T11:00:00Z",
+            ended_at = "2024-01-15T12:00:00Z",
         )
 
     io.mockk.coEvery { apiService.listNaps(childId = 1, page = 1) } returns
         PaginatedResponse(
             count = 2,
             next = "http://api/children/1/naps/?page=2",
-            results = listOf(nap1),
+            results = listOf(list1),
         )
     io.mockk.coEvery { apiService.listNaps(childId = 1, page = 2) } returns
-        PaginatedResponse(count = 2, next = null, results = listOf(nap2))
+        PaginatedResponse(count = 2, next = null, results = listOf(list2))
     io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
 
     val result = repository.refreshNaps(childId = 1)

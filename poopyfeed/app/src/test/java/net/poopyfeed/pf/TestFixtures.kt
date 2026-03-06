@@ -2,8 +2,11 @@ package net.poopyfeed.pf
 
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.Diaper
+import net.poopyfeed.pf.data.models.DiaperListResponse
 import net.poopyfeed.pf.data.models.Feeding
+import net.poopyfeed.pf.data.models.FeedingListResponse
 import net.poopyfeed.pf.data.models.Nap
+import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.UserProfile
 
 /**
@@ -60,6 +63,23 @@ object TestFixtures {
           created_at = created_at,
           updated_at = updated_at)
 
+  /** List response shape returned by the feedings API (fed_at, amount_oz as string). */
+  fun mockFeedingListResponse(
+      id: Int = 1,
+      feeding_type: String = "bottle",
+      fed_at: String = TS12,
+      amount_oz: String? = "4.0",
+      created_at: String = TS12,
+      updated_at: String = TS12
+  ) =
+      FeedingListResponse(
+          id = id,
+          feeding_type = feeding_type,
+          fed_at = fed_at,
+          amount_oz = amount_oz,
+          created_at = created_at,
+          updated_at = updated_at)
+
   fun mockDiaper(
       id: Int = 1,
       child: Int = 1,
@@ -76,6 +96,21 @@ object TestFixtures {
           created_at = created_at,
           updated_at = updated_at)
 
+  /** List response shape returned by the diapers API (changed_at). */
+  fun mockDiaperListResponse(
+      id: Int = 1,
+      change_type: String = "both",
+      changed_at: String = TS14,
+      created_at: String = TS14,
+      updated_at: String = TS14
+  ) =
+      DiaperListResponse(
+          id = id,
+          change_type = change_type,
+          changed_at = changed_at,
+          created_at = created_at,
+          updated_at = updated_at)
+
   fun mockNap(
       id: Int = 1,
       child: Int = 1,
@@ -89,6 +124,21 @@ object TestFixtures {
           child = child,
           start_time = start_time,
           end_time = end_time,
+          created_at = created_at,
+          updated_at = updated_at)
+
+  /** List response shape returned by the naps API (napped_at, ended_at). */
+  fun mockNapListResponse(
+      id: Int = 1,
+      napped_at: String = TS13,
+      ended_at: String? = TS14,
+      created_at: String = TS13,
+      updated_at: String = TS14
+  ) =
+      NapListResponse(
+          id = id,
+          napped_at = napped_at,
+          ended_at = ended_at,
           created_at = created_at,
           updated_at = updated_at)
 

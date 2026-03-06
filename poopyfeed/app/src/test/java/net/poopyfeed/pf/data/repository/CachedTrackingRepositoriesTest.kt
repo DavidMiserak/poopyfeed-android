@@ -67,9 +67,9 @@ class CachedTrackingRepositoriesTest {
     val feedingDao = io.mockk.mockk<FeedingDao>()
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val feeding = TestFixtures.mockFeeding()
+    val listItem = TestFixtures.mockFeedingListResponse()
     io.mockk.coEvery { apiService.listFeedings(1, 1) } returns
-        PaginatedResponse(1, results = listOf(feeding))
+        PaginatedResponse(1, results = listOf(listItem))
     val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
 
     val result = repo.refreshFeedings(1)
@@ -84,20 +84,20 @@ class CachedTrackingRepositoriesTest {
         val feedingDao = io.mockk.mockk<FeedingDao>()
         io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
         val apiService = io.mockk.mockk<PoopyFeedApiService>()
-        val feeding1 = TestFixtures.mockFeeding()
-        val feeding2 =
-            TestFixtures.mockFeeding(
+        val list1 = TestFixtures.mockFeedingListResponse()
+        val list2 =
+            TestFixtures.mockFeedingListResponse(
                 id = 2,
                 feeding_type = "breast",
                 amount_oz = null,
-                timestamp = "2024-01-15T14:00:00Z",
+                fed_at = "2024-01-15T14:00:00Z",
                 created_at = "2024-01-15T14:00:00Z",
                 updated_at = "2024-01-15T14:00:00Z")
         io.mockk.coEvery { apiService.listFeedings(1, 1) } returns
             PaginatedResponse(
-                count = 2, next = "http://api/feedings/?page=2", results = listOf(feeding1))
+                count = 2, next = "http://api/feedings/?page=2", results = listOf(list1))
         io.mockk.coEvery { apiService.listFeedings(1, 2) } returns
-            PaginatedResponse(count = 2, next = null, results = listOf(feeding2))
+            PaginatedResponse(count = 2, next = null, results = listOf(list2))
         val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
 
         val result = repo.refreshFeedings(1)
@@ -157,9 +157,9 @@ class CachedTrackingRepositoriesTest {
     io.mockk.every { diaperDao.getDiapersFlow(1) } returns flowOf(listOf(entity))
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val diaper = TestFixtures.mockDiaper(change_type = "wet")
+    val listItem = TestFixtures.mockDiaperListResponse(change_type = "wet")
     io.mockk.coEvery { apiService.listDiapers(1, 1) } returns
-        PaginatedResponse(1, results = listOf(diaper))
+        PaginatedResponse(1, results = listOf(listItem))
     val repo = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
 
     val listResults = repo.listDiapersCached(1).toList()
@@ -201,9 +201,10 @@ class CachedTrackingRepositoriesTest {
     io.mockk.every { napDao.getNapsFlow(1) } returns flowOf(listOf(entity))
     io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val nap = TestFixtures.mockNap(end_time = null, updated_at = "2024-01-15T13:00:00Z")
+    val listItem =
+        TestFixtures.mockNapListResponse(ended_at = null, updated_at = "2024-01-15T13:00:00Z")
     io.mockk.coEvery { apiService.listNaps(1, 1) } returns
-        PaginatedResponse(1, results = listOf(nap))
+        PaginatedResponse(1, results = listOf(listItem))
     val repo = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
 
     val listResults = repo.listNapsCached(1).toList()

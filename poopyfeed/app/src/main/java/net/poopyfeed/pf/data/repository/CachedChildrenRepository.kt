@@ -195,11 +195,11 @@ constructor(
             val allResults = mutableListOf<Feeding>()
             var page = 1
             var response = apiService.listFeedings(childId, page = page)
-            allResults.addAll(response.results)
+            allResults.addAll(response.results.map { it.toFeeding(childId) })
             while (response.next != null) {
               page += 1
               response = apiService.listFeedings(childId, page = page)
-              allResults.addAll(response.results)
+              allResults.addAll(response.results.map { it.toFeeding(childId) })
             }
             val entities = allResults.map { FeedingEntity.fromApiModel(it) }
             feedingDao.upsertFeedings(entities)
@@ -209,6 +209,7 @@ constructor(
         } catch (e: CancellationException) {
           throw e // preserve structured concurrency
         } catch (e: Exception) {
+          _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Error(e.toApiError())
         }
       }
@@ -288,11 +289,11 @@ constructor(
             val allResults = mutableListOf<Diaper>()
             var page = 1
             var response = apiService.listDiapers(childId, page = page)
-            allResults.addAll(response.results)
+            allResults.addAll(response.results.map { it.toDiaper(childId) })
             while (response.next != null) {
               page += 1
               response = apiService.listDiapers(childId, page = page)
-              allResults.addAll(response.results)
+              allResults.addAll(response.results.map { it.toDiaper(childId) })
             }
             val entities = allResults.map { DiaperEntity.fromApiModel(it) }
             diaperDao.upsertDiapers(entities)
@@ -302,6 +303,7 @@ constructor(
         } catch (e: CancellationException) {
           throw e // preserve structured concurrency
         } catch (e: Exception) {
+          _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Error(e.toApiError())
         }
       }
@@ -378,11 +380,11 @@ constructor(
             val allResults = mutableListOf<Nap>()
             var page = 1
             var response = apiService.listNaps(childId, page = page)
-            allResults.addAll(response.results)
+            allResults.addAll(response.results.map { it.toNap(childId) })
             while (response.next != null) {
               page += 1
               response = apiService.listNaps(childId, page = page)
-              allResults.addAll(response.results)
+              allResults.addAll(response.results.map { it.toNap(childId) })
             }
             val entities = allResults.map { NapEntity.fromApiModel(it) }
             napDao.upsertNaps(entities)
@@ -392,6 +394,7 @@ constructor(
         } catch (e: CancellationException) {
           throw e // preserve structured concurrency
         } catch (e: Exception) {
+          _syncedChildIds.value = _syncedChildIds.value + childId
           ApiResult.Error(e.toApiError())
         }
       }

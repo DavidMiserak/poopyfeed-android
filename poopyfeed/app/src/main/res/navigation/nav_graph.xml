@@ -59,7 +59,95 @@
         <argument
             android:name="childId"
             app:argType="integer" />
+
+        <action
+            android:id="@+id/action_childDetail_to_feedingsList"
+            app:destination="@id/FeedingsListFragment" />
+        <action
+            android:id="@+id/action_childDetail_to_diapersList"
+            app:destination="@id/DiapersListFragment" />
+        <action
+            android:id="@+id/action_childDetail_to_napsList"
+            app:destination="@id/NapsListFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/FeedingsListFragment"
+        android:name="net.poopyfeed.pf.feedings.FeedingsListFragment"
+        android:label="@string/feedings_list_title"
+        tools:layout="@layout/fragment_feedings_list">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_feedingsList_to_createFeeding"
+            app:destination="@id/createFeedingBottomSheet" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/DiapersListFragment"
+        android:name="net.poopyfeed.pf.diapers.DiapersListFragment"
+        android:label="@string/diapers_list_title"
+        tools:layout="@layout/fragment_diapers_list">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_diapersList_to_createDiaper"
+            app:destination="@id/createDiaperBottomSheet" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/NapsListFragment"
+        android:name="net.poopyfeed.pf.naps.NapsListFragment"
+        android:label="@string/naps_list_title"
+        tools:layout="@layout/fragment_naps_list">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_napsList_to_createNap"
+            app:destination="@id/createNapBottomSheet" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/createFeedingBottomSheet"
+        android:name="net.poopyfeed.pf.feedings.CreateFeedingBottomSheetFragment"
+        android:label="@string/create_feeding_title"
+        tools:layout="@layout/fragment_create_feeding_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/createDiaperBottomSheet"
+        android:name="net.poopyfeed.pf.diapers.CreateDiaperBottomSheetFragment"
+        android:label="@string/create_diaper_title"
+        tools:layout="@layout/fragment_create_diaper_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/createNapBottomSheet"
+        android:name="net.poopyfeed.pf.naps.CreateNapBottomSheetFragment"
+        android:label="@string/create_nap_title"
+        tools:layout="@layout/fragment_create_nap_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
 
     <dialog
         android:id="@+id/createChildBottomSheet"

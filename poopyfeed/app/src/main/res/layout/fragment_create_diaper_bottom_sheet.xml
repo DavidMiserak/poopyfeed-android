@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_12"
+    tools:context="net.poopyfeed.pf.diapers.CreateDiaperBottomSheetFragment">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:alpha="0.3"
+        android:background="@drawable/ic_drag_handle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:fontFamily="@font/fredoka"
+        android:text="@string/create_diaper_title"
+        android:textColor="@color/slate_900"
+        android:textSize="@dimen/text_title_large"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_2"
+        android:fontFamily="@font/dm_sans"
+        android:text="@string/create_diaper_type_label"
+        android:textColor="@color/slate_900"
+        android:textSize="@dimen/text_body_medium" />
+
+    <RadioGroup
+        android:id="@+id/radio_change_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_wet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/rose_400"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/diaper_change_wet"
+            android:textSize="@dimen/text_body_medium" />
+
+        <RadioButton
+            android:id="@+id/radio_dirty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/rose_400"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/diaper_change_dirty"
+            android:textSize="@dimen/text_body_medium" />
+
+        <RadioButton
+            android:id="@+id/radio_both"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/rose_400"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/diaper_change_both"
+            android:textSize="@dimen/text_body_medium" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_2"
+        android:fontFamily="@font/dm_sans"
+        android:text="@string/create_diaper_time_label"
+        android:textColor="@color/slate_900"
+        android:textSize="@dimen/text_body_medium" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_timestamp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_medium"
+            android:textColor="@color/slate_700"
+            tools:text="Mar 6, 2025 2:30 PM" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_change_time"
+            style="@style/Widget.Pf.Button.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_diaper_change_time" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_4">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_save"
+            style="@style/Widget.Pf.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/create_diaper_save" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_saving"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

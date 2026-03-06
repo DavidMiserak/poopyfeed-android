@@ -34,8 +34,8 @@ class DiapersRepositoryTest {
 
   @Test
   fun `listDiapers emits Loading then Success`() = runTest {
-    val diaper = TestFixtures.mockDiaper()
-    val response = PaginatedResponse(count = 1, results = listOf(diaper))
+    val listItem = TestFixtures.mockDiaperListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     coEvery { apiService.listDiapers(childId = 1, page = 1) } returns response
 
@@ -46,7 +46,7 @@ class DiapersRepositoryTest {
     assertIs<ApiResult.Success<PaginatedResponse<Diaper>>>(results[1])
     val success = results[1] as ApiResult.Success
     assertEquals(1, success.data.count)
-    assertEquals(diaper.id, success.data.results.first().id)
+    assertEquals(listItem.id, success.data.results.first().id)
   }
 
   @Test

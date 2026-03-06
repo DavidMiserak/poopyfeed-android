@@ -109,6 +109,29 @@ class MainActivity : AppCompatActivity() {
         R.id.ChildrenListFragment -> {
           navController.navigate(R.id.createChildBottomSheet)
         }
+        R.id.FeedingsListFragment -> {
+          val childId =
+              navController.currentBackStackEntry?.arguments?.getInt("childId")
+                  ?: return@setOnClickListener
+          navController.navigate(
+              R.id.action_feedingsList_to_createFeeding,
+              Bundle().apply { putInt("childId", childId) })
+        }
+        R.id.DiapersListFragment -> {
+          val childId =
+              navController.currentBackStackEntry?.arguments?.getInt("childId")
+                  ?: return@setOnClickListener
+          navController.navigate(
+              R.id.action_diapersList_to_createDiaper,
+              Bundle().apply { putInt("childId", childId) })
+        }
+        R.id.NapsListFragment -> {
+          val childId =
+              navController.currentBackStackEntry?.arguments?.getInt("childId")
+                  ?: return@setOnClickListener
+          navController.navigate(
+              R.id.action_napsList_to_createNap, Bundle().apply { putInt("childId", childId) })
+        }
       }
     }
 

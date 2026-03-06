@@ -132,4 +132,63 @@
     <!-- Home - My Children Card -->
     <string name="home_children_card_title">My Children</string>
     <string name="home_children_card_body">View and manage your children\'s profiles.</string>
+
+    <!-- Feedings List -->
+    <string name="feedings_list_title">Feedings</string>
+    <string name="feedings_list_empty_title">No feedings yet</string>
+    <string name="feedings_list_empty_body">Tap + to log a feeding.</string>
+    <string name="feedings_list_retry_button">Retry</string>
+    <string name="feeding_type_bottle">Bottle</string>
+    <string name="feeding_type_breast">Breast</string>
+    <string name="feedings_delete_confirm_title">Delete feeding?</string>
+    <string name="feedings_delete_confirm_message">This feeding will be removed.</string>
+    <string name="feedings_delete_confirm">Delete</string>
+
+    <!-- Diapers List -->
+    <string name="diapers_list_title">Diapers</string>
+    <string name="diapers_list_empty_title">No diaper changes yet</string>
+    <string name="diapers_list_empty_body">Tap + to log a diaper change.</string>
+    <string name="diapers_list_retry_button">Retry</string>
+    <string name="diaper_change_wet">Wet</string>
+    <string name="diaper_change_dirty">Dirty</string>
+    <string name="diaper_change_both">Both</string>
+    <string name="diapers_delete_confirm_title">Delete diaper change?</string>
+    <string name="diapers_delete_confirm_message">This entry will be removed.</string>
+    <string name="diapers_delete_confirm">Delete</string>
+
+    <!-- Naps List -->
+    <string name="naps_list_title">Naps</string>
+    <string name="naps_list_empty_title">No naps yet</string>
+    <string name="naps_list_empty_body">Tap + to start a nap.</string>
+    <string name="naps_list_retry_button">Retry</string>
+    <string name="nap_in_progress">In progress</string>
+    <string name="nap_end_button">End Nap</string>
+    <string name="naps_delete_confirm_title">Delete nap?</string>
+    <string name="naps_delete_confirm_message">This nap will be removed.</string>
+    <string name="naps_delete_confirm">Delete</string>
+
+    <!-- Create Feeding -->
+    <string name="create_feeding_title">Log Feeding</string>
+    <string name="create_feeding_type_label">Type</string>
+    <string name="create_feeding_amount_label">Amount (oz)</string>
+    <string name="create_feeding_amount_error">Enter amount for bottle feeding.</string>
+    <string name="create_feeding_type_error">Select feeding type.</string>
+    <string name="create_feeding_time_label">Time</string>
+    <string name="create_feeding_change_time">Change time</string>
+    <string name="create_feeding_save">Save</string>
+
+    <!-- Create Diaper -->
+    <string name="create_diaper_title">Log Diaper Change</string>
+    <string name="create_diaper_type_label">Change type</string>
+    <string name="create_diaper_type_error">Select change type.</string>
+    <string name="create_diaper_time_label">Time</string>
+    <string name="create_diaper_change_time">Change time</string>
+    <string name="create_diaper_save">Save</string>
+
+    <!-- Create Nap -->
+    <string name="create_nap_title">Start Nap</string>
+    <string name="create_nap_start_label">Start time</string>
+    <string name="create_nap_change_time">Change time</string>
+    <string name="create_nap_now">Now</string>
+    <string name="create_nap_start_button">Start Nap</string>
 </resources>

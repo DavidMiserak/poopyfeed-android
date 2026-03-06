@@ -34,8 +34,8 @@ class FeedingsRepositoryTest {
 
   @Test
   fun `listFeedings emits Loading then Success`() = runTest {
-    val feeding = TestFixtures.mockFeeding()
-    val response = PaginatedResponse(count = 1, results = listOf(feeding))
+    val listItem = TestFixtures.mockFeedingListResponse()
+    val response = PaginatedResponse(count = 1, results = listOf(listItem))
 
     coEvery { apiService.listFeedings(childId = 1, page = 1) } returns response
 
@@ -46,7 +46,7 @@ class FeedingsRepositoryTest {
     assertIs<ApiResult.Success<PaginatedResponse<Feeding>>>(results[1])
     val success = results[1] as ApiResult.Success
     assertEquals(1, success.data.count)
-    assertEquals(feeding.id, success.data.results.first().id)
+    assertEquals(listItem.id, success.data.results.first().id)
   }
 
   @Test
