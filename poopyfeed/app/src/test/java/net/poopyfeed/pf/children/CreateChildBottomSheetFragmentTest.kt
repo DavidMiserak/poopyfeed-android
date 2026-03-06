@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.view.View
 import androidx.navigation.Navigation
@@ -12,9 +12,12 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import net.poopyfeed.pf.R
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateChildRequest
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

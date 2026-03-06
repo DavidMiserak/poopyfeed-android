@@ -41,7 +41,7 @@
 
     <fragment
         android:id="@+id/ChildrenListFragment"
-        android:name="net.poopyfeed.pf.ChildrenListFragment"
+        android:name="net.poopyfeed.pf.children.ChildrenListFragment"
         android:label="@string/children_list_title"
         tools:layout="@layout/fragment_children_list">
 
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/ChildDetailFragment"
-        android:name="net.poopyfeed.pf.ChildDetailFragment"
+        android:name="net.poopyfeed.pf.children.ChildDetailFragment"
         android:label="@string/children_list_title"
         tools:layout="@layout/fragment_child_detail">
 
@@ -151,7 +151,7 @@
 
     <dialog
         android:id="@+id/createChildBottomSheet"
-        android:name="net.poopyfeed.pf.CreateChildBottomSheetFragment"
+        android:name="net.poopyfeed.pf.children.CreateChildBottomSheetFragment"
         android:label="@string/create_child_title"
         tools:layout="@layout/fragment_create_child_bottom_sheet" />
 

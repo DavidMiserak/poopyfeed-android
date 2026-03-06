@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.content.Context
 import io.mockk.coEvery
@@ -8,6 +8,7 @@ import io.mockk.mockk
 import kotlin.test.assertIs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import org.junit.Before

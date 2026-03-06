@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.databinding.ItemChildBinding
 import net.poopyfeed.pf.util.formatAge

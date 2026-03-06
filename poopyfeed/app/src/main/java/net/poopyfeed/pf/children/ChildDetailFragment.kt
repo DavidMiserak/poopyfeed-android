@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildDetailBinding
 
 /**

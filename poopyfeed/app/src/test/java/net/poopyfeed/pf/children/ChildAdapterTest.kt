@@ -1,10 +1,13 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.app.Activity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.material.chip.Chip
+import net.poopyfeed.pf.R
+import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.data.models.Child
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -20,7 +23,7 @@ class ChildAdapterTest {
 
   private lateinit var adapter: ChildAdapter
   private lateinit var activity: Activity
-  private var clickedChild: net.poopyfeed.pf.data.models.Child? = null
+  private var clickedChild: Child? = null
 
   @Before
   fun setup() {
@@ -35,9 +38,7 @@ class ChildAdapterTest {
     activity.setTheme(com.google.android.material.R.style.Theme_MaterialComponents_DayNight)
   }
 
-  private fun createAndBind(
-      child: net.poopyfeed.pf.data.models.Child
-  ): ChildAdapter.ChildViewHolder {
+  private fun createAndBind(child: Child): ChildAdapter.ChildViewHolder {
     val parent =
         FrameLayout(activity).apply {
           layoutParams =

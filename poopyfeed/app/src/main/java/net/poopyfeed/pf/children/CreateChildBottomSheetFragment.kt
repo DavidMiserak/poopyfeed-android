@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateChildBottomSheetBinding
 
 /**

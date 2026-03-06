@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/spacing_12"
-    tools:context=".CreateChildBottomSheetFragment">
+    tools:context="net.poopyfeed.pf.children.CreateChildBottomSheetFragment">
 
     <!-- Drag handle -->
     <View

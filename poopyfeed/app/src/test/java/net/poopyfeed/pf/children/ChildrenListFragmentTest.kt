@@ -1,4 +1,4 @@
-package net.poopyfeed.pf
+package net.poopyfeed.pf.children
 
 import android.view.View
 import android.widget.TextView
@@ -15,9 +15,13 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import net.poopyfeed.pf.R
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -58,9 +62,9 @@ class ChildrenListFragmentTest {
    * coroutines run.
    */
   private fun launchWithState(
-      children: List<net.poopyfeed.pf.data.models.Child> = emptyList(),
+      children: List<Child> = emptyList(),
       hasSynced: Boolean = true,
-      refreshResult: ApiResult<List<net.poopyfeed.pf.data.models.Child>>? = null,
+      refreshResult: ApiResult<List<Child>>? = null,
   ): ChildrenListFragment {
     every { repo.listChildrenCached() } returns flowOf(ApiResult.Success(children))
     every { repo.hasSyncedFlow } returns MutableStateFlow(hasSynced)
@@ -105,8 +109,7 @@ class ChildrenListFragmentTest {
   fun `shows error state on refresh failure`() {
     // Use replayed flow so observeChildren() gets Loading before refresh() runs; otherwise
     // refresh() can set Error then observeChildren overwrites with Loading.
-    val listFlow =
-        MutableSharedFlow<ApiResult<List<net.poopyfeed.pf.data.models.Child>>>(replay = 1)
+    val listFlow = MutableSharedFlow<ApiResult<List<Child>>>(replay = 1)
     listFlow.tryEmit(ApiResult.Success(emptyList()))
     every { repo.listChildrenCached() } returns listFlow
     every { repo.hasSyncedFlow } returns MutableStateFlow(false)
