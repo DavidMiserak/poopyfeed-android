@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_4"
                 android:text="@string/signup_title"
-                android:textSize="36sp"
+                android:textSize="@dimen/text_headline_large"
                 android:fontFamily="@font/fredoka"
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="bold" />

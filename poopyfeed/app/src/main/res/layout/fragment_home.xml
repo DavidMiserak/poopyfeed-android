@@ -11,7 +11,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_8">
+        android:paddingHorizontal="@dimen/spacing_8"
+        android:paddingVertical="@dimen/spacing_12"
+        android:maxWidth="@dimen/bottom_sheet_max_width">
 
         <!-- ======================== -->
         <!-- Decorative background blobs -->
@@ -45,9 +47,9 @@
             android:id="@+id/card_welcome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_0"
             app:cardCornerRadius="@dimen/corner_radius_lg"
-            app:cardElevation="@dimen/elevation_12"
+            app:cardElevation="@dimen/elevation_8"
             app:strokeWidth="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -100,7 +102,7 @@
             style="@style/Widget.Pf.CardView.Frosted"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_8"
+            android:layout_marginTop="@dimen/spacing_12"
             android:foreground="?attr/selectableItemBackground"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
@@ -160,7 +162,8 @@
             style="@style/Widget.Pf.CardView.Frosted"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_8"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginBottom="@dimen/spacing_12"
             android:foreground="?attr/selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

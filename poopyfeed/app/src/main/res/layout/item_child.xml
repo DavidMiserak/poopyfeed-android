@@ -5,14 +5,20 @@
     style="@style/Widget.Pf.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="48dp"
-    android:layout_margin="@dimen/spacing_4"
+    android:minHeight="56dp"
+    android:layout_marginStart="@dimen/spacing_0"
+    android:layout_marginEnd="@dimen/spacing_0"
+    android:layout_marginTop="@dimen/spacing_3"
+    android:layout_marginBottom="@dimen/spacing_3"
     android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_8">
+        android:paddingStart="@dimen/spacing_12"
+        android:paddingEnd="@dimen/spacing_8"
+        android:paddingTop="@dimen/spacing_8"
+        android:paddingBottom="@dimen/spacing_8">
 
         <!-- Child name -->
         <TextView
@@ -43,15 +49,14 @@
             app:layout_constraintTop_toBottomOf="@id/text_child_name"
             tools:text="3 months • Girl" />
 
-        <!-- Activity badges container (3-column grid) -->
-        <GridLayout
+        <!-- Activity badges container (horizontal flex) -->
+        <LinearLayout
             android:id="@+id/layout_activities"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_2"
-            android:columnCount="3"
-            android:rowCount="1"
-            android:useDefaultMargins="true"
+            android:layout_marginTop="@dimen/spacing_4"
+            android:orientation="horizontal"
+            android:spacing="@dimen/spacing_4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chip_role"
             app:layout_constraintTop_toBottomOf="@id/text_age_gender">
@@ -61,12 +66,10 @@
                 android:id="@+id/badge_feeding"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_row="0"
-                android:layout_column="0"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill_horizontal"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="@dimen/spacing_2"
+                android:paddingHorizontal="@dimen/spacing_4"
+                android:paddingVertical="@dimen/spacing_3"
                 android:background="@drawable/bg_badge_feeding"
                 android:gravity="center_horizontal">
 
@@ -75,14 +78,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/badge_icon_feeding"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_badge_icon"
                     android:gravity="center" />
 
                 <TextView
                     android:id="@+id/text_last_feeding"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_1"
+                    android:layout_marginTop="@dimen/spacing_2"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
                     android:textColor="?attr/colorOnSurfaceVariant"
@@ -97,12 +100,10 @@
                 android:id="@+id/badge_diaper"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_row="0"
-                android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill_horizontal"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="@dimen/spacing_2"
+                android:paddingHorizontal="@dimen/spacing_4"
+                android:paddingVertical="@dimen/spacing_3"
                 android:background="@drawable/bg_badge_diaper"
                 android:gravity="center_horizontal">
 
@@ -111,14 +112,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/badge_icon_diaper"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_badge_icon"
                     android:gravity="center" />
 
                 <TextView
                     android:id="@+id/text_last_diaper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_1"
+                    android:layout_marginTop="@dimen/spacing_2"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
                     android:textColor="?attr/colorOnSurfaceVariant"
@@ -133,12 +134,10 @@
                 android:id="@+id/badge_nap"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_row="0"
-                android:layout_column="2"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill_horizontal"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="@dimen/spacing_2"
+                android:paddingHorizontal="@dimen/spacing_4"
+                android:paddingVertical="@dimen/spacing_3"
                 android:background="@drawable/bg_badge_nap"
                 android:gravity="center_horizontal">
 
@@ -147,14 +146,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/badge_icon_nap"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_badge_icon"
                     android:gravity="center" />
 
                 <TextView
                     android:id="@+id/text_last_nap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_1"
+                    android:layout_marginTop="@dimen/spacing_2"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
                     android:textColor="?attr/colorOnSurfaceVariant"
@@ -164,7 +163,7 @@
 
             </LinearLayout>
 
-        </GridLayout>
+        </LinearLayout>
 
         <!-- Role badge (hidden for owner) -->
         <com.google.android.material.chip.Chip

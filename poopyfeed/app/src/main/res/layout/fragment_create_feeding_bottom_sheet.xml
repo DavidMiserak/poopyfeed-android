@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/spacing_12"
     tools:context="net.poopyfeed.pf.feedings.CreateFeedingBottomSheetFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/spacing_12"
+        android:paddingVertical="@dimen/spacing_12"
+        android:maxWidth="@dimen/bottom_sheet_max_width">
 
     <View
         android:layout_width="40dp"
@@ -40,36 +46,39 @@
         android:id="@+id/radio_feeding_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_8"
-        android:orientation="horizontal">
+        android:layout_marginBottom="@dimen/spacing_12"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:spacing="@dimen/spacing_4">
 
         <RadioButton
             android:id="@+id/radio_bottle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:checked="true"
             android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_bottle"
-            android:textSize="@dimen/text_body_medium" />
+            android:textSize="@dimen/text_body_medium"
+            android:paddingEnd="@dimen/spacing_6" />
 
         <RadioButton
             android:id="@+id/radio_breast"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_breast"
-            android:textSize="@dimen/text_body_medium" />
+            android:textSize="@dimen/text_body_medium"
+            android:paddingEnd="@dimen/spacing_6" />
     </RadioGroup>
 
+    <!-- Form section: Amount -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_8"
+        android:layout_marginBottom="@dimen/spacing_12"
         android:hint="@string/create_feeding_amount_label"
         app:boxBackgroundMode="outline"
         app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
@@ -86,11 +95,12 @@
             android:fontFamily="@font/dm_sans" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Form section: Feeding Duration (breast-specific) -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_minutes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_4"
+        android:layout_marginBottom="@dimen/spacing_12"
         android:hint="@string/create_feeding_minutes_label"
         android:visibility="gone"
         app:boxBackgroundMode="outline"
@@ -119,19 +129,20 @@
         android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
+    <!-- Form section: Feeding side (breast-specific) -->
     <RadioGroup
         android:id="@+id/radio_side"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_8"
+        android:layout_marginBottom="@dimen/spacing_12"
         android:visibility="gone"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:spacing="@dimen/spacing_2">
 
         <RadioButton
             android:id="@+id/radio_side_left"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_left"
@@ -139,9 +150,8 @@
 
         <RadioButton
             android:id="@+id/radio_side_right"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_right"
@@ -149,9 +159,8 @@
 
         <RadioButton
             android:id="@+id/radio_side_both"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_both"
@@ -167,35 +176,54 @@
         android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
+    <!-- Form section: Timestamp -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_8"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_marginBottom="@dimen/spacing_16"
+        android:orientation="vertical"
+        android:spacing="@dimen/spacing_3">
 
         <TextView
-            android:id="@+id/text_timestamp"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/spacing_2"
             android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="Mar 6, 2025 2:30 PM" />
+            android:text="@string/create_feeding_time_label"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_body_medium" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_change_time"
-            style="@style/Widget.Pf.Button.Secondary"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_feeding_change_time" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:spacing="@dimen/spacing_8">
+
+            <TextView
+                android:id="@+id/text_timestamp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Mar 6, 2025 2:30 PM" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_change_time"
+                style="@style/Widget.Pf.Button.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_feeding_change_time" />
+        </LinearLayout>
     </LinearLayout>
 
+    <!-- Action buttons -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_4">
+        android:layout_marginTop="@dimen/spacing_8">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_save"
@@ -213,4 +241,6 @@
             android:indeterminate="true"
             android:visibility="gone" />
     </FrameLayout>
-</LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>
