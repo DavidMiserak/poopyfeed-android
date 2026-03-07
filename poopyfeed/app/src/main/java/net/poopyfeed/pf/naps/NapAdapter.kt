@@ -14,9 +14,11 @@ import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of naps. Shows start time, duration or "In progress",
- * and "End Nap" button when [Nap.end_time] is null. Long-press triggers [onDeleteClick].
+ * and "End Nap" button when [Nap.end_time] is null. Tap triggers [onItemClick]; long-press
+ * triggers [onDeleteClick].
  */
 class NapAdapter(
+    private val onItemClick: (Nap) -> Unit,
     private val onDeleteClick: (Nap) -> Unit,
     private val onEndNapClick: (Nap) -> Unit,
 ) : ListAdapter<Nap, NapAdapter.NapViewHolder>(NapDiffCallback()) {
@@ -24,7 +26,7 @@ class NapAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NapViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ItemNapBinding.inflate(inflater, parent, false)
-    return NapViewHolder(binding, onDeleteClick, onEndNapClick)
+    return NapViewHolder(binding, onItemClick, onDeleteClick, onEndNapClick)
   }
 
   override fun onBindViewHolder(holder: NapViewHolder, position: Int) {
@@ -33,6 +35,7 @@ class NapAdapter(
 
   class NapViewHolder(
       private val binding: ItemNapBinding,
+      private val onItemClick: (Nap) -> Unit,
       private val onDeleteClick: (Nap) -> Unit,
       private val onEndNapClick: (Nap) -> Unit,
   ) : RecyclerView.ViewHolder(binding.root) {
@@ -53,6 +56,7 @@ class NapAdapter(
         binding.buttonEndNap.visibility = View.GONE
         binding.textDuration.text = formatNapDuration(ctx, nap.start_time, nap.end_time)
       }
+      binding.root.setOnClickListener { onItemClick(nap) }
       binding.root.setOnLongClickListener {
         onDeleteClick(nap)
         true

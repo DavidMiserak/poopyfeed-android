@@ -44,8 +44,10 @@ class NapsListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    val childId = requireArguments().getInt("childId")
     adapter =
         NapAdapter(
+            onItemClick = { nap -> navigateToEditNap(childId, nap.id) },
             onDeleteClick = { nap -> showDeleteConfirmationDialog(nap.id) },
             onEndNapClick = { nap -> viewModel.endNap(nap.id) },
         )
@@ -129,6 +131,34 @@ class NapsListFragment : Fragment() {
             }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("nap_updated", false)
+            ?.collect { updated ->
+              if (updated) {
+                viewModel.refresh()
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("nap_updated", false)
+              }
+            }
+      }
+    }
+  }
+
+  private fun navigateToEditNap(childId: Int, napId: Int) {
+    findNavController().navigate(
+        R.id.action_napsList_to_editNap,
+        Bundle().apply {
+          putInt("childId", childId)
+          putInt("napId", napId)
+        },
+    )
   }
 
   private fun showDeleteConfirmationDialog(napId: Int) {

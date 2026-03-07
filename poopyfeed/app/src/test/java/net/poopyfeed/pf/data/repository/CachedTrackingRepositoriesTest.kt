@@ -230,7 +230,7 @@ class CachedTrackingRepositoriesTest {
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     val napResponse = TestFixtures.mockNapListResponse()
     val createRequest = CreateNapRequest("2024-01-15T13:00:00Z", null)
-    val updateRequest = UpdateNapRequest("2024-01-15T14:00:00Z")
+    val updateRequest = UpdateNapRequest(end_time = "2024-01-15T14:00:00Z")
     io.mockk.coEvery { apiService.createNap(1, createRequest) } returns napResponse
     io.mockk.coEvery { apiService.updateNap(1, 1, updateRequest) } returns napResponse
     io.mockk.coEvery { apiService.deleteNap(1, 1) } returns Unit

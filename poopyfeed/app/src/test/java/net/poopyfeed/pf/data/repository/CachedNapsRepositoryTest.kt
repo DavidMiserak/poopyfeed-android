@@ -170,6 +170,53 @@ class CachedNapsRepositoryTest {
   }
 
   @Test
+  fun `getNap returns nap when in cache and child matches`() = runTest {
+    val entity =
+        NapEntity(
+            id = 2,
+            child = 1,
+            start_time = "2024-01-15T10:00:00Z",
+            end_time = "2024-01-15T11:00:00Z",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T11:00:00Z",
+        )
+    io.mockk.coEvery { napDao.getNap(2) } returns entity
+
+    val result = repository.getNap(childId = 1, napId = 2)
+
+    assertEquals(2, result?.id)
+    assertEquals(1, result?.child)
+    assertEquals("2024-01-15T11:00:00Z", result?.end_time)
+  }
+
+  @Test
+  fun `getNap returns null when child does not match`() = runTest {
+    val entity =
+        NapEntity(
+            id = 2,
+            child = 99,
+            start_time = "2024-01-15T10:00:00Z",
+            end_time = null,
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { napDao.getNap(2) } returns entity
+
+    val result = repository.getNap(childId = 1, napId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
+  fun `getNap returns null when not in cache`() = runTest {
+    io.mockk.coEvery { napDao.getNap(2) } returns null
+
+    val result = repository.getNap(childId = 1, napId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
   fun `updateNap success upserts and returns Success`() = runTest {
     val request = UpdateNapRequest(end_time = "2024-01-15T11:00:00Z")
     val napResponse =

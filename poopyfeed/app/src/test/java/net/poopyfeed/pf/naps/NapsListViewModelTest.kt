@@ -116,6 +116,6 @@ class NapsListViewModelTest {
         viewModel.endNap(10)
         advanceUntilIdle()
 
-        coVerify { mockRepository.updateNap(1, 10, match { it.end_time.isNotBlank() }) }
+        coVerify { mockRepository.updateNap(1, 10, match { !it.end_time.isNullOrBlank() }) }
       }
 }

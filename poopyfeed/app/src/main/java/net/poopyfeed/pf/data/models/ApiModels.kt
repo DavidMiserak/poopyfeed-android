@@ -175,8 +175,12 @@ data class CreateNapRequest(
     @SerialName("ended_at") val end_time: String? = null
 )
 
-/** DTO for ending an ongoing nap (PATCH with [ended_at]). */
-@Serializable data class UpdateNapRequest(@SerialName("ended_at") val end_time: String)
+/** DTO for PATCH nap (partial update). Omit nulls so backend receives only provided fields. */
+@Serializable
+data class UpdateNapRequest(
+    @SerialName("napped_at") @EncodeDefault(EncodeDefault.Mode.NEVER) val start_time: String? = null,
+    @SerialName("ended_at") @EncodeDefault(EncodeDefault.Mode.NEVER) val end_time: String? = null,
+)
 
 /**
  * Backend list response for naps. API returns [napped_at] and [ended_at]; [child] is omitted. Map

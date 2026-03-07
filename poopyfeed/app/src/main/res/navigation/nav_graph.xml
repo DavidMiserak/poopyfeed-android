@@ -120,6 +120,9 @@
         <action
             android:id="@+id/action_napsList_to_createNap"
             app:destination="@id/createNapBottomSheet" />
+        <action
+            android:id="@+id/action_napsList_to_editNap"
+            app:destination="@id/editNapBottomSheet" />
     </fragment>
 
     <fragment
@@ -191,6 +194,20 @@
 
         <argument
             android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/editNapBottomSheet"
+        android:name="net.poopyfeed.pf.naps.EditNapBottomSheetFragment"
+        android:label="@string/edit_nap_title"
+        tools:layout="@layout/fragment_edit_nap_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+        <argument
+            android:name="napId"
             app:argType="integer" />
     </dialog>
 

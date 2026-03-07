@@ -478,6 +478,12 @@ constructor(
         }
       }
 
+  /** Get a single nap from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  suspend fun getNap(childId: Int, napId: Int): Nap? =
+      withContext(ioDispatcher) {
+        napDao.getNap(napId)?.takeIf { it.child == childId }?.toApiModel()
+      }
+
   suspend fun deleteNap(childId: Int, napId: Int): ApiResult<Unit> =
       withContext(ioDispatcher) {
         try {

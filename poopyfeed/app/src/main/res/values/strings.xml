@@ -227,6 +227,10 @@
     <string name="create_nap_change_time">Change time</string>
     <string name="create_nap_now">Now</string>
     <string name="create_nap_start_button">Start Nap</string>
+    <string name="edit_nap_title">Edit nap</string>
+    <string name="edit_nap_end_label">End time</string>
+    <string name="edit_nap_set_end_time">Set end time</string>
+    <string name="edit_nap_save">Save</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
