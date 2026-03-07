@@ -146,6 +146,14 @@ interface PoopyFeedApiService {
       @Body request: CreateDiaperRequest
   ): DiaperListResponse
 
+  /** Update a diaper change record. PATCH /api/v1/children/{childId}/diapers/{diaperId}/ */
+  @PATCH("children/{childId}/diapers/{diaperId}/")
+  suspend fun updateDiaper(
+      @Path("childId") childId: Int,
+      @Path("diaperId") diaperId: Int,
+      @Body request: CreateDiaperRequest
+  ): DiaperListResponse
+
   /** Delete a diaper change record. DELETE /api/v1/children/{childId}/diapers/{diaperId}/ */
   @DELETE("children/{childId}/diapers/{diaperId}/")
   suspend fun deleteDiaper(@Path("childId") childId: Int, @Path("diaperId") diaperId: Int)

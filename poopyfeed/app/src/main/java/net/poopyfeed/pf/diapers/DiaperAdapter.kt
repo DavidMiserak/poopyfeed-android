@@ -12,15 +12,17 @@ import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of diaper changes. Shows change type (Wet/Dirty/Both)
- * and relative time. Long-press triggers [onDeleteClick].
+ * and relative time. Tap triggers [onItemClick]; long-press triggers [onDeleteClick].
  */
-class DiaperAdapter(private val onDeleteClick: (Diaper) -> Unit) :
-    ListAdapter<Diaper, DiaperAdapter.DiaperViewHolder>(DiaperDiffCallback()) {
+class DiaperAdapter(
+    private val onItemClick: (Diaper) -> Unit,
+    private val onDeleteClick: (Diaper) -> Unit,
+) : ListAdapter<Diaper, DiaperAdapter.DiaperViewHolder>(DiaperDiffCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiaperViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ItemDiaperBinding.inflate(inflater, parent, false)
-    return DiaperViewHolder(binding, onDeleteClick)
+    return DiaperViewHolder(binding, onItemClick, onDeleteClick)
   }
 
   override fun onBindViewHolder(holder: DiaperViewHolder, position: Int) {
@@ -29,6 +31,7 @@ class DiaperAdapter(private val onDeleteClick: (Diaper) -> Unit) :
 
   class DiaperViewHolder(
       private val binding: ItemDiaperBinding,
+      private val onItemClick: (Diaper) -> Unit,
       private val onDeleteClick: (Diaper) -> Unit,
   ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -45,6 +48,7 @@ class DiaperAdapter(private val onDeleteClick: (Diaper) -> Unit) :
       val timeSummary = formatRelativeTime(ctx, diaper.timestamp)
       binding.textTime.text = timeSummary
       binding.root.contentDescription = ctx.getString(R.string.a11y_diaper_item, timeSummary)
+      binding.root.setOnClickListener { onItemClick(diaper) }
       binding.root.setOnLongClickListener {
         onDeleteClick(diaper)
         true

@@ -17,6 +17,7 @@
         android:background="@drawable/ic_drag_handle" />
 
     <TextView
+        android:id="@+id/text_sheet_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/spacing_8"

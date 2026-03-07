@@ -360,6 +360,30 @@ constructor(
         }
       }
 
+  /** Get a single diaper from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  suspend fun getDiaper(childId: Int, diaperId: Int): Diaper? =
+      withContext(ioDispatcher) {
+        diaperDao.getDiaper(diaperId)?.takeIf { it.child == childId }?.toApiModel()
+      }
+
+  /** Update diaper: API-first, then cache. */
+  suspend fun updateDiaper(
+      childId: Int,
+      diaperId: Int,
+      request: CreateDiaperRequest
+  ): ApiResult<Diaper> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.updateDiaper(childId, diaperId, request)
+          val diaper = response.toDiaper(childId)
+          val entity = DiaperEntity.fromApiModel(diaper)
+          diaperDao.upsertDiaper(entity)
+          ApiResult.Success(diaper)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
   suspend fun clearChildCache(childId: Int) {
     withContext(ioDispatcher) { diaperDao.clearChildDiapers(childId) }
     _syncedChildIds.value = _syncedChildIds.value - childId

@@ -44,7 +44,12 @@ class DiapersListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    adapter = DiaperAdapter { diaper -> showDeleteConfirmationDialog(diaper.id) }
+    val childId = requireArguments().getInt("childId")
+    adapter =
+        DiaperAdapter(
+            onItemClick = { diaper -> navigateToEditDiaper(childId, diaper.id) },
+            onDeleteClick = { diaper -> showDeleteConfirmationDialog(diaper.id) },
+        )
     binding.recyclerDiapers.adapter = adapter
     binding.recyclerDiapers.layoutManager = LinearLayoutManager(requireContext())
 
@@ -125,6 +130,34 @@ class DiapersListFragment : Fragment() {
             }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("diaper_updated", false)
+            ?.collect { updated ->
+              if (updated) {
+                viewModel.refresh()
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("diaper_updated", false)
+              }
+            }
+      }
+    }
+  }
+
+  private fun navigateToEditDiaper(childId: Int, diaperId: Int) {
+    findNavController().navigate(
+        R.id.action_diapersList_to_editDiaper,
+        Bundle().apply {
+          putInt("childId", childId)
+          putInt("diaperId", diaperId)
+        },
+    )
   }
 
   private fun showDeleteConfirmationDialog(diaperId: Int) {

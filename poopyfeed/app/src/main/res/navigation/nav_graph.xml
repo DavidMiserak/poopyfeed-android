@@ -102,6 +102,9 @@
         <action
             android:id="@+id/action_diapersList_to_createDiaper"
             app:destination="@id/createDiaperBottomSheet" />
+        <action
+            android:id="@+id/action_diapersList_to_editDiaper"
+            app:destination="@id/editDiaperBottomSheet" />
     </fragment>
 
     <fragment
@@ -163,6 +166,20 @@
 
         <argument
             android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/editDiaperBottomSheet"
+        android:name="net.poopyfeed.pf.diapers.EditDiaperBottomSheetFragment"
+        android:label="@string/edit_diaper_title"
+        tools:layout="@layout/fragment_create_diaper_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+        <argument
+            android:name="diaperId"
             app:argType="integer" />
     </dialog>
 

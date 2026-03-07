@@ -214,6 +214,7 @@
 
     <!-- Create Diaper -->
     <string name="create_diaper_title">Log Diaper Change</string>
+    <string name="edit_diaper_title">Edit diaper change</string>
     <string name="create_diaper_type_label">Change type</string>
     <string name="create_diaper_type_error">Select change type.</string>
     <string name="create_diaper_time_label">Time</string>

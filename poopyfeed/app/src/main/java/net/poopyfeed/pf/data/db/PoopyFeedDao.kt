@@ -88,6 +88,10 @@ interface DiaperDao {
   @Query("SELECT * FROM diapers WHERE child = :childId ORDER BY timestamp DESC")
   suspend fun getDiapers(childId: Int): List<DiaperEntity>
 
+  /** Get a specific diaper by ID. */
+  @Query("SELECT * FROM diapers WHERE id = :diaperId")
+  suspend fun getDiaper(diaperId: Int): DiaperEntity?
+
   /** Get the most recent diaper change. */
   @Query("SELECT * FROM diapers WHERE child = :childId ORDER BY timestamp DESC LIMIT 1")
   suspend fun getLatestDiaper(childId: Int): DiaperEntity?

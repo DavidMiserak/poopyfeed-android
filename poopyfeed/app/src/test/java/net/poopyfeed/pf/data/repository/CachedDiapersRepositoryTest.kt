@@ -182,4 +182,90 @@ class CachedDiapersRepositoryTest {
     assertIs<ApiResult.Error<Unit>>(result)
     assertIs<ApiError.NetworkError>(result.error)
   }
+
+  @Test
+  fun `getDiaper returns diaper when in cache and child matches`() = runTest {
+    val entity =
+        DiaperEntity(
+            id = 2,
+            child = 1,
+            change_type = "wet",
+            timestamp = "2024-01-15T10:00:00Z",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { diaperDao.getDiaper(2) } returns entity
+
+    val result = repository.getDiaper(childId = 1, diaperId = 2)
+
+    assertEquals(2, result?.id)
+    assertEquals(1, result?.child)
+    assertEquals("wet", result?.change_type)
+  }
+
+  @Test
+  fun `getDiaper returns null when child does not match`() = runTest {
+    val entity =
+        DiaperEntity(
+            id = 2,
+            child = 99,
+            change_type = "wet",
+            timestamp = "2024-01-15T10:00:00Z",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { diaperDao.getDiaper(2) } returns entity
+
+    val result = repository.getDiaper(childId = 1, diaperId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
+  fun `getDiaper returns null when not in cache`() = runTest {
+    io.mockk.coEvery { diaperDao.getDiaper(2) } returns null
+
+    val result = repository.getDiaper(childId = 1, diaperId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
+  fun `updateDiaper success upserts and returns Success`() = runTest {
+    val request =
+        CreateDiaperRequest(
+            change_type = "both",
+            timestamp = "2024-01-15T11:00:00Z",
+        )
+    val diaperResponse =
+        TestFixtures.mockDiaperListResponse(
+            id = 2,
+            change_type = "both",
+            changed_at = "2024-01-15T11:00:00Z",
+        )
+    io.mockk.coEvery { apiService.updateDiaper(1, 2, request) } returns diaperResponse
+    io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
+
+    val result = repository.updateDiaper(childId = 1, diaperId = 2, request = request)
+
+    assertIs<ApiResult.Success<Diaper>>(result)
+    assertEquals(2, result.data.id)
+    assertEquals("both", result.data.change_type)
+  }
+
+  @Test
+  fun `updateDiaper network error returns Error`() = runTest {
+    val request =
+        CreateDiaperRequest(
+            change_type = "wet",
+            timestamp = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { apiService.updateDiaper(any(), any(), any()) } throws
+        IOException("Network down")
+
+    val result = repository.updateDiaper(childId = 1, diaperId = 2, request = request)
+
+    assertIs<ApiResult.Error<Diaper>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
 }
