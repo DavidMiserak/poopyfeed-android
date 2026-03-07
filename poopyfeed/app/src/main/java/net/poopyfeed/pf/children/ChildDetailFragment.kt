@@ -86,6 +86,18 @@ class ChildDetailFragment : Fragment() {
           try {
             val handle =
                 findNavController().currentBackStackEntry?.savedStateHandle ?: return@launch
+            handle.getStateFlow("child_updated", false).collect { updated ->
+              if (updated) {
+                handle.set("child_updated", false)
+                viewModel.refresh()
+              }
+            }
+          } catch (_: IllegalStateException) {}
+        }
+        launch {
+          try {
+            val handle =
+                findNavController().currentBackStackEntry?.savedStateHandle ?: return@launch
             handle.getStateFlow("diaper_created", false).collect { created ->
               if (created) {
                 handle.set("diaper_created", false)
@@ -151,7 +163,8 @@ class ChildDetailFragment : Fragment() {
   private fun openEditChild() {
     findNavController()
         .navigate(
-            R.id.editChildBottomSheet, Bundle().apply { putInt("childId", viewModel.childId) })
+            R.id.action_childDetail_to_editChild,
+            Bundle().apply { putInt("childId", viewModel.childId) })
   }
 
   override fun onDestroyView() {

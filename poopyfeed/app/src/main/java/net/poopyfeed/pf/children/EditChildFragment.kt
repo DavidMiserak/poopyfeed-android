@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,12 +23,12 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentEditChildBottomSheetBinding
 
 /**
- * Bottom sheet for editing a child: name, DOB, gender, custom bottle amounts, feeding reminder
- * interval, and notification preferences. Saves via PATCH; on success dismisses and sets
+ * Full-screen fragment for editing a child: name, DOB, gender, custom bottle amounts, feeding
+ * reminder interval, and notification preferences. Saves via PATCH; on success pops back and sets
  * savedStateHandle so the detail screen can refresh.
  */
 @AndroidEntryPoint
-class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
+class EditChildFragment : Fragment() {
 
   private var _binding: FragmentEditChildBottomSheetBinding? = null
   private val binding
@@ -54,6 +54,8 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    binding.dragHandle.visibility = View.GONE
 
     feedingReminderOptions =
         listOf(
@@ -82,7 +84,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
               is EditChildUiState.Ready -> bindForm(state)
               is EditChildUiState.Error -> {
                 Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-                dismiss()
+                findNavController().popBackStack()
               }
               is EditChildUiState.Saving -> {
                 binding.buttonSave.isEnabled = false
@@ -96,7 +98,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
                     ?.set("child_updated", true)
                 Snackbar.make(binding.root, R.string.edit_child_success, Snackbar.LENGTH_SHORT)
                     .show()
-                dismiss()
+                findNavController().popBackStack()
               }
               is EditChildUiState.SaveError -> {
                 binding.buttonSave.isEnabled = true
@@ -134,7 +136,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
         launch {
           viewModel.deleteSuccess.collect {
             findNavController().previousBackStackEntry?.savedStateHandle?.set("child_deleted", true)
-            dismiss()
+            findNavController().popBackStack()
           }
         }
         launch {
@@ -216,17 +218,15 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
             .let { if (it < 0) 0 else it }
     binding.spinnerFeedingReminder.setSelection(reminderIndex)
 
-    // Populate custom bottle amounts
     child.custom_bottle_low_oz?.let { binding.inputBottleLow.setText(it) }
     child.custom_bottle_mid_oz?.let { binding.inputBottleMid.setText(it) }
     child.custom_bottle_high_oz?.let { binding.inputBottleHigh.setText(it) }
 
     val showReminder = state.canEditReminder
-    binding.labelFeedingReminder.visibility = if (showReminder) View.VISIBLE else View.GONE
-    binding.spinnerFeedingReminder.visibility = if (showReminder) View.VISIBLE else View.GONE
+    binding.cardFeedingReminder.visibility = if (showReminder) View.VISIBLE else View.GONE
 
     val isOwner = child.user_role == "owner"
-    binding.buttonDelete.visibility = if (isOwner) View.VISIBLE else View.GONE
+    binding.cardDangerZone.visibility = if (isOwner) View.VISIBLE else View.GONE
 
     binding.buttonSave.isEnabled = true
     binding.buttonSave.visibility = View.VISIBLE
@@ -295,7 +295,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
           else -> "M"
         }
     val reminderHours =
-        if (binding.spinnerFeedingReminder.visibility == View.VISIBLE) {
+        if (binding.cardFeedingReminder.visibility == View.VISIBLE) {
           feedingReminderOptions
               .getOrNull(binding.spinnerFeedingReminder.selectedItemPosition)
               ?.second

@@ -1195,8 +1195,8 @@
         errorLine1="        if (binding.spinnerFeedingReminder.visibility == View.VISIBLE) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/net/poopyfeed/pf/children/EditChildBottomSheetFragment.kt"
-            line="298"
+            file="src/main/java/net/poopyfeed/pf/children/EditChildFragment.kt"
+            line="299"
             column="13"/>
     </issue>
 

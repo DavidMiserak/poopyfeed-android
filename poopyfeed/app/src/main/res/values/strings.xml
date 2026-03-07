@@ -131,6 +131,7 @@
     <string name="child_detail_edit_button">Edit</string>
     <string name="child_detail_share_button">Share</string>
     <string name="child_detail_delete_button">Delete Child</string>
+    <string name="child_detail_danger_zone_warning">Removing this child is permanent. All feedings, diapers, naps, and data for this child will be deleted.</string>
     <string name="child_detail_delete_title">Delete Child?</string>
     <string name="child_detail_delete_message">This will delete %1$s and all associated data. This action cannot be undone.</string>
     <string name="child_detail_delete_confirm">Delete</string>

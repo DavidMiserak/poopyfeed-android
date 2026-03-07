@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="net.poopyfeed.pf.children.EditChildBottomSheetFragment">
+    tools:context="net.poopyfeed.pf.children.EditChildFragment">
 
   <LinearLayout
       android:layout_width="match_parent"
@@ -12,8 +12,9 @@
       android:orientation="vertical"
       android:padding="@dimen/spacing_12">
 
-    <!-- Drag handle -->
+    <!-- Drag handle (hidden when used as full-screen fragment) -->
     <View
+        android:id="@+id/drag_handle"
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
@@ -276,24 +277,43 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Feeding reminders (owner/co-parent only) -->
-    <TextView
-        android:id="@+id/label_feeding_reminder"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_feeding_reminder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/feeding_reminder_label"
-        android:fontFamily="@font/dm_sans"
-        android:textSize="@dimen/text_body_medium"
-        android:textColor="?attr/colorOnSurface"
-        android:layout_marginTop="@dimen/spacing_4"
-        android:layout_marginBottom="@dimen/spacing_2" />
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/corner_radius_md"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:cardElevation="0dp">
 
-    <Spinner
-        android:id="@+id/spinner_feeding_reminder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:contentDescription="@string/a11y_feeding_reminder"
-        android:layout_marginBottom="@dimen/spacing_8" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="@dimen/spacing_12">
+
+        <TextView
+            android:id="@+id/label_feeding_reminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/feeding_reminder_label"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_medium"
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <Spinner
+            android:id="@+id/spinner_feeding_reminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:contentDescription="@string/a11y_feeding_reminder" />
+
+      </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- ===== Notification Preferences Section ===== -->
     <com.google.android.material.card.MaterialCardView
@@ -452,17 +472,58 @@
 
     </FrameLayout>
 
-    <!-- Delete child (owner only; visibility set in code) -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_delete"
-        style="@style/Widget.Pf.Button.Secondary"
+    <!-- Danger Zone: Delete child (owner only; card visibility set in code) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_danger_zone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginTop="@dimen/spacing_8"
-        android:text="@string/child_detail_delete_button"
-        android:contentDescription="@string/child_detail_delete_button"
-        android:visibility="gone" />
+        android:layout_marginTop="@dimen/spacing_16"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/corner_radius_md"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorError"
+        app:cardBackgroundColor="?attr/colorErrorContainer">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="@dimen/spacing_12">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/account_delete_section_title"
+            android:textAppearance="@style/TextAppearance.Pf.LabelLarge"
+            android:textColor="?attr/colorError"
+            android:fontFamily="@font/fredoka"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_4" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/child_detail_danger_zone_warning"
+            android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+            android:textColor="?attr/colorOnErrorContainer"
+            android:fontFamily="@font/dm_sans"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/child_detail_delete_button"
+            android:contentDescription="@string/child_detail_delete_button"
+            android:textColor="?attr/colorOnError"
+            android:backgroundTint="?attr/colorError"
+            android:fontFamily="@font/dm_sans" />
+
+      </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
   </LinearLayout>
 

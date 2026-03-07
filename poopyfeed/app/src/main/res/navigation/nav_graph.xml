@@ -104,6 +104,10 @@
         <action
             android:id="@+id/action_childDetail_to_quickLogSheet"
             app:destination="@id/childDetailQuickLogSheet" />
+
+        <action
+            android:id="@+id/action_childDetail_to_editChild"
+            app:destination="@id/EditChildFragment" />
     </fragment>
 
     <dialog
@@ -278,16 +282,16 @@
         android:label="@string/create_child_title"
         tools:layout="@layout/fragment_create_child_bottom_sheet" />
 
-    <dialog
-        android:id="@+id/editChildBottomSheet"
-        android:name="net.poopyfeed.pf.children.EditChildBottomSheetFragment"
+    <fragment
+        android:id="@+id/EditChildFragment"
+        android:name="net.poopyfeed.pf.children.EditChildFragment"
         android:label="@string/edit_child_title"
         tools:layout="@layout/fragment_edit_child_bottom_sheet">
 
         <argument
             android:name="childId"
             app:argType="integer" />
-    </dialog>
+    </fragment>
 
     <dialog
         android:id="@+id/createInviteBottomSheet"
