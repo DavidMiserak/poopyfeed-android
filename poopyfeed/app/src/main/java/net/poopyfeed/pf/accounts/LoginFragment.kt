@@ -112,7 +112,7 @@ class LoginFragment : Fragment() {
 
   private fun navigateToHome() {
     val navController = findNavController()
-    navController.navigate(R.id.action_loginFragment_to_homeFragment)
+    navController.navigate(R.id.action_loginFragment_to_childrenList)
   }
 
   override fun onDestroyView() {

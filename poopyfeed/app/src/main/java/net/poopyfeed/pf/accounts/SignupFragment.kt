@@ -113,7 +113,7 @@ class SignupFragment : Fragment() {
 
   private fun navigateToHome() {
     val navController = findNavController()
-    navController.navigate(R.id.action_signupFragment_to_homeFragment)
+    navController.navigate(R.id.action_signupFragment_to_childrenList)
   }
 
   override fun onDestroyView() {

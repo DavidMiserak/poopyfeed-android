@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_login">
 
         <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/HomeFragment"
+            android:id="@+id/action_loginFragment_to_childrenList"
+            app:destination="@id/ChildrenListFragment"
             app:popUpTo="@id/LoginFragment"
             app:popUpToInclusive="true" />
 
@@ -317,8 +317,8 @@
         tools:layout="@layout/fragment_signup">
 
         <action
-            android:id="@+id/action_signupFragment_to_homeFragment"
-            app:destination="@id/HomeFragment"
+            android:id="@+id/action_signupFragment_to_childrenList"
+            app:destination="@id/ChildrenListFragment"
             app:popUpTo="@id/LoginFragment"
             app:popUpToInclusive="true" />
     </fragment>

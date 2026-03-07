@@ -22,7 +22,7 @@ sealed interface LoginUiState {
   /** Login request in progress. */
   data object Loading : LoginUiState
 
-  /** Login succeeded; navigate to home. */
+  /** Login succeeded; navigate to children list. */
   data object Success : LoginUiState
 
   /** Login failed; [message] is user-facing. */
@@ -45,7 +45,7 @@ constructor(
   private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
   val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-  /** True if a token is already stored (skip login and go to home). */
+  /** True if a token is already stored (skip login and go to children list). */
   fun checkExistingToken(): Boolean = tokenManager.getToken() != null
 
   /**
