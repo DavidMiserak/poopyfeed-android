@@ -86,6 +86,52 @@ class DateTimeUtilsTest {
     assertEquals("Never", result)
   }
 
+  // === formatRelativeTimeShort Tests ===
+
+  @Test
+  fun `formatRelativeTimeShort with null returns dash`() {
+    val result = formatRelativeTimeShort(mockContext, null)
+    assertEquals("—", result)
+  }
+
+  @Test
+  fun `formatRelativeTimeShort with less than 1 minute ago returns now`() {
+    val eventTime = "2024-01-14T10:00:00Z"
+    val nowMillis = 1705226430000L // 30 seconds later
+    val result = formatRelativeTimeShort(mockContext, eventTime, nowMillis)
+    assertEquals("now", result)
+  }
+
+  @Test
+  fun `formatRelativeTimeShort with 5 minutes ago returns 5m`() {
+    val eventTime = "2024-01-14T10:00:00Z"
+    val nowMillis = 1705226700000L // 5 minutes later
+    val result = formatRelativeTimeShort(mockContext, eventTime, nowMillis)
+    assertEquals("5m", result)
+  }
+
+  @Test
+  fun `formatRelativeTimeShort with 2 hours ago returns 2h`() {
+    val eventTime = "2024-01-14T10:00:00Z"
+    val nowMillis = 1705233600000L // 2 hours later
+    val result = formatRelativeTimeShort(mockContext, eventTime, nowMillis)
+    assertEquals("2h", result)
+  }
+
+  @Test
+  fun `formatRelativeTimeShort with 3 days ago returns 3d`() {
+    val eventTime = "2024-01-14T10:00:00Z"
+    val nowMillis = 1705485600000L // 3 days later
+    val result = formatRelativeTimeShort(mockContext, eventTime, nowMillis)
+    assertEquals("3d", result)
+  }
+
+  @Test
+  fun `formatRelativeTimeShort with invalid string returns dash`() {
+    val result = formatRelativeTimeShort(mockContext, "invalid-date", 0L)
+    assertEquals("—", result)
+  }
+
   // === formatAge Tests ===
 
   @Test

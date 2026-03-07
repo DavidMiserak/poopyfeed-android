@@ -10,6 +10,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.databinding.ItemChildBinding
 import net.poopyfeed.pf.util.formatAge
+import net.poopyfeed.pf.util.formatRelativeTimeShort
 
 /**
  * RecyclerView adapter for displaying a list of children. Shows child name, age, gender, and last
@@ -44,50 +45,11 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
           else binding.root.context.getString(R.string.create_child_gender_male)
       binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
 
-      // Parse activity timestamps
-      val feedingMs =
-          if (child.last_feeding != null) {
-            try {
-              java.text
-                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-                  .parse(child.last_feeding)
-                  ?.time
-            } catch (e: Exception) {
-              null
-            }
-          } else null
-
-      val diaperMs =
-          if (child.last_diaper_change != null) {
-            try {
-              java.text
-                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-                  .parse(child.last_diaper_change)
-                  ?.time
-            } catch (e: Exception) {
-              null
-            }
-          } else null
-
-      val napMs =
-          if (child.last_nap != null) {
-            try {
-              java.text
-                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-                  .parse(child.last_nap)
-                  ?.time
-            } catch (e: Exception) {
-              null
-            }
-          } else null
-
-      // Activity times on right column (just the time, emoji + label are in layout)
-      binding.textLastFeeding.text = formatTimeAbbreviated(feedingMs)
-      binding.textLastDiaper.text = formatTimeAbbreviated(diaperMs)
-      binding.textLastNap.text = formatTimeAbbreviated(napMs)
+      // Activity times on right column: short format ("1m", "1h", "1d")
+      val ctx = binding.root.context
+      binding.textLastFeeding.text = formatRelativeTimeShort(ctx, child.last_feeding)
+      binding.textLastDiaper.text = formatRelativeTimeShort(ctx, child.last_diaper_change)
+      binding.textLastNap.text = formatRelativeTimeShort(ctx, child.last_nap)
 
       // Show role badge only for non-owners
       binding.chipRole.visibility = if (child.user_role == "owner") View.GONE else View.VISIBLE
@@ -101,22 +63,6 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
 
       // Click listener
       binding.root.setOnClickListener { onChildClick(child) }
-    }
-
-    private fun formatTimeAbbreviated(timeMs: Long?): String {
-      if (timeMs == null) return "—"
-      val now = System.currentTimeMillis()
-      val diffMs = now - timeMs
-      val diffMinutes = diffMs / 60000
-      val diffHours = diffMs / 3600000
-      val diffDays = diffMs / 86400000
-
-      return when {
-        diffMinutes < 1 -> "now"
-        diffMinutes < 60 -> "${diffMinutes}m"
-        diffHours < 24 -> "${diffHours}h"
-        else -> "${diffDays}d"
-      }
     }
   }
 

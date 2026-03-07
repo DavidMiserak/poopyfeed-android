@@ -52,6 +52,37 @@ fun formatRelativeTime(
 }
 
 /**
+ * Short relative time for lists (e.g. "now", "5m", "2h", "3d"). Null returns "—".
+ *
+ * @param context Context for optional localization (currently uses literal "—" and "now")
+ * @param isoString ISO 8601 datetime or null
+ * @param nowMillis Current time in millis for testing; defaults to [System.currentTimeMillis]
+ * @return "—", "now", or abbreviated span like "1m", "1h", "1d"
+ */
+fun formatRelativeTimeShort(
+    context: Context,
+    isoString: String?,
+    nowMillis: Long = System.currentTimeMillis(),
+): String {
+  if (isoString == null) return "—"
+  return try {
+    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val diffMs = nowMillis - millis
+    val diffMinutes = diffMs / 60_000
+    val diffHours = diffMs / 3_600_000
+    val diffDays = diffMs / 86_400_000
+    when {
+      diffMinutes < 1 -> "now"
+      diffMinutes < 60 -> "${diffMinutes}m"
+      diffHours < 24 -> "${diffHours}h"
+      else -> "${diffDays}d"
+    }
+  } catch (e: Exception) {
+    "—"
+  }
+}
+
+/**
  * Formats the age of a child from a date of birth string (ISO 8601 date format). Returns "X months"
  * for infants under 12 months, or "X yr Y mo" for older children. Uses the device local date for
  * "today" so age is correct by the user's location.
