@@ -76,7 +76,9 @@ constructor(
           return@collect
         }
 
-        val ageFormatted = formatAge(child.date_of_birth)
+        val age = formatAge(child.date_of_birth)
+        val gender = if (child.gender == "M") "Boy" else "Girl"
+        val ageFormatted = "$age • $gender"
         val lastFeedingFormatted = formatRelativeTime(context, child.last_feeding)
         val lastDiaperFormatted = formatRelativeTime(context, child.last_diaper_change)
         val lastNapFormatted = formatRelativeTime(context, child.last_nap)
