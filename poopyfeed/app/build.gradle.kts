@@ -24,6 +24,9 @@ android {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1/\"")
             buildConfigField("String", "WEB_BASE_URL", "\"http://10.0.2.2:4200/\"")
+            // E2E critical path tests skip when empty (no backend). Set via -PE2E_TEST_EMAIL=... in CI.
+            buildConfigField("String", "E2E_TEST_EMAIL", "\"${project.findProperty("E2E_TEST_EMAIL") ?: ""}\"")
+            buildConfigField("String", "E2E_TEST_PASSWORD", "\"${project.findProperty("E2E_TEST_PASSWORD") ?: ""}\"")
         }
         release {
             isMinifyEnabled = true

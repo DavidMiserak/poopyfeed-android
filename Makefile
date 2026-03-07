@@ -1,4 +1,4 @@
-.PHONY: help build build-debug build-release install clean test test-e2e lint shell logs format
+.PHONY: help build build-debug build-release install clean test test-e2e test-e2e-critical lint shell logs format coverage
 
 # Variables
 GRADLE = ./gradlew
@@ -26,9 +26,10 @@ help:
 	@echo "  make uninstall          Uninstall app from device"
 	@echo ""
 	@echo "Testing & Quality:"
-	@echo "  make test               Run unit tests"
-	@echo "  make test-e2e           Run E2E tests on connected device/emulator"
-	@echo "  make coverage           Run unit tests with Kover coverage report (85% minimum)"
+	@echo "  make test               Run unit tests (JVM + Robolectric)"
+	@echo "  make test-e2e           Run all E2E tests on connected device/emulator"
+	@echo "  make test-e2e-critical  Run E2E critical-path tests (set E2E_TEST_EMAIL, E2E_TEST_PASSWORD for backend)"
+	@echo "  make coverage           Run unit tests + Kover report (85%% line minimum); opens HTML report"
 	@echo "  make lint               Run lint checks"
 	@echo "  make lint-fix           Attempt to auto-fix lint issues"
 	@echo ""
@@ -86,26 +87,33 @@ clean:
 # Testing
 test:
 	@echo "Running unit tests..."
-	cd poopyfeed && $(GRADLE) test
+	cd poopyfeed && $(GRADLE) testDebugUnitTest
 
 test-e2e:
 	@echo "Running E2E tests on connected device/emulator..."
 	cd poopyfeed && $(GRADLE) connectedDebugAndroidTest
 
+# Run E2E critical-path tests (login → child detail → feedings/diapers/naps).
+# Requires backend; set E2E_TEST_EMAIL and E2E_TEST_PASSWORD (env or -e for adb).
+# Example: E2E_TEST_EMAIL=e2e@test.com E2E_TEST_PASSWORD=secret make test-e2e-critical
+test-e2e-critical:
+	@echo "Running E2E critical-path tests (backend + credentials required)..."
+	cd poopyfeed && $(GRADLE) connectedDebugAndroidTest \
+		-PE2E_TEST_EMAIL="$${E2E_TEST_EMAIL}" \
+		-PE2E_TEST_PASSWORD="$${E2E_TEST_PASSWORD}" \
+		--tests "net.poopyfeed.pf.CriticalPathE2eTest"
+
 coverage:
-	@echo "Running unit tests with coverage (Kover)..."
-	cd poopyfeed && $(GRADLE) koverXmlReport
+	@echo "Running unit tests with Kover coverage..."
+	cd poopyfeed && $(GRADLE) koverHtmlReportDebug
 	@echo ""
-	@echo "Kover coverage summary (LINE):"
-	@if [ -f "poopyfeed/app/build/reports/kover/report.xml" ]; then \
-		grep -o '<counter type="LINE"[^>]*/>' poopyfeed/app/build/reports/kover/report.xml | \
-		awk -F'"' '{missed+=$$4; covered+=$$6} END { total=missed+covered; if (total>0) printf "  %.2f%% (%d/%d lines covered)\n", covered*100/total, covered, total; else print "  0.00%% (0/0 lines covered)"; }'; \
+	@echo "Kover coverage (LINE, 85%% minimum):"
+	@if [ -f "poopyfeed/app/build/reports/kover/html/debug/index.html" ]; then \
+		echo "  HTML report: poopyfeed/app/build/reports/kover/html/debug/index.html"; \
+		(xdg-open poopyfeed/app/build/reports/kover/html/debug/index.html 2>/dev/null || open poopyfeed/app/build/reports/kover/html/debug/index.html 2>/dev/null) || true; \
 	else \
-		echo "  XML report not found at poopyfeed/app/build/reports/kover/report.xml"; \
+		echo "  Report not found (run 'make coverage' from repo root)."; \
 	fi
-	@echo ""
-	@echo "HTML report (if generated via Gradle):"
-	@echo "  (not configured yet for Kover)"
 
 # Lint
 lint:
