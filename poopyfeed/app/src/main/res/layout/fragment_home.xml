@@ -43,13 +43,14 @@
         <!-- Hero welcome banner (gradient) -->
         <!-- ======================== -->
 
+        <!-- Welcome banner (refined, minimal elevation) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_welcome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_0"
             app:cardCornerRadius="@dimen/corner_radius_lg"
-            app:cardElevation="@dimen/elevation_8"
+            app:cardElevation="@dimen/elevation_2"
             app:strokeWidth="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -59,7 +60,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimaryContainer"
-                android:padding="@dimen/spacing_12">
+                android:paddingStart="@dimen/spacing_12"
+                android:paddingEnd="@dimen/spacing_12"
+                android:paddingTop="@dimen/spacing_16"
+                android:paddingBottom="@dimen/spacing_16">
 
                 <!-- Welcome text (white on gradient) -->
                 <TextView

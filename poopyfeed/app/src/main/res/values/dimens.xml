@@ -12,10 +12,15 @@
     <dimen name="spacing_20">40dp</dimen>
     <dimen name="spacing_24">48dp</dimen>
 
-    <!-- Corner Radius -->
-    <dimen name="corner_radius_md">12dp</dimen>
-    <dimen name="corner_radius_lg">24dp</dimen>
-    <dimen name="corner_radius_xl">32dp</dimen>
+    <!-- Corner Radius (organic variance) -->
+    <dimen name="corner_radius_sm">8dp</dimen>
+    <dimen name="corner_radius_md">16dp</dimen>
+    <dimen name="corner_radius_lg">20dp</dimen>
+    <dimen name="corner_radius_xl">24dp</dimen>
+
+    <!-- Border & Divider -->
+    <dimen name="divider_thickness">1dp</dimen>
+    <dimen name="accent_stripe_width">3dp</dimen>
 
     <!-- Typography -->
     <dimen name="text_display_large">57sp</dimen>
