@@ -242,4 +242,61 @@ class DateTimeUtilsTest {
     val result = formatTimestampForDisplay(mockContext, invalid)
     assertEquals(invalid, result)
   }
+
+  // === formatNapDuration Tests ===
+
+  @Test
+  fun `formatNapDuration under 60 minutes returns minutes only`() {
+    val result =
+        formatNapDuration(
+            mockContext,
+            "2024-01-15T10:00:00Z",
+            "2024-01-15T10:45:00Z",
+        )
+    assertEquals("45m", result)
+  }
+
+  @Test
+  fun `formatNapDuration exactly 60 minutes returns hours only`() {
+    val result =
+        formatNapDuration(
+            mockContext,
+            "2024-01-15T10:00:00Z",
+            "2024-01-15T11:00:00Z",
+        )
+    assertEquals("1h", result)
+  }
+
+  @Test
+  fun `formatNapDuration mixed hours and minutes`() {
+    val result =
+        formatNapDuration(
+            mockContext,
+            "2024-01-15T10:00:00Z",
+            "2024-01-15T11:30:00Z",
+        )
+    assertEquals("1h 30m", result)
+  }
+
+  @Test
+  fun `formatNapDuration with invalid start returns empty string`() {
+    val result =
+        formatNapDuration(
+            mockContext,
+            "invalid",
+            "2024-01-15T11:00:00Z",
+        )
+    assertEquals("", result)
+  }
+
+  @Test
+  fun `formatNapDuration with invalid end returns empty string`() {
+    val result =
+        formatNapDuration(
+            mockContext,
+            "2024-01-15T10:00:00Z",
+            "invalid",
+        )
+    assertEquals("", result)
+  }
 }

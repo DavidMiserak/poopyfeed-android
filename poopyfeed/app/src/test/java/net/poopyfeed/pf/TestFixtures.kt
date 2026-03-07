@@ -7,6 +7,7 @@ import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.models.FeedingListResponse
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
+import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.models.UserProfile
 
 /**
@@ -169,4 +170,24 @@ object TestFixtures {
           first_name = first_name,
           last_name = last_name,
           timezone = timezone)
+
+  fun mockNotification(
+      id: Int = 1,
+      eventType: String = "feeding",
+      message: String = "Baby was fed",
+      isRead: Boolean = false,
+      createdAt: String = TS12,
+      actorName: String = "Caregiver",
+      childName: String = "Baby Alice",
+      childId: Int = 1
+  ) =
+      Notification(
+          id = id,
+          eventType = eventType,
+          message = message,
+          isRead = isRead,
+          createdAt = createdAt,
+          actorName = actorName,
+          childName = childName,
+          childId = childId)
 }
