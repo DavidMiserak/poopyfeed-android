@@ -223,6 +223,17 @@
 
     <issue
         id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-testing than 2.8.9 is available: 2.9.7"
+        errorLine1="navigationFragmentKtx = &quot;2.8.9&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="12"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
         message="A newer version of androidx.navigation:navigation-ui-ktx than 2.8.9 is available: 2.9.7"
         errorLine1="navigationUiKtx = &quot;2.8.9&quot;"
         errorLine2="                  ~~~~~~~">
@@ -239,7 +250,7 @@
         errorLine2="       ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="19"
+            line="20"
             column="8"/>
     </issue>
 
@@ -250,7 +261,7 @@
         errorLine2="       ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="19"
+            line="20"
             column="8"/>
     </issue>
 
@@ -261,7 +272,7 @@
         errorLine2="       ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="19"
+            line="20"
             column="8"/>
     </issue>
 
@@ -272,7 +283,7 @@
         errorLine2="            ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="22"
+            line="23"
             column="13"/>
     </issue>
 
@@ -283,7 +294,7 @@
         errorLine2="           ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="23"
+            line="24"
             column="12"/>
     </issue>
 
@@ -294,7 +305,7 @@
         errorLine2="                   ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="25"
+            line="26"
             column="20"/>
     </issue>
 
@@ -305,8 +316,19 @@
         errorLine2="                     ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="28"
+            line="29"
             column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.fragment:fragment-testing than 1.8.7 is available: 1.8.9"
+        errorLine1="fragmentTesting = &quot;1.8.7&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="30"
+            column="19"/>
     </issue>
 
     <issue
@@ -333,12 +355,23 @@
 
     <issue
         id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-datetime than 0.6.2 is available: 0.7.1"
+        errorLine1="kotlinxDatetime = &quot;0.6.2&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="17"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
         message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.8.0 is available: 1.10.0"
         errorLine1="kotlinxSerialization = &quot;1.8.0&quot;"
         errorLine2="                       ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="17"
+            line="18"
             column="24"/>
     </issue>
 
@@ -349,7 +382,7 @@
         errorLine2="        ~~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="20"
+            line="21"
             column="9"/>
     </issue>
 
@@ -360,7 +393,7 @@
         errorLine2="              ~~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="24"
+            line="25"
             column="15"/>
     </issue>
 
@@ -371,7 +404,7 @@
         errorLine2="           ~~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
-            line="26"
+            line="27"
             column="12"/>
     </issue>
 
@@ -389,7 +422,7 @@
         errorLine2="             ~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_main.xml"
-            line="35"
+            line="36"
             column="14"/>
     </issue>
 
@@ -417,13 +450,178 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/slate_50` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
-        errorLine1="    android:background=&quot;@color/slate_50&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme_Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_main.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/content_main.xml"
             line="6"
             column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_account_settings.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_child_detail.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_children_list.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_diapers_list.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_feedings_list.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_home.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_login.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_naps_list.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_notifications.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Pf`)"
+        errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_signup.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_banner_accent_stripe` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_banner_accent_stripe.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_banner_timezone_gradient` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_banner_timezone_gradient.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_button_primary_selector` appears to be unused"
+        errorLine1="&lt;selector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_button_primary_selector.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_button_timezone_primary` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_button_timezone_primary.xml"
+            line="3"
+            column="1"/>
     </issue>
 
     <issue
@@ -439,6 +637,94 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.bg_gradient_button_primary` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_gradient_button_primary.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_gradient_button_primary_pressed` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_gradient_button_primary_pressed.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_gradient_hero` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_gradient_hero.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_gradient_page` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_gradient_page.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.bg_toolbar_gradient_line` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/bg_toolbar_gradient_line.xml"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.rose_50` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_50&quot;>#fff5f7&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="4"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.rose_100` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_100&quot;>#ffe4e6&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.rose_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_200&quot;>#fecdd3&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.color.rose_300` appears to be unused"
         errorLine1="    &lt;color name=&quot;rose_300&quot;>#fda4af&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~">
@@ -450,12 +736,199 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.color.rose_400` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_400&quot;>#fb7185&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.rose_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_500&quot;>#f43f5e&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.rose_600` appears to be unused"
+        errorLine1="    &lt;color name=&quot;rose_600&quot;>#e11d48&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.amber_400` appears to be unused"
+        errorLine1="    &lt;color name=&quot;amber_400&quot;>#fbbf24&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="13"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.amber_600` appears to be unused"
+        errorLine1="    &lt;color name=&quot;amber_600&quot;>#d97706&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="14"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.orange_400` appears to be unused"
+        errorLine1="    &lt;color name=&quot;orange_400&quot;>#fb923c&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="15"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.orange_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;orange_500&quot;>#f97316&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="16"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_50` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_50&quot;>#f8fafc&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="19"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_100` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_100&quot;>#f1f5f9&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="20"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.color.slate_200` appears to be unused"
         errorLine1="    &lt;color name=&quot;slate_200&quot;>#e2e8f0&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="20"
+            line="21"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_300` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_300&quot;>#cbd5e1&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="22"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_600` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_600&quot;>#475569&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="23"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_700` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_700&quot;>#334155&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="24"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.slate_900` appears to be unused"
+        errorLine1="    &lt;color name=&quot;slate_900&quot;>#0f172a&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="25"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.emerald_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;emerald_500&quot;>#10b981&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="28"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.emerald_50` appears to be unused"
+        errorLine1="    &lt;color name=&quot;emerald_50&quot;>#f0fdf4&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="29"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.red_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;red_500&quot;>#ef4444&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="30"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.red_50` appears to be unused"
+        errorLine1="    &lt;color name=&quot;red_50&quot;>#fef2f2&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="31"
             column="12"/>
     </issue>
 
@@ -466,7 +939,18 @@
         errorLine2="           ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="33"
+            line="34"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.amber_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;amber_200&quot;>#fde68a&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="35"
             column="12"/>
     </issue>
 
@@ -477,7 +961,18 @@
         errorLine2="           ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="34"
+            line="36"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.white_95` appears to be unused"
+        errorLine1="    &lt;color name=&quot;white_95&quot;>#F2FFFFFF&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="39"
             column="12"/>
     </issue>
 
@@ -488,7 +983,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="38"
+            line="40"
             column="12"/>
     </issue>
 
@@ -499,8 +994,30 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="39"
+            line="41"
             column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.white` appears to be unused"
+        errorLine1="    &lt;color name=&quot;white&quot;>#FFFFFFFF&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="44"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.layout.content_main` appears to be unused"
+        errorLine1="&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/content_main.xml"
+            line="2"
+            column="1"/>
     </issue>
 
     <issue
@@ -554,7 +1071,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="30"
+            line="33"
             column="12"/>
     </issue>
 
@@ -565,7 +1082,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="34"
+            line="37"
             column="12"/>
     </issue>
 
@@ -576,7 +1093,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="37"
+            line="40"
             column="12"/>
     </issue>
 
@@ -587,8 +1104,19 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="39"
+            line="42"
             column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_heart_logo` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_heart_logo.xml"
+            line="3"
+            column="1"/>
     </issue>
 
     <issue
@@ -604,12 +1132,23 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.action_settings` appears to be unused"
+        errorLine1="    &lt;string name=&quot;action_settings&quot;>Settings&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="3"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.string.home_getting_started_title` appears to be unused"
         errorLine1="    &lt;string name=&quot;home_getting_started_title&quot;>Getting Started&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="36"
+            line="42"
             column="13"/>
     </issue>
 
@@ -620,7 +1159,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="37"
+            line="43"
             column="13"/>
     </issue>
 
@@ -631,7 +1170,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="61"
+            line="67"
             column="13"/>
     </issue>
 
@@ -642,7 +1181,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="70"
+            line="76"
             column="13"/>
     </issue>
 
@@ -653,7 +1192,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="72"
+            line="78"
             column="13"/>
     </issue>
 
@@ -664,7 +1203,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="75"
+            line="81"
             column="13"/>
     </issue>
 
@@ -675,7 +1214,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="76"
+            line="82"
             column="13"/>
     </issue>
 
@@ -686,7 +1225,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="93"
+            line="99"
             column="13"/>
     </issue>
 
@@ -697,7 +1236,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="95"
+            line="101"
             column="13"/>
     </issue>
 
@@ -708,7 +1247,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="99"
+            line="110"
             column="13"/>
     </issue>
 
@@ -719,7 +1258,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="100"
+            line="111"
             column="13"/>
     </issue>
 
@@ -730,7 +1269,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="101"
+            line="112"
             column="13"/>
     </issue>
 
@@ -741,7 +1280,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="102"
+            line="113"
             column="13"/>
     </issue>
 
@@ -752,7 +1291,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="115"
+            line="127"
             column="13"/>
     </issue>
 
@@ -763,7 +1302,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="124"
+            line="137"
             column="13"/>
     </issue>
 
@@ -774,19 +1313,63 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="128"
+            line="141"
             column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.Theme_Pf_Dark` appears to be unused"
-        errorLine1="    &lt;style name=&quot;Theme.Pf.Dark&quot; parent=&quot;Theme.Material3.Dark.NoActionBar&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.string.create_feeding_amount_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_feeding_amount_error&quot;>Enter amount for bottle feeding.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/values/themes.xml"
-            line="41"
-            column="12"/>
+            file="src/main/res/values/strings.xml"
+            line="201"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_feeding_minutes_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_feeding_minutes_error&quot;>Enter minutes for breast feeding.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="203"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_feeding_side_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_feeding_side_error&quot;>Select side for breast feeding.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="205"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_feeding_type_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_feeding_type_error&quot;>Select feeding type.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="209"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.create_diaper_type_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;create_diaper_type_error&quot;>Select change type.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="219"
+            column="13"/>
     </issue>
 
     <issue
@@ -796,7 +1379,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
-            line="120"
+            line="74"
             column="12"/>
     </issue>
 
@@ -807,8 +1390,19 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
-            line="126"
+            line="80"
             column="12"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension property `View.isVisible` instead?"
+        errorLine1="        if (binding.spinnerFeedingReminder.visibility == View.VISIBLE) {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/EditChildBottomSheetFragment.kt"
+            line="219"
+            column="13"/>
     </issue>
 
     <issue
@@ -818,7 +1412,18 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_create_child_bottom_sheet.xml"
-            line="72"
+            line="73"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="KeyboardInaccessibleWidget"
+        message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
+        errorLine1="            android:clickable=&quot;true&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_edit_child_bottom_sheet.xml"
+            line="75"
             column="13"/>
     </issue>
 
@@ -828,9 +1433,119 @@
         errorLine1="      binding.textAgeGender.text = &quot;$ageFormatted • $genderFormatted&quot;"
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/net/poopyfeed/pf/ChildAdapter.kt"
-            line="43"
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="46"
             column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="      binding.textLastFeeding.text = &quot;Last feeding\n$feedingTime&quot;"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="50"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="      binding.textLastFeeding.text = &quot;Last feeding\n$feedingTime&quot;"
+        errorLine2="                                      ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="50"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="      binding.textLastDiaper.text = &quot;Last diaper\n$diaperTime&quot;"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="53"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="      binding.textLastDiaper.text = &quot;Last diaper\n$diaperTime&quot;"
+        errorLine2="                                     ~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="53"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="      binding.textLastNap.text = &quot;Last nap\n$napTime&quot;"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="56"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="      binding.textLastNap.text = &quot;Last nap\n$napTime&quot;"
+        errorLine2="                                  ~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/children/ChildAdapter.kt"
+            line="56"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="        binding.inputAmount.setText(feeding.amount_oz.toString())"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/feedings/EditFeedingBottomSheetFragment.kt"
+            line="128"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="        binding.inputMinutes.setText(feeding.duration_minutes.toString())"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/feedings/EditFeedingBottomSheetFragment.kt"
+            line="136"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            binding.textAmount.text = &quot;${feeding.amount_oz} oz&quot;"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/feedings/FeedingAdapter.kt"
+            line="53"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            binding.textAmount.text = &quot;${feeding.amount_oz} oz&quot;"
+        errorLine2="                                                           ~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/feedings/FeedingAdapter.kt"
+            line="53"
+            column="60"/>
     </issue>
 
     <issue
@@ -840,7 +1555,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_child_detail.xml"
-            line="69"
+            line="72"
             column="21"/>
     </issue>
 
