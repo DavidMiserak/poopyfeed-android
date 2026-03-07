@@ -1,4 +1,4 @@
-.PHONY: help build build-debug build-release install clean test lint shell logs format
+.PHONY: help build build-debug build-release install clean test test-e2e lint shell logs format
 
 # Variables
 GRADLE = ./gradlew
@@ -27,6 +27,7 @@ help:
 	@echo ""
 	@echo "Testing & Quality:"
 	@echo "  make test               Run unit tests"
+	@echo "  make test-e2e           Run E2E tests on connected device/emulator"
 	@echo "  make coverage           Run unit tests with Kover coverage report (85% minimum)"
 	@echo "  make lint               Run lint checks"
 	@echo "  make lint-fix           Attempt to auto-fix lint issues"
@@ -86,6 +87,10 @@ clean:
 test:
 	@echo "Running unit tests..."
 	cd poopyfeed && $(GRADLE) test
+
+test-e2e:
+	@echo "Running E2E tests on connected device/emulator..."
+	cd poopyfeed && $(GRADLE) connectedDebugAndroidTest
 
 coverage:
 	@echo "Running unit tests with coverage (Kover)..."
