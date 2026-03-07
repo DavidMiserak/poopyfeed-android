@@ -66,10 +66,10 @@ sealed interface NotificationPrefState {
 }
 
 /**
- * ViewModel for [EditChildFragment]. Loads child by ID, exposes form state, and saves
- * updates (name, DOB, gender, feeding reminder interval, custom bottle amounts) via PATCH. Also
- * manages per-child notification preferences. Feeding reminder and notification preferences are
- * only relevant when [can_edit] is true (owner/co-parent).
+ * ViewModel for [EditChildFragment]. Loads child by ID, exposes form state, and saves updates
+ * (name, DOB, gender, feeding reminder interval, custom bottle amounts) via PATCH. Also manages
+ * per-child notification preferences. Feeding reminder and notification preferences are only
+ * relevant when [can_edit] is true (owner/co-parent).
  */
 @HiltViewModel
 class EditChildViewModel

@@ -28,8 +28,7 @@ class SignupE2eTest {
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1)
-  val activityRule = ActivityScenarioRule(MainActivity::class.java)
+  @get:Rule(order = 1) val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
   @Before
   fun setUp() {
@@ -114,10 +113,8 @@ class SignupE2eTest {
     onView(withId(R.id.button_signup)).perform(click())
 
     // No validation errors should appear (API call happens but may fail without backend)
-    onView(withId(R.id.input_layout_signup_email))
-        .check(matches(not(hasTextInputLayoutError())))
-    onView(withId(R.id.input_layout_signup_password))
-        .check(matches(not(hasTextInputLayoutError())))
+    onView(withId(R.id.input_layout_signup_email)).check(matches(not(hasTextInputLayoutError())))
+    onView(withId(R.id.input_layout_signup_password)).check(matches(not(hasTextInputLayoutError())))
     onView(withId(R.id.input_layout_signup_confirm_password))
         .check(matches(not(hasTextInputLayoutError())))
   }

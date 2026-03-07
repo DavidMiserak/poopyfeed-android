@@ -37,8 +37,9 @@ class PendingInvitesFragmentTest {
 
   @BindValue @JvmField val childrenRepository: ChildrenRepository = mockk(relaxed = true)
 
-  @BindValue @JvmField val cachedChildrenRepository: CachedChildrenRepository =
-      mockk(relaxed = true)
+  @BindValue
+  @JvmField
+  val cachedChildrenRepository: CachedChildrenRepository = mockk(relaxed = true)
 
   private lateinit var navController: TestNavHostController
 
@@ -78,8 +79,7 @@ class PendingInvitesFragmentTest {
   @Test
   fun `ready state with invites shows recycler`() {
     val invite = TestFixtures.mockShareInvite(id = 1, child = 5)
-    coEvery { sharingRepository.getPendingInvites() } returns
-        ApiResult.Success(listOf(invite))
+    coEvery { sharingRepository.getPendingInvites() } returns ApiResult.Success(listOf(invite))
     every { childrenRepository.getChild(5) } returns
         flowOf(ApiResult.Success(TestFixtures.mockChild(id = 5, name = "Baby Sam")))
 

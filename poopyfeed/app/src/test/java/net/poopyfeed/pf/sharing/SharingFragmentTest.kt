@@ -8,7 +8,6 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
@@ -80,7 +79,8 @@ class SharingFragmentTest {
   @Test
   fun `error state shows error layout and hides list`() {
     coEvery { sharingRepository.listInvites(childId) } returns
-        ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.HttpError(500, "Error", "Server error"))
+        ApiResult.Error(
+            net.poopyfeed.pf.data.models.ApiError.HttpError(500, "Error", "Server error"))
 
     var fragment: SharingFragment? = null
     launchFragmentInHiltContainer<SharingFragment>(
