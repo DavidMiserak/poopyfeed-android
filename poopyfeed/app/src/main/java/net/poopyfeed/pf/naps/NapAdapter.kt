@@ -14,8 +14,8 @@ import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of naps. Shows start time, duration or "In progress",
- * and "End Nap" button when [Nap.end_time] is null. Tap triggers [onItemClick]; long-press
- * triggers [onDeleteClick].
+ * and "End Nap" button when [Nap.end_time] is null. Tap triggers [onItemClick]; long-press triggers
+ * [onDeleteClick].
  */
 class NapAdapter(
     private val onItemClick: (Nap) -> Unit,

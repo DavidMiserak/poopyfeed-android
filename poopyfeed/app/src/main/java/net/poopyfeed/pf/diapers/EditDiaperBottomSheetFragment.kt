@@ -22,8 +22,8 @@ import net.poopyfeed.pf.databinding.FragmentCreateDiaperBottomSheetBinding
 import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
- * Bottom sheet for editing an existing diaper change. Reuses the create diaper form layout; prefills
- * change type and timestamp. On success signals diaper_updated and dismisses.
+ * Bottom sheet for editing an existing diaper change. Reuses the create diaper form layout;
+ * prefills change type and timestamp. On success signals diaper_updated and dismisses.
  */
 @AndroidEntryPoint
 class EditDiaperBottomSheetFragment : BottomSheetDialogFragment() {

@@ -176,9 +176,12 @@ data class CreateNapRequest(
 )
 
 /** DTO for PATCH nap (partial update). Omit nulls so backend receives only provided fields. */
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class UpdateNapRequest(
-    @SerialName("napped_at") @EncodeDefault(EncodeDefault.Mode.NEVER) val start_time: String? = null,
+    @SerialName("napped_at")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val start_time: String? = null,
     @SerialName("ended_at") @EncodeDefault(EncodeDefault.Mode.NEVER) val end_time: String? = null,
 )
 

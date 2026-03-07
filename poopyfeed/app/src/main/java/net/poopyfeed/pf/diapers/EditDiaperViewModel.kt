@@ -33,7 +33,10 @@ sealed interface EditDiaperUiState {
   data class ValidationError(val typeError: String? = null) : EditDiaperUiState
 }
 
-/** ViewModel for [EditDiaperBottomSheetFragment]. Loads diaper for prefill, validates and saves updates. */
+/**
+ * ViewModel for [EditDiaperBottomSheetFragment]. Loads diaper for prefill, validates and saves
+ * updates.
+ */
 @HiltViewModel
 class EditDiaperViewModel
 @Inject

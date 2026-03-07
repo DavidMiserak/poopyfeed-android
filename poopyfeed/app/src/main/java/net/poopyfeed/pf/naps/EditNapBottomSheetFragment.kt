@@ -82,10 +82,7 @@ class EditNapBottomSheetFragment : BottomSheetDialogFragment() {
               binding.progressSaving.visibility = View.VISIBLE
             }
             is EditNapUiState.Success -> {
-              findNavController()
-                  .previousBackStackEntry
-                  ?.savedStateHandle
-                  ?.set("nap_updated", true)
+              findNavController().previousBackStackEntry?.savedStateHandle?.set("nap_updated", true)
               dismiss()
             }
             is EditNapUiState.SaveError -> {

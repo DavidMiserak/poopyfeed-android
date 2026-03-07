@@ -152,13 +152,14 @@ class NapsListFragment : Fragment() {
   }
 
   private fun navigateToEditNap(childId: Int, napId: Int) {
-    findNavController().navigate(
-        R.id.action_napsList_to_editNap,
-        Bundle().apply {
-          putInt("childId", childId)
-          putInt("napId", napId)
-        },
-    )
+    findNavController()
+        .navigate(
+            R.id.action_napsList_to_editNap,
+            Bundle().apply {
+              putInt("childId", childId)
+              putInt("napId", napId)
+            },
+        )
   }
 
   private fun showDeleteConfirmationDialog(napId: Int) {

@@ -243,7 +243,10 @@ constructor(
         }
       }
 
-  /** Get a single feeding from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  /**
+   * Get a single feeding from cache for prefill (e.g. edit). Returns null if not found or wrong
+   * child.
+   */
   suspend fun getFeeding(childId: Int, feedingId: Int): Feeding? =
       withContext(ioDispatcher) {
         feedingDao.getFeeding(feedingId)?.takeIf { it.child == childId }?.toApiModel()
@@ -360,7 +363,10 @@ constructor(
         }
       }
 
-  /** Get a single diaper from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  /**
+   * Get a single diaper from cache for prefill (e.g. edit). Returns null if not found or wrong
+   * child.
+   */
   suspend fun getDiaper(childId: Int, diaperId: Int): Diaper? =
       withContext(ioDispatcher) {
         diaperDao.getDiaper(diaperId)?.takeIf { it.child == childId }?.toApiModel()
@@ -478,7 +484,9 @@ constructor(
         }
       }
 
-  /** Get a single nap from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  /**
+   * Get a single nap from cache for prefill (e.g. edit). Returns null if not found or wrong child.
+   */
   suspend fun getNap(childId: Int, napId: Int): Nap? =
       withContext(ioDispatcher) {
         napDao.getNap(napId)?.takeIf { it.child == childId }?.toApiModel()

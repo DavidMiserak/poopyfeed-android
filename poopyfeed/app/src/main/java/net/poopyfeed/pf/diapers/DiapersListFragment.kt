@@ -151,13 +151,14 @@ class DiapersListFragment : Fragment() {
   }
 
   private fun navigateToEditDiaper(childId: Int, diaperId: Int) {
-    findNavController().navigate(
-        R.id.action_diapersList_to_editDiaper,
-        Bundle().apply {
-          putInt("childId", childId)
-          putInt("diaperId", diaperId)
-        },
-    )
+    findNavController()
+        .navigate(
+            R.id.action_diapersList_to_editDiaper,
+            Bundle().apply {
+              putInt("childId", childId)
+              putInt("diaperId", diaperId)
+            },
+        )
   }
 
   private fun showDeleteConfirmationDialog(diaperId: Int) {

@@ -38,7 +38,10 @@ sealed interface EditFeedingUiState {
   ) : EditFeedingUiState
 }
 
-/** ViewModel for [EditFeedingBottomSheetFragment]. Loads feeding for prefill, validates and saves updates. */
+/**
+ * ViewModel for [EditFeedingBottomSheetFragment]. Loads feeding for prefill, validates and saves
+ * updates.
+ */
 @HiltViewModel
 class EditFeedingViewModel
 @Inject

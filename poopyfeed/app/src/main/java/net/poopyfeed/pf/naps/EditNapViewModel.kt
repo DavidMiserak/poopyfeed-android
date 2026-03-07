@@ -31,7 +31,9 @@ sealed interface EditNapUiState {
   data class SaveError(val message: String) : EditNapUiState
 }
 
-/** ViewModel for [EditNapBottomSheetFragment]. Loads nap for prefill, saves start/end time updates. */
+/**
+ * ViewModel for [EditNapBottomSheetFragment]. Loads nap for prefill, saves start/end time updates.
+ */
 @HiltViewModel
 class EditNapViewModel
 @Inject
@@ -44,8 +46,7 @@ constructor(
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
   private val napId: Int = checkNotNull(savedStateHandle["napId"])
 
-  private val _uiState: MutableStateFlow<EditNapUiState> =
-      MutableStateFlow(EditNapUiState.Loading)
+  private val _uiState: MutableStateFlow<EditNapUiState> = MutableStateFlow(EditNapUiState.Loading)
   val uiState: StateFlow<EditNapUiState> = _uiState.asStateFlow()
 
   init {
@@ -56,8 +57,7 @@ constructor(
     viewModelScope.launch {
       val nap = repo.getNap(childId, napId)
       _uiState.value =
-          if (nap != null) EditNapUiState.Ready(nap)
-          else EditNapUiState.Error("Nap not found.")
+          if (nap != null) EditNapUiState.Ready(nap) else EditNapUiState.Error("Nap not found.")
     }
   }
 

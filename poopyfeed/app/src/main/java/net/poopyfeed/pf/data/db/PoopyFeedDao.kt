@@ -122,8 +122,7 @@ interface NapDao {
   suspend fun getNaps(childId: Int): List<NapEntity>
 
   /** Get a specific nap by ID. */
-  @Query("SELECT * FROM naps WHERE id = :napId")
-  suspend fun getNap(napId: Int): NapEntity?
+  @Query("SELECT * FROM naps WHERE id = :napId") suspend fun getNap(napId: Int): NapEntity?
 
   /** Get the most recent nap. */
   @Query("SELECT * FROM naps WHERE child = :childId ORDER BY start_time DESC LIMIT 1")

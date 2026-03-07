@@ -13,8 +13,8 @@ import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of feedings. Shows type (Bottle/Breast); for bottle
- * shows amount (oz), for breast shows duration and side when available (e.g. "15 min • Left").
- * Tap triggers [onItemClick]; long-press triggers [onDeleteClick].
+ * shows amount (oz), for breast shows duration and side when available (e.g. "15 min • Left"). Tap
+ * triggers [onItemClick]; long-press triggers [onDeleteClick].
  */
 class FeedingAdapter(
     private val onItemClick: (Feeding) -> Unit,

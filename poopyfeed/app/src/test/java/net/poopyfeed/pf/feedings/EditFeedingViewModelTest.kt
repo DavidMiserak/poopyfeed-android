@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +22,6 @@ import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditFeedingViewModelTest {
@@ -47,31 +47,34 @@ class EditFeedingViewModelTest {
   }
 
   @Test
-  fun `init loads feeding and emits Ready with correct data`() = runTest(testDispatcher) {
-    val feeding = TestFixtures.mockFeeding(id = 2, feeding_type = "bottle", amount_oz = 4.0)
-    coEvery { mockRepository.getFeeding(1, 2) } returns feeding
+  fun `init loads feeding and emits Ready with correct data`() =
+      runTest(testDispatcher) {
+        val feeding = TestFixtures.mockFeeding(id = 2, feeding_type = "bottle", amount_oz = 4.0)
+        coEvery { mockRepository.getFeeding(1, 2) } returns feeding
 
-    viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
+        viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
 
-    assertIs<EditFeedingUiState.Ready>(viewModel.uiState.value)
-    assertEquals(2, (viewModel.uiState.value as EditFeedingUiState.Ready).feeding.id)
-    assertEquals("bottle", (viewModel.uiState.value as EditFeedingUiState.Ready).feeding.feeding_type)
-  }
+        assertIs<EditFeedingUiState.Ready>(viewModel.uiState.value)
+        assertEquals(2, (viewModel.uiState.value as EditFeedingUiState.Ready).feeding.id)
+        assertEquals(
+            "bottle", (viewModel.uiState.value as EditFeedingUiState.Ready).feeding.feeding_type)
+      }
 
   @Test
-  fun `init when getFeeding returns null emits Error`() = runTest(testDispatcher) {
-    coEvery { mockRepository.getFeeding(1, 2) } returns null
+  fun `init when getFeeding returns null emits Error`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.getFeeding(1, 2) } returns null
 
-    viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
+        viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
 
-    assertIs<EditFeedingUiState.Error>(viewModel.uiState.value)
-    assertEquals(
-        "Feeding not found.",
-        (viewModel.uiState.value as EditFeedingUiState.Error).message,
-    )
-  }
+        assertIs<EditFeedingUiState.Error>(viewModel.uiState.value)
+        assertEquals(
+            "Feeding not found.",
+            (viewModel.uiState.value as EditFeedingUiState.Error).message,
+        )
+      }
 
   @Test
   fun `saveFeeding with valid data calls repo updateFeeding and emits Success`() =
@@ -105,21 +108,22 @@ class EditFeedingViewModelTest {
       }
 
   @Test
-  fun `saveFeeding API error emits SaveError`() = runTest(testDispatcher) {
-    val feeding = TestFixtures.mockFeeding(id = 2)
-    coEvery { mockRepository.getFeeding(1, 2) } returns feeding
-    coEvery { mockRepository.updateFeeding(1, 2, any()) } returns
-        ApiResult.Error(ApiError.NetworkError("fail"))
+  fun `saveFeeding API error emits SaveError`() =
+      runTest(testDispatcher) {
+        val feeding = TestFixtures.mockFeeding(id = 2)
+        coEvery { mockRepository.getFeeding(1, 2) } returns feeding
+        coEvery { mockRepository.updateFeeding(1, 2, any()) } returns
+            ApiResult.Error(ApiError.NetworkError("fail"))
 
-    viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
-    viewModel.saveFeeding("bottle", 4.0, null, "", "2024-01-15T12:00:00Z")
-    advanceUntilIdle()
+        viewModel = EditFeedingViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        viewModel.saveFeeding("bottle", 4.0, null, "", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
 
-    assertIs<EditFeedingUiState.SaveError>(viewModel.uiState.value)
-    assertEquals(
-        "Error message",
-        (viewModel.uiState.value as EditFeedingUiState.SaveError).message,
-    )
-  }
+        assertIs<EditFeedingUiState.SaveError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditFeedingUiState.SaveError).message,
+        )
+      }
 }

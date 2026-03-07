@@ -22,8 +22,8 @@ import net.poopyfeed.pf.databinding.FragmentCreateFeedingBottomSheetBinding
 import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
- * Bottom sheet for editing an existing feeding. Reuses the create feeding form layout; prefills type,
- * amount (bottle), and timestamp. On success signals feeding_updated and dismisses.
+ * Bottom sheet for editing an existing feeding. Reuses the create feeding form layout; prefills
+ * type, amount (bottle), and timestamp. On success signals feeding_updated and dismisses.
  */
 @AndroidEntryPoint
 class EditFeedingBottomSheetFragment : BottomSheetDialogFragment() {

@@ -47,31 +47,33 @@ class EditDiaperViewModelTest {
   }
 
   @Test
-  fun `init loads diaper and emits Ready with correct data`() = runTest(testDispatcher) {
-    val diaper = TestFixtures.mockDiaper(id = 2, change_type = "wet")
-    coEvery { mockRepository.getDiaper(1, 2) } returns diaper
+  fun `init loads diaper and emits Ready with correct data`() =
+      runTest(testDispatcher) {
+        val diaper = TestFixtures.mockDiaper(id = 2, change_type = "wet")
+        coEvery { mockRepository.getDiaper(1, 2) } returns diaper
 
-    viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
+        viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
 
-    assertIs<EditDiaperUiState.Ready>(viewModel.uiState.value)
-    assertEquals(2, (viewModel.uiState.value as EditDiaperUiState.Ready).diaper.id)
-    assertEquals("wet", (viewModel.uiState.value as EditDiaperUiState.Ready).diaper.change_type)
-  }
+        assertIs<EditDiaperUiState.Ready>(viewModel.uiState.value)
+        assertEquals(2, (viewModel.uiState.value as EditDiaperUiState.Ready).diaper.id)
+        assertEquals("wet", (viewModel.uiState.value as EditDiaperUiState.Ready).diaper.change_type)
+      }
 
   @Test
-  fun `init when getDiaper returns null emits Error`() = runTest(testDispatcher) {
-    coEvery { mockRepository.getDiaper(1, 2) } returns null
+  fun `init when getDiaper returns null emits Error`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.getDiaper(1, 2) } returns null
 
-    viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
+        viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
 
-    assertIs<EditDiaperUiState.Error>(viewModel.uiState.value)
-    assertEquals(
-        "Diaper change not found.",
-        (viewModel.uiState.value as EditDiaperUiState.Error).message,
-    )
-  }
+        assertIs<EditDiaperUiState.Error>(viewModel.uiState.value)
+        assertEquals(
+            "Diaper change not found.",
+            (viewModel.uiState.value as EditDiaperUiState.Error).message,
+        )
+      }
 
   @Test
   fun `saveDiaper with valid data calls repo updateDiaper and emits Success`() =
@@ -105,21 +107,22 @@ class EditDiaperViewModelTest {
       }
 
   @Test
-  fun `saveDiaper API error emits SaveError`() = runTest(testDispatcher) {
-    val diaper = TestFixtures.mockDiaper(id = 2)
-    coEvery { mockRepository.getDiaper(1, 2) } returns diaper
-    coEvery { mockRepository.updateDiaper(1, 2, any()) } returns
-        ApiResult.Error(ApiError.NetworkError("fail"))
+  fun `saveDiaper API error emits SaveError`() =
+      runTest(testDispatcher) {
+        val diaper = TestFixtures.mockDiaper(id = 2)
+        coEvery { mockRepository.getDiaper(1, 2) } returns diaper
+        coEvery { mockRepository.updateDiaper(1, 2, any()) } returns
+            ApiResult.Error(ApiError.NetworkError("fail"))
 
-    viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
-    advanceUntilIdle()
-    viewModel.saveDiaper("wet", "2024-01-15T12:00:00Z")
-    advanceUntilIdle()
+        viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        viewModel.saveDiaper("wet", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
 
-    assertIs<EditDiaperUiState.SaveError>(viewModel.uiState.value)
-    assertEquals(
-        "Error message",
-        (viewModel.uiState.value as EditDiaperUiState.SaveError).message,
-    )
-  }
+        assertIs<EditDiaperUiState.SaveError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditDiaperUiState.SaveError).message,
+        )
+      }
 }

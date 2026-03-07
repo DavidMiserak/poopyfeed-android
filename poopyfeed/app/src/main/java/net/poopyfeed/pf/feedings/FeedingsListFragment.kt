@@ -16,7 +16,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
-import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.databinding.FragmentFeedingsListBinding
 
 /**
@@ -152,13 +151,14 @@ class FeedingsListFragment : Fragment() {
   }
 
   private fun navigateToEditFeeding(childId: Int, feedingId: Int) {
-    findNavController().navigate(
-        R.id.action_feedingsList_to_editFeeding,
-        Bundle().apply {
-          putInt("childId", childId)
-          putInt("feedingId", feedingId)
-        },
-    )
+    findNavController()
+        .navigate(
+            R.id.action_feedingsList_to_editFeeding,
+            Bundle().apply {
+              putInt("childId", childId)
+              putInt("feedingId", feedingId)
+            },
+        )
   }
 
   private fun showDeleteConfirmationDialog(feedingId: Int) {
