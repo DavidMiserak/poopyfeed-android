@@ -39,14 +39,16 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
 
       // Age and gender line: "X months • Girl" or "X yr Y mo • Boy"
       val ageFormatted = formatAge(child.date_of_birth)
+      val ctx = binding.root.context
       val genderFormatted =
-          if (child.gender == "F")
-              binding.root.context.getString(R.string.create_child_gender_female)
-          else binding.root.context.getString(R.string.create_child_gender_male)
+          when (child.gender) {
+            "F" -> ctx.getString(R.string.create_child_gender_female)
+            "O" -> ctx.getString(R.string.create_child_gender_other)
+            else -> ctx.getString(R.string.create_child_gender_male)
+          }
       binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
 
       // Activity times on right column: short format ("1m", "1h", "1d")
-      val ctx = binding.root.context
       binding.textLastFeeding.text = formatRelativeTimeShort(ctx, child.last_feeding)
       binding.textLastDiaper.text = formatRelativeTimeShort(ctx, child.last_diaper_change)
       binding.textLastNap.text = formatRelativeTimeShort(ctx, child.last_nap)

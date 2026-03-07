@@ -59,6 +59,35 @@ data class UpdateChildRequest(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val date_of_birth: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val gender: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val feeding_reminder_interval: Int? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val custom_bottle_low_oz: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val custom_bottle_mid_oz: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val custom_bottle_high_oz: String? = null,
+)
+
+/** Per-child notification preference. Auto-created by backend for each accessible child. */
+@Serializable
+data class NotificationPreference(
+    val id: Int,
+    @SerialName("child_id") val childId: Int,
+    @SerialName("child_name") val childName: String,
+    @SerialName("notify_feedings") val notifyFeedings: Boolean,
+    @SerialName("notify_diapers") val notifyDiapers: Boolean,
+    @SerialName("notify_naps") val notifyNaps: Boolean,
+)
+
+/** DTO for PATCH update of a notification preference. Only non-null fields are sent. */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class UpdateNotificationPreferenceRequest(
+    @SerialName("notify_feedings")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val notifyFeedings: Boolean? = null,
+    @SerialName("notify_diapers")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val notifyDiapers: Boolean? = null,
+    @SerialName("notify_naps")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val notifyNaps: Boolean? = null,
 )
 
 /** Feeding event - bottle or breastfeeding. */

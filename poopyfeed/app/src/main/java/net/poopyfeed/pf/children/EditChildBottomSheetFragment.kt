@@ -23,9 +23,9 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentEditChildBottomSheetBinding
 
 /**
- * Bottom sheet for editing a child: name, DOB, gender, and (for owner/co-parent) feeding reminder
- * interval. Saves via PATCH; on success dismisses and sets savedStateHandle so the detail screen
- * can refresh.
+ * Bottom sheet for editing a child: name, DOB, gender, custom bottle amounts, feeding reminder
+ * interval, and notification preferences. Saves via PATCH; on success dismisses and sets
+ * savedStateHandle so the detail screen can refresh.
  */
 @AndroidEntryPoint
 class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
@@ -39,6 +39,9 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
 
   /** Spinner options: (display label, value in hours or null for Off). Built in onViewCreated. */
   private lateinit var feedingReminderOptions: List<Pair<String, Int?>>
+
+  /** Suppress checkbox listener callbacks when programmatically setting checked state. */
+  private var suppressPrefListeners = false
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -64,52 +67,70 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
     binding.inputDob.setOnClickListener { showDatePicker() }
     binding.buttonSave.setOnClickListener { saveChild() }
     binding.buttonDelete.setOnClickListener { showDeleteConfirmationDialog() }
+    binding.buttonRestoreDefaults.setOnClickListener { restoreBottleDefaults() }
+    setupNotificationPrefListeners()
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is EditChildUiState.Loading -> {
-              binding.buttonSave.isEnabled = false
-              binding.progressSaving.visibility = View.GONE
-            }
-            is EditChildUiState.Ready -> bindForm(state)
-            is EditChildUiState.Error -> {
-              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-              dismiss()
-            }
-            is EditChildUiState.Saving -> {
-              binding.buttonSave.isEnabled = false
-              binding.buttonSave.visibility = View.GONE
-              binding.progressSaving.visibility = View.VISIBLE
-            }
-            is EditChildUiState.Success -> {
-              findNavController()
-                  .previousBackStackEntry
-                  ?.savedStateHandle
-                  ?.set("child_updated", true)
-              Snackbar.make(binding.root, R.string.edit_child_success, Snackbar.LENGTH_SHORT).show()
-              dismiss()
-            }
-            is EditChildUiState.SaveError -> {
-              binding.buttonSave.isEnabled = true
-              binding.buttonSave.visibility = View.VISIBLE
-              binding.progressSaving.visibility = View.GONE
-              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-            }
-            is EditChildUiState.ValidationError -> {
-              binding.buttonSave.isEnabled = true
-              binding.buttonSave.visibility = View.VISIBLE
-              binding.progressSaving.visibility = View.GONE
-              binding.layoutName.error = state.nameError
-              binding.layoutDob.error = state.dobError
+        launch {
+          viewModel.uiState.collect { state ->
+            when (state) {
+              is EditChildUiState.Loading -> {
+                binding.buttonSave.isEnabled = false
+                binding.progressSaving.visibility = View.GONE
+              }
+              is EditChildUiState.Ready -> bindForm(state)
+              is EditChildUiState.Error -> {
+                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                dismiss()
+              }
+              is EditChildUiState.Saving -> {
+                binding.buttonSave.isEnabled = false
+                binding.buttonSave.visibility = View.GONE
+                binding.progressSaving.visibility = View.VISIBLE
+              }
+              is EditChildUiState.Success -> {
+                findNavController()
+                    .previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("child_updated", true)
+                Snackbar.make(binding.root, R.string.edit_child_success, Snackbar.LENGTH_SHORT)
+                    .show()
+                dismiss()
+              }
+              is EditChildUiState.SaveError -> {
+                binding.buttonSave.isEnabled = true
+                binding.buttonSave.visibility = View.VISIBLE
+                binding.progressSaving.visibility = View.GONE
+                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+              }
+              is EditChildUiState.ValidationError -> {
+                binding.buttonSave.isEnabled = true
+                binding.buttonSave.visibility = View.VISIBLE
+                binding.progressSaving.visibility = View.GONE
+                binding.layoutName.error = state.nameError
+                binding.layoutDob.error = state.dobError
+                if (state.bottleError != null) {
+                  binding.textBottleError.text = state.bottleError
+                  binding.textBottleError.visibility = View.VISIBLE
+                } else {
+                  binding.textBottleError.visibility = View.GONE
+                }
+              }
             }
           }
         }
-      }
-    }
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        launch {
+          viewModel.notificationPrefState.collect { state -> bindNotificationPrefState(state) }
+        }
+        launch {
+          viewModel.preferenceSaving.collect { saving ->
+            binding.textPrefsSaving.visibility = if (saving) View.VISIBLE else View.GONE
+            binding.checkboxNotifyFeedings.isEnabled = !saving
+            binding.checkboxNotifyDiapers.isEnabled = !saving
+            binding.checkboxNotifyNaps.isEnabled = !saving
+          }
+        }
         launch {
           viewModel.deleteSuccess.collect {
             findNavController().previousBackStackEntry?.savedStateHandle?.set("child_deleted", true)
@@ -134,6 +155,49 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
     binding.spinnerFeedingReminder.adapter = adapter
   }
 
+  private fun setupNotificationPrefListeners() {
+    binding.checkboxNotifyFeedings.setOnCheckedChangeListener { _, isChecked ->
+      if (!suppressPrefListeners) viewModel.toggleNotificationPref("notify_feedings", isChecked)
+    }
+    binding.checkboxNotifyDiapers.setOnCheckedChangeListener { _, isChecked ->
+      if (!suppressPrefListeners) viewModel.toggleNotificationPref("notify_diapers", isChecked)
+    }
+    binding.checkboxNotifyNaps.setOnCheckedChangeListener { _, isChecked ->
+      if (!suppressPrefListeners) viewModel.toggleNotificationPref("notify_naps", isChecked)
+    }
+  }
+
+  private fun bindNotificationPrefState(state: NotificationPrefState?) {
+    when (state) {
+      null -> {
+        binding.cardNotificationPrefs.visibility = View.GONE
+      }
+      is NotificationPrefState.Loading -> {
+        binding.cardNotificationPrefs.visibility = View.VISIBLE
+        binding.layoutPrefsLoading.visibility = View.VISIBLE
+        binding.layoutPrefsCheckboxes.visibility = View.GONE
+        binding.textPrefsError.visibility = View.GONE
+      }
+      is NotificationPrefState.Loaded -> {
+        binding.cardNotificationPrefs.visibility = View.VISIBLE
+        binding.layoutPrefsLoading.visibility = View.GONE
+        binding.textPrefsError.visibility = View.GONE
+        binding.layoutPrefsCheckboxes.visibility = View.VISIBLE
+        suppressPrefListeners = true
+        binding.checkboxNotifyFeedings.isChecked = state.pref.notifyFeedings
+        binding.checkboxNotifyDiapers.isChecked = state.pref.notifyDiapers
+        binding.checkboxNotifyNaps.isChecked = state.pref.notifyNaps
+        suppressPrefListeners = false
+      }
+      is NotificationPrefState.Error -> {
+        binding.cardNotificationPrefs.visibility = View.VISIBLE
+        binding.layoutPrefsLoading.visibility = View.GONE
+        binding.layoutPrefsCheckboxes.visibility = View.GONE
+        binding.textPrefsError.visibility = View.VISIBLE
+      }
+    }
+  }
+
   private fun bindForm(state: EditChildUiState.Ready) {
     val child = state.child
     binding.inputName.setText(child.name)
@@ -143,6 +207,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
         when (child.gender) {
           "M" -> R.id.radio_boy
           "F" -> R.id.radio_girl
+          "O" -> R.id.radio_other
           else -> R.id.radio_boy
         })
     val reminderIndex =
@@ -150,6 +215,11 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
             .indexOfFirst { it.second == child.feeding_reminder_interval }
             .let { if (it < 0) 0 else it }
     binding.spinnerFeedingReminder.setSelection(reminderIndex)
+
+    // Populate custom bottle amounts
+    child.custom_bottle_low_oz?.let { binding.inputBottleLow.setText(it) }
+    child.custom_bottle_mid_oz?.let { binding.inputBottleMid.setText(it) }
+    child.custom_bottle_high_oz?.let { binding.inputBottleHigh.setText(it) }
 
     val showReminder = state.canEditReminder
     binding.labelFeedingReminder.visibility = if (showReminder) View.VISIBLE else View.GONE
@@ -163,6 +233,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
     binding.progressSaving.visibility = View.GONE
     binding.layoutName.error = null
     binding.layoutDob.error = null
+    binding.textBottleError.visibility = View.GONE
   }
 
   private fun showDatePicker() {
@@ -195,6 +266,13 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
         .show()
   }
 
+  private fun restoreBottleDefaults() {
+    binding.inputBottleLow.text?.clear()
+    binding.inputBottleMid.text?.clear()
+    binding.inputBottleHigh.text?.clear()
+    binding.textBottleError.visibility = View.GONE
+  }
+
   private fun showDeleteConfirmationDialog() {
     val state = viewModel.uiState.value
     if (state !is EditChildUiState.Ready) return
@@ -213,6 +291,7 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
         when (binding.radioGender.checkedRadioButtonId) {
           R.id.radio_boy -> "M"
           R.id.radio_girl -> "F"
+          R.id.radio_other -> "O"
           else -> "M"
         }
     val reminderHours =
@@ -223,7 +302,10 @@ class EditChildBottomSheetFragment : BottomSheetDialogFragment() {
         } else {
           null
         }
-    viewModel.save(name, dob, gender, reminderHours)
+    val bottleLow = binding.inputBottleLow.text.toString()
+    val bottleMid = binding.inputBottleMid.text.toString()
+    val bottleHigh = binding.inputBottleHigh.text.toString()
+    viewModel.save(name, dob, gender, reminderHours, bottleLow, bottleMid, bottleHigh)
   }
 
   override fun onDestroyView() {

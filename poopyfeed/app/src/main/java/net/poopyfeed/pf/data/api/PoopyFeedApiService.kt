@@ -241,6 +241,17 @@ interface PoopyFeedApiService {
   @GET("notifications/")
   suspend fun listNotifications(@Query("page") page: Int = 1): PaginatedResponse<Notification>
 
+  /** Get all per-child notification preferences. GET /api/v1/notifications/preferences/ */
+  @GET("notifications/preferences/")
+  suspend fun getNotificationPreferences(): List<NotificationPreference>
+
+  /** Update a notification preference. PATCH /api/v1/notifications/preferences/{id}/ */
+  @PATCH("notifications/preferences/{id}/")
+  suspend fun updateNotificationPreference(
+      @Path("id") id: Int,
+      @Body request: UpdateNotificationPreferenceRequest
+  ): NotificationPreference
+
   /** Get unread notification count. GET /api/v1/notifications/unread-count/ */
   @GET("notifications/unread-count/") suspend fun getUnreadCount(): UnreadCountResponse
 

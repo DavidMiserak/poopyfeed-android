@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/spacing_12"
     tools:context="net.poopyfeed.pf.children.EditChildBottomSheetFragment">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="@dimen/spacing_12">
 
     <!-- Drag handle -->
     <View
@@ -42,14 +46,14 @@
         app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
         app:boxCornerRadiusTopStart="@dimen/corner_radius_md">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/input_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:textColor="?attr/colorOnSurface"
-            android:fontFamily="@font/dm_sans"
-            android:minHeight="48dp" />
+      <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/input_name"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="text"
+          android:textColor="?attr/colorOnSurface"
+          android:fontFamily="@font/dm_sans"
+          android:minHeight="48dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -66,16 +70,16 @@
         app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
         app:boxCornerRadiusTopStart="@dimen/corner_radius_md">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/input_dob"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="date"
-            android:focusable="false"
-            android:clickable="true"
-            android:textColor="?attr/colorOnSurface"
-            android:fontFamily="@font/dm_sans"
-            android:minHeight="48dp" />
+      <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/input_dob"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="date"
+          android:focusable="false"
+          android:clickable="true"
+          android:textColor="?attr/colorOnSurface"
+          android:fontFamily="@font/dm_sans"
+          android:minHeight="48dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,31 +102,178 @@
         android:orientation="horizontal"
         android:layout_marginBottom="@dimen/spacing_8">
 
-        <RadioButton
-            android:id="@+id/radio_boy"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:text="@string/create_child_gender_male"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
-            android:buttonTint="?attr/colorPrimary"
-            android:contentDescription="@string/create_child_gender_male" />
+      <RadioButton
+          android:id="@+id/radio_boy"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:minHeight="48dp"
+          android:text="@string/create_child_gender_male"
+          android:fontFamily="@font/dm_sans"
+          android:textSize="@dimen/text_body_medium"
+          android:buttonTint="?attr/colorPrimary"
+          android:contentDescription="@string/create_child_gender_male" />
 
-        <RadioButton
-            android:id="@+id/radio_girl"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:text="@string/create_child_gender_female"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
-            android:buttonTint="?attr/colorPrimary"
-            android:contentDescription="@string/create_child_gender_female" />
+      <RadioButton
+          android:id="@+id/radio_girl"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:minHeight="48dp"
+          android:text="@string/create_child_gender_female"
+          android:fontFamily="@font/dm_sans"
+          android:textSize="@dimen/text_body_medium"
+          android:buttonTint="?attr/colorPrimary"
+          android:contentDescription="@string/create_child_gender_female" />
+
+      <RadioButton
+          android:id="@+id/radio_other"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:minHeight="48dp"
+          android:text="@string/create_child_gender_other"
+          android:fontFamily="@font/dm_sans"
+          android:textSize="@dimen/text_body_medium"
+          android:buttonTint="?attr/colorPrimary"
+          android:contentDescription="@string/create_child_gender_other" />
 
     </RadioGroup>
+
+    <!-- ===== Custom Bottle Amounts Section ===== -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_bottle_amounts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        app:cardCornerRadius="@dimen/corner_radius_md"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:cardElevation="0dp">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="@dimen/spacing_12">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bottle_amounts_title"
+            android:fontFamily="@font/fredoka"
+            android:textSize="@dimen/text_body_large"
+            android:textColor="?attr/colorOnSurface"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_4" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bottle_amounts_description"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_small"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <!-- Low oz -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_bottle_low"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_8"
+            android:hint="@string/bottle_low_label"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopStart="@dimen/corner_radius_md">
+
+          <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/input_bottle_low"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="numberDecimal"
+              android:textColor="?attr/colorOnSurface"
+              android:fontFamily="@font/dm_sans"
+              android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mid oz -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_bottle_mid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_8"
+            android:hint="@string/bottle_mid_label"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopStart="@dimen/corner_radius_md">
+
+          <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/input_bottle_mid"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="numberDecimal"
+              android:textColor="?attr/colorOnSurface"
+              android:fontFamily="@font/dm_sans"
+              android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- High oz -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_bottle_high"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_8"
+            android:hint="@string/bottle_high_label"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+            app:boxCornerRadiusTopStart="@dimen/corner_radius_md">
+
+          <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/input_bottle_high"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="numberDecimal"
+              android:textColor="?attr/colorOnSurface"
+              android:fontFamily="@font/dm_sans"
+              android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Bottle amounts validation error -->
+        <TextView
+            android:id="@+id/text_bottle_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorError"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_small"
+            android:visibility="gone"
+            android:layout_marginBottom="@dimen/spacing_4"
+            tools:text="Low amount must be less than recommended amount"
+            tools:visibility="visible" />
+
+        <!-- Restore defaults button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_restore_defaults"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/bottle_restore_defaults"
+            android:fontFamily="@font/dm_sans" />
+
+      </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Feeding reminders (owner/co-parent only) -->
     <TextView
@@ -144,30 +295,160 @@
         android:contentDescription="@string/a11y_feeding_reminder"
         android:layout_marginBottom="@dimen/spacing_8" />
 
+    <!-- ===== Notification Preferences Section ===== -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_notification_prefs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        app:cardCornerRadius="@dimen/corner_radius_md"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:cardElevation="0dp"
+        android:visibility="gone">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="@dimen/spacing_12">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_prefs_title"
+            android:fontFamily="@font/fredoka"
+            android:textSize="@dimen/text_body_large"
+            android:textColor="?attr/colorOnSurface"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_4" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_prefs_description"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_small"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <!-- Loading indicator -->
+        <LinearLayout
+            android:id="@+id/layout_prefs_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:padding="@dimen/spacing_8">
+
+          <com.google.android.material.progressindicator.CircularProgressIndicator
+              android:layout_width="20dp"
+              android:layout_height="20dp"
+              android:indeterminate="true"
+              android:contentDescription="@null"
+              android:layout_marginEnd="@dimen/spacing_8" />
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/notification_pref_loading"
+              android:fontFamily="@font/dm_sans"
+              android:textSize="@dimen/text_body_small"
+              android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
+        <!-- Error text -->
+        <TextView
+            android:id="@+id/text_prefs_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_pref_error"
+            android:textColor="?attr/colorError"
+            android:fontFamily="@font/dm_sans"
+            android:textSize="@dimen/text_body_small"
+            android:visibility="gone" />
+
+        <!-- Preference checkboxes -->
+        <LinearLayout
+            android:id="@+id/layout_prefs_checkboxes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+          <com.google.android.material.checkbox.MaterialCheckBox
+              android:id="@+id/checkbox_notify_feedings"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:minHeight="48dp"
+              android:text="@string/notification_pref_feedings"
+              android:fontFamily="@font/dm_sans"
+              android:textSize="@dimen/text_body_medium"
+              android:textColor="?attr/colorOnSurface" />
+
+          <com.google.android.material.checkbox.MaterialCheckBox
+              android:id="@+id/checkbox_notify_diapers"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:minHeight="48dp"
+              android:text="@string/notification_pref_diapers"
+              android:fontFamily="@font/dm_sans"
+              android:textSize="@dimen/text_body_medium"
+              android:textColor="?attr/colorOnSurface" />
+
+          <com.google.android.material.checkbox.MaterialCheckBox
+              android:id="@+id/checkbox_notify_naps"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:minHeight="48dp"
+              android:text="@string/notification_pref_naps"
+              android:fontFamily="@font/dm_sans"
+              android:textSize="@dimen/text_body_medium"
+              android:textColor="?attr/colorOnSurface" />
+
+          <!-- Saving indicator -->
+          <TextView
+              android:id="@+id/text_prefs_saving"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/notification_pref_saving"
+              android:fontFamily="@font/dm_sans"
+              android:textSize="@dimen/text_body_small"
+              android:textColor="?attr/colorOnSurfaceVariant"
+              android:visibility="gone" />
+
+        </LinearLayout>
+
+      </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Save button -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_4">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_save"
-            style="@style/Widget.Pf.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:text="@string/edit_child_save_button"
-            android:contentDescription="@string/edit_child_save_button"
-            android:layout_gravity="center" />
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/button_save"
+          style="@style/Widget.Pf.Button.Primary"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="48dp"
+          android:text="@string/edit_child_save_button"
+          android:contentDescription="@string/edit_child_save_button"
+          android:layout_gravity="center" />
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_saving"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            android:visibility="gone"
-            android:contentDescription="@null" />
+      <com.google.android.material.progressindicator.CircularProgressIndicator
+          android:id="@+id/progress_saving"
+          android:layout_width="24dp"
+          android:layout_height="24dp"
+          android:layout_gravity="center"
+          android:indeterminate="true"
+          android:visibility="gone"
+          android:contentDescription="@null" />
 
     </FrameLayout>
 
@@ -183,4 +464,6 @@
         android:contentDescription="@string/child_detail_delete_button"
         android:visibility="gone" />
 
-</LinearLayout>
+  </LinearLayout>
+
+</ScrollView>

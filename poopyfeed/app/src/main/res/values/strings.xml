@@ -162,6 +162,30 @@
     <string name="feeding_reminder_4h">Every 4 hours</string>
     <string name="feeding_reminder_6h">Every 6 hours</string>
     <string name="a11y_feeding_reminder">Feeding reminder interval</string>
+    <string name="create_child_gender_other">Other</string>
+
+    <!-- Custom bottle amounts (edit child) -->
+    <string name="bottle_amounts_title">Quick Bottle Amounts (Optional)</string>
+    <string name="bottle_amounts_description">Customize amounts for quick logging buttons, or leave blank to use age-based defaults.</string>
+    <string name="bottle_low_label">Low (oz)</string>
+    <string name="bottle_mid_label">Recommended (oz)</string>
+    <string name="bottle_high_label">High (oz)</string>
+    <string name="bottle_restore_defaults">Restore Defaults</string>
+    <string name="bottle_amount_error_range">Amount must be between 0.1 and 50 oz</string>
+    <string name="bottle_amount_error_partial">If setting custom amounts, all three (low, recommended, high) must be provided</string>
+    <string name="bottle_amount_error_order_low_mid">Low amount must be less than recommended amount</string>
+    <string name="bottle_amount_error_order_mid_high">Recommended amount must be less than high amount</string>
+
+    <!-- Notification preferences (edit child) -->
+    <string name="notification_prefs_title">Notification Preferences</string>
+    <string name="notification_prefs_description">Choose which activities trigger notifications when someone else logs them for this child.</string>
+    <string name="notification_pref_feedings">Feedings</string>
+    <string name="notification_pref_diapers">Diaper changes</string>
+    <string name="notification_pref_naps">Naps</string>
+    <string name="notification_pref_loading">Loading notification preferences&#8230;</string>
+    <string name="notification_pref_saving">Saving&#8230;</string>
+    <string name="notification_pref_saved">Notification preference updated</string>
+    <string name="notification_pref_error">Failed to load notification preferences</string>
 
     <!-- Home - My Children Card -->
     <string name="home_children_card_title">My Children</string>

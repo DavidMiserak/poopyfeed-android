@@ -131,6 +131,7 @@ class CreateChildBottomSheetFragment : BottomSheetDialogFragment() {
         when (genderRadioId) {
           R.id.radio_boy -> "M"
           R.id.radio_girl -> "F"
+          R.id.radio_other -> "O"
           else -> ""
         }
 
