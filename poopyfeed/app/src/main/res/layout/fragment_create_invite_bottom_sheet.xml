@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_12"
+    tools:context="net.poopyfeed.pf.sharing.CreateInviteBottomSheetFragment">
+
+    <!-- Drag handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_8"
+        android:background="@drawable/ic_drag_handle"
+        android:alpha="0.3" />
+
+    <!-- Form panel -->
+    <LinearLayout
+        android:id="@+id/panel_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_invite_title"
+        android:fontFamily="@font/fredoka"
+        android:textSize="@dimen/text_title_large"
+        android:textColor="?attr/colorOnSurface"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/spacing_8" />
+
+    <!-- Role label -->
+    <TextView
+        android:id="@+id/label_role"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_invite_role_label"
+        android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <!-- Role chips -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_role"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_8"
+        app:singleSelection="true"
+        app:selectionRequired="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_co_parent"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sharing_role_co_parent"
+            android:tag="co-parent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_caregiver"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sharing_role_caregiver"
+            android:tag="caregiver" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/text_role_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+        android:textColor="?attr/colorError"
+        android:visibility="gone"
+        android:layout_marginBottom="@dimen/spacing_4"
+        tools:text="Select a role."
+        tools:visibility="visible" />
+
+    <!-- Send invite button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_send"
+        style="@style/Widget.Pf.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:text="@string/create_invite_send" />
+
+    </LinearLayout>
+
+    <!-- Success state: show invite link (matches web "Tap to Copy Link") -->
+    <LinearLayout
+        android:id="@+id/panel_invite_created"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingTop="@dimen/spacing_8">
+
+        <TextView
+            android:id="@+id/text_invite_created_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_invite_link_created"
+            android:fontFamily="@font/fredoka"
+            android:textSize="@dimen/text_title_large"
+            android:textColor="?attr/colorOnSurface"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_4" />
+
+        <TextView
+            android:id="@+id/text_invite_share_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_invite_share_hint"
+            android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <TextView
+            android:id="@+id/text_invite_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+            android:textColor="?attr/colorPrimary"
+            android:padding="@dimen/spacing_8"
+            android:background="?attr/selectableItemBackground"
+            android:inputType="none"
+            android:focusable="true"
+            android:clickable="true"
+            android:textIsSelectable="true"
+            android:layout_marginBottom="@dimen/spacing_8"
+            tools:text="abc123token" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_copy_code"
+            style="@style/Widget.Pf.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/create_invite_copy_code"
+            android:layout_marginBottom="@dimen/spacing_4" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_done"
+            style="@style/Widget.Pf.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/create_invite_done" />
+    </LinearLayout>
+
+</LinearLayout>

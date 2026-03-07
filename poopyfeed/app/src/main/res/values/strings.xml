@@ -41,6 +41,8 @@
     <string name="home_subtitle">Here is what is happening with your little one today.</string>
     <string name="home_getting_started_title">Getting Started</string>
     <string name="home_getting_started_body">Add your first child to start tracking feedings, diapers, and naps.</string>
+    <string name="pending_invites_card_title">You have %d pending invite(s)</string>
+    <string name="pending_invites_card_body">Tap to view and accept.</string>
 
     <!-- Account settings -->
     <string name="account_settings_title">Account settings</string>
@@ -99,6 +101,8 @@
     <string name="children_list_error_title">Unable to load children</string>
     <string name="children_list_retry_button">Retry</string>
     <string name="children_list_add_button">Add Child</string>
+    <string name="children_list_fab_sheet_title">Add a child</string>
+    <string name="children_list_enter_invite_code">Enter invite code</string>
     <string name="child_role_badge">%1$s</string>
 
     <!-- Child card badges (emoji icons for feeding / diaper / nap) -->
@@ -120,6 +124,7 @@
     <string name="child_detail_diapers">🚼\nDiapers</string>
     <string name="child_detail_naps">😴\nNaps</string>
     <string name="child_detail_edit_button">Edit</string>
+    <string name="child_detail_share_button">Share</string>
     <string name="child_detail_delete_button">Delete Child</string>
     <string name="child_detail_delete_title">Delete Child?</string>
     <string name="child_detail_delete_message">This will delete %1$s and all associated data. This action cannot be undone.</string>
@@ -231,6 +236,47 @@
     <string name="edit_nap_end_label">End time</string>
     <string name="edit_nap_set_end_time">Set end time</string>
     <string name="edit_nap_save">Save</string>
+
+    <!-- Pending invites -->
+    <string name="pending_invites_title">Pending invites</string>
+    <string name="pending_invites_empty_title">No pending invites</string>
+    <string name="pending_invites_empty_body">When someone shares a child with you, they can send you an invite link or a code. Enter the code below to accept.</string>
+    <string name="pending_invites_accept_by_token">Enter code</string>
+    <string name="pending_invites_token_hint">Paste invite link or code</string>
+    <string name="pending_invites_enter_token_title">Enter invite code</string>
+    <string name="pending_invites_retry">Retry</string>
+    <string name="pending_invite_accept">Accept</string>
+    <string name="pending_invite_for_child">Invited to care for %1$s</string>
+    <string name="pending_invite_for_role">Invite as %1$s</string>
+    <string name="sharing_role_co_parent">Co-parent</string>
+    <string name="sharing_role_caregiver">Caregiver</string>
+
+    <!-- Manage sharing -->
+    <string name="sharing_title">Manage sharing</string>
+    <string name="sharing_empty_title">No one else has access yet</string>
+    <string name="sharing_empty_body">Invite a co-parent or caregiver by email to give them access to this child.</string>
+    <string name="sharing_invite_button">Invite someone</string>
+    <string name="sharing_retry">Retry</string>
+    <string name="sharing_section_invite_links">Invite links</string>
+    <string name="sharing_section_people">People with access</string>
+    <string name="invite_link_copy">Copy code</string>
+    <string name="invite_code_label">Invite code</string>
+    <string name="invite_code_copied">Code copied to clipboard</string>
+    <string name="invite_link_pause">Pause</string>
+    <string name="invite_link_resume">Resume</string>
+    <string name="invite_link_delete">Delete</string>
+    <string name="invite_link_paused">Paused</string>
+    <string name="create_invite_title">Create invite link</string>
+    <string name="create_invite_email_label">Email</string>
+    <string name="create_invite_role_label">Role</string>
+    <string name="create_invite_send">Create link</string>
+    <string name="create_invite_email_error">Enter a valid email address.</string>
+    <string name="create_invite_role_error">Select a role.</string>
+    <string name="create_invite_link_created">Invite link created</string>
+    <string name="create_invite_share_hint">Share this code with the person you want to invite.</string>
+    <string name="create_invite_copy_code">Copy code</string>
+    <string name="create_invite_done">Done</string>
+    <string name="create_invite_code_copied">Code copied to clipboard</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>

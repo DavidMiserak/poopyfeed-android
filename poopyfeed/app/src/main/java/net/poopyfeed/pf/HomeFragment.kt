@@ -50,6 +50,23 @@ class HomeFragment : Fragment() {
       findNavController().navigate(R.id.action_homeFragment_to_childrenList)
     }
 
+    // Pending invites card: visibility and click to Pending Invites screen
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.pendingInvites.collect { invites ->
+          binding.cardPendingInvites.visibility =
+              if (invites.isNotEmpty()) View.VISIBLE else View.GONE
+          if (invites.isNotEmpty()) {
+            binding.textPendingInvitesTitle.text =
+                getString(R.string.pending_invites_card_title, invites.size)
+          }
+        }
+      }
+    }
+    binding.cardPendingInvites.setOnClickListener {
+      findNavController().navigate(R.id.action_homeFragment_to_pendingInvitesFragment)
+    }
+
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.uiState.collect { state ->

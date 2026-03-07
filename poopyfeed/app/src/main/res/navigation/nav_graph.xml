@@ -37,6 +37,23 @@
         <action
             android:id="@+id/action_homeFragment_to_childrenList"
             app:destination="@id/ChildrenListFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_pendingInvitesFragment"
+            app:destination="@id/pendingInvitesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pendingInvitesFragment"
+        android:name="net.poopyfeed.pf.sharing.PendingInvitesFragment"
+        android:label="@string/pending_invites_title"
+        tools:layout="@layout/fragment_pending_invites">
+
+        <action
+            android:id="@+id/action_pendingInvitesFragment_to_childDetail"
+            app:destination="@id/ChildDetailFragment"
+            app:popUpTo="@id/pendingInvitesFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -48,7 +65,17 @@
         <action
             android:id="@+id/action_childrenList_to_childDetail"
             app:destination="@id/ChildDetailFragment" />
+
+        <action
+            android:id="@+id/action_childrenList_to_fabSheet"
+            app:destination="@id/childrenListFabSheet" />
     </fragment>
+
+    <dialog
+        android:id="@+id/childrenListFabSheet"
+        android:name="net.poopyfeed.pf.children.ChildrenListFabBottomSheetFragment"
+        android:label="@string/children_list_fab_sheet_title"
+        tools:layout="@layout/fragment_children_list_fab_sheet" />
 
     <fragment
         android:id="@+id/ChildDetailFragment"
@@ -69,6 +96,25 @@
         <action
             android:id="@+id/action_childDetail_to_napsList"
             app:destination="@id/NapsListFragment" />
+
+        <action
+            android:id="@+id/action_childDetail_to_sharingFragment"
+            app:destination="@id/sharingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sharingFragment"
+        android:name="net.poopyfeed.pf.sharing.SharingFragment"
+        android:label="@string/sharing_title"
+        tools:layout="@layout/fragment_sharing">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_sharingFragment_to_createInviteBottomSheet"
+            app:destination="@id/createInviteBottomSheet" />
     </fragment>
 
     <fragment
@@ -222,6 +268,17 @@
         android:name="net.poopyfeed.pf.children.EditChildBottomSheetFragment"
         android:label="@string/edit_child_title"
         tools:layout="@layout/fragment_edit_child_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/createInviteBottomSheet"
+        android:name="net.poopyfeed.pf.sharing.CreateInviteBottomSheetFragment"
+        android:label="@string/create_invite_title"
+        tools:layout="@layout/fragment_create_invite_bottom_sheet">
 
         <argument
             android:name="childId"

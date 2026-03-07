@@ -57,10 +57,9 @@ class ApiModelsTest {
   @Test
   fun `DeleteAccountRequest and CreateShareRequest map fields correctly`() {
     val deleteRequest = DeleteAccountRequest(current_password = "super-secret")
-    val shareRequest = CreateShareRequest(email = "friend@example.com", role = "co-parent")
+    val shareRequest = CreateShareRequest(role = "co-parent")
 
     assertEquals("super-secret", deleteRequest.current_password)
-    assertEquals("friend@example.com", shareRequest.email)
     assertEquals("co-parent", shareRequest.role)
   }
 
@@ -70,17 +69,17 @@ class ApiModelsTest {
         ShareInvite(
             id = 1,
             child = 42,
-            invited_email = "caregiver@example.com",
+            token = "abc123",
             role = "caregiver",
-            status = "pending",
-            created_at = "2024-01-01T10:00:00Z",
-            updated_at = "2024-01-01T10:00:00Z")
+            isActive = true,
+            createdAt = "2024-01-01T10:00:00Z",
+            inviteUrl = null)
 
     assertEquals(1, invite.id)
     assertEquals(42, invite.child)
-    assertEquals("caregiver@example.com", invite.invited_email)
+    assertEquals("abc123", invite.token)
     assertEquals("caregiver", invite.role)
-    assertEquals("pending", invite.status)
+    assertTrue(invite.isActive)
   }
 
   @Test

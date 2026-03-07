@@ -1,6 +1,8 @@
 package net.poopyfeed.pf
 
 import net.poopyfeed.pf.data.models.Child
+import net.poopyfeed.pf.data.models.ChildInvite
+import net.poopyfeed.pf.data.models.ChildShare
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.models.DiaperListResponse
 import net.poopyfeed.pf.data.models.Feeding
@@ -8,6 +10,7 @@ import net.poopyfeed.pf.data.models.FeedingListResponse
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.Notification
+import net.poopyfeed.pf.data.models.ShareInvite
 import net.poopyfeed.pf.data.models.UserProfile
 
 /**
@@ -190,4 +193,54 @@ object TestFixtures {
           actorName = actorName,
           childName = childName,
           childId = childId)
+
+  fun mockShareInvite(
+      id: Int = 1,
+      child: Int = 1,
+      token: String = "abc123token",
+      role: String = "co-parent",
+      isActive: Boolean = true,
+      createdAt: String = TS12,
+      inviteUrl: String? = null
+  ) =
+      ShareInvite(
+          id = id,
+          child = child,
+          token = token,
+          role = role,
+          isActive = isActive,
+          createdAt = createdAt,
+          inviteUrl = inviteUrl)
+
+  fun mockChildShare(
+      id: Int = 1,
+      userEmail: String = "partner@example.com",
+      role: String = "co-parent",
+      roleDisplay: String? = "Co-parent",
+      createdAt: String = TS12
+  ) =
+      ChildShare(
+          id = id,
+          userEmail = userEmail,
+          role = role,
+          roleDisplay = roleDisplay,
+          createdAt = createdAt)
+
+  fun mockChildInvite(
+      id: Int = 1,
+      token: String = "abc123token",
+      role: String = "co-parent",
+      roleDisplay: String = "Co-parent",
+      isActive: Boolean = true,
+      createdAt: String = TS12,
+      inviteUrl: String? = "https://example.com/children/accept-invite/abc123token/"
+  ) =
+      ChildInvite(
+          id = id,
+          token = token,
+          role = role,
+          roleDisplay = roleDisplay,
+          isActive = isActive,
+          createdAt = createdAt,
+          inviteUrl = inviteUrl)
 }

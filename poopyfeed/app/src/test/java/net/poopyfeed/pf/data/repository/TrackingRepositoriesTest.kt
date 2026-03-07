@@ -237,11 +237,10 @@ class TrackingRepositoriesTest {
     val share =
         ChildShare(
             id = 1,
-            child = 1,
-            shared_with_user = "friend@example.com",
+            userEmail = "friend@example.com",
             role = "co-parent",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:00:00Z")
+            roleDisplay = "Co-parent",
+            createdAt = "2024-01-15T10:00:00Z")
 
     io.mockk.coEvery { apiService.listShares(1) } returns listOf(share)
 
@@ -249,53 +248,39 @@ class TrackingRepositoriesTest {
 
     assertIs<ApiResult.Success<List<ChildShare>>>(result)
     assertEquals(1, result.data.size)
-    assertEquals("friend@example.com", result.data.first().shared_with_user)
+    assertEquals("friend@example.com", result.data.first().userEmail)
   }
 
   @Test
-  fun `SharingRepository createShare success returns ShareInvite`() = runTest {
+  fun `SharingRepository createShare success returns ShareInviteResponse`() = runTest {
     val repository = SharingRepository(apiService)
 
-    val request = CreateShareRequest(email = "friend@example.com", role = "co-parent")
-    val invite =
-        ShareInvite(
+    val request = CreateShareRequest(role = "co-parent")
+    val response =
+        net.poopyfeed.pf.data.models.ShareInviteResponse(
             id = 10,
-            child = 1,
-            invited_email = "friend@example.com",
+            token = "abc123",
             role = "co-parent",
-            status = "pending",
-            created_at = "2024-01-15T10:05:00Z",
-            updated_at = "2024-01-15T10:05:00Z")
+            isActive = true,
+            createdAt = "2024-01-15T10:05:00Z",
+            inviteUrl = "https://example.com/invite/abc123")
 
-    io.mockk.coEvery { apiService.createShare(1, request) } returns invite
+    io.mockk.coEvery { apiService.createShare(1, request) } returns response
 
     val result = repository.createShare(1, request)
 
-    assertIs<ApiResult.Success<ShareInvite>>(result)
-    assertEquals(invite, result.data)
+    assertIs<ApiResult.Success<net.poopyfeed.pf.data.models.ShareInviteResponse>>(result)
+    assertEquals("abc123", result.data.token)
   }
 
   @Test
-  fun `SharingRepository getPendingInvites success returns list`() = runTest {
+  fun `SharingRepository getPendingInvites returns empty list`() = runTest {
     val repository = SharingRepository(apiService)
-
-    val invite =
-        ShareInvite(
-            id = 11,
-            child = 1,
-            invited_email = "pending@example.com",
-            role = "caregiver",
-            status = "pending",
-            created_at = "2024-01-15T11:00:00Z",
-            updated_at = "2024-01-15T11:00:00Z")
-
-    io.mockk.coEvery { apiService.getPendingInvites() } returns listOf(invite)
 
     val result = repository.getPendingInvites()
 
     assertIs<ApiResult.Success<List<ShareInvite>>>(result)
-    assertEquals(1, result.data.size)
-    assertEquals("pending@example.com", result.data.first().invited_email)
+    assertEquals(0, result.data.size)
   }
 
   @Test
@@ -303,36 +288,30 @@ class TrackingRepositoriesTest {
     val repository = SharingRepository(apiService)
 
     val errorResponse =
-        retrofit2.Response.error<ShareInvite>(400, "Bad request".toResponseBody(null))
+        retrofit2.Response.error<net.poopyfeed.pf.data.models.Child>(
+            400, "Bad request".toResponseBody(null))
 
-    io.mockk.coEvery { apiService.acceptInvite(42) } throws retrofit2.HttpException(errorResponse)
+    io.mockk.coEvery { apiService.acceptInvite(any()) } throws
+        retrofit2.HttpException(errorResponse)
 
-    val result = repository.acceptInvite(42)
+    val result = repository.acceptInvite("badtoken")
 
-    assertIs<ApiResult.Error<ShareInvite>>(result)
+    assertIs<ApiResult.Error<net.poopyfeed.pf.data.models.Child>>(result)
     assertIs<ApiError.HttpError>(result.error)
     assertEquals(400, result.error.statusCode)
   }
 
   @Test
-  fun `SharingRepository acceptInvite success returns updated invite`() = runTest {
+  fun `SharingRepository acceptInvite success returns Child`() = runTest {
     val repository = SharingRepository(apiService)
 
-    val invite =
-        ShareInvite(
-            id = 42,
-            child = 1,
-            invited_email = "friend@example.com",
-            role = "co-parent",
-            status = "accepted",
-            created_at = "2024-01-15T10:00:00Z",
-            updated_at = "2024-01-15T10:10:00Z")
+    val child = net.poopyfeed.pf.TestFixtures.mockChild(id = 1, name = "Baby")
 
-    io.mockk.coEvery { apiService.acceptInvite(42) } returns invite
+    io.mockk.coEvery { apiService.acceptInvite(any()) } returns child
 
-    val result = repository.acceptInvite(42)
+    val result = repository.acceptInvite("valid-token")
 
-    assertIs<ApiResult.Success<ShareInvite>>(result)
-    assertEquals(invite, result.data)
+    assertIs<ApiResult.Success<net.poopyfeed.pf.data.models.Child>>(result)
+    assertEquals(1, result.data.id)
   }
 }

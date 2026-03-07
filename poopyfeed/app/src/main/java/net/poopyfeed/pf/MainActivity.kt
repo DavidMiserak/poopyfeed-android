@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     binding.fab.setOnClickListener {
       when (destination.id) {
         R.id.ChildrenListFragment -> {
-          navController.navigate(R.id.createChildBottomSheet)
+          navController.navigate(R.id.childrenListFabSheet)
         }
         R.id.FeedingsListFragment -> {
           val childId =

@@ -137,6 +137,18 @@ class ChildrenListFragment : Fragment() {
             }
       }
     }
+
+    // Listen for accept-invite result from ChildrenListFabBottomSheetFragment
+    parentFragmentManager.setFragmentResultListener(
+        ChildrenListFabBottomSheetFragment.ACCEPT_INVITE_RESULT_KEY,
+        viewLifecycleOwner,
+    ) { _, bundle ->
+      val childId = bundle.getInt(ChildrenListFabBottomSheetFragment.KEY_CHILD_ID, -1)
+      if (childId != -1) {
+        viewModel.refresh()
+        navigateToChildDetail(childId)
+      }
+    }
   }
 
   private fun navigateToChildDetail(childId: Int) {

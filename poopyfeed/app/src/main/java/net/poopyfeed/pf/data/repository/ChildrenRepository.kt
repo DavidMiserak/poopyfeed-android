@@ -291,7 +291,40 @@ constructor(
         }
       }
 
-  suspend fun createShare(childId: Int, request: CreateShareRequest): ApiResult<ShareInvite> =
+  suspend fun listInvites(childId: Int): ApiResult<List<ChildInvite>> =
+      withContext(ioDispatcher) {
+        try {
+          val invites = apiService.listInvites(childId)
+          ApiResult.Success(invites)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  suspend fun toggleInvite(childId: Int, invitePk: Int): ApiResult<ChildInvite> =
+      withContext(ioDispatcher) {
+        try {
+          val invite = apiService.toggleInvite(childId, invitePk)
+          ApiResult.Success(invite)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  suspend fun deleteInvite(childId: Int, invitePk: Int): ApiResult<Unit> =
+      withContext(ioDispatcher) {
+        try {
+          apiService.deleteInvite(childId, invitePk)
+          ApiResult.Success(Unit)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  suspend fun createShare(
+      childId: Int,
+      request: CreateShareRequest
+  ): ApiResult<ShareInviteResponse> =
       withContext(ioDispatcher) {
         try {
           val invite = apiService.createShare(childId, request)
@@ -301,21 +334,19 @@ constructor(
         }
       }
 
+  /**
+   * Returns pending invites for the current user. Backend has no such endpoint; returns empty list.
+   * Accept flow uses token via [acceptInvite] (e.g. from deep link).
+   */
   suspend fun getPendingInvites(): ApiResult<List<ShareInvite>> =
-      withContext(ioDispatcher) {
-        try {
-          val invites = apiService.getPendingInvites()
-          ApiResult.Success(invites)
-        } catch (e: Exception) {
-          ApiResult.Error(e.toApiError())
-        }
-      }
+      withContext(ioDispatcher) { ApiResult.Success(emptyList()) }
 
-  suspend fun acceptInvite(inviteId: Int): ApiResult<ShareInvite> =
+  /** Accept an invite by token (from invite link). Returns the child on success. */
+  suspend fun acceptInvite(token: String): ApiResult<Child> =
       withContext(ioDispatcher) {
         try {
-          val invite = apiService.acceptInvite(inviteId)
-          ApiResult.Success(invite)
+          val child = apiService.acceptInvite(AcceptInviteRequest(token))
+          ApiResult.Success(child)
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

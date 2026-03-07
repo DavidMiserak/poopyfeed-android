@@ -207,19 +207,44 @@ data class NapListResponse(
           updated_at = updated_at)
 }
 
-/** Child sharing relationship. */
+/** Child share (existing access). From GET /api/v1/children/{id}/shares/. */
 @Serializable
 data class ChildShare(
     val id: Int,
-    val child: Int,
-    val shared_with_user: String, // Email of the shared-with user
+    @SerialName("user_email") val userEmail: String,
     val role: String, // 'co-parent' or 'caregiver'
-    val created_at: String,
-    val updated_at: String
+    @SerialName("role_display") val roleDisplay: String? = null,
+    @SerialName("created_at") val createdAt: String,
 )
 
-/** DTO for creating a share invite. */
-@Serializable data class CreateShareRequest(val email: String, val role: String)
+/** DTO for creating an invite. Backend expects only role. POST /api/v1/children/{id}/invites/. */
+@Serializable data class CreateShareRequest(val role: String)
+
+/** Response from creating an invite. Contains token for share link. */
+@Serializable
+data class ShareInviteResponse(
+    val id: Int,
+    val token: String,
+    val role: String,
+    @SerialName("is_active") val isActive: Boolean = true,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("invite_url") val inviteUrl: String? = null,
+)
+
+/** Invite link for a child (from GET/PATCH /api/v1/children/{id}/invites/). */
+@Serializable
+data class ChildInvite(
+    val id: Int,
+    val token: String,
+    val role: String,
+    @SerialName("role_display") val roleDisplay: String,
+    @SerialName("is_active") val isActive: Boolean = true,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("invite_url") val inviteUrl: String? = null,
+)
+
+/** DTO for accepting an invite. POST /api/v1/invites/accept/. */
+@Serializable data class AcceptInviteRequest(val token: String)
 
 // ========================
 // Notifications
@@ -245,16 +270,19 @@ data class Notification(
 /** Request body for PATCH notification (mark as read). */
 @Serializable data class MarkReadRequest(@SerialName("is_read") val isRead: Boolean = true)
 
-/** Share invite (pending or accepted). */
+/**
+ * Share invite (from GET /api/v1/children/{id}/invites/). Token-based; no "pending for user"
+ * endpoint. Accept via POST /api/v1/invites/accept/ with { "token": "..." }.
+ */
 @Serializable
 data class ShareInvite(
     val id: Int,
     val child: Int,
-    val invited_email: String,
+    val token: String,
     val role: String,
-    val status: String, // 'pending' or 'accepted'
-    val created_at: String,
-    val updated_at: String
+    @SerialName("is_active") val isActive: Boolean = true,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("invite_url") val inviteUrl: String? = null,
 )
 
 /**

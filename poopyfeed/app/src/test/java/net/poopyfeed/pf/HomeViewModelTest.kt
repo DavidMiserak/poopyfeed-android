@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.SharingRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
@@ -29,6 +30,7 @@ class HomeViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockSharingRepository: SharingRepository = mockk(relaxed = true)
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
@@ -56,9 +58,15 @@ class HomeViewModelTest {
     every { mockTokenManager.getToken() } returns "test-token"
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Success(emptyList())
 
     val viewModel =
-        HomeViewModel(mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+        HomeViewModel(
+            mockAuthRepository,
+            mockSharingRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -74,7 +82,11 @@ class HomeViewModelTest {
 
         val viewModel =
             HomeViewModel(
-                mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+                mockAuthRepository,
+                mockSharingRepository,
+                mockClearSessionUseCase,
+                mockTokenManager,
+                mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -93,7 +105,11 @@ class HomeViewModelTest {
 
         val viewModel =
             HomeViewModel(
-                mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+                mockAuthRepository,
+                mockSharingRepository,
+                mockClearSessionUseCase,
+                mockTokenManager,
+                mockContext)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -110,7 +126,12 @@ class HomeViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Error(networkError)
 
     val viewModel =
-        HomeViewModel(mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+        HomeViewModel(
+            mockAuthRepository,
+            mockSharingRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 

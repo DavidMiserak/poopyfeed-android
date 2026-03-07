@@ -189,26 +189,49 @@ interface PoopyFeedApiService {
   suspend fun deleteNap(@Path("childId") childId: Int, @Path("napId") napId: Int)
 
   // ========================
-  // Sharing Endpoints
+  // Sharing Endpoints (match backend: children/{id}/shares/, children/{id}/invites/,
+  // invites/accept/)
   // ========================
 
-  /** Get list of children shared with other users. GET /api/v1/children/{childId}/sharing/ */
-  @GET("children/{childId}/sharing/")
+  /** Get list of shares for a child (owner only). GET /api/v1/children/{childId}/shares/ */
+  @GET("children/{childId}/shares/")
   suspend fun listShares(@Path("childId") childId: Int): List<ChildShare>
 
-  /** Create a share invite for a child. POST /api/v1/children/{childId}/sharing/ */
-  @POST("children/{childId}/sharing/")
+  /** List invite links for a child (owner only). GET /api/v1/children/{childId}/invites/ */
+  @GET("children/{childId}/invites/")
+  suspend fun listInvites(@Path("childId") childId: Int): List<ChildInvite>
+
+  /**
+   * Create an invite for a child (owner only). Body: { "role": "co-parent"|"caregiver" }. POST
+   * /api/v1/children/{childId}/invites/
+   */
+  @POST("children/{childId}/invites/")
   suspend fun createShare(
       @Path("childId") childId: Int,
       @Body request: CreateShareRequest
-  ): ShareInvite
+  ): ShareInviteResponse
 
-  /** Get pending invites for current user. GET /api/v1/invites/pending/ */
-  @GET("invites/pending/") suspend fun getPendingInvites(): List<ShareInvite>
+  /**
+   * Toggle invite active status (owner only). PATCH /api/v1/children/{childId}/invites/{invitePk}/
+   */
+  @PATCH("children/{childId}/invites/{invitePk}/")
+  suspend fun toggleInvite(
+      @Path("childId") childId: Int,
+      @Path("invitePk") invitePk: Int,
+  ): ChildInvite
 
-  /** Accept a share invite. POST /api/v1/invites/{inviteId}/accept/ */
-  @POST("invites/{inviteId}/accept/")
-  suspend fun acceptInvite(@Path("inviteId") inviteId: Int): ShareInvite
+  /** Delete an invite (owner only). DELETE /api/v1/children/{childId}/invites/{invitePk}/delete/ */
+  @DELETE("children/{childId}/invites/{invitePk}/delete/")
+  suspend fun deleteInvite(
+      @Path("childId") childId: Int,
+      @Path("invitePk") invitePk: Int,
+  )
+
+  /**
+   * Accept an invite by token. Body: { "token": "..." }. POST /api/v1/invites/accept/ Returns the
+   * child the user now has access to. There is no GET pending-invites endpoint.
+   */
+  @POST("invites/accept/") suspend fun acceptInvite(@Body request: AcceptInviteRequest): Child
 
   // ========================
   // Notifications Endpoints

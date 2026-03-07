@@ -56,6 +56,10 @@ class ChildDetailFragment : Fragment() {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
       findNavController().navigate(R.id.action_childDetail_to_napsList, bundle)
     }
+    binding.buttonShare.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_sharingFragment, bundle)
+    }
 
     collectFlows()
   }
@@ -105,6 +109,7 @@ class ChildDetailFragment : Fragment() {
       binding.chipRole.text = state.child.user_role.replaceFirstChar { it.uppercaseChar() }
     }
     binding.buttonEdit.visibility = if (state.canEdit) View.VISIBLE else View.GONE
+    binding.buttonShare.visibility = if (state.isOwner) View.VISIBLE else View.GONE
   }
 
   private fun openEditChild() {

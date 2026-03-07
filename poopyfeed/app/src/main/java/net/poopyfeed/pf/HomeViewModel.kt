@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.ShareInvite
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.SharingRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
@@ -40,6 +42,7 @@ class HomeViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
+    private val sharingRepository: SharingRepository,
     private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
@@ -47,6 +50,9 @@ constructor(
 
   private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Loading)
   val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+  private val _pendingInvites: MutableStateFlow<List<ShareInvite>> = MutableStateFlow(emptyList())
+  val pendingInvites: StateFlow<List<ShareInvite>> = _pendingInvites.asStateFlow()
 
   init {
     loadProfile()
@@ -69,6 +75,7 @@ constructor(
         is ApiResult.Success -> {
           val profile = result.data
           _uiState.value = HomeUiState.Ready(email = profile.email)
+          loadPendingInvites()
         }
         is ApiResult.Error -> {
           val error = result.error
@@ -81,6 +88,19 @@ constructor(
         }
         is ApiResult.Loading -> {
           // no-op; we manage Loading locally
+        }
+      }
+    }
+  }
+
+  /** Loads pending share invites and updates [pendingInvites]. Call after profile is ready. */
+  fun loadPendingInvites() {
+    viewModelScope.launch {
+      when (val result = sharingRepository.getPendingInvites()) {
+        is ApiResult.Success -> _pendingInvites.value = result.data
+        is ApiResult.Error -> _pendingInvites.value = emptyList()
+        is ApiResult.Loading -> {
+          /* keep current */
         }
       }
     }
