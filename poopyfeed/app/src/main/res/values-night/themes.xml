@@ -1,7 +1,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Dark theme for PoopyFeed (no color overrides; uses system/Material You colors) -->
+    <!-- Dark theme for PoopyFeed with brand colors -->
     <style name="Base.Theme.Pf" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:fontFamily">@font/dm_sans</item>
+
+        <!-- Primary (Rose) -->
+        <item name="colorPrimary">@color/rose_200</item>
+        <item name="colorOnPrimary">@color/rose_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/rose_dark_container</item>
+        <item name="colorOnPrimaryContainer">@color/rose_100</item>
+
+        <!-- Secondary (Orange) -->
+        <item name="colorSecondary">@color/orange_dark_secondary</item>
+        <item name="colorOnSecondary">@color/orange_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/orange_dark_container</item>
+        <item name="colorOnSecondaryContainer">@color/orange_dark_onContainer</item>
+
+        <!-- Tertiary (Amber) -->
+        <item name="colorTertiary">@color/amber_dark_tertiary</item>
+        <item name="colorOnTertiary">@color/amber_dark_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/amber_dark_container</item>
+        <item name="colorOnTertiaryContainer">@color/amber_dark_onContainer</item>
+
+        <!-- Surface / Background -->
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/dark_onSurface</item>
+        <item name="colorSurfaceVariant">@color/dark_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/dark_onSurfaceVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/dark_surfaceContainerHigh</item>
+        <item name="colorOutline">@color/dark_outline</item>
+        <item name="android:colorBackground">@color/dark_surface</item>
+        <item name="colorOnBackground">@color/dark_onSurface</item>
+
+        <!-- Error -->
+        <item name="colorError">@color/dark_error</item>
+        <item name="colorOnError">@color/dark_onError</item>
+        <item name="colorErrorContainer">@color/dark_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/dark_onErrorContainer</item>
     </style>
 </resources>

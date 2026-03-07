@@ -42,4 +42,27 @@
 
     <!-- Additional utilities -->
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Dark mode colors -->
+    <color name="rose_dark_onPrimary">#4e1125</color>
+    <color name="rose_dark_container">#6d1b34</color>
+    <color name="orange_dark_secondary">#ffb780</color>
+    <color name="orange_dark_onSecondary">#4a2800</color>
+    <color name="orange_dark_container">#6b3a00</color>
+    <color name="orange_dark_onContainer">#ffddb8</color>
+    <color name="amber_dark_tertiary">#ffe08a</color>
+    <color name="amber_dark_onTertiary">#3d2e00</color>
+    <color name="amber_dark_container">#574400</color>
+    <color name="amber_dark_onContainer">#ffe9a8</color>
+    <color name="dark_surface">#1a1a1e</color>
+    <color name="dark_onSurface">#e4e1e6</color>
+    <color name="dark_surfaceVariant">#49454e</color>
+    <color name="dark_onSurfaceVariant">#cac4cf</color>
+    <color name="dark_surfaceContainerHigh">#2b2930</color>
+    <color name="dark_outline">#948f99</color>
+    <color name="dark_error">#ffb4ab</color>
+    <color name="dark_onError">#690005</color>
+    <color name="dark_errorContainer">#93000a</color>
+    <color name="dark_onErrorContainer">#ffdad6</color>
+    <color name="light_onErrorContainer">#410002</color>
 </resources>

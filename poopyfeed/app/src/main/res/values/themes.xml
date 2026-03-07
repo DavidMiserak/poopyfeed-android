@@ -1,8 +1,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme (no color overrides; uses system/Material You colors) -->
+    <!-- Base application theme with brand colors -->
     <style name="Base.Theme.Pf" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:fontFamily">@font/dm_sans</item>
+
+        <!-- Primary (Rose) -->
+        <item name="colorPrimary">@color/rose_400</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/rose_100</item>
+        <item name="colorOnPrimaryContainer">@color/rose_600</item>
+
+        <!-- Secondary (Orange) -->
+        <item name="colorSecondary">@color/orange_400</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/orange_50</item>
+        <item name="colorOnSecondaryContainer">@color/amber_600</item>
+
+        <!-- Tertiary (Amber) -->
+        <item name="colorTertiary">@color/amber_400</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/amber_50</item>
+        <item name="colorOnTertiaryContainer">@color/amber_600</item>
+
+        <!-- Surface / Background -->
+        <item name="colorSurface">@color/slate_50</item>
+        <item name="colorOnSurface">@color/slate_900</item>
+        <item name="colorSurfaceVariant">@color/slate_100</item>
+        <item name="colorOnSurfaceVariant">@color/slate_600</item>
+        <item name="colorOutline">@color/slate_200</item>
+        <item name="android:colorBackground">@color/slate_50</item>
+        <item name="colorOnBackground">@color/slate_900</item>
+
+        <!-- Error -->
+        <item name="colorError">@color/red_500</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorErrorContainer">@color/red_50</item>
+        <item name="colorOnErrorContainer">@color/light_onErrorContainer</item>
     </style>
 
     <!-- Light theme -->
