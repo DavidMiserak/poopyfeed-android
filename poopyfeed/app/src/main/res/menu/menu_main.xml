@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="net.poopyfeed.pf.MainActivity">
     <item
+        android:id="@+id/action_account"
+        android:orderInCategory="50"
+        android:title="@string/nav_account"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"
         android:title="@string/logout_button"

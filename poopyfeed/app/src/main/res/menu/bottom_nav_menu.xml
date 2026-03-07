@@ -17,9 +17,4 @@
         android:title="@string/nav_notifications"
         android:icon="@drawable/ic_notifications" />
 
-    <item
-        android:id="@id/AccountSettingsFragment"
-        android:title="@string/nav_account"
-        android:icon="@drawable/ic_person" />
-
 </menu>
