@@ -72,6 +72,22 @@
         <item name="cornerRadius">@dimen/corner_radius_md</item>
     </style>
 
+    <!-- Quick log: primary button with visible border (OutlinedButton so stroke applies) -->
+    <style name="Widget.Pf.Button.Primary.Bordered" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:fontFamily">@font/dm_sans_bold</item>
+        <item name="android:textSize">@dimen/text_body_large</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">@dimen/corner_radius_md</item>
+    </style>
+
+    <!-- Quick log: secondary button with thicker border -->
+    <style name="Widget.Pf.Button.Secondary.Bordered" parent="Widget.Pf.Button.Secondary">
+        <item name="strokeWidth">2dp</item>
+    </style>
+
     <!-- ===================== -->
     <!-- FAB Style             -->
     <!-- ===================== -->

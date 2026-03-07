@@ -38,7 +38,10 @@ data class Child(
     val last_diaper_change: String? = null, // ISO 8601 datetime or null
     val last_nap: String? = null, // ISO 8601 datetime or null
     val can_edit: Boolean = false, // true for owner or co-parent
-    val feeding_reminder_interval: Int? = null // 2, 3, 4, or 6 hours; null = off
+    val feeding_reminder_interval: Int? = null, // 2, 3, 4, or 6 hours; null = off
+    val custom_bottle_low_oz: String? = null, // Quick-log bottle amount (oz)
+    val custom_bottle_mid_oz: String? = null,
+    val custom_bottle_high_oz: String? = null,
 )
 
 /** DTO for creating a Child. */

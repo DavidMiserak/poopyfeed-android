@@ -125,10 +125,11 @@ class MainActivity : AppCompatActivity() {
     binding.appBar.isVisible = !isAuthDestination
     binding.bottomNav.isVisible = !isAuthDestination
 
-    // Show FAB only on list screens (children, feedings, diapers, naps)
+    // Show FAB on child detail (quick log) and list screens (children, feedings, diapers, naps)
     val isFabDestination =
         destination.id in
             setOf(
+                R.id.ChildDetailFragment,
                 R.id.ChildrenListFragment,
                 R.id.FeedingsListFragment,
                 R.id.DiapersListFragment,
@@ -137,6 +138,14 @@ class MainActivity : AppCompatActivity() {
 
     binding.fab.setOnClickListener {
       when (destination.id) {
+        R.id.ChildDetailFragment -> {
+          val childId =
+              navController.currentBackStackEntry?.arguments?.getInt("childId")
+                  ?: return@setOnClickListener
+          navController.navigate(
+              R.id.action_childDetail_to_quickLogSheet,
+              Bundle().apply { putInt("childId", childId) })
+        }
         R.id.ChildrenListFragment -> {
           navController.navigate(R.id.childrenListFabSheet)
         }

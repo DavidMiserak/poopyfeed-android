@@ -100,7 +100,22 @@
         <action
             android:id="@+id/action_childDetail_to_sharingFragment"
             app:destination="@id/sharingFragment" />
+
+        <action
+            android:id="@+id/action_childDetail_to_quickLogSheet"
+            app:destination="@id/childDetailQuickLogSheet" />
     </fragment>
+
+    <dialog
+        android:id="@+id/childDetailQuickLogSheet"
+        android:name="net.poopyfeed.pf.children.ChildDetailQuickLogBottomSheetFragment"
+        android:label="@string/quick_log_sheet_title"
+        tools:layout="@layout/fragment_child_detail_quick_log_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
 
     <fragment
         android:id="@+id/sharingFragment"

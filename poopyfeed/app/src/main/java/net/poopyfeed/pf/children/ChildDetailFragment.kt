@@ -82,6 +82,42 @@ class ChildDetailFragment : Fragment() {
             // NavController not fully set up (e.g. in tests); skip child_deleted listener
           }
         }
+        launch {
+          try {
+            val handle =
+                findNavController().currentBackStackEntry?.savedStateHandle ?: return@launch
+            handle.getStateFlow("diaper_created", false).collect { created ->
+              if (created) {
+                handle.set("diaper_created", false)
+                viewModel.refresh()
+              }
+            }
+          } catch (_: IllegalStateException) {}
+        }
+        launch {
+          try {
+            val handle =
+                findNavController().currentBackStackEntry?.savedStateHandle ?: return@launch
+            handle.getStateFlow("feeding_created", false).collect { created ->
+              if (created) {
+                handle.set("feeding_created", false)
+                viewModel.refresh()
+              }
+            }
+          } catch (_: IllegalStateException) {}
+        }
+        launch {
+          try {
+            val handle =
+                findNavController().currentBackStackEntry?.savedStateHandle ?: return@launch
+            handle.getStateFlow("nap_created", false).collect { created ->
+              if (created) {
+                handle.set("nap_created", false)
+                viewModel.refresh()
+              }
+            }
+          } catch (_: IllegalStateException) {}
+        }
       }
     }
   }

@@ -102,6 +102,11 @@
     <string name="children_list_retry_button">Retry</string>
     <string name="children_list_add_button">Add Child</string>
     <string name="children_list_fab_sheet_title">Add a child</string>
+    <string name="quick_log_sheet_title">Quick log</string>
+    <string name="quick_log_sheet_subtitle">One tap, then done</string>
+    <string name="quick_log_bottle_oz_int">%d oz</string>
+    <string name="quick_log_bottle_oz_float">%.1f oz</string>
+    <string name="quick_log_nap_section_label">Nap</string>
     <string name="children_list_enter_invite_code">Enter invite code</string>
     <string name="child_role_badge">%1$s</string>
 

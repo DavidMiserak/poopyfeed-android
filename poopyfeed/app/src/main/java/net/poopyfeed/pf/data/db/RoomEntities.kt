@@ -23,6 +23,9 @@ data class ChildEntity(
     val last_nap: String? = null,
     val can_edit: Boolean = false,
     val feeding_reminder_interval: Int? = null,
+    val custom_bottle_low_oz: String? = null,
+    val custom_bottle_mid_oz: String? = null,
+    val custom_bottle_high_oz: String? = null,
 
     // Local metadata
     @ColumnInfo(name = "synced_at") val syncedAt: Long = System.currentTimeMillis()
@@ -40,7 +43,10 @@ data class ChildEntity(
           last_diaper_change = last_diaper_change,
           last_nap = last_nap,
           can_edit = can_edit,
-          feeding_reminder_interval = feeding_reminder_interval)
+          feeding_reminder_interval = feeding_reminder_interval,
+          custom_bottle_low_oz = custom_bottle_low_oz,
+          custom_bottle_mid_oz = custom_bottle_mid_oz,
+          custom_bottle_high_oz = custom_bottle_high_oz)
 
   companion object {
     fun fromApiModel(child: Child): ChildEntity =
@@ -56,7 +62,10 @@ data class ChildEntity(
             last_diaper_change = child.last_diaper_change,
             last_nap = child.last_nap,
             can_edit = child.can_edit,
-            feeding_reminder_interval = child.feeding_reminder_interval)
+            feeding_reminder_interval = child.feeding_reminder_interval,
+            custom_bottle_low_oz = child.custom_bottle_low_oz,
+            custom_bottle_mid_oz = child.custom_bottle_mid_oz,
+            custom_bottle_high_oz = child.custom_bottle_high_oz)
   }
 }
 

@@ -11,11 +11,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * PoopyFeed Room database.
  *
  * Schema version 1: children, feedings, diapers, naps. Version 2: children can_edit,
- * feeding_reminder_interval. Version 3: feedings duration_minutes, side.
+ * feeding_reminder_interval. Version 3: feedings duration_minutes, side. Version 4: children
+ * custom_bottle_low_oz, custom_bottle_mid_oz, custom_bottle_high_oz.
  */
 @Database(
     entities = [ChildEntity::class, FeedingEntity::class, DiaperEntity::class, NapEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
@@ -46,6 +47,15 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
           }
         }
 
+    private val MIGRATION_3_4 =
+        object : Migration(3, 4) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE children ADD COLUMN custom_bottle_low_oz TEXT NULL")
+            db.execSQL("ALTER TABLE children ADD COLUMN custom_bottle_mid_oz TEXT NULL")
+            db.execSQL("ALTER TABLE children ADD COLUMN custom_bottle_high_oz TEXT NULL")
+          }
+        }
+
     @Volatile private var instance: PoopyFeedDatabase? = null
 
     fun getInstance(context: Context): PoopyFeedDatabase {
@@ -54,7 +64,7 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
             instance
                 ?: Room.databaseBuilder(
                         context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                     .also { instance = it }
           }
