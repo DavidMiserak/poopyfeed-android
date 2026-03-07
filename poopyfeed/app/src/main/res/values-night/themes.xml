@@ -3,6 +3,8 @@
     <!-- Dark theme for PoopyFeed with brand colors -->
     <style name="Base.Theme.Pf" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:fontFamily">@font/dm_sans</item>
+        <!-- Disable Material You dynamic colors so our brand palette is used (Android 12+) -->
+        <item name="dynamicColorThemeOverlay">@null</item>
 
         <!-- Primary (Rose) -->
         <item name="colorPrimary">@color/rose_200</item>
