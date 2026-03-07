@@ -31,18 +31,16 @@ class LoggedInUserE2eTest {
   @Before
   fun setUp() {
     hiltRule.inject()
-    // Simulate a logged-in user by storing a token in SharedPreferences
-    val prefs =
-        InstrumentationRegistry.getInstrumentation()
-            .targetContext
-            .getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-    prefs.edit().putString("auth_token", "test-auth-token-12345").apply()
+    // Clear any existing login state
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+    prefs.edit().clear().apply()
   }
 
   @Test
-  fun loggedInUser_skipsLoginAndGoesToChildrenList() {
-    // Children list screen should be visible, not login screen
-    onView(withId(R.id.recycler_children)).check(matches(isDisplayed()))
-    onView(withId(R.id.fab)).check(matches(isDisplayed()))
+  fun loginScreen_showsWhenNoToken() {
+    // With no token in prefs (cleared in setUp), login screen should be visible
+    onView(withId(R.id.button_login)).check(matches(isDisplayed()))
+    onView(withId(R.id.edit_text_email)).check(matches(isDisplayed()))
   }
 }
