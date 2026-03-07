@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowDialog
 import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [ChildDetailFragment] using Hilt + Robolectric. */
@@ -70,7 +69,7 @@ class ChildDetailFragmentTest {
   }
 
   @Test
-  fun `ready state shows child name and owner buttons visible`() {
+  fun `ready state shows child name and edit button visible for owner`() {
     val fragment = launchFragment()
     val root = fragment.requireView()
 
@@ -79,33 +78,46 @@ class ChildDetailFragmentTest {
         root.findViewById<android.widget.TextView>(R.id.text_child_name).text.toString(),
     )
     assertNotNull(root.findViewById<android.widget.TextView>(R.id.text_age_gender).text)
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.button_delete).visibility)
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.button_edit).visibility)
     assertEquals(View.GONE, root.findViewById<View>(R.id.chip_role).visibility)
   }
 
   @Test
-  fun `non-owner hides delete and edit and shows role chip`() {
+  fun `caregiver hides edit and shows role chip`() {
     every { repo.getChildCached(childId) } returns
         flowOf(
-            TestFixtures.mockChild(id = childId, name = "Test Child", user_role = "co-parent"),
+            TestFixtures.mockChild(
+                id = childId,
+                name = "Test Child",
+                user_role = "caregiver",
+                can_edit = false,
+            ),
         )
 
     val fragment = launchFragment()
     val root = fragment.requireView()
 
-    assertEquals(View.GONE, root.findViewById<View>(R.id.button_delete).visibility)
     assertEquals(View.GONE, root.findViewById<View>(R.id.button_edit).visibility)
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.chip_role).visibility)
   }
 
   @Test
-  fun `delete button opens confirmation dialog`() {
-    val fragment = launchFragment()
-    fragment.requireView().findViewById<View>(R.id.button_delete).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+  fun `co-parent shows edit and role chip`() {
+    every { repo.getChildCached(childId) } returns
+        flowOf(
+            TestFixtures.mockChild(
+                id = childId,
+                name = "Test Child",
+                user_role = "co-parent",
+                can_edit = true,
+            ),
+        )
 
-    assertNotNull(ShadowDialog.getLatestDialog())
+    val fragment = launchFragment()
+    val root = fragment.requireView()
+
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.button_edit).visibility)
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.chip_role).visibility)
   }
 
   @Test

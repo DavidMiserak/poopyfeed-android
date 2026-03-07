@@ -7,13 +7,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.util.formatAge
@@ -32,6 +29,7 @@ sealed interface ChildDetailUiState {
       val lastDiaperFormatted: String,
       val lastNapFormatted: String,
       val isOwner: Boolean,
+      val canEdit: Boolean,
   ) : ChildDetailUiState
 
   /** Failed to load child; [message] is user-facing. */
@@ -40,7 +38,7 @@ sealed interface ChildDetailUiState {
 
 /**
  * ViewModel for [ChildDetailFragment]. Loads a child by ID and displays their profile and last
- * activities. Handles deletion with confirmation.
+ * activities. Delete is handled from the edit screen.
  */
 @HiltViewModel
 class ChildDetailViewModel
@@ -56,12 +54,6 @@ constructor(
   private val _uiState: MutableStateFlow<ChildDetailUiState> =
       MutableStateFlow(ChildDetailUiState.Loading)
   val uiState: StateFlow<ChildDetailUiState> = _uiState.asStateFlow()
-
-  private val _navigateBack: MutableSharedFlow<Unit> = MutableSharedFlow(replay = 0)
-  val navigateBack = _navigateBack.asSharedFlow()
-
-  private val _deleteError: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
-  val deleteError = _deleteError.asSharedFlow()
 
   init {
     observeChild()
@@ -89,6 +81,7 @@ constructor(
         val lastDiaperFormatted = formatRelativeTime(context, child.last_diaper_change)
         val lastNapFormatted = formatRelativeTime(context, child.last_nap)
         val isOwner = child.user_role == "owner"
+        val canEdit = child.can_edit
 
         _uiState.value =
             ChildDetailUiState.Ready(
@@ -98,25 +91,8 @@ constructor(
                 lastDiaperFormatted = lastDiaperFormatted,
                 lastNapFormatted = lastNapFormatted,
                 isOwner = isOwner,
+                canEdit = canEdit,
             )
-      }
-    }
-  }
-
-  /** Deletes the child from the API and cache. Navigates back on success or emits error. */
-  fun deleteChild() {
-    viewModelScope.launch {
-      val result = repo.deleteChild(childId)
-      when (result) {
-        is ApiResult.Success -> {
-          _navigateBack.emit(Unit)
-        }
-        is ApiResult.Error -> {
-          _deleteError.emit(result.error.getUserMessage(context))
-        }
-        is ApiResult.Loading -> {
-          // no-op; we manage loading locally
-        }
       }
     }
   }

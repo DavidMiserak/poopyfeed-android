@@ -21,6 +21,8 @@ data class ChildEntity(
     val last_feeding: String? = null,
     val last_diaper_change: String? = null,
     val last_nap: String? = null,
+    val can_edit: Boolean = false,
+    val feeding_reminder_interval: Int? = null,
 
     // Local metadata
     @ColumnInfo(name = "synced_at") val syncedAt: Long = System.currentTimeMillis()
@@ -36,7 +38,9 @@ data class ChildEntity(
           updated_at = updated_at,
           last_feeding = last_feeding,
           last_diaper_change = last_diaper_change,
-          last_nap = last_nap)
+          last_nap = last_nap,
+          can_edit = can_edit,
+          feeding_reminder_interval = feeding_reminder_interval)
 
   companion object {
     fun fromApiModel(child: Child): ChildEntity =
@@ -50,7 +54,9 @@ data class ChildEntity(
             updated_at = child.updated_at,
             last_feeding = child.last_feeding,
             last_diaper_change = child.last_diaper_change,
-            last_nap = child.last_nap)
+            last_nap = child.last_nap,
+            can_edit = child.can_edit,
+            feeding_reminder_interval = child.feeding_reminder_interval)
   }
 }
 

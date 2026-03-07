@@ -223,7 +223,12 @@ class CachedChildrenRepositoryTest {
 
   @Test
   fun `updateChild success upserts and returns Success`() = runTest {
-    val request = CreateChildRequest("Baby Alice Updated", "2024-01-15", "F")
+    val request =
+        net.poopyfeed.pf.data.models.UpdateChildRequest(
+            name = "Baby Alice Updated",
+            date_of_birth = "2024-01-15",
+            gender = "F",
+        )
     val child =
         TestFixtures.mockChild(name = "Baby Alice Updated", updated_at = "2024-01-15T12:00:00Z")
     io.mockk.coEvery { apiService.updateChild(1, request) } returns child

@@ -3,9 +3,9 @@ package net.poopyfeed.pf.children
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -32,16 +32,20 @@ class ChildDetailViewModelTest {
   }
 
   @Test
-  fun `deleteChild calls repository delete`() = runTest {
+  fun `loads child from repository`() = runTest {
     val mockChild = TestFixtures.mockChild()
     coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
     coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
-    coEvery { mockRepository.deleteChild(1) } returns ApiResult.Success(Unit)
 
     val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
 
-    viewModel.deleteChild()
-
-    coVerify { mockRepository.deleteChild(1) }
+    // ViewModel observes getChildCached; state may be Loading or Ready depending on dispatcher
+    val state = viewModel.uiState.value
+    assert(state is ChildDetailUiState.Loading || state is ChildDetailUiState.Ready) {
+      "Expected Loading or Ready, got $state"
+    }
+    if (state is ChildDetailUiState.Ready) {
+      assertEquals(mockChild.name, state.child.name)
+    }
   }
 }

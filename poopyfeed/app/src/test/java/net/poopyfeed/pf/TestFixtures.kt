@@ -31,7 +31,9 @@ object TestFixtures {
       updated_at: String = TS,
       last_feeding: String? = TS12,
       last_diaper_change: String? = TS14_30,
-      last_nap: String? = TS13
+      last_nap: String? = TS13,
+      can_edit: Boolean = true,
+      feeding_reminder_interval: Int? = null
   ) =
       Child(
           id = id,
@@ -43,7 +45,9 @@ object TestFixtures {
           updated_at = updated_at,
           last_feeding = last_feeding,
           last_diaper_change = last_diaper_change,
-          last_nap = last_nap)
+          last_nap = last_nap,
+          can_edit = can_edit,
+          feeding_reminder_interval = feeding_reminder_interval)
 
   fun mockFeeding(
       id: Int = 1,

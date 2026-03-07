@@ -40,10 +40,8 @@ class NapAdapter(
     fun bind(nap: Nap) {
       val ctx = binding.root.context
       val timeSummary = formatRelativeTime(ctx, nap.start_time)
-      binding.textStartTime.text =
-          ctx.getString(R.string.nap_record_start, timeSummary)
-      binding.root.contentDescription =
-          ctx.getString(R.string.a11y_nap_item, timeSummary)
+      binding.textStartTime.text = ctx.getString(R.string.nap_record_start, timeSummary)
+      binding.root.contentDescription = ctx.getString(R.string.a11y_nap_item, timeSummary)
       if (nap.end_time == null) {
         binding.textDuration.visibility = View.GONE
         binding.labelInProgress.visibility = View.VISIBLE

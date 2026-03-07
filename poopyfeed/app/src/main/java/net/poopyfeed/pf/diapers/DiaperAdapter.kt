@@ -44,8 +44,7 @@ class DiaperAdapter(private val onDeleteClick: (Diaper) -> Unit) :
       binding.textChangeType.text = typeLabel
       val timeSummary = formatRelativeTime(ctx, diaper.timestamp)
       binding.textTime.text = timeSummary
-      binding.root.contentDescription =
-          ctx.getString(R.string.a11y_diaper_item, timeSummary)
+      binding.root.contentDescription = ctx.getString(R.string.a11y_diaper_item, timeSummary)
       binding.root.setOnLongClickListener {
         onDeleteClick(diaper)
         true

@@ -50,8 +50,7 @@ class FeedingAdapter(private val onDeleteClick: (Feeding) -> Unit) :
       }
       val timeSummary = formatRelativeTime(ctx, feeding.timestamp)
       binding.textTime.text = timeSummary
-      binding.root.contentDescription =
-          ctx.getString(R.string.a11y_feeding_item, timeSummary)
+      binding.root.contentDescription = ctx.getString(R.string.a11y_feeding_item, timeSummary)
       binding.root.setOnLongClickListener {
         onDeleteClick(feeding)
         true

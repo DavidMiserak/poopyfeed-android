@@ -201,29 +201,19 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Action buttons (owner-only) -->
+        <!-- Edit button (owner / co-parent) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_edit"
             style="@style/Widget.Pf.Button.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_marginTop="@dimen/spacing_8"
             android:text="@string/child_detail_edit_button"
+            android:contentDescription="@string/child_detail_edit_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/card_tracking"
-            android:visibility="gone" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_delete"
-            style="@style/Widget.Pf.Button.Secondary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_4"
-            android:text="@string/child_detail_delete_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_edit"
             android:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

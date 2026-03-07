@@ -166,6 +166,17 @@
         android:label="@string/create_child_title"
         tools:layout="@layout/fragment_create_child_bottom_sheet" />
 
+    <dialog
+        android:id="@+id/editChildBottomSheet"
+        android:name="net.poopyfeed.pf.children.EditChildBottomSheetFragment"
+        android:label="@string/edit_child_title"
+        tools:layout="@layout/fragment_edit_child_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
     <fragment
         android:id="@+id/AccountSettingsFragment"
         android:name="net.poopyfeed.pf.accounts.AccountSettingsFragment"

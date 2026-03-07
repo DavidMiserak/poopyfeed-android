@@ -1,6 +1,8 @@
 package net.poopyfeed.pf.data.models
 
 import android.content.Context
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.poopyfeed.pf.R
@@ -34,12 +36,27 @@ data class Child(
     val updated_at: String, // ISO 8601 datetime
     val last_feeding: String? = null, // ISO 8601 datetime or null
     val last_diaper_change: String? = null, // ISO 8601 datetime or null
-    val last_nap: String? = null // ISO 8601 datetime or null
+    val last_nap: String? = null, // ISO 8601 datetime or null
+    val can_edit: Boolean = false, // true for owner or co-parent
+    val feeding_reminder_interval: Int? = null // 2, 3, 4, or 6 hours; null = off
 )
 
-/** DTO for creating/updating a Child. */
+/** DTO for creating a Child. */
 @Serializable
 data class CreateChildRequest(val name: String, val date_of_birth: String, val gender: String)
+
+/**
+ * DTO for PATCH update of a Child. Only non-null fields are sent so the backend performs partial
+ * update. Used for editing profile and/or feeding reminder interval (owner/co-parent only).
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class UpdateChildRequest(
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val name: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val date_of_birth: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val gender: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val feeding_reminder_interval: Int? = null,
+)
 
 /** Feeding event - bottle or breastfeeding. */
 data class Feeding(

@@ -120,7 +120,12 @@ class ChildrenRepositoryTest {
 
   @Test
   fun `updateChild returns Success`() = runTest {
-    val request = CreateChildRequest("Baby Alice", "2024-01-15", "F")
+    val request =
+        net.poopyfeed.pf.data.models.UpdateChildRequest(
+            name = "Baby Alice",
+            date_of_birth = "2024-01-15",
+            gender = "F",
+        )
     val updated = TestFixtures.mockChild(updated_at = "2024-01-15T12:00:00Z")
     coEvery { apiService.updateChild(1, request) } returns updated
 

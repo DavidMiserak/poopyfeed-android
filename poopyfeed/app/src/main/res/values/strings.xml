@@ -125,6 +125,7 @@
     <string name="child_detail_delete_message">This will delete %1$s and all associated data. This action cannot be undone.</string>
     <string name="child_detail_delete_confirm">Delete</string>
     <string name="child_detail_delete_success">Child deleted successfully.</string>
+    <string name="child_detail_error_generic">Child not found.</string>
 
     <!-- Create Child / Bottom Sheet -->
     <string name="create_child_title">Add Child</string>
@@ -139,6 +140,18 @@
     <string name="create_child_save_button">Add Child</string>
     <string name="create_child_saving">Saving…</string>
     <string name="create_child_success">Child added successfully!</string>
+
+    <!-- Edit Child / Bottom Sheet -->
+    <string name="edit_child_title">Edit child</string>
+    <string name="edit_child_save_button">Save</string>
+    <string name="edit_child_success">Child updated.</string>
+    <string name="feeding_reminder_label">Feeding reminders</string>
+    <string name="feeding_reminder_off">Off</string>
+    <string name="feeding_reminder_2h">Every 2 hours</string>
+    <string name="feeding_reminder_3h">Every 3 hours</string>
+    <string name="feeding_reminder_4h">Every 4 hours</string>
+    <string name="feeding_reminder_6h">Every 6 hours</string>
+    <string name="a11y_feeding_reminder">Feeding reminder interval</string>
 
     <!-- Home - My Children Card -->
     <string name="home_children_card_title">My Children</string>

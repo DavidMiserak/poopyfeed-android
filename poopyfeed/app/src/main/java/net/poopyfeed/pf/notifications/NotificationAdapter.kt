@@ -38,8 +38,7 @@ class NotificationAdapter(private val onNotificationClick: (Notification) -> Uni
       binding.textTime.text = formatRelativeTime(binding.root.context, notification.createdAt)
       binding.root.contentDescription =
           binding.root.context.getString(
-              net.poopyfeed.pf.R.string.a11y_notification_item,
-              notification.message)
+              net.poopyfeed.pf.R.string.a11y_notification_item, notification.message)
       binding.textMeta.text =
           binding.root.context.getString(
               net.poopyfeed.pf.R.string.notification_meta,
