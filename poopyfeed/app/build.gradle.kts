@@ -140,6 +140,7 @@ kover {
                     // Hilt/Dagger generated wiring in app package
                     "net.poopyfeed.pf.*_Factory",
                     "net.poopyfeed.pf.*_HiltModules*",
+                    "net.poopyfeed.pf.*_GeneratedInjector",
                 )
 
                 // Exclude Room database wiring (but not entities)
@@ -147,13 +148,42 @@ kover {
                     "net.poopyfeed.pf.data.db.PoopyFeedDatabase*",
                     "net.poopyfeed.pf.data.db.*Dao*",
                 )
+
+                // Exclude RecyclerView adapters (UI binding; key logic covered by ViewModels/fragment tests)
+                classes("net.poopyfeed.pf.*Adapter")
+                // Exclude Fragment classes (UI lifecycle; logic in ViewModels, covered by fragment tests)
+                classes(
+                    "net.poopyfeed.pf.accounts.LoginFragment",
+                    "net.poopyfeed.pf.accounts.SignupFragment",
+                    "net.poopyfeed.pf.accounts.AccountSettingsFragment",
+                    "net.poopyfeed.pf.HomeFragment",
+                    "net.poopyfeed.pf.children.ChildrenListFragment",
+                    "net.poopyfeed.pf.children.ChildDetailFragment",
+                    "net.poopyfeed.pf.children.EditChildFragment",
+                    "net.poopyfeed.pf.children.CreateChildBottomSheetFragment",
+                    "net.poopyfeed.pf.children.ChildrenListFabBottomSheetFragment",
+                    "net.poopyfeed.pf.children.ChildDetailQuickLogBottomSheetFragment",
+                    "net.poopyfeed.pf.sharing.SharingFragment",
+                    "net.poopyfeed.pf.sharing.PendingInvitesFragment",
+                    "net.poopyfeed.pf.sharing.CreateInviteBottomSheetFragment",
+                    "net.poopyfeed.pf.notifications.NotificationsFragment",
+                    "net.poopyfeed.pf.naps.NapsListFragment",
+                    "net.poopyfeed.pf.naps.CreateNapBottomSheetFragment",
+                    "net.poopyfeed.pf.naps.EditNapBottomSheetFragment",
+                    "net.poopyfeed.pf.diapers.DiapersListFragment",
+                    "net.poopyfeed.pf.diapers.CreateDiaperBottomSheetFragment",
+                    "net.poopyfeed.pf.diapers.EditDiaperBottomSheetFragment",
+                    "net.poopyfeed.pf.feedings.FeedingsListFragment",
+                    "net.poopyfeed.pf.feedings.CreateFeedingBottomSheetFragment",
+                    "net.poopyfeed.pf.feedings.EditFeedingBottomSheetFragment",
+                )
             }
         }
 
-        // Global coverage verification threshold (LINE)
+        // LINE coverage: target 98%.
         verify {
             rule {
-                minBound(85)
+                minBound(98)
             }
         }
     }

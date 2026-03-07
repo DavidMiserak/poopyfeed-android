@@ -138,4 +138,30 @@ class PendingInvitesViewModelTest {
         assertTrue(collected.size == 1 && collected[0] == 3)
         job.cancel()
       }
+
+  @Test
+  fun `acceptByToken when API returns Error emits errorMessage`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.acceptInvite("bad-token") } returns
+            ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("Invalid token"))
+
+        viewModel =
+            PendingInvitesViewModel(
+                mockSharingRepository,
+                mockChildrenRepository,
+                mockCachedChildrenRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        val messages = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
+        viewModel.acceptByToken("bad-token")
+        advanceUntilIdle()
+        job.cancel()
+        advanceUntilIdle()
+
+        assertTrue(messages.isNotEmpty())
+      }
 }

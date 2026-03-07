@@ -10,12 +10,14 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import org.junit.After
@@ -117,5 +119,57 @@ class NapsListViewModelTest {
         advanceUntilIdle()
 
         coVerify { mockRepository.updateNap(1, 10, match { !it.end_time.isNullOrBlank() }) }
+      }
+
+  @Test
+  fun `refresh when Error and state Loading sets Empty`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Success(emptyList()))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(false, true)
+        coEvery { mockRepository.refreshNaps(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<NapsListUiState.Empty>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `refresh when Error and state Ready sets Error`() =
+      runTest(testDispatcher) {
+        val naps = listOf(TestFixtures.mockNap())
+        coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Success(naps))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshNaps(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        assertIs<NapsListUiState.Ready>(viewModel.uiState.value)
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertIs<NapsListUiState.Error>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `deleteNap when Error emits deleteError`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Success(emptyList()))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshNaps(1) } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.deleteNap(1, 10) } returns
+            ApiResult.Error(ApiError.NetworkError("fail"))
+
+        viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        val emissions = mutableListOf<String>()
+        val job = launch { viewModel.deleteError.collect { emissions.add(it) } }
+        viewModel.deleteNap(10)
+        advanceUntilIdle()
+        job.cancel()
+
+        assert(emissions.size == 1)
       }
 }

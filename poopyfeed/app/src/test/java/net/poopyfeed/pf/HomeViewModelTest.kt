@@ -140,4 +140,67 @@ class HomeViewModelTest {
     assertEquals(networkError.getUserMessage(mockContext), state.message)
     coVerify(exactly = 0) { mockClearSessionUseCase() }
   }
+
+  @Test
+  fun `when profile returns Loading then state remains Loading`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Loading()
+
+    val viewModel =
+        HomeViewModel(
+            mockAuthRepository,
+            mockSharingRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
+
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<HomeUiState.Loading>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `when profile succeeds and getPendingInvites returns Error then pendingInvites is empty`() =
+      runTest {
+        every { mockTokenManager.getToken() } returns "test-token"
+        coEvery { mockAuthRepository.getProfile() } returns
+            ApiResult.Success(TestFixtures.mockUserProfile())
+        coEvery { mockSharingRepository.getPendingInvites() } returns
+            ApiResult.Error(ApiError.NetworkError("Network down"))
+
+        val viewModel =
+            HomeViewModel(
+                mockAuthRepository,
+                mockSharingRepository,
+                mockClearSessionUseCase,
+                mockTokenManager,
+                mockContext)
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertIs<HomeUiState.Ready>(viewModel.uiState.value)
+        assertEquals(emptyList(), viewModel.pendingInvites.value)
+      }
+
+  @Test
+  fun `when profile succeeds and getPendingInvites returns Loading then pendingInvites stays empty`() =
+      runTest {
+        every { mockTokenManager.getToken() } returns "test-token"
+        coEvery { mockAuthRepository.getProfile() } returns
+            ApiResult.Success(TestFixtures.mockUserProfile())
+        coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Loading()
+
+        val viewModel =
+            HomeViewModel(
+                mockAuthRepository,
+                mockSharingRepository,
+                mockClearSessionUseCase,
+                mockTokenManager,
+                mockContext)
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertIs<HomeUiState.Ready>(viewModel.uiState.value)
+        assertEquals(emptyList(), viewModel.pendingInvites.value)
+      }
 }

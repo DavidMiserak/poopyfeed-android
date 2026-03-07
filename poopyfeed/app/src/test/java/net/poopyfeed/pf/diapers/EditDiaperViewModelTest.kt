@@ -125,4 +125,19 @@ class EditDiaperViewModelTest {
             (viewModel.uiState.value as EditDiaperUiState.SaveError).message,
         )
       }
+
+  @Test
+  fun `saveDiaper when repo returns Loading keeps Saving`() =
+      runTest(testDispatcher) {
+        val diaper = TestFixtures.mockDiaper(id = 2)
+        coEvery { mockRepository.getDiaper(1, 2) } returns diaper
+        coEvery { mockRepository.updateDiaper(1, 2, any()) } returns ApiResult.Loading()
+
+        viewModel = EditDiaperViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        viewModel.saveDiaper("wet", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        assertIs<EditDiaperUiState.Saving>(viewModel.uiState.value)
+      }
 }

@@ -6,6 +6,7 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -252,5 +253,35 @@ class CachedNapsRepositoryTest {
 
     assertIs<ApiResult.Error<Unit>>(result)
     assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `clearChildCache clears dao and removes child from synced set`() = runTest {
+    io.mockk.coEvery { apiService.listNaps(1, page = 1) } returns
+        PaginatedResponse(
+            count = 1, next = null, results = listOf(TestFixtures.mockNapListResponse()))
+    io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
+    io.mockk.coEvery { napDao.clearChildNaps(1) } returns Unit
+
+    repository.refreshNaps(childId = 1)
+    kotlin.test.assertTrue(repository.hasSyncedFlow(1).take(1).toList().single())
+
+    repository.clearChildCache(1)
+    kotlin.test.assertFalse(repository.hasSyncedFlow(1).take(1).toList().single())
+    io.mockk.coVerify { napDao.clearChildNaps(1) }
+  }
+
+  @Test
+  fun `clearSessionCache resets sync state`() = runTest {
+    io.mockk.coEvery { apiService.listNaps(1, page = 1) } returns
+        PaginatedResponse(
+            count = 1, next = null, results = listOf(TestFixtures.mockNapListResponse()))
+    io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
+
+    repository.refreshNaps(childId = 1)
+    kotlin.test.assertTrue(repository.hasSyncedFlow(1).take(1).toList().single())
+
+    repository.clearSessionCache()
+    kotlin.test.assertFalse(repository.hasSyncedFlow(1).take(1).toList().single())
   }
 }

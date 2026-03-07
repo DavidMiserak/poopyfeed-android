@@ -11,6 +11,7 @@ import io.mockk.verify
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -288,5 +289,85 @@ class MainActivityViewModelTest {
 
     coVerify { mockAuthRepository.logout() }
     coVerify { mockClearSessionUseCase() }
+  }
+
+  @Test
+  fun `useDeviceTimezone when API Error emits bannerError and restores Visible`() = runTest {
+    val deviceTz = java.util.TimeZone.getDefault().id
+    val differentTz = if (deviceTz == "UTC") "America/New_York" else "UTC"
+    every { mockTokenManager.getProfileTimezone() } returns differentTz
+    val apiError = ApiError.NetworkError("Network failed")
+    coEvery { mockAuthRepository.updateProfile(any()) } returns ApiResult.Error(apiError)
+
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
+    viewModel.checkTimezoneMismatch()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val errors = mutableListOf<String>()
+    val job = launch { viewModel.bannerError.collect { errors.add(it) } }
+    viewModel.useDeviceTimezone()
+    testDispatcher.scheduler.advanceUntilIdle()
+    job.cancel()
+
+    kotlin.test.assertTrue(errors.isNotEmpty())
+    assertIs<TimezoneBannerState.Visible>(viewModel.timezoneBanner.value)
+  }
+
+  @Test
+  fun `refreshUnreadCount success updates unreadCount`() = runTest {
+    coEvery { mockNotificationsRepository.getUnreadCount() } returns ApiResult.Success(5)
+
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
+    viewModel.refreshUnreadCount()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    kotlin.test.assertEquals(5, viewModel.unreadCount.value)
+  }
+
+  @Test
+  fun `refreshUnreadCount when Error leaves count unchanged`() = runTest {
+    coEvery { mockNotificationsRepository.getUnreadCount() } returns
+        ApiResult.Error(ApiError.NetworkError("down"))
+
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
+    viewModel.refreshUnreadCount()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    kotlin.test.assertEquals(0, viewModel.unreadCount.value)
+  }
+
+  @Test
+  fun `refreshUnreadCount when Loading leaves count unchanged`() = runTest {
+    coEvery { mockNotificationsRepository.getUnreadCount() } returns ApiResult.Loading()
+
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
+    viewModel.refreshUnreadCount()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    kotlin.test.assertEquals(0, viewModel.unreadCount.value)
   }
 }

@@ -134,4 +134,31 @@ class LoginViewModelTest {
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
   }
+
+  @Test
+  fun `login when repository returns Loading stays Loading`() = runTest {
+    every { mockTokenManager.getToken() } returns null
+    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Loading()
+
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    viewModel.login("user@example.com", "pass")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<LoginUiState.Loading>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `login success when getProfile returns Error still emits Success`() = runTest {
+    every { mockTokenManager.getToken() } returns null
+    every { mockTokenManager.saveToken(any()) } returns Unit
+    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
+    coEvery { mockAuthRepository.getProfile() } returns
+        ApiResult.Error(ApiError.NetworkError("profile fail"))
+
+    val viewModel = LoginViewModel(mockAuthRepository, mockTokenManager, mockContext)
+    viewModel.login("user@example.com", "password123")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<LoginUiState.Success>(viewModel.uiState.value)
+  }
 }

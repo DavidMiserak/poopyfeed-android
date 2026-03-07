@@ -127,4 +127,37 @@ class DiapersListViewModelTest {
         job.cancel()
         assert(emissions.size == 1)
       }
+
+  @Test
+  fun `refresh when Error and state Loading sets Empty`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listDiapersCached(1) } returns
+            flowOf(ApiResult.Success(emptyList()))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(false, true)
+        coEvery { mockRepository.refreshDiapers(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<DiapersListUiState.Empty>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `refresh when Error and state Ready sets Error`() =
+      runTest(testDispatcher) {
+        val diapers = listOf(TestFixtures.mockDiaper())
+        coEvery { mockRepository.listDiapersCached(1) } returns flowOf(ApiResult.Success(diapers))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshDiapers(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        assertIs<DiapersListUiState.Ready>(viewModel.uiState.value)
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertIs<DiapersListUiState.Error>(viewModel.uiState.value)
+      }
 }

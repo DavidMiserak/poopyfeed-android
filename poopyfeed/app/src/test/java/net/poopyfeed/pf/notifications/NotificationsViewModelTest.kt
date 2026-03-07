@@ -249,4 +249,130 @@ class NotificationsViewModelTest {
 
         assertTrue(!viewModel.hasUnread)
       }
+
+  @Test
+  fun `refresh when listNotifications returns Loading keeps state`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Loading()
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<NotificationsListUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `loadNextPage when page 2 returns Error emits errorMessage`() =
+      runTest(testDispatcher) {
+        val page1 =
+            PaginatedResponse(
+                count = 2,
+                next = "http://page2",
+                previous = null,
+                results = listOf(TestFixtures.mockNotification(id = 1)))
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Success(page1)
+        coEvery { mockRepository.listNotifications(page = 2) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+        val errors = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { errors.add(it) } }
+        viewModel.loadNextPage()
+        advanceUntilIdle()
+        job.cancel()
+
+        assertTrue(errors.size == 1)
+      }
+
+  @Test
+  fun `loadNextPage when page 2 returns Loading resets isLoadingMore`() =
+      runTest(testDispatcher) {
+        val page1 =
+            PaginatedResponse(
+                count = 2,
+                next = "http://page2",
+                previous = null,
+                results = listOf(TestFixtures.mockNotification(id = 1)))
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Success(page1)
+        coEvery { mockRepository.listNotifications(page = 2) } returns ApiResult.Loading()
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+        viewModel.loadNextPage()
+        advanceUntilIdle()
+
+        val ready = viewModel.uiState.value as? NotificationsListUiState.Ready
+        assertTrue(ready != null && !ready.isLoadingMore)
+      }
+
+  @Test
+  fun `markAsReadAndNavigate when markAsRead returns Error emits errorMessage`() =
+      runTest(testDispatcher) {
+        val list =
+            PaginatedResponse(
+                count = 1,
+                next = null,
+                previous = null,
+                results = listOf(TestFixtures.mockNotification(id = 10)))
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Success(list)
+        coEvery { mockRepository.markAsRead(10) } returns
+            ApiResult.Error(ApiError.NetworkError("fail"))
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+        val errors = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { errors.add(it) } }
+        viewModel.markAsReadAndNavigate(10, 42)
+        advanceUntilIdle()
+        job.cancel()
+
+        assertTrue(errors.size == 1)
+      }
+
+  @Test
+  fun `markAllRead when API returns Loading does not emit error`() =
+      runTest(testDispatcher) {
+        val list =
+            PaginatedResponse(
+                count = 1,
+                next = null,
+                previous = null,
+                results = listOf(TestFixtures.mockNotification()))
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Success(list)
+        coEvery { mockRepository.markAllRead() } returns ApiResult.Loading()
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+        val errors = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { errors.add(it) } }
+        viewModel.markAllRead()
+        advanceUntilIdle()
+        job.cancel()
+
+        assertTrue(errors.isEmpty())
+      }
+
+  @Test
+  fun `markAsReadAndNavigate when markAsRead returns Loading does not navigate`() =
+      runTest(testDispatcher) {
+        val list =
+            PaginatedResponse(
+                count = 1,
+                next = null,
+                previous = null,
+                results = listOf(TestFixtures.mockNotification(id = 10)))
+        coEvery { mockRepository.listNotifications(page = 1) } returns ApiResult.Success(list)
+        coEvery { mockRepository.markAsRead(10) } returns ApiResult.Loading()
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+        val navIds = mutableListOf<Int>()
+        val job = launch { viewModel.navigateToChild.collect { navIds.add(it) } }
+        viewModel.markAsReadAndNavigate(10, 42)
+        advanceUntilIdle()
+        job.cancel()
+
+        assertTrue(navIds.isEmpty())
+      }
 }

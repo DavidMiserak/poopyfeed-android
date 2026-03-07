@@ -95,4 +95,15 @@ class CreateFeedingViewModelTest {
         assertIs<CreateFeedingUiState.Error>(viewModel.uiState.value)
         assert((viewModel.uiState.value as CreateFeedingUiState.Error).message == "Error message")
       }
+
+  @Test
+  fun `createFeeding when repo returns Loading keeps Saving`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createFeeding(1, any()) } returns ApiResult.Loading()
+
+        viewModel.createFeeding("bottle", 4.0, null, "", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        assertIs<CreateFeedingUiState.Saving>(viewModel.uiState.value)
+      }
 }

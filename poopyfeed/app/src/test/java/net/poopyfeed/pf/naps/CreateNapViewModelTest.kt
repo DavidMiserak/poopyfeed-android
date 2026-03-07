@@ -71,4 +71,15 @@ class CreateNapViewModelTest {
         assertIs<CreateNapUiState.Error>(viewModel.uiState.value)
         assert((viewModel.uiState.value as CreateNapUiState.Error).message == "Error message")
       }
+
+  @Test
+  fun `createNap when repo returns Loading keeps Saving`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createNap(1, any()) } returns ApiResult.Loading()
+
+        viewModel.createNap("2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        assertIs<CreateNapUiState.Saving>(viewModel.uiState.value)
+      }
 }

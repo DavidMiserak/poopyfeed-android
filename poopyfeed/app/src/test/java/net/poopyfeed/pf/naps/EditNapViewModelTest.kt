@@ -112,4 +112,19 @@ class EditNapViewModelTest {
             (viewModel.uiState.value as EditNapUiState.SaveError).message,
         )
       }
+
+  @Test
+  fun `saveNap when repo returns Loading keeps Saving`() =
+      runTest(testDispatcher) {
+        val nap = TestFixtures.mockNap(id = 2)
+        coEvery { mockRepository.getNap(1, 2) } returns nap
+        coEvery { mockRepository.updateNap(1, 2, any()) } returns ApiResult.Loading()
+
+        viewModel = EditNapViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        viewModel.saveNap("2024-01-15T10:00:00Z", "2024-01-15T11:00:00Z")
+        advanceUntilIdle()
+
+        assertIs<EditNapUiState.Saving>(viewModel.uiState.value)
+      }
 }

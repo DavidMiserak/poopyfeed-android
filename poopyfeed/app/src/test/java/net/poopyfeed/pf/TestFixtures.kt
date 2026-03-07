@@ -37,7 +37,10 @@ object TestFixtures {
       last_diaper_change: String? = TS14_30,
       last_nap: String? = TS13,
       can_edit: Boolean = true,
-      feeding_reminder_interval: Int? = null
+      feeding_reminder_interval: Int? = null,
+      custom_bottle_low_oz: String? = null,
+      custom_bottle_mid_oz: String? = null,
+      custom_bottle_high_oz: String? = null,
   ) =
       Child(
           id = id,
@@ -51,7 +54,11 @@ object TestFixtures {
           last_diaper_change = last_diaper_change,
           last_nap = last_nap,
           can_edit = can_edit,
-          feeding_reminder_interval = feeding_reminder_interval)
+          feeding_reminder_interval = feeding_reminder_interval,
+          custom_bottle_low_oz = custom_bottle_low_oz,
+          custom_bottle_mid_oz = custom_bottle_mid_oz,
+          custom_bottle_high_oz = custom_bottle_high_oz,
+      )
 
   fun mockFeeding(
       id: Int = 1,

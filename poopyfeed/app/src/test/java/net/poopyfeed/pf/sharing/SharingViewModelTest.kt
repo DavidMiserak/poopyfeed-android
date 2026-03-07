@@ -9,6 +9,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -122,5 +123,123 @@ class SharingViewModelTest {
 
         io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listInvites(7) }
         io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listShares(7) }
+      }
+
+  @Test
+  fun `toggleInvite when API returns Error emits errorMessage`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 1,
+                token = "t1",
+                role = "caregiver",
+                roleDisplay = "Caregiver",
+                isActive = true,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.toggleInvite(7, 1) } returns
+            ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("Toggle failed"))
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        val messages = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
+        viewModel.toggleInvite(invite)
+        advanceUntilIdle()
+        job.cancel()
+        advanceUntilIdle()
+
+        assertTrue(messages.isNotEmpty())
+      }
+
+  @Test
+  fun `deleteInvite when API returns Error emits errorMessage`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 2,
+                token = "t2",
+                role = "co-parent",
+                roleDisplay = "Co-parent",
+                isActive = false,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.deleteInvite(7, 2) } returns
+            ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.HttpError(403, "Forbidden", ""))
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        val messages = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
+        viewModel.deleteInvite(invite)
+        advanceUntilIdle()
+        job.cancel()
+        advanceUntilIdle()
+
+        assertTrue(messages.isNotEmpty())
+      }
+
+  @Test
+  fun `toggleInvite when API returns Loading does not emit error`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 1,
+                token = "t1",
+                role = "caregiver",
+                roleDisplay = "Caregiver",
+                isActive = true,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.toggleInvite(7, 1) } returns ApiResult.Loading()
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        val messages = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
+        viewModel.toggleInvite(invite)
+        advanceUntilIdle()
+        job.cancel()
+        assertTrue(messages.isEmpty())
+      }
+
+  @Test
+  fun `load when listInvites returns Loading and listShares Success keeps Loading state`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Loading()
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        assertIs<SharingUiState.Loading>(viewModel.uiState.value)
       }
 }

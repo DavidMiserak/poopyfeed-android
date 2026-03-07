@@ -5,12 +5,20 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -18,16 +26,23 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateChildViewModelTest {
 
+  private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
   private lateinit var viewModel: CreateChildViewModel
 
   @Before
   fun setup() {
+    Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
     every { mockContext.getString(any()) } returns "Error message"
     viewModel = CreateChildViewModel(mockRepository, mockContext)
+  }
+
+  @After
+  fun tearDown() {
+    Dispatchers.resetMain()
   }
 
   @Test
@@ -37,15 +52,41 @@ class CreateChildViewModelTest {
   }
 
   @Test
-  fun `createChild with valid inputs calls repository`() = runTest {
-    coEvery { mockRepository.createChild(any()) } returns
-        ApiResult.Success(TestFixtures.mockChild())
+  fun `createChild with valid inputs calls repository`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createChild(any()) } returns
+            ApiResult.Success(TestFixtures.mockChild())
 
-    viewModel.createChild("Alice", "2024-01-15", "F")
+        viewModel.createChild("Alice", "2024-01-15", "F")
+        advanceUntilIdle()
 
-    // Verify repository was called
-    coVerify { mockRepository.createChild(any()) }
-  }
+        coVerify { mockRepository.createChild(any()) }
+        assertIs<CreateChildUiState.Success>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createChild when repo returns Error emits Error state`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createChild(any()) } returns
+            ApiResult.Error(ApiError.NetworkError("Network down"))
+
+        viewModel.createChild("Alice", "2024-01-15", "F")
+        advanceUntilIdle()
+
+        assertIs<CreateChildUiState.Error>(viewModel.uiState.value)
+        assertEquals("Error message", (viewModel.uiState.value as CreateChildUiState.Error).message)
+      }
+
+  @Test
+  fun `createChild when repo returns Loading keeps Saving state`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createChild(any()) } returns ApiResult.Loading()
+
+        viewModel.createChild("Alice", "2024-01-15", "F")
+        advanceUntilIdle()
+
+        assertIs<CreateChildUiState.Saving>(viewModel.uiState.value)
+      }
 
   @Test
   fun `createChild with empty name sets ValidationError`() {
@@ -79,13 +120,13 @@ class CreateChildViewModelTest {
   }
 
   @Test
-  fun `createChild validates inputs before calling repository`() = runTest {
-    // This test verifies that with empty inputs, the repository is never called
-    viewModel.createChild("", "", "")
+  fun `createChild validates inputs before calling repository`() =
+      runTest(testDispatcher) {
+        viewModel.createChild("", "", "")
+        advanceUntilIdle()
 
-    val state = viewModel.uiState.value
-    assertIs<CreateChildUiState.ValidationError>(state)
-    // Repository should not be called
-    coVerify(exactly = 0) { mockRepository.createChild(any()) }
-  }
+        val state = viewModel.uiState.value
+        assertIs<CreateChildUiState.ValidationError>(state)
+        coVerify(exactly = 0) { mockRepository.createChild(any()) }
+      }
 }

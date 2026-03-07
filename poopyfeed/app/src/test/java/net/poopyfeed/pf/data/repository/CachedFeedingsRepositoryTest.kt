@@ -302,4 +302,20 @@ class CachedFeedingsRepositoryTest {
     val syncedAfterClear = repository.hasSyncedFlow(1).take(1).toList().single()
     kotlin.test.assertFalse(syncedAfterClear)
   }
+
+  @Test
+  fun `clearChildCache clears dao and removes child from synced set`() = runTest {
+    val listItem = TestFixtures.mockFeedingListResponse()
+    io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
+        PaginatedResponse(count = 1, results = listOf(listItem))
+    io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
+    io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
+
+    repository.refreshFeedings(childId = 1)
+    kotlin.test.assertTrue(repository.hasSyncedFlow(1).take(1).toList().single())
+
+    repository.clearChildCache(1)
+    kotlin.test.assertFalse(repository.hasSyncedFlow(1).take(1).toList().single())
+    io.mockk.coVerify { feedingDao.clearChildFeedings(1) }
+  }
 }

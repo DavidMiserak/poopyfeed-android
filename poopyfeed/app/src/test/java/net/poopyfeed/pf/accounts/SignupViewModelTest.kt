@@ -103,4 +103,26 @@ class SignupViewModelTest {
     val idleState = viewModel.uiState.value
     assertIs<SignupUiState.Idle>(idleState)
   }
+
+  @Test
+  fun `signUp when repository returns Loading stays Loading`() = runTest {
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Loading()
+
+    viewModel.signUp("test@example.com", "password123")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<SignupUiState.Loading>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `signUp success when getProfile returns Error still emits Success`() = runTest {
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Success("token-123")
+    coEvery { mockAuthRepository.getProfile() } returns
+        ApiResult.Error(ApiError.NetworkError("profile fail"))
+
+    viewModel.signUp("test@example.com", "password123")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<SignupUiState.Success>(viewModel.uiState.value)
+  }
 }

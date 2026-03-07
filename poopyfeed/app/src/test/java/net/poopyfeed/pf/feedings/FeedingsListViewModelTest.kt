@@ -128,4 +128,37 @@ class FeedingsListViewModelTest {
         assert(emissions.size == 1)
         assert(emissions[0] == "Error message")
       }
+
+  @Test
+  fun `refresh when Error and state Loading sets Empty`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listFeedingsCached(1) } returns
+            flowOf(ApiResult.Success(emptyList()))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(false, true)
+        coEvery { mockRepository.refreshFeedings(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<FeedingsListUiState.Empty>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `refresh when Error and state Ready sets Error`() =
+      runTest(testDispatcher) {
+        val feedings = listOf(TestFixtures.mockFeeding())
+        coEvery { mockRepository.listFeedingsCached(1) } returns flowOf(ApiResult.Success(feedings))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshFeedings(1) } returns
+            ApiResult.Error(ApiError.NetworkError("down"))
+
+        viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        assertIs<FeedingsListUiState.Ready>(viewModel.uiState.value)
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertIs<FeedingsListUiState.Error>(viewModel.uiState.value)
+      }
 }

@@ -488,4 +488,108 @@ class AccountSettingsViewModelTest {
 
     coVerify(exactly = 0) { mockAuthRepository.getProfile() }
   }
+
+  @Test
+  fun `loadProfile when getProfile returns Loading keeps Loading state`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Loading()
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.Loading>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `saveProfile when updateProfile returns Loading keeps Saving state`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockAuthRepository.updateProfile(any()) } returns ApiResult.Loading()
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.saveProfile("New", "Name", "Europe/Berlin")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.Saving>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `saveProfile no-op when not in Ready state`() = runTest {
+    every { mockTokenManager.getToken() } returns null
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.saveProfile("New", "Name", "UTC")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
+    coVerify(exactly = 0) { mockAuthRepository.updateProfile(any()) }
+  }
+
+  @Test
+  fun `changePassword when API returns Loading keeps ChangingPassword state`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
+        ApiResult.Loading()
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.ChangingPassword>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `changePassword with newPassword blank emits PasswordChangeError`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    every { mockContext.getString(R.string.account_new_password_label) } returns "New password"
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.changePassword(VALID_PASSWORD, "", "")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.PasswordChangeError>(viewModel.uiState.value)
+    coVerify(exactly = 0) { mockAuthRepository.changePassword(any(), any()) }
+  }
+
+  @Test
+  fun `deleteAccount when API returns Loading keeps DeletingAccount state`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Loading()
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.deleteAccount(VALID_PASSWORD)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.DeletingAccount>(viewModel.uiState.value)
+  }
 }

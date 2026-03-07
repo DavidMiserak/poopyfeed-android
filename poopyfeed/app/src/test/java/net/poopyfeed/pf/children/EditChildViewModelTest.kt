@@ -250,11 +250,242 @@ class EditChildViewModelTest {
 
         viewModel = createViewModel()
         advanceUntilIdle()
+        val errors = mutableListOf<String>()
+        val job = launch { viewModel.deleteError.collect { errors.add(it) } }
         viewModel.deleteChild()
         advanceUntilIdle()
+        job.cancel()
 
         coVerify { mockRepository.deleteChild(1) }
-        // deleteError is one-shot; we've covered the branch
-        assertIs<EditChildUiState.Ready>(viewModel.uiState.value)
+        assertEquals(1, errors.size)
+      }
+
+  @Test
+  fun `init when getChildCached flow throws emits Error`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.getChildCached(1) } returns
+            kotlinx.coroutines.flow.flow { throw RuntimeException("Cache failed") }
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertIs<EditChildUiState.Error>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `init when no notification pref for child leaves notificationPrefState null`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } returns
+            listOf(
+                NotificationPreference(
+                    id = 99,
+                    childId = 999,
+                    childName = "Other",
+                    notifyFeedings = false,
+                    notifyDiapers = false,
+                    notifyNaps = false))
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.notificationPrefState.value)
+      }
+
+  @Test
+  fun `init when getNotificationPreferences throws sets NotificationPrefState Error`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } throws RuntimeException("API error")
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val prefState = viewModel.notificationPrefState.value
+        assertIs<NotificationPrefState.Error>(prefState)
+      }
+
+  @Test
+  fun `toggleNotificationPref notify_feedings updates pref and persists`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        val pref =
+            NotificationPreference(
+                id = 10,
+                childId = 1,
+                childName = "A",
+                notifyFeedings = false,
+                notifyDiapers = true,
+                notifyNaps = false)
+        val updated = pref.copy(notifyFeedings = true)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } returns listOf(pref)
+        coEvery { mockApiService.updateNotificationPreference(10, any()) } returns updated
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.toggleNotificationPref("notify_feedings", true)
+        advanceUntilIdle()
+
+        val loaded = viewModel.notificationPrefState.value as? NotificationPrefState.Loaded
+        assertEquals(true, loaded?.pref?.notifyFeedings)
+      }
+
+  @Test
+  fun `toggleNotificationPref notify_diapers and notify_naps builds correct request`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        val pref =
+            NotificationPreference(
+                id = 10,
+                childId = 1,
+                childName = "A",
+                notifyFeedings = false,
+                notifyDiapers = false,
+                notifyNaps = false)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } returns listOf(pref)
+        coEvery { mockApiService.updateNotificationPreference(10, any()) } returns
+            pref.copy(notifyNaps = true)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.toggleNotificationPref("notify_naps", true)
+        advanceUntilIdle()
+
+        val loaded = viewModel.notificationPrefState.value as? NotificationPrefState.Loaded
+        assertEquals(true, loaded?.pref?.notifyNaps)
+      }
+
+  @Test
+  fun `toggleNotificationPref when API throws resets preferenceSaving`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        val pref =
+            NotificationPreference(
+                id = 10,
+                childId = 1,
+                childName = "A",
+                notifyFeedings = true,
+                notifyDiapers = false,
+                notifyNaps = false)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } returns listOf(pref)
+        coEvery { mockApiService.updateNotificationPreference(10, any()) } throws
+            RuntimeException("Network error")
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.toggleNotificationPref("notify_feedings", false)
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.preferenceSaving.value)
+      }
+
+  @Test
+  fun `toggleNotificationPref unknown field does not call API`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = true)
+        val pref =
+            NotificationPreference(
+                id = 10,
+                childId = 1,
+                childName = "A",
+                notifyFeedings = false,
+                notifyDiapers = false,
+                notifyNaps = false)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockApiService.getNotificationPreferences() } returns listOf(pref)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.toggleNotificationPref("unknown_field", true)
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { mockApiService.updateNotificationPreference(any(), any()) }
+      }
+
+  @Test
+  fun `save when repo returns Loading keeps Saving state`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockRepository.updateChild(1, any()) } returns ApiResult.Loading()
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, null, null, null)
+        advanceUntilIdle()
+
+        assertIs<EditChildUiState.Saving>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `save with bottle amount out of range emits ValidationError`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, "0.05", "5.0", "6.0")
+
+        assertIs<EditChildUiState.ValidationError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditChildUiState.ValidationError).bottleError)
+        coVerify(exactly = 0) { mockRepository.updateChild(any(), any()) }
+      }
+
+  @Test
+  fun `save with bottle low ge mid emits ValidationError`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, "5.0", "5.0", "6.0")
+
+        assertIs<EditChildUiState.ValidationError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditChildUiState.ValidationError).bottleError)
+      }
+
+  @Test
+  fun `save with bottle mid ge high emits ValidationError`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, "4.0", "6.0", "6.0")
+
+        assertIs<EditChildUiState.ValidationError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditChildUiState.ValidationError).bottleError)
+      }
+
+  @Test
+  fun `deleteChild when repo returns Loading does not emit`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+        coEvery { mockRepository.deleteChild(1) } returns ApiResult.Loading()
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        val emitted = mutableListOf<Unit>()
+        val job = launch { viewModel.deleteSuccess.collect { emitted.add(it) } }
+        viewModel.deleteChild()
+        advanceUntilIdle()
+        job.cancel()
+
+        assertEquals(0, emitted.size)
       }
 }

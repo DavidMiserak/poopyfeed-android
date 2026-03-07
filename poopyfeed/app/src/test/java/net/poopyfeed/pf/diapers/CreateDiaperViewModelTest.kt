@@ -79,4 +79,15 @@ class CreateDiaperViewModelTest {
         assertIs<CreateDiaperUiState.Error>(viewModel.uiState.value)
         assert((viewModel.uiState.value as CreateDiaperUiState.Error).message == "Error message")
       }
+
+  @Test
+  fun `createDiaper when repo returns Loading keeps Saving`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createDiaper(1, any()) } returns ApiResult.Loading()
+
+        viewModel.createDiaper("wet", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        assertIs<CreateDiaperUiState.Saving>(viewModel.uiState.value)
+      }
 }

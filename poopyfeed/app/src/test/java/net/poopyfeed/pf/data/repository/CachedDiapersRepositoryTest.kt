@@ -6,6 +6,7 @@ import kotlin.test.assertIs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -267,5 +268,35 @@ class CachedDiapersRepositoryTest {
 
     assertIs<ApiResult.Error<Diaper>>(result)
     assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `clearChildCache clears dao and removes child from synced set`() = runTest {
+    io.mockk.coEvery { apiService.listDiapers(1, page = 1) } returns
+        PaginatedResponse(
+            count = 1, next = null, results = listOf(TestFixtures.mockDiaperListResponse()))
+    io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
+    io.mockk.coEvery { diaperDao.clearChildDiapers(1) } returns Unit
+
+    repository.refreshDiapers(childId = 1)
+    kotlin.test.assertTrue(repository.hasSyncedFlow(1).take(1).toList().single())
+
+    repository.clearChildCache(1)
+    kotlin.test.assertFalse(repository.hasSyncedFlow(1).take(1).toList().single())
+    io.mockk.coVerify { diaperDao.clearChildDiapers(1) }
+  }
+
+  @Test
+  fun `clearSessionCache resets sync state`() = runTest {
+    io.mockk.coEvery { apiService.listDiapers(1, page = 1) } returns
+        PaginatedResponse(
+            count = 1, next = null, results = listOf(TestFixtures.mockDiaperListResponse()))
+    io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
+
+    repository.refreshDiapers(childId = 1)
+    kotlin.test.assertTrue(repository.hasSyncedFlow(1).take(1).toList().single())
+
+    repository.clearSessionCache()
+    kotlin.test.assertFalse(repository.hasSyncedFlow(1).take(1).toList().single())
   }
 }
