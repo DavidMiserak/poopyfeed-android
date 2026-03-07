@@ -168,13 +168,17 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_account_last_name">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/auto_complete_account_timezone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
                         android:textColor="?attr/colorOnSurface"
-                        android:fontFamily="@font/dm_sans" />
+                        android:fontFamily="@font/dm_sans"
+                        android:paddingStart="@dimen/spacing_8"
+                        android:paddingEnd="@dimen/spacing_8"
+                        android:paddingTop="@dimen/spacing_4"
+                        android:paddingBottom="@dimen/spacing_4" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
