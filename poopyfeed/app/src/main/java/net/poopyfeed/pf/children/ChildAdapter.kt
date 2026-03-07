@@ -1,5 +1,6 @@
 package net.poopyfeed.pf.children
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,6 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.databinding.ItemChildBinding
 import net.poopyfeed.pf.util.formatAge
-import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of children. Shows child name, age, gender, and last
@@ -45,15 +45,49 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
           else binding.root.context.getString(R.string.create_child_gender_male)
       binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
 
-      // Last activities: show all three with label and time on separate lines
-      val feedingTime = formatRelativeTime(binding.root.context, child.last_feeding)
-      binding.textLastFeeding.text = "Last feeding\n$feedingTime"
+      // Parse activity timestamps
+      val feedingMs = if (child.last_feeding != null) {
+        try {
+          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+              .parse(child.last_feeding)?.time
+        } catch (e: Exception) { null }
+      } else null
 
-      val diaperTime = formatRelativeTime(binding.root.context, child.last_diaper_change)
-      binding.textLastDiaper.text = "Last diaper\n$diaperTime"
+      val diaperMs = if (child.last_diaper_change != null) {
+        try {
+          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+              .parse(child.last_diaper_change)?.time
+        } catch (e: Exception) { null }
+      } else null
 
-      val napTime = formatRelativeTime(binding.root.context, child.last_nap)
-      binding.textLastNap.text = "Last nap\n$napTime"
+      val napMs = if (child.last_nap != null) {
+        try {
+          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+              .parse(child.last_nap)?.time
+        } catch (e: Exception) { null }
+      } else null
+
+      // Activity times on right column with emojis (emoji + Last <event>: <time>)
+      binding.textLastFeeding.text = if (feedingMs != null) {
+        "🍼 Last feeding: ${formatTimeAbbreviated(feedingMs)}"
+      } else {
+        "🍼 Last feeding: —"
+      }
+
+      binding.textLastDiaper.text = if (diaperMs != null) {
+        "💩 Last diaper: ${formatTimeAbbreviated(diaperMs)}"
+      } else {
+        "💩 Last diaper: —"
+      }
+
+      binding.textLastNap.text = if (napMs != null) {
+        "😴 Last nap: ${formatTimeAbbreviated(napMs)}"
+      } else {
+        "😴 Last nap: —"
+      }
 
       // Show role badge only for non-owners
       binding.chipRole.visibility = if (child.user_role == "owner") View.GONE else View.VISIBLE
@@ -67,6 +101,22 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
 
       // Click listener
       binding.root.setOnClickListener { onChildClick(child) }
+    }
+
+    private fun formatTimeAbbreviated(timeMs: Long?): String {
+      if (timeMs == null) return "—"
+      val now = System.currentTimeMillis()
+      val diffMs = now - timeMs
+      val diffMinutes = diffMs / 60000
+      val diffHours = diffMs / 3600000
+      val diffDays = diffMs / 86400000
+
+      return when {
+        diffMinutes < 1 -> "now"
+        diffMinutes < 60 -> "${diffMinutes}m"
+        diffHours < 24 -> "${diffHours}h"
+        else -> "${diffDays}d"
+      }
     }
   }
 
