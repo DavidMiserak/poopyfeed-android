@@ -6,7 +6,12 @@
     </style>
 
     <!-- Light theme -->
-    <style name="Theme.Pf" parent="Base.Theme.Pf" />
+    <style name="Theme.Pf" parent="Base.Theme.Pf">
+        <!-- Transparent system bars for edge-to-edge (API 23+) -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    </style>
 
     <!-- ===================== -->
     <!-- Button Styles         -->

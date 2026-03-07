@@ -2,138 +2,6 @@
 <issues format="6" by="lint 9.0.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.1)" variant="all" version="9.0.1">
 
     <issue
-        id="UnusedAttribute"
-        message="Attribute `font` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:font=&quot;@font/dm_sans_regular&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="5"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontStyle` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontStyle=&quot;normal&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="6"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontWeight` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontWeight=&quot;400&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="7"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `font` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:font=&quot;@font/dm_sans_medium&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="12"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontStyle` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontStyle=&quot;normal&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="13"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontWeight` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontWeight=&quot;500&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="14"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `font` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:font=&quot;@font/dm_sans_bold&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="19"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontStyle` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontStyle=&quot;normal&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="20"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontWeight` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontWeight=&quot;700&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/dm_sans.xml"
-            line="21"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `font` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:font=&quot;@font/fredoka_semibold&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/fredoka.xml"
-            line="5"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontStyle` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontStyle=&quot;normal&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/fredoka.xml"
-            line="6"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `fontWeight` is only used in API level 26 and higher (current min is 24)"
-        errorLine1="        android:fontWeight=&quot;600&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/font/fredoka.xml"
-            line="7"
-            column="9"/>
-    </issue>
-
-    <issue
         id="AndroidGradlePluginVersion"
         message="A newer version of Gradle than 9.2.1 is available: 9.4.0"
         errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip"
@@ -406,13 +274,6 @@
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
             line="27"
             column="12"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `values`.">
-        <location
-            file="src/main/res/values-v23"/>
     </issue>
 
     <issue
@@ -1379,7 +1240,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
-            line="74"
+            line="79"
             column="12"/>
     </issue>
 
@@ -1390,7 +1251,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/themes.xml"
-            line="80"
+            line="85"
             column="12"/>
     </issue>
 
@@ -1402,28 +1263,6 @@
         <location
             file="src/main/java/net/poopyfeed/pf/children/EditChildBottomSheetFragment.kt"
             line="219"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="KeyboardInaccessibleWidget"
-        message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
-        errorLine1="            android:clickable=&quot;true&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_child_bottom_sheet.xml"
-            line="73"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="KeyboardInaccessibleWidget"
-        message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
-        errorLine1="            android:clickable=&quot;true&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_edit_child_bottom_sheet.xml"
-            line="75"
             column="13"/>
     </issue>
 
