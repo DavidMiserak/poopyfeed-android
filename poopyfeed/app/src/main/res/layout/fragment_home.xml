@@ -135,8 +135,8 @@
 
                 <ImageView
                     android:id="@+id/icon_children_chevron"
-                    android:layout_width="@dimen/spacing_6"
-                    android:layout_height="@dimen/spacing_6"
+                    android:layout_width="@dimen/spacing_12"
+                    android:layout_height="@dimen/spacing_12"
                     android:layout_marginStart="@dimen/spacing_4"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_chevron_right"
