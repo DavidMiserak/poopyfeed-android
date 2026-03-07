@@ -123,7 +123,7 @@ class LoginFragmentTest {
   }
 
   @Test
-  fun `valid credentials and login success navigates to HomeFragment`() {
+  fun `valid credentials and login success navigates to ChildrenListFragment`() {
     coEvery { authRepository.login("user@example.com", "password123") } returns
         ApiResult.Success("token-123")
     coEvery { authRepository.getProfile() } returns
@@ -137,7 +137,7 @@ class LoginFragmentTest {
     root.findViewById<View>(R.id.button_login).performClick()
     repeat(40) { ShadowLooper.idleMainLooper() }
 
-    assertEquals(R.id.HomeFragment, navController.currentDestination?.id)
+    assertEquals(R.id.ChildrenListFragment, navController.currentDestination?.id)
   }
 
   @Test

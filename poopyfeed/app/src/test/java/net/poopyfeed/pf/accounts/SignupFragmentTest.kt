@@ -150,7 +150,7 @@ class SignupFragmentTest {
   }
 
   @Test
-  fun `valid signup success navigates to HomeFragment`() {
+  fun `valid signup success navigates to ChildrenListFragment`() {
     coEvery { authRepository.signup("a@b.co", "password123") } returns
         ApiResult.Success("token-123")
     coEvery { authRepository.getProfile() } returns
@@ -169,6 +169,6 @@ class SignupFragmentTest {
     root.findViewById<View>(R.id.button_signup).performClick()
     repeat(40) { ShadowLooper.idleMainLooper() }
 
-    assertEquals(R.id.HomeFragment, navController.currentDestination?.id)
+    assertEquals(R.id.ChildrenListFragment, navController.currentDestination?.id)
   }
 }
