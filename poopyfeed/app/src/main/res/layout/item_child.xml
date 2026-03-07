@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/fredoka"
             android:textSize="@dimen/text_headline_small"
-            android:textColor="@color/slate_900"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chip_role"
@@ -36,7 +36,7 @@
             android:layout_marginTop="@dimen/spacing_1"
             android:fontFamily="@font/dm_sans"
             android:textSize="@dimen/text_body_medium"
-            android:textColor="@color/slate_700"
+            android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chip_role"
             app:layout_constraintTop_toBottomOf="@id/text_child_name"
@@ -84,7 +84,7 @@
                     android:layout_marginTop="@dimen/spacing_1"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
-                    android:textColor="@color/slate_700"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center"
                     android:lines="2"
                     tools:text="4m ago" />
@@ -120,7 +120,7 @@
                     android:layout_marginTop="@dimen/spacing_1"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
-                    android:textColor="@color/slate_700"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center"
                     android:lines="2"
                     tools:text="22h ago" />
@@ -156,7 +156,7 @@
                     android:layout_marginTop="@dimen/spacing_1"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_label_small"
-                    android:textColor="@color/slate_700"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center"
                     android:lines="2"
                     tools:text="8h ago" />
@@ -173,7 +173,7 @@
             android:layout_marginStart="@dimen/spacing_4"
             android:text="@string/child_role_badge"
             android:textSize="@dimen/text_label_small"
-            app:chipBackgroundColor="@color/rose_100"
+            app:chipBackgroundColor="?attr/colorSecondaryContainer"
             app:chipIcon="@drawable/ic_person"
             app:chipIconSize="@dimen/spacing_4"
             app:layout_constraintEnd_toStartOf="@id/icon_chevron"
@@ -192,7 +192,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:tint="@color/slate_600" />
+            app:tint="?attr/colorOnSurfaceVariant" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

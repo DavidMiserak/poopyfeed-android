@@ -5,7 +5,7 @@
     android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_page"
+    android:background="?attr/colorSurface"
     tools:context="net.poopyfeed.pf.naps.NapsListFragment">
 
     <FrameLayout
@@ -61,7 +61,7 @@
                         android:layout_marginTop="@dimen/spacing_2"
                         android:text="@string/naps_list_empty_body"
                         android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
-                        android:textColor="@color/slate_600"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/text_empty_title" />
@@ -97,7 +97,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
-                        android:textColor="@color/red_500"
+                        android:textColor="?attr/colorError"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"

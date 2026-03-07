@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_page"
+    android:background="?attr/colorSurface"
     android:fillViewport="true"
     tools:context="net.poopyfeed.pf.children.ChildDetailFragment">
 
@@ -29,7 +29,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_gradient_hero"
+                android:background="?attr/colorPrimaryContainer"
                 android:padding="@dimen/spacing_12">
 
                 <!-- Child name -->
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/fredoka"
                     android:textSize="@dimen/text_headline_medium"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorOnPrimaryContainer"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/chip_role"
@@ -54,7 +54,7 @@
                     android:layout_marginTop="@dimen/spacing_2"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_body_large"
-                    android:textColor="@color/rose_100"
+                    android:textColor="?attr/colorOnPrimaryContainer"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/chip_role"
                     app:layout_constraintTop_toBottomOf="@id/text_child_name"
@@ -68,7 +68,7 @@
                     android:layout_marginStart="@dimen/spacing_4"
                     android:text="Co-parent"
                     android:textSize="@dimen/text_label_small"
-                    app:chipBackgroundColor="@color/rose_100"
+                    app:chipBackgroundColor="?attr/colorSecondaryContainer"
                     app:chipIcon="@drawable/ic_person"
                     app:chipIconSize="@dimen/spacing_4"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -103,7 +103,7 @@
                     android:text="@string/child_detail_last_feeding"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_body_small"
-                    android:textColor="@color/slate_600"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -118,7 +118,7 @@
                     android:text="@string/child_detail_last_diaper"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_body_small"
-                    android:textColor="@color/slate_600"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/label_feeding"
@@ -133,7 +133,7 @@
                     android:text="@string/child_detail_last_nap"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_body_small"
-                    android:textColor="@color/slate_600"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/label_diaper"
@@ -216,12 +216,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_delete"
+            style="@style/Widget.Pf.Button.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_4"
             android:text="@string/child_detail_delete_button"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/red_500"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/button_edit"

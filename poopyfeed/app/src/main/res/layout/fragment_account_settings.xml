@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_page"
+    android:background="?attr/colorSurface"
     android:fillViewport="true"
     tools:context="net.poopyfeed.pf.accounts.AccountSettingsFragment">
 
@@ -18,7 +18,7 @@
             android:id="@+id/blob_rose"
             android:layout_width="240dp"
             android:layout_height="240dp"
-            android:background="@drawable/bg_blob_rose"
+            android:background="?attr/colorSurfaceContainer"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="-40dp"
@@ -28,7 +28,7 @@
             android:id="@+id/blob_orange"
             android:layout_width="320dp"
             android:layout_height="320dp"
-            android:background="@drawable/bg_blob_orange"
+            android:background="?attr/colorSurfaceContainer"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="-60dp"
@@ -74,8 +74,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -85,7 +85,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:enabled="false"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -102,8 +102,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_account_email">
@@ -114,7 +114,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:imeOptions="actionNext"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -131,8 +131,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_account_first_name">
@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:imeOptions="actionNext"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -162,8 +162,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_account_last_name">
@@ -173,7 +173,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -198,8 +198,8 @@
                     android:layout_marginTop="@dimen/spacing_6"
                     android:visibility="gone"
                     android:indeterminate="true"
-                    app:indicatorColor="@color/rose_400"
-                    app:trackColor="@color/rose_100"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button_account_save" />
@@ -243,7 +243,7 @@
                     android:layout_marginTop="@dimen/spacing_4"
                     android:text="@string/account_password_validation_error_short"
                     android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
-                    android:textColor="@color/slate_700"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_password_title" />
@@ -260,8 +260,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_password_hint">
@@ -272,7 +272,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:imeOptions="actionNext"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -289,8 +289,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_password_current">
@@ -301,7 +301,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:imeOptions="actionNext"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -318,8 +318,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
                     app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
-                    app:boxStrokeColor="@color/rose_400"
-                    app:hintTextColor="@color/rose_400"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/input_layout_password_new">
@@ -330,7 +330,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:imeOptions="actionDone"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:fontFamily="@font/dm_sans" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -355,8 +355,8 @@
                     android:layout_marginTop="@dimen/spacing_6"
                     android:visibility="gone"
                     android:indeterminate="true"
-                    app:indicatorColor="@color/rose_400"
-                    app:trackColor="@color/rose_100"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button_change_password" />
@@ -389,7 +389,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/account_delete_section_title"
                     android:textAppearance="@style/TextAppearance.Pf.LabelLarge"
-                    android:textColor="@color/red_500"
+                    android:textColor="?attr/colorError"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -402,7 +402,7 @@
                     android:layout_marginTop="@dimen/spacing_8"
                     android:text="@string/account_delete_warning"
                     android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
-                    android:textColor="@color/red_500"
+                    android:textColor="?attr/colorError"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_delete_title" />
@@ -414,8 +414,8 @@
                     android:layout_height="@dimen/button_height"
                     android:layout_marginTop="@dimen/spacing_8"
                     android:text="@string/account_delete_button"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="@color/red_500"
+                    android:textColor="?attr/colorOnError"
+                    android:backgroundTint="?attr/colorError"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_delete_warning" />
@@ -428,8 +428,8 @@
                     android:layout_marginTop="@dimen/spacing_6"
                     android:visibility="gone"
                     android:indeterminate="true"
-                    app:indicatorColor="@color/red_500"
-                    app:trackColor="@color/rose_200"
+                    app:indicatorColor="?attr/colorError"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button_delete_account" />

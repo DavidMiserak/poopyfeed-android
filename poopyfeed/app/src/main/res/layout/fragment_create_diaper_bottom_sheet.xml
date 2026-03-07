@@ -22,7 +22,7 @@
         android:layout_marginBottom="@dimen/spacing_8"
         android:fontFamily="@font/fredoka"
         android:text="@string/create_diaper_title"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_title_large"
         android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
         android:layout_marginBottom="@dimen/spacing_2"
         android:fontFamily="@font/dm_sans"
         android:text="@string/create_diaper_type_label"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
     <RadioGroup
@@ -47,7 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/diaper_change_wet"
             android:textSize="@dimen/text_body_medium" />
@@ -57,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/diaper_change_dirty"
             android:textSize="@dimen/text_body_medium" />
@@ -67,7 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/diaper_change_both"
             android:textSize="@dimen/text_body_medium" />
@@ -79,7 +79,7 @@
         android:layout_marginBottom="@dimen/spacing_2"
         android:fontFamily="@font/dm_sans"
         android:text="@string/create_diaper_time_label"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
     <LinearLayout
@@ -96,7 +96,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/dm_sans"
             android:textSize="@dimen/text_body_medium"
-            android:textColor="@color/slate_700"
+            android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="Mar 6, 2025 2:30 PM" />
 
         <com.google.android.material.button.MaterialButton

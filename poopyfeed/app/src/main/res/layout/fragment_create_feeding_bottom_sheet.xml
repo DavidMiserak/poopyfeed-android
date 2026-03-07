@@ -22,7 +22,7 @@
         android:layout_marginBottom="@dimen/spacing_8"
         android:fontFamily="@font/fredoka"
         android:text="@string/create_feeding_title"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_title_large"
         android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
         android:layout_marginBottom="@dimen/spacing_2"
         android:fontFamily="@font/dm_sans"
         android:text="@string/create_feeding_type_label"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
     <RadioGroup
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_bottle"
             android:textSize="@dimen/text_body_medium" />
@@ -58,7 +58,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_breast"
             android:textSize="@dimen/text_body_medium" />
@@ -81,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:textColor="@color/slate_900"
+            android:textColor="?attr/colorOnSurface"
             android:fontFamily="@font/dm_sans" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -103,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:textColor="@color/slate_900"
+            android:textColor="?attr/colorOnSurface"
             android:fontFamily="@font/dm_sans" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -115,7 +115,7 @@
         android:visibility="gone"
         android:fontFamily="@font/dm_sans"
         android:text="@string/create_feeding_side_label"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
     <RadioGroup
@@ -131,7 +131,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_left"
             android:textSize="@dimen/text_body_medium" />
@@ -141,7 +141,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_right"
             android:textSize="@dimen/text_body_medium" />
@@ -151,7 +151,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:buttonTint="@color/rose_400"
+            android:buttonTint="?attr/colorPrimary"
             android:fontFamily="@font/dm_sans"
             android:text="@string/create_feeding_side_both"
             android:textSize="@dimen/text_body_medium" />
@@ -163,7 +163,7 @@
         android:layout_marginBottom="@dimen/spacing_2"
         android:fontFamily="@font/dm_sans"
         android:text="@string/create_feeding_time_label"
-        android:textColor="@color/slate_900"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/text_body_medium" />
 
     <LinearLayout
@@ -180,7 +180,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/dm_sans"
             android:textSize="@dimen/text_body_medium"
-            android:textColor="@color/slate_700"
+            android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="Mar 6, 2025 2:30 PM" />
 
         <com.google.android.material.button.MaterialButton

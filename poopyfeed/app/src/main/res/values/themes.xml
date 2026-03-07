@@ -1,69 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme -->
+    <!-- Base application theme (no color overrides; uses system/Material You colors) -->
     <style name="Base.Theme.Pf" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Primary Colors (Rose) -->
-        <item name="colorPrimary">@color/rose_400</item>
-        <item name="colorPrimaryContainer">@color/rose_50</item>
-        <item name="colorPrimaryInverse">@color/rose_100</item>
-
-        <!-- Secondary Colors (Amber/Orange) -->
-        <item name="colorSecondary">@color/orange_500</item>
-        <item name="colorSecondaryContainer">@color/amber_400</item>
-
-        <!-- Tertiary Colors -->
-        <item name="colorTertiary">@color/emerald_500</item>
-        <item name="colorTertiaryContainer">@color/emerald_50</item>
-
-        <!-- Error/Semantic -->
-        <item name="colorError">@color/red_500</item>
-        <item name="colorErrorContainer">@color/red_50</item>
-
-        <!-- Surface Colors -->
-        <item name="colorSurface">@color/slate_50</item>
-        <item name="colorSurfaceVariant">@color/slate_100</item>
-
-        <!-- Text Colors -->
-        <item name="android:textColorPrimary">@color/slate_900</item>
-        <item name="android:textColorSecondary">@color/slate_600</item>
-
-        <!-- Outline -->
-        <item name="colorOutline">@color/rose_200</item>
-
-        <!-- Global font family: DM Sans for body text -->
         <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
     <!-- Light theme -->
     <style name="Theme.Pf" parent="Base.Theme.Pf" />
 
-    <!-- Dark theme -->
-    <style name="Theme.Pf.Dark" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/rose_400</item>
-        <item name="colorPrimaryContainer">@color/rose_600</item>
-        <item name="colorSecondary">@color/orange_500</item>
-        <item name="colorSecondaryContainer">@color/orange_400</item>
-        <item name="colorTertiary">@color/emerald_500</item>
-        <item name="colorError">@color/red_500</item>
-        <item name="colorSurface">@color/slate_900</item>
-        <item name="colorSurfaceVariant">@color/slate_700</item>
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/slate_300</item>
-        <item name="android:fontFamily">@font/dm_sans</item>
-    </style>
-
     <!-- ===================== -->
     <!-- Button Styles         -->
     <!-- ===================== -->
 
-    <!-- Primary gradient button -->
+    <!-- Primary button (uses theme primary color) -->
     <style name="Widget.Pf.Button.Primary" parent="Widget.Material3.Button.UnelevatedButton">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:fontFamily">@font/dm_sans_bold</item>
         <item name="android:textSize">@dimen/text_body_large</item>
         <item name="android:letterSpacing">0.02</item>
-        <item name="android:background">@drawable/bg_button_primary_selector</item>
-        <item name="backgroundTint">@null</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">12dp</item>
         <item name="cornerRadius">@dimen/corner_radius_md</item>
@@ -71,9 +25,9 @@
 
     <!-- Secondary outlined button -->
     <style name="Widget.Pf.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textColor">@color/slate_700</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/dm_sans_medium</item>
-        <item name="strokeColor">@color/rose_200</item>
+        <item name="strokeColor">?attr/colorOutline</item>
         <item name="strokeWidth">2dp</item>
         <item name="cornerRadius">@dimen/corner_radius_md</item>
     </style>
@@ -83,8 +37,8 @@
     <!-- ===================== -->
 
     <style name="Widget.Pf.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="backgroundTint">@color/rose_400</item>
-        <item name="tint">@color/white</item>
+        <item name="backgroundTint">?attr/colorPrimaryContainer</item>
+        <item name="tint">?attr/colorOnPrimaryContainer</item>
         <item name="elevation">12dp</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Pf.FAB</item>
     </style>
@@ -99,17 +53,17 @@
 
     <!-- Standard elevated card (24dp corners) -->
     <style name="Widget.Pf.CardView" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
         <item name="cardElevation">8dp</item>
         <item name="cardCornerRadius">@dimen/corner_radius_lg</item>
     </style>
 
-    <!-- Frosted glass card with rose border -->
+    <!-- Frosted glass card with outline -->
     <style name="Widget.Pf.CardView.Frosted" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardBackgroundColor">@color/white_95</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerHigh</item>
         <item name="cardElevation">12dp</item>
         <item name="cardCornerRadius">@dimen/corner_radius_lg</item>
-        <item name="strokeColor">@color/rose_200</item>
+        <item name="strokeColor">?attr/colorOutline</item>
         <item name="strokeWidth">2dp</item>
     </style>
 
@@ -118,23 +72,23 @@
     <!-- ===================== -->
 
     <style name="TextAppearance.Pf.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
-        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/fredoka</item>
     </style>
 
     <style name="TextAppearance.Pf.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
-        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/fredoka</item>
     </style>
 
     <style name="TextAppearance.Pf.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
-        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/fredoka</item>
     </style>
 
     <style name="TextAppearance.Pf.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
-        <item name="android:textColor">@color/slate_900</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/fredoka</item>
     </style>
 
@@ -143,17 +97,17 @@
     <!-- ========================== -->
 
     <style name="TextAppearance.Pf.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/slate_700</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
     <style name="TextAppearance.Pf.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">@color/slate_700</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/dm_sans</item>
     </style>
 
     <style name="TextAppearance.Pf.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
-        <item name="android:textColor">@color/slate_700</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/dm_sans_medium</item>
     </style>
 
