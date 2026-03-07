@@ -116,6 +116,17 @@
             app:destination="@id/createNapBottomSheet" />
     </fragment>
 
+    <fragment
+        android:id="@+id/NotificationsFragment"
+        android:name="net.poopyfeed.pf.notifications.NotificationsFragment"
+        android:label="@string/notifications_title"
+        tools:layout="@layout/fragment_notifications">
+
+        <action
+            android:id="@+id/action_notificationsFragment_to_childDetail"
+            app:destination="@id/ChildDetailFragment" />
+    </fragment>
+
     <dialog
         android:id="@+id/createFeedingBottomSheet"
         android:name="net.poopyfeed.pf.feedings.CreateFeedingBottomSheetFragment"

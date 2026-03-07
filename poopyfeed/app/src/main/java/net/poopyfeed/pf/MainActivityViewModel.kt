@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
@@ -43,6 +44,7 @@ constructor(
     private val authRepository: AuthRepository,
     private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
+    private val notificationsRepository: NotificationsRepository,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -52,6 +54,13 @@ constructor(
    */
   private val _logoutNavigateToLogin = MutableSharedFlow<Unit>(replay = 0)
   val logoutNavigateToLogin: SharedFlow<Unit> = _logoutNavigateToLogin.asSharedFlow()
+
+  /**
+   * Unread notification count for the bottom nav badge. Updated by polling when app is in
+   * foreground.
+   */
+  private val _unreadCount = MutableStateFlow(0)
+  val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
 
   /** Current timezone banner state (Hidden, Visible, or Saving). */
   private val _timezoneBanner = MutableStateFlow<TimezoneBannerState>(TimezoneBannerState.Hidden)
@@ -125,5 +134,19 @@ constructor(
   /** Dismisses the timezone banner for the session without updating profile. */
   fun dismissTimezoneBanner() {
     _timezoneBanner.value = TimezoneBannerState.Hidden
+  }
+
+  /**
+   * Fetches unread notification count from API and updates [unreadCount]. Called every 30s when app
+   * is in foreground.
+   */
+  fun refreshUnreadCount() {
+    viewModelScope.launch {
+      when (val result = notificationsRepository.getUnreadCount()) {
+        is ApiResult.Success -> _unreadCount.value = result.data
+        is ApiResult.Error -> Unit // leave count unchanged on error
+        else -> Unit
+      }
+    }
   }
 }

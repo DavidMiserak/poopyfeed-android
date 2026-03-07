@@ -6,6 +6,7 @@
     <!-- Bottom navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_children">Children</string>
+    <string name="nav_notifications">Notifications</string>
     <string name="nav_account">Account</string>
 
     <!-- Login -->
@@ -209,4 +210,12 @@
     <string name="create_nap_change_time">Change time</string>
     <string name="create_nap_now">Now</string>
     <string name="create_nap_start_button">Start Nap</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="mark_all_read">Mark all read</string>
+    <string name="notifications_empty_title">No notifications yet</string>
+    <string name="notifications_empty_body">When someone logs a feeding, diaper, or nap for a shared child, you\'ll see it here.</string>
+    <string name="notifications_retry">Retry</string>
+    <string name="notification_meta">%1$s for %2$s</string>
 </resources>

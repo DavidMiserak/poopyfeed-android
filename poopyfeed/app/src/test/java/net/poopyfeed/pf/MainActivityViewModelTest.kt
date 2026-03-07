@@ -19,6 +19,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
@@ -32,6 +33,7 @@ class MainActivityViewModelTest {
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
 
   @Before
@@ -58,7 +60,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
     viewModel.checkTimezoneMismatch()
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -74,7 +80,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
     viewModel.checkTimezoneMismatch()
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -94,7 +104,11 @@ class MainActivityViewModelTest {
 
       val viewModel =
           MainActivityViewModel(
-              mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+              mockAuthRepository,
+              mockClearSessionUseCase,
+              mockTokenManager,
+              mockNotificationsRepository,
+              mockContext)
       viewModel.checkTimezoneMismatch()
 
       testDispatcher.scheduler.advanceUntilIdle()
@@ -108,7 +122,11 @@ class MainActivityViewModelTest {
   fun `dismissTimezoneBanner hides the banner`() = runTest {
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
     viewModel.dismissTimezoneBanner()
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -126,7 +144,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
 
     // Manually create Visible state by setting up the mock to create the condition
     // We'll just call useDeviceTimezone on a Hidden state (no-op) then on a Visible
@@ -167,7 +189,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
 
     // Trigger Visible state by calling checkTimezoneMismatch
     // This will set Visible if device tz != cached tz
@@ -201,7 +227,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
 
     viewModel.checkTimezoneMismatch()
     testDispatcher.scheduler.advanceUntilIdle()
@@ -220,7 +250,11 @@ class MainActivityViewModelTest {
   fun `useDeviceTimezone no-op when not in Visible state`() = runTest {
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
 
     // Start with Hidden state (default)
     assertIs<TimezoneBannerState.Hidden>(viewModel.timezoneBanner.value)
@@ -243,7 +277,11 @@ class MainActivityViewModelTest {
 
     val viewModel =
         MainActivityViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockContext)
     viewModel.logout()
 
     testDispatcher.scheduler.advanceUntilIdle()

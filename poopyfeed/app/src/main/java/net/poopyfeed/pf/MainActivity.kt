@@ -18,6 +18,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.ActivityMainBinding
@@ -54,11 +55,25 @@ class MainActivity : AppCompatActivity() {
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.checkTimezoneMismatch()
+        viewModel.refreshUnreadCount()
         launch { viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() } }
         launch { viewModel.timezoneBanner.collect { bindTimezoneBannerState(it) } }
         launch {
           viewModel.bannerError.collect { message ->
             Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+          }
+        }
+        launch {
+          viewModel.unreadCount.collect { count ->
+            val badge = binding.bottomNav.getOrCreateBadge(R.id.NotificationsFragment)
+            badge.number = count
+            badge.isVisible = count > 0
+          }
+        }
+        launch {
+          while (true) {
+            delay(30_000)
+            viewModel.refreshUnreadCount()
           }
         }
       }
@@ -92,7 +107,11 @@ class MainActivity : AppCompatActivity() {
       val navController = findNavController(R.id.nav_host_fragment_content_main)
       appBarConfiguration =
           AppBarConfiguration(
-              setOf(R.id.HomeFragment, R.id.ChildrenListFragment, R.id.AccountSettingsFragment))
+              setOf(
+                  R.id.HomeFragment,
+                  R.id.ChildrenListFragment,
+                  R.id.NotificationsFragment,
+                  R.id.AccountSettingsFragment))
       setupActionBarWithNavController(navController, appBarConfiguration)
       NavigationUI.setupWithNavController(binding.bottomNav, navController)
       navController.addOnDestinationChangedListener { _, destination, _ ->

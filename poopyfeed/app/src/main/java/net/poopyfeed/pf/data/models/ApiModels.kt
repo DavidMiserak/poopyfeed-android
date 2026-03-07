@@ -190,6 +190,30 @@ data class ChildShare(
 /** DTO for creating a share invite. */
 @Serializable data class CreateShareRequest(val email: String, val role: String)
 
+// ========================
+// Notifications
+// ========================
+
+/** In-app notification for activity alerts (feeding, diaper, nap). */
+@Serializable
+data class Notification(
+    val id: Int,
+    @SerialName("event_type") val eventType: String,
+    val message: String,
+    @SerialName("is_read") val isRead: Boolean,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("actor_name") val actorName: String,
+    @SerialName("child_name") val childName: String,
+    @SerialName("child_id") val childId: Int
+)
+
+@Serializable data class UnreadCountResponse(val count: Int)
+
+@Serializable data class MarkAllReadResponse(val updated: Int)
+
+/** Request body for PATCH notification (mark as read). */
+@Serializable data class MarkReadRequest(@SerialName("is_read") val isRead: Boolean = true)
+
 /** Share invite (pending or accepted). */
 @Serializable
 data class ShareInvite(

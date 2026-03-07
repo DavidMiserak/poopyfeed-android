@@ -198,4 +198,25 @@ interface PoopyFeedApiService {
   /** Accept a share invite. POST /api/v1/invites/{inviteId}/accept/ */
   @POST("invites/{inviteId}/accept/")
   suspend fun acceptInvite(@Path("inviteId") inviteId: Int): ShareInvite
+
+  // ========================
+  // Notifications Endpoints
+  // ========================
+
+  /** Get paginated list of notifications. GET /api/v1/notifications/ */
+  @GET("notifications/")
+  suspend fun listNotifications(@Query("page") page: Int = 1): PaginatedResponse<Notification>
+
+  /** Get unread notification count. GET /api/v1/notifications/unread-count/ */
+  @GET("notifications/unread-count/") suspend fun getUnreadCount(): UnreadCountResponse
+
+  /** Mark all notifications as read. POST /api/v1/notifications/mark-all-read/ */
+  @POST("notifications/mark-all-read/") suspend fun markAllNotificationsRead(): MarkAllReadResponse
+
+  /** Mark a single notification as read. PATCH /api/v1/notifications/{id}/ */
+  @PATCH("notifications/{id}/")
+  suspend fun markNotificationRead(
+      @Path("id") id: Int,
+      @Body request: MarkReadRequest
+  ): Notification
 }
