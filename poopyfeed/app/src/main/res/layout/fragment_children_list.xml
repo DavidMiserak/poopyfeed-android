@@ -12,62 +12,124 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- RecyclerView with children list -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_children"
+        <!-- List container with RecyclerView -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingStart="@dimen/spacing_6"
-            android:paddingEnd="@dimen/spacing_6"
-            android:paddingTop="@dimen/spacing_6"
-            android:paddingBottom="@dimen/spacing_24"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_child" />
+            android:orientation="vertical">
 
-        <!-- Empty state: no children -->
+            <!-- RecyclerView with children list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_children"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/spacing_6"
+                android:paddingEnd="@dimen/spacing_6"
+                android:paddingTop="@dimen/spacing_12"
+                android:paddingBottom="@dimen/spacing_24"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_child" />
+
+        </LinearLayout>
+
+        <!-- Empty state: no children (refined, inviting) -->
         <LinearLayout
             android:id="@+id/layout_empty_state"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="@dimen/spacing_12"
+            android:paddingHorizontal="@dimen/spacing_12"
             android:visibility="gone">
 
+            <!-- Empty state card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Pf.CardView.Frosted"
-                android:layout_margin="@dimen/spacing_8">
+                android:layout_marginHorizontal="@dimen/spacing_8">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/spacing_12">
+                    android:paddingStart="@dimen/spacing_12"
+                    android:paddingEnd="@dimen/spacing_12"
+                    android:paddingTop="@dimen/spacing_16"
+                    android:paddingBottom="@dimen/spacing_16">
 
+                    <!-- Icon/emoji placeholder -->
                     <TextView
-                        android:id="@+id/text_empty_title"
-                        android:layout_width="0dp"
+                        android:id="@+id/icon_empty"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/children_list_empty_title"
-                        android:textAppearance="@style/TextAppearance.Pf.TitleLarge"
+                        android:text="👶"
+                        android:textSize="48sp"
+                        android:gravity="center"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <!-- Empty title -->
+                    <TextView
+                        android:id="@+id/text_empty_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_8"
+                        android:text="@string/children_list_empty_title"
+                        android:fontFamily="@font/fredoka"
+                        android:textSize="@dimen/text_headline_small"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/icon_empty" />
+
+                    <!-- Empty body -->
                     <TextView
                         android:id="@+id/text_empty_body"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_2"
+                        android:layout_marginTop="@dimen/spacing_4"
                         android:text="@string/children_list_empty_body"
-                        android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_medium"
                         android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.2"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/text_empty_title" />
+
+                    <!-- Subtle accent line -->
+                    <View
+                        android:id="@+id/divider_empty"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/divider_thickness"
+                        android:layout_marginTop="@dimen/spacing_8"
+                        android:background="?attr/colorOutline"
+                        android:alpha="0.3"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_empty_body" />
+
+                    <!-- CTA text -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_8"
+                        android:text="Tap the + button to add your first child"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorPrimary"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider_empty" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,44 +137,91 @@
 
         </LinearLayout>
 
-        <!-- Error state -->
+        <!-- Error state (refined, actionable) -->
         <LinearLayout
             android:id="@+id/layout_error_state"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="@dimen/spacing_12"
+            android:paddingHorizontal="@dimen/spacing_12"
             android:visibility="gone">
 
+            <!-- Error card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Pf.CardView.Frosted"
-                android:layout_margin="@dimen/spacing_8">
+                android:layout_marginHorizontal="@dimen/spacing_8">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/spacing_12">
+                    android:paddingStart="@dimen/spacing_12"
+                    android:paddingEnd="@dimen/spacing_12"
+                    android:paddingTop="@dimen/spacing_16"
+                    android:paddingBottom="@dimen/spacing_16">
 
+                    <!-- Error icon -->
+                    <TextView
+                        android:id="@+id/icon_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚠️"
+                        android:textSize="44sp"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <!-- Error title -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_8"
+                        android:text="Something went wrong"
+                        android:fontFamily="@font/fredoka"
+                        android:textSize="@dimen/text_headline_small"
+                        android:textColor="?attr/colorError"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/icon_error" />
+
+                    <!-- Error message -->
                     <TextView
                         android:id="@+id/text_error_message"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
-                        android:textColor="?attr/colorError"
+                        android:layout_marginTop="@dimen/spacing_4"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.2"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Failed to load children" />
+                        app:layout_constraintTop_toBottomOf="@+id/text_title"
+                        tools:text="We couldn't load your children. Check your connection and try again." />
 
+                    <!-- Hidden title view for constraint reference -->
+                    <TextView
+                        android:id="@+id/text_title"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_error_message"
+                        tools:ignore="UnusedAttribute" />
+
+                    <!-- Retry button (full-width, prominent) -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_retry"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
-                        android:layout_marginTop="@dimen/spacing_4"
+                        android:layout_marginTop="@dimen/spacing_12"
                         android:contentDescription="@string/a11y_retry"
                         android:text="@string/children_list_retry_button"
                         style="@style/Widget.Pf.Button.Primary"
