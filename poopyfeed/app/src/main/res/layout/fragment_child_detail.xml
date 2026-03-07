@@ -11,7 +11,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_8">
+        android:paddingStart="@dimen/spacing_8"
+        android:paddingEnd="@dimen/spacing_8"
+        android:paddingTop="@dimen/spacing_8"
+        android:paddingBottom="@dimen/bottom_nav_inset">
 
         <!-- Hero banner card -->
         <com.google.android.material.card.MaterialCardView

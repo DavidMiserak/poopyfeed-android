@@ -10,7 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="@dimen/spacing_8">
 
         <!-- Decorative background blobs -->
@@ -18,7 +18,7 @@
             android:id="@+id/blob_rose"
             android:layout_width="240dp"
             android:layout_height="240dp"
-            android:background="?attr/colorSurfaceContainer"
+            android:background="@drawable/bg_blob_rose"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="-40dp"
@@ -28,7 +28,7 @@
             android:id="@+id/blob_orange"
             android:layout_width="320dp"
             android:layout_height="320dp"
-            android:background="?attr/colorSurfaceContainer"
+            android:background="@drawable/bg_blob_orange"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="-60dp"
@@ -41,10 +41,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/spacing_16"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_signup_subtitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed">
 
             <ImageView
                 android:layout_width="36dp"
@@ -76,7 +77,8 @@
             android:paddingHorizontal="@dimen/spacing_8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/brand_mark" />
+            app:layout_constraintTop_toBottomOf="@id/brand_mark"
+            app:layout_constraintBottom_toTopOf="@id/card_signup" />
 
         <!-- Sign-up card (frosted glass) -->
         <com.google.android.material.card.MaterialCardView
@@ -87,7 +89,8 @@
             android:layout_marginTop="@dimen/spacing_12"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_signup_subtitle">
+            app:layout_constraintTop_toBottomOf="@id/text_signup_subtitle"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

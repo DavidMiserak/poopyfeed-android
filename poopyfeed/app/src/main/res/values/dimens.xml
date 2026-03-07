@@ -26,6 +26,9 @@
     <dimen name="text_body_small">12sp</dimen>
     <dimen name="text_label_small">11sp</dimen>
 
+    <!-- Bottom nav content inset (so list/scroll content clears the nav bar) -->
+    <dimen name="bottom_nav_inset">80dp</dimen>
+
     <!-- FAB Margin -->
     <dimen name="fab_margin">@dimen/spacing_8</dimen>
 

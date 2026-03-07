@@ -11,14 +11,17 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing_8">
+        android:paddingStart="@dimen/spacing_8"
+        android:paddingEnd="@dimen/spacing_8"
+        android:paddingTop="@dimen/spacing_8"
+        android:paddingBottom="@dimen/bottom_nav_inset">
 
         <!-- Decorative background blobs -->
         <View
             android:id="@+id/blob_rose"
             android:layout_width="240dp"
             android:layout_height="240dp"
-            android:background="?attr/colorSurfaceContainer"
+            android:background="@drawable/bg_blob_rose"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="-40dp"
@@ -28,7 +31,7 @@
             android:id="@+id/blob_orange"
             android:layout_width="320dp"
             android:layout_height="320dp"
-            android:background="?attr/colorSurfaceContainer"
+            android:background="@drawable/bg_blob_orange"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="-60dp"
