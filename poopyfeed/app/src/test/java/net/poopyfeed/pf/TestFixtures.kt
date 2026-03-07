@@ -56,7 +56,9 @@ object TestFixtures {
       amount_oz: Double? = 4.0,
       timestamp: String = TS12,
       created_at: String = TS12,
-      updated_at: String = TS12
+      updated_at: String = TS12,
+      duration_minutes: Int? = null,
+      side: String? = null,
   ) =
       Feeding(
           id = id,
@@ -65,7 +67,10 @@ object TestFixtures {
           amount_oz = amount_oz,
           timestamp = timestamp,
           created_at = created_at,
-          updated_at = updated_at)
+          updated_at = updated_at,
+          duration_minutes = duration_minutes,
+          side = side,
+      )
 
   /** List response shape returned by the feedings API (fed_at, amount_oz as string). */
   fun mockFeedingListResponse(
@@ -74,7 +79,9 @@ object TestFixtures {
       fed_at: String = TS12,
       amount_oz: String? = "4.0",
       created_at: String = TS12,
-      updated_at: String = TS12
+      updated_at: String = TS12,
+      duration_minutes: Int? = null,
+      side: String? = null,
   ) =
       FeedingListResponse(
           id = id,
@@ -82,7 +89,10 @@ object TestFixtures {
           fed_at = fed_at,
           amount_oz = amount_oz,
           created_at = created_at,
-          updated_at = updated_at)
+          updated_at = updated_at,
+          duration_minutes = duration_minutes,
+          side = side,
+      )
 
   fun mockDiaper(
       id: Int = 1,

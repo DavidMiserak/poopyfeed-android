@@ -80,6 +80,8 @@ data class FeedingEntity(
     val timestamp: String,
     val created_at: String,
     val updated_at: String,
+    val duration_minutes: Int? = null,
+    val side: String? = null,
     @ColumnInfo(name = "synced_at") val syncedAt: Long = System.currentTimeMillis()
 ) {
   fun toApiModel(): Feeding =
@@ -90,7 +92,10 @@ data class FeedingEntity(
           amount_oz = amount_oz,
           timestamp = timestamp,
           created_at = created_at,
-          updated_at = updated_at)
+          updated_at = updated_at,
+          duration_minutes = duration_minutes,
+          side = side,
+      )
 
   companion object {
     fun fromApiModel(feeding: Feeding): FeedingEntity =
@@ -101,7 +106,10 @@ data class FeedingEntity(
             amount_oz = feeding.amount_oz,
             timestamp = feeding.timestamp,
             created_at = feeding.created_at,
-            updated_at = feeding.updated_at)
+            updated_at = feeding.updated_at,
+            duration_minutes = feeding.duration_minutes,
+            side = feeding.side,
+        )
   }
 }
 

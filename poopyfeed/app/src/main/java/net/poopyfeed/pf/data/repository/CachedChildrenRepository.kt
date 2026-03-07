@@ -243,6 +243,30 @@ constructor(
         }
       }
 
+  /** Get a single feeding from cache for prefill (e.g. edit). Returns null if not found or wrong child. */
+  suspend fun getFeeding(childId: Int, feedingId: Int): Feeding? =
+      withContext(ioDispatcher) {
+        feedingDao.getFeeding(feedingId)?.takeIf { it.child == childId }?.toApiModel()
+      }
+
+  /** Update feeding: API-first, then cache. */
+  suspend fun updateFeeding(
+      childId: Int,
+      feedingId: Int,
+      request: CreateFeedingRequest
+  ): ApiResult<Feeding> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.updateFeeding(childId, feedingId, request)
+          val feeding = response.toFeeding(childId)
+          val entity = FeedingEntity.fromApiModel(feeding)
+          feedingDao.upsertFeeding(entity)
+          ApiResult.Success(feeding)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
   /** Clear feedings cache for a child. Resets sync status for this child. */
   suspend fun clearChildCache(childId: Int) {
     withContext(ioDispatcher) { feedingDao.clearChildFeedings(childId) }

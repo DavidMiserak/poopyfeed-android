@@ -10,12 +10,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 /**
  * PoopyFeed Room database.
  *
- * Schema version 1: children, feedings, diapers, naps. Schema version 2: children can_edit,
- * feeding_reminder_interval columns.
+ * Schema version 1: children, feedings, diapers, naps. Version 2: children can_edit,
+ * feeding_reminder_interval. Version 3: feedings duration_minutes, side.
  */
 @Database(
     entities = [ChildEntity::class, FeedingEntity::class, DiaperEntity::class, NapEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
@@ -38,6 +38,14 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
           }
         }
 
+    private val MIGRATION_2_3 =
+        object : Migration(2, 3) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE feedings ADD COLUMN duration_minutes INTEGER NULL")
+            db.execSQL("ALTER TABLE feedings ADD COLUMN side TEXT NULL")
+          }
+        }
+
     @Volatile private var instance: PoopyFeedDatabase? = null
 
     fun getInstance(context: Context): PoopyFeedDatabase {
@@ -46,7 +54,7 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
             instance
                 ?: Room.databaseBuilder(
                         context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                     .also { instance = it }
           }

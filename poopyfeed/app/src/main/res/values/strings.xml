@@ -164,6 +164,8 @@
     <string name="feedings_list_retry_button">Retry</string>
     <string name="feeding_type_bottle">🍼 Bottle</string>
     <string name="feeding_type_breast">🤱 Breast</string>
+    <string name="feeding_breast_detail">%1$d min • %2$s</string>
+    <string name="feeding_breast_duration_only">%1$d min</string>
     <string name="feedings_delete_confirm_title">Delete feeding?</string>
     <string name="feedings_delete_confirm_message">This feeding will be removed.</string>
     <string name="feedings_delete_confirm">Delete</string>
@@ -208,6 +210,7 @@
     <string name="create_feeding_time_label">Time</string>
     <string name="create_feeding_change_time">Change time</string>
     <string name="create_feeding_save">Save</string>
+    <string name="edit_feeding_title">Edit feeding</string>
 
     <!-- Create Diaper -->
     <string name="create_diaper_title">Log Diaper Change</string>

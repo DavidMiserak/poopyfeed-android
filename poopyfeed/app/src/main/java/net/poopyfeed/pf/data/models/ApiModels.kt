@@ -66,7 +66,9 @@ data class Feeding(
     val amount_oz: Double? = null, // Only for bottle feeding
     val timestamp: String, // ISO 8601 datetime
     val created_at: String,
-    val updated_at: String
+    val updated_at: String,
+    val duration_minutes: Int? = null, // Breast only
+    val side: String? = null, // Breast only: 'left', 'right', 'both'
 )
 
 /**
@@ -80,7 +82,9 @@ data class FeedingListResponse(
     @kotlinx.serialization.SerialName("fed_at") val fed_at: String,
     val amount_oz: String? = null,
     val created_at: String,
-    val updated_at: String
+    val updated_at: String,
+    @SerialName("duration_minutes") val duration_minutes: Int? = null,
+    val side: String? = null,
 ) {
   fun toFeeding(childId: Int): Feeding =
       Feeding(
@@ -90,7 +94,10 @@ data class FeedingListResponse(
           amount_oz = amount_oz?.toDoubleOrNull(),
           timestamp = fed_at,
           created_at = created_at,
-          updated_at = updated_at)
+          updated_at = updated_at,
+          duration_minutes = duration_minutes,
+          side = side?.takeIf { it.isNotBlank() },
+      )
 }
 
 /**

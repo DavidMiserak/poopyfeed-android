@@ -16,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.databinding.FragmentFeedingsListBinding
 
 /**
@@ -44,7 +45,12 @@ class FeedingsListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    adapter = FeedingAdapter { feeding -> showDeleteConfirmationDialog(feeding.id) }
+    val childId = requireArguments().getInt("childId")
+    adapter =
+        FeedingAdapter(
+            onItemClick = { feeding -> navigateToEditFeeding(childId, feeding.id) },
+            onDeleteClick = { feeding -> showDeleteConfirmationDialog(feeding.id) },
+        )
     binding.recyclerFeedings.adapter = adapter
     binding.recyclerFeedings.layoutManager = LinearLayoutManager(requireContext())
 
@@ -125,6 +131,34 @@ class FeedingsListFragment : Fragment() {
             }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("feeding_updated", false)
+            ?.collect { updated ->
+              if (updated) {
+                viewModel.refresh()
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("feeding_updated", false)
+              }
+            }
+      }
+    }
+  }
+
+  private fun navigateToEditFeeding(childId: Int, feedingId: Int) {
+    findNavController().navigate(
+        R.id.action_feedingsList_to_editFeeding,
+        Bundle().apply {
+          putInt("childId", childId)
+          putInt("feedingId", feedingId)
+        },
+    )
   }
 
   private fun showDeleteConfirmationDialog(feedingId: Int) {

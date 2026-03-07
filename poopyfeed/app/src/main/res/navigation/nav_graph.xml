@@ -84,6 +84,9 @@
         <action
             android:id="@+id/action_feedingsList_to_createFeeding"
             app:destination="@id/createFeedingBottomSheet" />
+        <action
+            android:id="@+id/action_feedingsList_to_editFeeding"
+            app:destination="@id/editFeedingBottomSheet" />
     </fragment>
 
     <fragment
@@ -135,6 +138,20 @@
 
         <argument
             android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/editFeedingBottomSheet"
+        android:name="net.poopyfeed.pf.feedings.EditFeedingBottomSheetFragment"
+        android:label="@string/edit_feeding_title"
+        tools:layout="@layout/fragment_create_feeding_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+        <argument
+            android:name="feedingId"
             app:argType="integer" />
     </dialog>
 

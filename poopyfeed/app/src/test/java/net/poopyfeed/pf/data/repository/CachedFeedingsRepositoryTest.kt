@@ -193,6 +193,101 @@ class CachedFeedingsRepositoryTest {
   }
 
   @Test
+  fun `getFeeding returns feeding when in cache and child matches`() = runTest {
+    val entity =
+        FeedingEntity(
+            id = 2,
+            child = 1,
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            timestamp = "2024-01-15T10:00:00Z",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { feedingDao.getFeeding(2) } returns entity
+
+    val result = repository.getFeeding(childId = 1, feedingId = 2)
+
+    assertEquals(2, result?.id)
+    assertEquals(1, result?.child)
+    assertEquals("bottle", result?.feeding_type)
+  }
+
+  @Test
+  fun `getFeeding returns null when child does not match`() = runTest {
+    val entity =
+        FeedingEntity(
+            id = 2,
+            child = 99,
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            timestamp = "2024-01-15T10:00:00Z",
+            created_at = "2024-01-15T10:00:00Z",
+            updated_at = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { feedingDao.getFeeding(2) } returns entity
+
+    val result = repository.getFeeding(childId = 1, feedingId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
+  fun `getFeeding returns null when not in cache`() = runTest {
+    io.mockk.coEvery { feedingDao.getFeeding(2) } returns null
+
+    val result = repository.getFeeding(childId = 1, feedingId = 2)
+
+    assertEquals(null, result)
+  }
+
+  @Test
+  fun `updateFeeding success upserts and returns Success`() = runTest {
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle",
+            amount_oz = 5.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T11:00:00Z",
+        )
+    val feedingResponse =
+        TestFixtures.mockFeedingListResponse(
+            id = 2,
+            feeding_type = "bottle",
+            amount_oz = "5.0",
+            fed_at = "2024-01-15T11:00:00Z",
+        )
+    io.mockk.coEvery { apiService.updateFeeding(1, 2, request) } returns feedingResponse
+    io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit
+
+    val result = repository.updateFeeding(childId = 1, feedingId = 2, request = request)
+
+    assertIs<ApiResult.Success<Feeding>>(result)
+    assertEquals(2, result.data.id)
+    assertEquals(5.0, result.data.amount_oz)
+  }
+
+  @Test
+  fun `updateFeeding network error returns Error`() = runTest {
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { apiService.updateFeeding(any(), any(), any()) } throws
+        IOException("Network down")
+
+    val result = repository.updateFeeding(childId = 1, feedingId = 2, request = request)
+
+    assertIs<ApiResult.Error<Feeding>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
   fun `clearSessionCache resets sync state so hasSyncedFlow emits false`() = runTest {
     val listItem = TestFixtures.mockFeedingListResponse()
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
