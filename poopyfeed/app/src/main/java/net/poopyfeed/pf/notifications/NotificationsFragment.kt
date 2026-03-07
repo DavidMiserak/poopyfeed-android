@@ -45,29 +45,29 @@ class NotificationsFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    requireActivity().addMenuProvider(
-        object : MenuProvider {
-          override fun onCreateMenu(menu: Menu, menuInflater: android.view.MenuInflater) {
-            menuInflater.inflate(R.menu.menu_notifications, menu)
-          }
-
-          override fun onPrepareMenu(menu: Menu) {
-            menu.findItem(R.id.action_mark_all_read)?.isEnabled = viewModel.hasUnread
-          }
-
-          override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
-            return when (menuItem.itemId) {
-              R.id.action_mark_all_read -> {
-                viewModel.markAllRead()
-                true
+    requireActivity()
+        .addMenuProvider(
+            object : MenuProvider {
+              override fun onCreateMenu(menu: Menu, menuInflater: android.view.MenuInflater) {
+                menuInflater.inflate(R.menu.menu_notifications, menu)
               }
-              else -> false
-            }
-          }
-        },
-        viewLifecycleOwner,
-        Lifecycle.State.STARTED
-    )
+
+              override fun onPrepareMenu(menu: Menu) {
+                menu.findItem(R.id.action_mark_all_read)?.isEnabled = viewModel.hasUnread
+              }
+
+              override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                  R.id.action_mark_all_read -> {
+                    viewModel.markAllRead()
+                    true
+                  }
+                  else -> false
+                }
+              }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.STARTED)
 
     adapter = NotificationAdapter { notification ->
       viewModel.markAsReadAndNavigate(notification.id, notification.childId)

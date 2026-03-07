@@ -11,11 +11,17 @@ import net.poopyfeed.pf.R
 /**
  * Utility functions for formatting dates and times. All functions handle ISO 8601 strings from the
  * backend (always UTC).
+ *
+ * Timezone behavior: Absolute timestamps ([formatTimestampForDisplay]) and relative times
+ * ([formatRelativeTime]) are displayed using the device default timezone and locale (e.g. Android
+ * [DateUtils] uses the system timezone). [formatAge] uses the device local date for "today" so
+ * child age is correct by location.
  */
 
 /**
  * Formats a relative time span from an ISO 8601 datetime string (e.g. "1 hour ago", "3 days ago").
- * Null input returns a localized "Never" string.
+ * Null input returns a localized "Never" string. Uses device locale for wording; the span is
+ * timezone-agnostic.
  *
  * @param context Context for localization
  * @param isoString ISO 8601 datetime or null (e.g. "2024-01-15T10:00:00Z" or with fractional
@@ -47,7 +53,8 @@ fun formatRelativeTime(
 
 /**
  * Formats the age of a child from a date of birth string (ISO 8601 date format). Returns "X months"
- * for infants under 12 months, or "X yr Y mo" for older children.
+ * for infants under 12 months, or "X yr Y mo" for older children. Uses the device local date for
+ * "today" so age is correct by the user's location.
  *
  * @param dobString ISO 8601 date string (format: "YYYY-MM-DD")
  * @param nowMillis Current time in millis for testing; defaults to [System.currentTimeMillis]
@@ -56,7 +63,10 @@ fun formatRelativeTime(
 fun formatAge(dobString: String, nowMillis: Long = System.currentTimeMillis()): String {
   return try {
     val dob = LocalDate.parse(dobString)
-    val now = Instant.fromEpochMilliseconds(nowMillis).toLocalDateTime(TimeZone.UTC).date
+    val now =
+        Instant.fromEpochMilliseconds(nowMillis)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
 
     var years = now.year - dob.year
     var months = now.monthNumber - dob.monthNumber
@@ -108,7 +118,10 @@ fun formatNapDuration(context: Context, startIso: String, endIso: String): Strin
   }
 }
 
-/** Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM"). */
+/**
+ * Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM") using the device
+ * default timezone and locale.
+ */
 fun formatTimestampForDisplay(context: Context, isoString: String): String {
   return try {
     val millis = Instant.parse(isoString).toEpochMilliseconds()

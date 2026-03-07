@@ -3,9 +3,12 @@ package net.poopyfeed.pf.util
 import android.content.Context
 import io.mockk.every
 import io.mockk.mockk
+import java.util.TimeZone
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlinx.datetime.Instant
 import net.poopyfeed.pf.R
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -13,12 +16,19 @@ import org.junit.Test
 class DateTimeUtilsTest {
 
   private lateinit var mockContext: Context
+  private var originalTimeZone: TimeZone? = null
 
   @Before
   fun setup() {
     mockContext = mockk()
     every { mockContext.getString(R.string.child_detail_never) } returns "Never"
     every { mockContext.getString(R.string.child_detail_just_now) } returns "Just now"
+    originalTimeZone = TimeZone.getDefault()
+  }
+
+  @After
+  fun tearDown() {
+    originalTimeZone?.let { TimeZone.setDefault(it) }
   }
 
   // === Instant.parse tests (verifying kotlinx-datetime handles our API formats) ===
@@ -174,5 +184,62 @@ class DateTimeUtilsTest {
 
     val result = formatAge(dob, nowMillis)
     assertEquals("1 yr 8 mo", result)
+  }
+
+  // === formatAge timezone behavior (device local date for "today") ===
+
+  /**
+   * When "now" is 2024-01-02 00:00 UTC, in UTC the date is Jan 2; in PST it is Jan 1. For a child
+   * born 2023-01-02, age in UTC is "1 yr", in PST is "11 months". Verifies formatAge uses the
+   * system (device) timezone for the "now" date.
+   */
+  @Test
+  fun `formatAge uses system timezone for now date`() {
+    val dob = "2023-01-02"
+    val nowMillis = Instant.parse("2024-01-02T00:00:00Z").toEpochMilliseconds()
+
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    val resultUtc = formatAge(dob, nowMillis)
+    assertEquals("1 yr", resultUtc)
+
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
+    val resultPst = formatAge(dob, nowMillis)
+    assertEquals("11 months", resultPst)
+
+    assertNotEquals(resultUtc, resultPst)
+  }
+
+  @Test
+  fun `formatAge same calendar day in different timezone gives same age`() {
+    val dob = "2024-01-15"
+    // 2024-01-15 12:00 UTC is Jan 15 in both UTC and America/Los_Angeles
+    val nowMillis = Instant.parse("2024-01-15T12:00:00Z").toEpochMilliseconds()
+
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    val resultUtc = formatAge(dob, nowMillis)
+
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
+    val resultPst = formatAge(dob, nowMillis)
+
+    assertEquals(resultUtc, resultPst)
+    assertEquals("0 months", resultUtc)
+  }
+
+  // === formatTimestampForDisplay (device timezone) ===
+
+  @Test
+  fun `formatTimestampForDisplay with valid ISO returns non-empty formatted string`() {
+    val result = formatTimestampForDisplay(mockContext, "2024-01-15T14:30:00Z")
+    assert(result.isNotEmpty()) { "Expected formatted date/time, got empty" }
+    assert(!result.startsWith("2024-01-15") || result.contains(":")) {
+      "Expected localized format, not raw ISO: $result"
+    }
+  }
+
+  @Test
+  fun `formatTimestampForDisplay with invalid string returns string unchanged`() {
+    val invalid = "not-a-date"
+    val result = formatTimestampForDisplay(mockContext, invalid)
+    assertEquals(invalid, result)
   }
 }
