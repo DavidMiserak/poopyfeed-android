@@ -48,7 +48,10 @@ class FeedingAdapter(private val onDeleteClick: (Feeding) -> Unit) :
       } else {
         binding.textAmount.visibility = View.GONE
       }
-      binding.textTime.text = formatRelativeTime(ctx, feeding.timestamp)
+      val timeSummary = formatRelativeTime(ctx, feeding.timestamp)
+      binding.textTime.text = timeSummary
+      binding.root.contentDescription =
+          ctx.getString(R.string.a11y_feeding_item, timeSummary)
       binding.root.setOnLongClickListener {
         onDeleteClick(feeding)
         true

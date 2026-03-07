@@ -218,4 +218,14 @@
     <string name="notifications_empty_body">When someone logs a feeding, diaper, or nap for a shared child, you\'ll see it here.</string>
     <string name="notifications_retry">Retry</string>
     <string name="notification_meta">%1$s for %2$s</string>
+
+    <!-- Accessibility (TalkBack) -->
+    <string name="a11y_child_card">%1$s. Double tap to view.</string>
+    <string name="a11y_feeding_item">Feeding, %1$s. Double tap for options.</string>
+    <string name="a11y_diaper_item">Diaper change, %1$s. Double tap for options.</string>
+    <string name="a11y_nap_item">Nap, %1$s. Double tap for options.</string>
+    <string name="a11y_notification_item">%1$s. Double tap to open child.</string>
+    <string name="a11y_retry">Retry</string>
+    <string name="a11y_dismiss">Dismiss</string>
+    <string name="a11y_use_device_timezone">Use device timezone</string>
 </resources>

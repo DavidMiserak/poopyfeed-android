@@ -42,7 +42,10 @@ class DiaperAdapter(private val onDeleteClick: (Diaper) -> Unit) :
             else -> diaper.change_type.replaceFirstChar { it.uppercaseChar() }
           }
       binding.textChangeType.text = typeLabel
-      binding.textTime.text = formatRelativeTime(ctx, diaper.timestamp)
+      val timeSummary = formatRelativeTime(ctx, diaper.timestamp)
+      binding.textTime.text = timeSummary
+      binding.root.contentDescription =
+          ctx.getString(R.string.a11y_diaper_item, timeSummary)
       binding.root.setOnLongClickListener {
         onDeleteClick(diaper)
         true

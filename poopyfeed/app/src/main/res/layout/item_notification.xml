@@ -5,6 +5,7 @@
     style="@style/Widget.Pf.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:minHeight="48dp"
     android:layout_marginHorizontal="@dimen/spacing_4"
     android:layout_marginVertical="@dimen/spacing_2"
     android:foreground="?attr/selectableItemBackground">

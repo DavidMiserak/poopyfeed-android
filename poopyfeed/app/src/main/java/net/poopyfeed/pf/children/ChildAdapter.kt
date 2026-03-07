@@ -61,6 +61,10 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
         binding.chipRole.text = child.user_role.replaceFirstChar { it.uppercaseChar() }
       }
 
+      // TalkBack: describe card for accessibility
+      binding.root.contentDescription =
+          binding.root.context.getString(R.string.a11y_child_card, child.name)
+
       // Click listener
       binding.root.setOnClickListener { onChildClick(child) }
     }
