@@ -78,7 +78,7 @@
                 app:chipIconSize="@dimen/spacing_4"
                 android:visibility="gone" />
 
-            <!-- Activity indicators (vertical stack with emoji + event text) -->
+            <!-- Activity indicators (tabular, right-aligned for quick scanning) -->
             <LinearLayout
                 android:id="@+id/layout_activity_indicators"
                 android:layout_width="wrap_content"
@@ -87,35 +87,107 @@
                 android:spacing="@dimen/spacing_2"
                 android:gravity="end">
 
-                <!-- Feeding indicator -->
-                <TextView
-                    android:id="@+id/text_last_feeding"
+                <!-- Feeding row: emoji + label [padding] time -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
-                    android:textSize="@dimen/text_label_small"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="🍼 Last feeding: 2h" />
+                    android:orientation="horizontal"
+                    android:spacing="@dimen/spacing_2"
+                    android:gravity="center_vertical">
 
-                <!-- Diaper indicator -->
-                <TextView
-                    android:id="@+id/text_last_diaper"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
-                    android:textSize="@dimen/text_label_small"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="💩 Last diaper: 30m" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🍼"
+                        android:textSize="14sp" />
 
-                <!-- Nap indicator -->
-                <TextView
-                    android:id="@+id/text_last_nap"
+                    <TextView
+                        android:layout_width="56dp"
+                        android:layout_height="wrap_content"
+                        android:text="Feeding"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/text_last_feeding"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="end"
+                        tools:text="17h" />
+
+                </LinearLayout>
+
+                <!-- Diaper row: emoji + label [padding] time -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
-                    android:textSize="@dimen/text_label_small"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="😴 Last nap: 8h" />
+                    android:orientation="horizontal"
+                    android:spacing="@dimen/spacing_2"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💩"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="56dp"
+                        android:layout_height="wrap_content"
+                        android:text="Diaper"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/text_last_diaper"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="end"
+                        tools:text="17h" />
+
+                </LinearLayout>
+
+                <!-- Nap row: emoji + label [padding] time -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:spacing="@dimen/spacing_2"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😴"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="56dp"
+                        android:layout_height="wrap_content"
+                        android:text="Nap"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/text_last_nap"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/dm_sans"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="end"
+                        tools:text="22h" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -134,16 +206,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:tint="?attr/colorOnSurfaceVariant" />
-
-        <!-- Subtle bottom divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_thickness"
-            android:background="?attr/colorOutline"
-            android:alpha="0.15"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -121,7 +121,7 @@ class ChildAdapterTest {
   }
 
   @Test
-  fun `activity badges show Never for null timestamps`() {
+  fun `activity time shows dash for null timestamps`() {
     val child =
         TestFixtures.mockChild(last_feeding = null, last_diaper_change = null, last_nap = null)
     val holder = createAndBind(child)
@@ -130,13 +130,13 @@ class ChildAdapterTest {
     val diaperText = holder.itemView.findViewById<TextView>(R.id.text_last_diaper).text.toString()
     val napText = holder.itemView.findViewById<TextView>(R.id.text_last_nap).text.toString()
 
-    assertTrue("Expected 'Never' in feeding text: $feedingText", feedingText.contains("Never"))
-    assertTrue("Expected 'Never' in diaper text: $diaperText", diaperText.contains("Never"))
-    assertTrue("Expected 'Never' in nap text: $napText", napText.contains("Never"))
+    assertEquals("Expected dash for null feeding", "—", feedingText)
+    assertEquals("Expected dash for null diaper", "—", diaperText)
+    assertEquals("Expected dash for null nap", "—", napText)
   }
 
   @Test
-  fun `activity badges show relative time for non-null timestamps`() {
+  fun `activity time shows abbreviated time for non-null timestamps`() {
     val child =
         TestFixtures.mockChild(
             last_feeding = "2024-01-15T12:00:00Z",
@@ -148,10 +148,10 @@ class ChildAdapterTest {
     val diaperText = holder.itemView.findViewById<TextView>(R.id.text_last_diaper).text.toString()
     val napText = holder.itemView.findViewById<TextView>(R.id.text_last_nap).text.toString()
 
-    // Non-null timestamps should NOT show "Never"
-    assertFalse("Feeding should not show Never", feedingText.contains("Never"))
-    assertFalse("Diaper should not show Never", diaperText.contains("Never"))
-    assertFalse("Nap should not show Never", napText.contains("Never"))
+    // Should show abbreviated time (e.g., "2d" for old timestamps from 2024)
+    assertTrue("Expected time abbreviation for feeding: $feedingText", feedingText.matches(Regex("now|\\d+[mhd]")))
+    assertTrue("Expected time abbreviation for diaper: $diaperText", diaperText.matches(Regex("now|\\d+[mhd]")))
+    assertTrue("Expected time abbreviation for nap: $napText", napText.matches(Regex("now|\\d+[mhd]")))
   }
 
   @Test

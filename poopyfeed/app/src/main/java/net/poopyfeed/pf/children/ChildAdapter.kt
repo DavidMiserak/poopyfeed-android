@@ -70,24 +70,10 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
         } catch (e: Exception) { null }
       } else null
 
-      // Activity times on right column with emojis (emoji + Last <event>: <time>)
-      binding.textLastFeeding.text = if (feedingMs != null) {
-        "🍼 Last feeding: ${formatTimeAbbreviated(feedingMs)}"
-      } else {
-        "🍼 Last feeding: —"
-      }
-
-      binding.textLastDiaper.text = if (diaperMs != null) {
-        "💩 Last diaper: ${formatTimeAbbreviated(diaperMs)}"
-      } else {
-        "💩 Last diaper: —"
-      }
-
-      binding.textLastNap.text = if (napMs != null) {
-        "😴 Last nap: ${formatTimeAbbreviated(napMs)}"
-      } else {
-        "😴 Last nap: —"
-      }
+      // Activity times on right column (just the time, emoji + label are in layout)
+      binding.textLastFeeding.text = formatTimeAbbreviated(feedingMs)
+      binding.textLastDiaper.text = formatTimeAbbreviated(diaperMs)
+      binding.textLastNap.text = formatTimeAbbreviated(napMs)
 
       // Show role badge only for non-owners
       binding.chipRole.visibility = if (child.user_role == "owner") View.GONE else View.VISIBLE
