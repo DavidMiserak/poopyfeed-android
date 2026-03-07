@@ -54,7 +54,7 @@ object NetworkModule {
       cookieJar: PersistentCookieJar,
       @ApplicationContext context: Context,
   ): OkHttpClient {
-    val connectivityInterceptor = ConnectivityInterceptor(context)
+    val connectivityInterceptor = ConnectivityInterceptor(context, BuildConfig.API_BASE_URL)
     val authInterceptor = Interceptor { chain ->
       val token = prefs.getString("auth_token", null)
       val request =

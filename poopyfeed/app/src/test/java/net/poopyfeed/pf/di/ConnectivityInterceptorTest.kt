@@ -22,11 +22,14 @@ class ConnectivityInterceptorTest {
   private lateinit var chain: Interceptor.Chain
   private lateinit var mockResponse: Response
 
+  /** Remote API URL so the connectivity check is enforced in tests. */
+  private val remoteApiUrl = "https://poopyfeed.net/api/v1/"
+
   @Before
   fun setup() {
     context = mockk()
     cm = mockk()
-    interceptor = ConnectivityInterceptor(context)
+    interceptor = ConnectivityInterceptor(context, remoteApiUrl)
     chain = mockk()
 
     val mockRequest = mockk<Request>()
@@ -86,6 +89,21 @@ class ConnectivityInterceptorTest {
     every { chain.proceed(mockRequest) } returns mockResponse
 
     val result = interceptor.intercept(chain)
+
+    assert(result == mockResponse)
+  }
+
+  @Test
+  fun `intercept delegates to chain for local API URL without checking connectivity`() {
+    val localInterceptor = ConnectivityInterceptor(context, "http://10.0.2.2:8000/api/v1/")
+    val mockRequest = mockk<Request>()
+
+    every { cm.activeNetwork } returns null
+
+    every { chain.request() } returns mockRequest
+    every { chain.proceed(mockRequest) } returns mockResponse
+
+    val result = localInterceptor.intercept(chain)
 
     assert(result == mockResponse)
   }
