@@ -20,8 +20,9 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentNotificationsBinding
 
 /**
- * In-app notifications center. Lists notifications with pull-to-refresh, "Mark all read" in
- * toolbar, and tap to navigate to child dashboard (marking that notification read).
+ * In-app notifications center. Lists notifications with pull-to-refresh, "Load more" for
+ * pagination, "Mark all read" in toolbar, and tap to navigate to child dashboard (marking that
+ * notification read).
  */
 @AndroidEntryPoint
 class NotificationsFragment : Fragment() {
@@ -69,9 +70,12 @@ class NotificationsFragment : Fragment() {
             viewLifecycleOwner,
             Lifecycle.State.STARTED)
 
-    adapter = NotificationAdapter { notification ->
-      viewModel.markAsReadAndNavigate(notification.id, notification.childId)
-    }
+    adapter =
+        NotificationAdapter(
+            onNotificationClick = { notification ->
+              viewModel.markAsReadAndNavigate(notification.id, notification.childId)
+            },
+            onLoadMoreClick = { viewModel.loadNextPage() })
     binding.recyclerNotifications.adapter = adapter
     binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
 
@@ -96,7 +100,14 @@ class NotificationsFragment : Fragment() {
               binding.recyclerNotifications.visibility = View.VISIBLE
               binding.layoutEmptyState.visibility = View.GONE
               binding.layoutErrorState.visibility = View.GONE
-              adapter.submitList(state.notifications)
+              val list =
+                  state.notifications.map { NotificationsListItem.NotificationItem(it) } +
+                      if (state.hasNextPage) {
+                        listOf(NotificationsListItem.LoadMoreFooter(state.isLoadingMore))
+                      } else {
+                        emptyList()
+                      }
+              adapter.submitList(list)
             }
             is NotificationsListUiState.Empty -> {
               binding.progressLoading.visibility = View.GONE

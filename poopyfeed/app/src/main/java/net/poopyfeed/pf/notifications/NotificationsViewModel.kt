@@ -21,8 +21,11 @@ import net.poopyfeed.pf.data.repository.NotificationsRepository
 sealed interface NotificationsListUiState {
   data object Loading : NotificationsListUiState
 
-  data class Ready(val notifications: List<Notification>, val hasNextPage: Boolean) :
-      NotificationsListUiState
+  data class Ready(
+      val notifications: List<Notification>,
+      val hasNextPage: Boolean,
+      val isLoadingMore: Boolean = false,
+  ) : NotificationsListUiState
 
   data object Empty : NotificationsListUiState
 
@@ -56,6 +59,9 @@ constructor(
   private val _errorMessage = MutableSharedFlow<String>(replay = 0)
   val errorMessage: SharedFlow<String> = _errorMessage.asSharedFlow()
 
+  /** Next page to request when loading more (2 after first page, then 3, 4, …). */
+  private var nextPageToLoad = 2
+
   init {
     refresh()
   }
@@ -70,6 +76,7 @@ constructor(
   fun refresh() {
     viewModelScope.launch {
       _isRefreshing.value = true
+      nextPageToLoad = 2
       when (val result = repo.listNotifications(page = 1)) {
         is ApiResult.Success -> {
           val list = result.data.results
@@ -78,7 +85,9 @@ constructor(
                 list.isEmpty() -> NotificationsListUiState.Empty
                 else ->
                     NotificationsListUiState.Ready(
-                        notifications = list, hasNextPage = result.data.hasNextPage)
+                        notifications = list,
+                        hasNextPage = result.data.hasNextPage,
+                        isLoadingMore = false)
               }
         }
         is ApiResult.Error ->
@@ -86,6 +95,35 @@ constructor(
         else -> Unit
       }
       _isRefreshing.value = false
+    }
+  }
+
+  /**
+   * Load the next page of notifications and append to the list. No-op if not in Ready state,
+   * hasNextPage is false, or a load-more is already in progress.
+   */
+  fun loadNextPage() {
+    val current = _uiState.value
+    if (current !is NotificationsListUiState.Ready || !current.hasNextPage || current.isLoadingMore)
+        return
+    viewModelScope.launch {
+      _uiState.value = current.copy(isLoadingMore = true)
+      when (val result = repo.listNotifications(page = nextPageToLoad)) {
+        is ApiResult.Success -> {
+          val combined = current.notifications + result.data.results
+          nextPageToLoad++
+          _uiState.value =
+              NotificationsListUiState.Ready(
+                  notifications = combined,
+                  hasNextPage = result.data.hasNextPage,
+                  isLoadingMore = false)
+        }
+        is ApiResult.Error -> {
+          _uiState.value = current.copy(isLoadingMore = false)
+          _errorMessage.emit(result.error.getUserMessage(context))
+        }
+        else -> _uiState.value = current.copy(isLoadingMore = false)
+      }
     }
   }
 

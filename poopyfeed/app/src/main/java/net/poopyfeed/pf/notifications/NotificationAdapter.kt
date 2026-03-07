@@ -8,24 +8,60 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.databinding.ItemNotificationBinding
+import net.poopyfeed.pf.databinding.ItemNotificationLoadMoreBinding
 import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
- * RecyclerView adapter for the notifications list. Shows message, relative time, and read state.
- * Calls [onNotificationClick] when an item is tapped (navigate to child + mark read).
+ * List item for the notifications RecyclerView: either a notification row or the load-more footer.
  */
-class NotificationAdapter(private val onNotificationClick: (Notification) -> Unit) :
-    ListAdapter<Notification, NotificationAdapter.NotificationViewHolder>(
-        NotificationDiffCallback()) {
+sealed class NotificationsListItem {
+  data class NotificationItem(val notification: Notification) : NotificationsListItem()
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
-    val binding =
-        ItemNotificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-    return NotificationViewHolder(binding, onNotificationClick)
-  }
+  data class LoadMoreFooter(val isLoading: Boolean) : NotificationsListItem()
+}
 
-  override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
-    holder.bind(getItem(position))
+private const val VIEW_TYPE_NOTIFICATION = 0
+private const val VIEW_TYPE_LOAD_MORE = 1
+
+/**
+ * RecyclerView adapter for the notifications list. Shows notification rows and an optional
+ * load-more footer. Calls [onNotificationClick] when a notification is tapped and [onLoadMoreClick]
+ * when the footer "Load more" is tapped (when not loading).
+ */
+class NotificationAdapter(
+    private val onNotificationClick: (Notification) -> Unit,
+    private val onLoadMoreClick: () -> Unit,
+) : ListAdapter<NotificationsListItem, RecyclerView.ViewHolder>(NotificationsListDiffCallback()) {
+
+  override fun getItemViewType(position: Int): Int =
+      when (getItem(position)) {
+        is NotificationsListItem.NotificationItem -> VIEW_TYPE_NOTIFICATION
+        is NotificationsListItem.LoadMoreFooter -> VIEW_TYPE_LOAD_MORE
+      }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+      when (viewType) {
+        VIEW_TYPE_NOTIFICATION -> {
+          val binding =
+              ItemNotificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          NotificationViewHolder(binding, onNotificationClick)
+        }
+        VIEW_TYPE_LOAD_MORE -> {
+          val binding =
+              ItemNotificationLoadMoreBinding.inflate(
+                  LayoutInflater.from(parent.context), parent, false)
+          LoadMoreFooterViewHolder(binding, onLoadMoreClick)
+        }
+        else -> error("Unknown viewType: $viewType")
+      }
+
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    when (val item = getItem(position)) {
+      is NotificationsListItem.NotificationItem ->
+          (holder as NotificationViewHolder).bind(item.notification)
+      is NotificationsListItem.LoadMoreFooter ->
+          (holder as LoadMoreFooterViewHolder).bind(item.isLoading)
+    }
   }
 
   class NotificationViewHolder(
@@ -49,9 +85,44 @@ class NotificationAdapter(private val onNotificationClick: (Notification) -> Uni
     }
   }
 
-  internal class NotificationDiffCallback : DiffUtil.ItemCallback<Notification>() {
-    override fun areItemsTheSame(old: Notification, new: Notification): Boolean = old.id == new.id
+  class LoadMoreFooterViewHolder(
+      private val binding: ItemNotificationLoadMoreBinding,
+      private val onLoadMoreClick: () -> Unit,
+  ) : RecyclerView.ViewHolder(binding.root) {
 
-    override fun areContentsTheSame(old: Notification, new: Notification): Boolean = old == new
+    fun bind(isLoading: Boolean) {
+      binding.buttonLoadMore.visibility = if (isLoading) View.GONE else View.VISIBLE
+      binding.progressLoadMore.visibility = if (isLoading) View.VISIBLE else View.GONE
+      binding.buttonLoadMore.setOnClickListener { if (!isLoading) onLoadMoreClick() }
+    }
+  }
+
+  private class NotificationsListDiffCallback : DiffUtil.ItemCallback<NotificationsListItem>() {
+    override fun areItemsTheSame(
+        oldItem: NotificationsListItem,
+        newItem: NotificationsListItem,
+    ): Boolean =
+        when {
+          oldItem is NotificationsListItem.NotificationItem &&
+              newItem is NotificationsListItem.NotificationItem ->
+              oldItem.notification.id == newItem.notification.id
+          oldItem is NotificationsListItem.LoadMoreFooter &&
+              newItem is NotificationsListItem.LoadMoreFooter -> true
+          else -> false
+        }
+
+    override fun areContentsTheSame(
+        oldItem: NotificationsListItem,
+        newItem: NotificationsListItem,
+    ): Boolean =
+        when {
+          oldItem is NotificationsListItem.NotificationItem &&
+              newItem is NotificationsListItem.NotificationItem ->
+              oldItem.notification == newItem.notification
+          oldItem is NotificationsListItem.LoadMoreFooter &&
+              newItem is NotificationsListItem.LoadMoreFooter ->
+              oldItem.isLoading == newItem.isLoading
+          else -> false
+        }
   }
 }
