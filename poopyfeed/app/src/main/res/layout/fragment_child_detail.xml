@@ -35,21 +35,33 @@
                 android:background="?attr/colorPrimaryContainer"
                 android:paddingStart="@dimen/spacing_12"
                 android:paddingEnd="@dimen/spacing_12"
-                android:paddingTop="@dimen/spacing_16"
-                android:paddingBottom="@dimen/spacing_16">
+                android:paddingTop="@dimen/spacing_12"
+                android:paddingBottom="@dimen/spacing_12">
+
+                <!-- Avatar emoji -->
+                <TextView
+                    android:id="@+id/text_avatar_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👶"
+                    android:textSize="48sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="Hardcoded" />
 
                 <!-- Child name -->
                 <TextView
                     android:id="@+id/text_child_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
                     android:fontFamily="@font/fredoka"
                     android:textSize="@dimen/text_headline_medium"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/layout_actions"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_avatar_emoji"
                     tools:text="Baby Alice" />
 
                 <!-- Age and gender -->
@@ -57,7 +69,7 @@
                     android:id="@+id/text_age_gender"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_2"
+                    android:layout_marginTop="@dimen/spacing_4"
                     android:fontFamily="@font/dm_sans"
                     android:textSize="@dimen/text_body_large"
                     android:textColor="?attr/colorOnPrimaryContainer"
@@ -116,30 +128,204 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Status indicators: 3 mini cards with accent stripes -->
-        <LinearLayout
-            android:id="@+id/layout_activities"
+        <!-- Activity status: consolidated single card with accent stripe -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_activity_status"
+            style="@style/Widget.Pf.CardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_12"
-            android:orientation="vertical"
-            android:spacing="@dimen/spacing_2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/card_hero">
 
-            <!-- Feeding status mini-card -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.Pf.CardView"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp">
+                android:orientation="horizontal">
+
+                <!-- Single accent stripe for whole card -->
+                <View
+                    android:layout_width="@dimen/accent_stripe_width"
+                    android:layout_height="match_parent"
+                    android:background="?attr/colorPrimary"
+                    android:alpha="0.7" />
+
+                <!-- Rows container -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- Feeding row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/spacing_8"
+                        android:paddingEnd="@dimen/spacing_8"
+                        android:paddingTop="@dimen/spacing_6"
+                        android:paddingBottom="@dimen/spacing_6">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🍼"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_4"
+                            android:text="Last Feeding"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:id="@+id/label_feeding"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:gravity="end"
+                            tools:text="2h ago" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/spacing_8"
+                        android:background="?attr/colorSurfaceVariant"
+                        android:alpha="0.3" />
+
+                    <!-- Diaper row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/spacing_8"
+                        android:paddingEnd="@dimen/spacing_8"
+                        android:paddingTop="@dimen/spacing_6"
+                        android:paddingBottom="@dimen/spacing_6">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💩"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_4"
+                            android:text="Last Diaper"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:id="@+id/label_diaper"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:gravity="end"
+                            tools:text="30m ago" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/spacing_8"
+                        android:background="?attr/colorSurfaceVariant"
+                        android:alpha="0.3" />
+
+                    <!-- Nap row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/spacing_8"
+                        android:paddingEnd="@dimen/spacing_8"
+                        android:paddingTop="@dimen/spacing_6"
+                        android:paddingBottom="@dimen/spacing_6">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="😴"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_4"
+                            android:text="Last Nap"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:id="@+id/label_nap"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:gravity="end"
+                            tools:text="1h ago" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tracking shortcuts (action buttons with better spacing) -->
+        <LinearLayout
+            android:id="@+id/card_tracking"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:orientation="vertical"
+            android:spacing="@dimen/spacing_4"
+            android:clickable="false"
+            android:focusable="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_activity_status">
+
+            <!-- Feedings navigation card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_feedings"
+                style="@style/Widget.Pf.CardView"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="@dimen/spacing_12">
 
                     <View
                         android:layout_width="@dimen/accent_stripe_width"
@@ -154,55 +340,52 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:paddingStart="@dimen/spacing_8"
-                        android:paddingEnd="@dimen/spacing_8"
-                        android:paddingTop="@dimen/spacing_6"
-                        android:paddingBottom="@dimen/spacing_6">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Feeding"
-                                android:fontFamily="@font/fredoka"
-                                android:textSize="@dimen/text_body_medium"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
+                        android:paddingEnd="@dimen/spacing_8">
 
                         <TextView
-                            android:id="@+id/label_feeding"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/dm_sans"
+                            android:text="🍼"
+                            android:textSize="18sp"
+                            android:layout_marginEnd="@dimen/spacing_4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/child_detail_feedings"
+                            android:fontFamily="@font/fredoka"
                             android:textSize="@dimen/text_body_medium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            tools:text="2h ago" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null"
+                        android:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Diaper status mini-card -->
+            <!-- Diapers navigation card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_diapers"
                 style="@style/Widget.Pf.CardView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp">
+                android:layout_height="56dp"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="@dimen/spacing_12">
 
                     <View
                         android:layout_width="@dimen/accent_stripe_width"
@@ -217,55 +400,52 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:paddingStart="@dimen/spacing_8"
-                        android:paddingEnd="@dimen/spacing_8"
-                        android:paddingTop="@dimen/spacing_6"
-                        android:paddingBottom="@dimen/spacing_6">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Diaper"
-                                android:fontFamily="@font/fredoka"
-                                android:textSize="@dimen/text_body_medium"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
+                        android:paddingEnd="@dimen/spacing_8">
 
                         <TextView
-                            android:id="@+id/label_diaper"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/dm_sans"
+                            android:text="💩"
+                            android:textSize="18sp"
+                            android:layout_marginEnd="@dimen/spacing_4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/child_detail_diapers"
+                            android:fontFamily="@font/fredoka"
                             android:textSize="@dimen/text_body_medium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            tools:text="30m ago" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null"
+                        android:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Nap status mini-card -->
+            <!-- Naps navigation card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_naps"
                 style="@style/Widget.Pf.CardView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp">
+                android:layout_height="56dp"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="@dimen/spacing_12">
 
                     <View
                         android:layout_width="@dimen/accent_stripe_width"
@@ -280,82 +460,36 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:paddingStart="@dimen/spacing_8"
-                        android:paddingEnd="@dimen/spacing_8"
-                        android:paddingTop="@dimen/spacing_6"
-                        android:paddingBottom="@dimen/spacing_6">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Nap"
-                                android:fontFamily="@font/fredoka"
-                                android:textSize="@dimen/text_body_medium"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
+                        android:paddingEnd="@dimen/spacing_8">
 
                         <TextView
-                            android:id="@+id/label_nap"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/dm_sans"
+                            android:text="😴"
+                            android:textSize="18sp"
+                            android:layout_marginEnd="@dimen/spacing_4" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/child_detail_naps"
+                            android:fontFamily="@font/fredoka"
                             android:textSize="@dimen/text_body_medium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            tools:text="1h ago" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null"
+                        android:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-        <!-- Tracking shortcuts (action buttons with better spacing) -->
-        <LinearLayout
-            android:id="@+id/card_tracking"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_16"
-            android:orientation="vertical"
-            android:spacing="@dimen/spacing_4"
-            android:clickable="false"
-            android:focusable="false"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_activities">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_feedings"
-                style="@style/Widget.Pf.Button.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:text="@string/child_detail_feedings" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_diapers"
-                style="@style/Widget.Pf.Button.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:text="@string/child_detail_diapers" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_naps"
-                style="@style/Widget.Pf.Button.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:text="@string/child_detail_naps" />
 
         </LinearLayout>
 

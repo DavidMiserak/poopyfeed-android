@@ -1,6 +1,5 @@
 package net.poopyfeed.pf.children
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,29 +45,44 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
       binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
 
       // Parse activity timestamps
-      val feedingMs = if (child.last_feeding != null) {
-        try {
-          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-              .parse(child.last_feeding)?.time
-        } catch (e: Exception) { null }
-      } else null
+      val feedingMs =
+          if (child.last_feeding != null) {
+            try {
+              java.text
+                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                  .parse(child.last_feeding)
+                  ?.time
+            } catch (e: Exception) {
+              null
+            }
+          } else null
 
-      val diaperMs = if (child.last_diaper_change != null) {
-        try {
-          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-              .parse(child.last_diaper_change)?.time
-        } catch (e: Exception) { null }
-      } else null
+      val diaperMs =
+          if (child.last_diaper_change != null) {
+            try {
+              java.text
+                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                  .parse(child.last_diaper_change)
+                  ?.time
+            } catch (e: Exception) {
+              null
+            }
+          } else null
 
-      val napMs = if (child.last_nap != null) {
-        try {
-          java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-              .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
-              .parse(child.last_nap)?.time
-        } catch (e: Exception) { null }
-      } else null
+      val napMs =
+          if (child.last_nap != null) {
+            try {
+              java.text
+                  .SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+                  .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+                  .parse(child.last_nap)
+                  ?.time
+            } catch (e: Exception) {
+              null
+            }
+          } else null
 
       // Activity times on right column (just the time, emoji + label are in layout)
       binding.textLastFeeding.text = formatTimeAbbreviated(feedingMs)

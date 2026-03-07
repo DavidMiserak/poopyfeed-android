@@ -149,9 +149,14 @@ class ChildAdapterTest {
     val napText = holder.itemView.findViewById<TextView>(R.id.text_last_nap).text.toString()
 
     // Should show abbreviated time (e.g., "2d" for old timestamps from 2024)
-    assertTrue("Expected time abbreviation for feeding: $feedingText", feedingText.matches(Regex("now|\\d+[mhd]")))
-    assertTrue("Expected time abbreviation for diaper: $diaperText", diaperText.matches(Regex("now|\\d+[mhd]")))
-    assertTrue("Expected time abbreviation for nap: $napText", napText.matches(Regex("now|\\d+[mhd]")))
+    assertTrue(
+        "Expected time abbreviation for feeding: $feedingText",
+        feedingText.matches(Regex("now|\\d+[mhd]")))
+    assertTrue(
+        "Expected time abbreviation for diaper: $diaperText",
+        diaperText.matches(Regex("now|\\d+[mhd]")))
+    assertTrue(
+        "Expected time abbreviation for nap: $napText", napText.matches(Regex("now|\\d+[mhd]")))
   }
 
   @Test
