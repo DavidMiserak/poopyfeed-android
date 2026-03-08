@@ -228,6 +228,7 @@ constructor(
               allResults.addAll(response.results.map { it.toFeeding(childId) })
             }
             val entities = allResults.map { FeedingEntity.fromApiModel(it) }
+            feedingDao.clearChildFeedings(childId)
             feedingDao.upsertFeedings(entities)
             _syncedChildIds.value = _syncedChildIds.value + childId
             ApiResult.Success(allResults)
@@ -388,6 +389,7 @@ constructor(
               allResults.addAll(response.results.map { it.toDiaper(childId) })
             }
             val entities = allResults.map { DiaperEntity.fromApiModel(it) }
+            diaperDao.clearChildDiapers(childId)
             diaperDao.upsertDiapers(entities)
             _syncedChildIds.value = _syncedChildIds.value + childId
             ApiResult.Success(allResults)
@@ -540,6 +542,7 @@ constructor(
               allResults.addAll(response.results.map { it.toNap(childId) })
             }
             val entities = allResults.map { NapEntity.fromApiModel(it) }
+            napDao.clearChildNaps(childId)
             napDao.upsertNaps(entities)
             _syncedChildIds.value = _syncedChildIds.value + childId
             ApiResult.Success(allResults)

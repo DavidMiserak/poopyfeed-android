@@ -86,10 +86,11 @@ class CachedDiapersRepositoryTest {
   }
 
   @Test
-  fun `refreshDiapers success upserts and returns Success`() = runTest {
+  fun `refreshDiapers success clears then upserts and returns Success`() = runTest {
     val listItem = TestFixtures.mockDiaperListResponse()
     val response = PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 1) } returns response
+    io.mockk.coEvery { diaperDao.clearChildDiapers(1) } returns Unit
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
 
     val result = repository.refreshDiapers(childId = 1)
@@ -112,6 +113,7 @@ class CachedDiapersRepositoryTest {
         )
     io.mockk.coEvery { apiService.listDiapers(childId = 1, page = 2) } returns
         PaginatedResponse(count = 2, next = null, results = listOf(list2))
+    io.mockk.coEvery { diaperDao.clearChildDiapers(1) } returns Unit
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
 
     val result = repository.refreshDiapers(childId = 1)

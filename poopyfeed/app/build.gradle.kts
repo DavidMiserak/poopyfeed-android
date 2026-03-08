@@ -50,6 +50,9 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all { testTask ->
+                testTask.jvmArgs("-Xshare:off")
+            }
         }
     }
     lint {

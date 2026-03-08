@@ -87,10 +87,11 @@ class CachedFeedingsRepositoryTest {
   }
 
   @Test
-  fun `refreshFeedings success upserts and returns Success`() = runTest {
+  fun `refreshFeedings success clears then upserts and returns Success`() = runTest {
     val listItem = TestFixtures.mockFeedingListResponse()
     val response = PaginatedResponse(count = 1, results = listOf(listItem))
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns response
+    io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
     val result = repository.refreshFeedings(childId = 1)
@@ -113,6 +114,7 @@ class CachedFeedingsRepositoryTest {
         )
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 2) } returns
         PaginatedResponse(count = 2, next = null, results = listOf(list2))
+    io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
     val result = repository.refreshFeedings(childId = 1)
@@ -330,6 +332,7 @@ class CachedFeedingsRepositoryTest {
     val listItem = TestFixtures.mockFeedingListResponse()
     io.mockk.coEvery { apiService.listFeedings(childId = 1, page = 1) } returns
         PaginatedResponse(count = 1, results = listOf(listItem))
+    io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
 
     repository.refreshFeedings(childId = 1)

@@ -85,6 +85,7 @@ class CachedTrackingRepositoriesTest {
   @Test
   fun `CachedFeedingsRepository refreshFeedings success`() = runTest {
     val feedingDao = io.mockk.mockk<FeedingDao>()
+    io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
     io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     val listItem = TestFixtures.mockFeedingListResponse()
@@ -109,6 +110,7 @@ class CachedTrackingRepositoriesTest {
   fun `CachedFeedingsRepository refreshFeedings fetches all pages when next is non-null`() =
       runTest {
         val feedingDao = io.mockk.mockk<FeedingDao>()
+        io.mockk.coEvery { feedingDao.clearChildFeedings(1) } returns Unit
         io.mockk.coEvery { feedingDao.upsertFeedings(any()) } returns Unit
         val apiService = io.mockk.mockk<PoopyFeedApiService>()
         val list1 = TestFixtures.mockFeedingListResponse()
@@ -210,6 +212,7 @@ class CachedTrackingRepositoriesTest {
             created_at = "2024-01-15T14:00:00Z",
             updated_at = "2024-01-15T14:00:00Z")
     io.mockk.every { diaperDao.getDiapersFlow(1) } returns flowOf(listOf(entity))
+    io.mockk.coEvery { diaperDao.clearChildDiapers(1) } returns Unit
     io.mockk.coEvery { diaperDao.upsertDiapers(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     val listItem = TestFixtures.mockDiaperListResponse(change_type = "wet")
@@ -270,6 +273,7 @@ class CachedTrackingRepositoriesTest {
             created_at = "2024-01-15T13:00:00Z",
             updated_at = "2024-01-15T13:00:00Z")
     io.mockk.every { napDao.getNapsFlow(1) } returns flowOf(listOf(entity))
+    io.mockk.coEvery { napDao.clearChildNaps(1) } returns Unit
     io.mockk.coEvery { napDao.upsertNaps(any()) } returns Unit
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     val listItem =
