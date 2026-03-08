@@ -9,8 +9,8 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -174,12 +174,9 @@ class PoopyFeedMessagingService : FirebaseMessagingService() {
                   "Pattern Alerts",
                   NotificationManager.IMPORTANCE_DEFAULT,
               )
-              .apply {
-                description = "Alerts when feeding or nap patterns deviate from normal"
-              }
+              .apply { description = "Alerts when feeding or nap patterns deviate from normal" }
 
-      manager.createNotificationChannels(
-          listOf(activityChannel, feedingChannel, patternChannel))
+      manager.createNotificationChannels(listOf(activityChannel, feedingChannel, patternChannel))
     }
   }
 }

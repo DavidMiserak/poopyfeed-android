@@ -173,6 +173,7 @@ kover {
                     "net.poopyfeed.pf.sharing.PendingInvitesFragment",
                     "net.poopyfeed.pf.sharing.CreateInviteBottomSheetFragment",
                     "net.poopyfeed.pf.notifications.NotificationsFragment",
+                    "net.poopyfeed.pf.notifications.PoopyFeedMessagingService",
                     "net.poopyfeed.pf.naps.NapsListFragment",
                     "net.poopyfeed.pf.naps.CreateNapBottomSheetFragment",
                     "net.poopyfeed.pf.naps.EditNapBottomSheetFragment",
