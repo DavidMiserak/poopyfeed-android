@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import org.junit.After
 import org.junit.Before
@@ -29,6 +30,7 @@ class ChildDetailViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
+  private lateinit var mockAnalyticsRepository: AnalyticsRepository
   private lateinit var savedStateHandle: SavedStateHandle
 
   @Before
@@ -36,6 +38,7 @@ class ChildDetailViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
+    mockAnalyticsRepository = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     every { mockContext.getString(any()) } returns "formatted_time"
   }
@@ -53,8 +56,12 @@ class ChildDetailViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.getDashboardSummary(1) } returns
             ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
 
-        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -70,8 +77,12 @@ class ChildDetailViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.getDashboardSummary(1) } returns
             ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
 
-        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -90,8 +101,12 @@ class ChildDetailViewModelTest {
         coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.getDashboardSummary(1) } returns ApiResult.Success(mockSummary)
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
 
-        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -111,12 +126,96 @@ class ChildDetailViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.getDashboardSummary(1) } returns
             ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("failed"))
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
 
-        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertTrue(state is ChildDetailUiState.Ready)
         assertEquals(null, state.dashboardSummary)
+      }
+
+  @Test
+  fun `Ready state includes patternAlerts when getPatternAlerts succeeds`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        val mockAlerts =
+            TestFixtures.mockPatternAlertsResponse(
+                feedingAlert = true,
+                feedingMessage = "Baby usually feeds every 3h — it's been 3h 30m",
+                napAlert = false)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(mockAlerts)
+
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        val ready = state
+        assertEquals(mockAlerts, ready.patternAlerts)
+        assertTrue(ready.patternAlerts?.hasAnyAlert == true)
+        assertTrue(ready.patternAlerts?.feeding?.alert == true)
+        assertEquals(
+            "Baby usually feeds every 3h — it's been 3h 30m", ready.patternAlerts?.feeding?.message)
+        assertTrue(ready.patternAlerts?.nap?.alert == false)
+      }
+
+  @Test
+  fun `Ready state has null patternAlerts when getPatternAlerts fails (silent suppression)`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("failed"))
+
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        assertEquals(null, state.patternAlerts)
+      }
+
+  @Test
+  fun `refreshPatternAlerts re-calls repository and updates state`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
+
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+        advanceUntilIdle()
+
+        val initialAlerts = (viewModel.uiState.value as? ChildDetailUiState.Ready)?.patternAlerts
+        assertTrue(initialAlerts != null)
+
+        // Call refreshPatternAlerts
+        viewModel.refreshPatternAlerts()
+        advanceUntilIdle()
+
+        val finalAlerts = (viewModel.uiState.value as? ChildDetailUiState.Ready)?.patternAlerts
+        assertTrue(finalAlerts != null)
       }
 }

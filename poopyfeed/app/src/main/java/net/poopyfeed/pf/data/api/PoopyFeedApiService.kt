@@ -283,4 +283,12 @@ interface PoopyFeedApiService {
   /** Unregister FCM device token. Uses HTTP method override for DELETE with body. */
   @HTTP(method = "DELETE", path = "notifications/devices/", hasBody = true)
   suspend fun unregisterDeviceToken(@Body request: DeviceTokenDeleteRequest): DeviceTokenResponse
+
+  // ========================
+  // Analytics Endpoints
+  // ========================
+
+  /** Get pattern alerts for a child. GET /api/v1/analytics/children/{childId}/pattern-alerts/ */
+  @GET("analytics/children/{childId}/pattern-alerts/")
+  suspend fun getPatternAlerts(@Path("childId") childId: Int): PatternAlertsResponse
 }

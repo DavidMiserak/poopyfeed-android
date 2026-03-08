@@ -75,6 +75,25 @@ data class NotificationPreference(
     @SerialName("notify_naps") val notifyNaps: Boolean,
 )
 
+/** Per-type alert payload within a PatternAlertsResponse. */
+@Serializable
+data class PatternAlert(
+    val alert: Boolean,
+    val message: String? = null,
+    val data_points: Int = 0,
+)
+
+/** Response from GET /api/v1/analytics/children/{childId}/pattern-alerts/ */
+@Serializable
+data class PatternAlertsResponse(
+    val child_id: Int,
+    val feeding: PatternAlert,
+    val nap: PatternAlert,
+) {
+  val hasAnyAlert: Boolean
+    get() = feeding.alert || nap.alert
+}
+
 /** DTO for PATCH update of a notification preference. Only non-null fields are sent. */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable

@@ -337,6 +337,99 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Pattern alerts card (feeding and nap warnings) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_pattern_alerts"
+            style="@style/Widget.Pf.CardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_activity_status">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Amber accent stripe -->
+                <View
+                    android:layout_width="@dimen/accent_stripe_width"
+                    android:layout_height="match_parent"
+                    android:background="?attr/colorTertiary"
+                    android:alpha="0.9" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="@dimen/spacing_8"
+                    android:paddingEnd="@dimen/spacing_8"
+                    android:paddingTop="@dimen/spacing_6"
+                    android:paddingBottom="@dimen/spacing_6">
+
+                    <!-- Feeding alert row -->
+                    <LinearLayout
+                        android:id="@+id/row_feeding_alert"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚠️"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/text_feeding_alert"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_4"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="Baby usually feeds every 3h — it's been 3h 30m" />
+                    </LinearLayout>
+
+                    <!-- Nap alert row (with margin if both are shown) -->
+                    <LinearLayout
+                        android:id="@+id/row_nap_alert"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="@dimen/spacing_4"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚠️"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/text_nap_alert"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_4"
+                            android:fontFamily="@font/dm_sans"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="Baby usually naps after ~2h awake — awake for 2h 30m" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Today summary card (batch dashboard-summary); skeleton shown until loaded -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_today"
@@ -345,9 +438,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_12"
             android:minHeight="72dp"
+            app:layout_goneMarginTop="@dimen/spacing_12"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_activity_status">
+            app:layout_constraintTop_toBottomOf="@id/card_pattern_alerts">
 
             <FrameLayout
                 android:layout_width="match_parent"

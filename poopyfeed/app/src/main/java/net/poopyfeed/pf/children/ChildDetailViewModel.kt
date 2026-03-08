@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.DashboardSummaryResponse
+import net.poopyfeed.pf.data.models.PatternAlertsResponse
+import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.util.formatAge
 import net.poopyfeed.pf.util.formatRelativeTime
@@ -25,7 +27,7 @@ sealed interface ChildDetailUiState {
 
   /**
    * Child loaded and displayed. [dashboardSummary] is null until batch load completes (show
-   * skeleton).
+   * skeleton). [patternAlerts] is null until async load completes.
    */
   data class Ready(
       val child: Child,
@@ -36,6 +38,7 @@ sealed interface ChildDetailUiState {
       val isOwner: Boolean,
       val canEdit: Boolean,
       val dashboardSummary: DashboardSummaryResponse? = null,
+      val patternAlerts: PatternAlertsResponse? = null,
   ) : ChildDetailUiState
 
   /** Failed to load child; [message] is user-facing. */
@@ -52,6 +55,7 @@ class ChildDetailViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedChildrenRepository,
+    private val analyticsRepo: AnalyticsRepository,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -64,6 +68,7 @@ constructor(
   init {
     observeChild()
     loadDashboardSummary()
+    loadPatternAlerts()
     refresh()
   }
 
@@ -84,6 +89,27 @@ constructor(
       }
     }
   }
+
+  /** Loads pattern alerts (feeding and nap warnings). Updates Ready state when done. */
+  private fun loadPatternAlerts() {
+    viewModelScope.launch {
+      when (val result = analyticsRepo.getPatternAlerts(childId)) {
+        is ApiResult.Success -> {
+          val current = _uiState.value
+          if (current is ChildDetailUiState.Ready) {
+            _uiState.value = current.copy(patternAlerts = result.data)
+          }
+        }
+        is ApiResult.Error -> {
+          // Silent suppression per spec: if API fails, no alert cards shown
+        }
+        else -> Unit
+      }
+    }
+  }
+
+  /** Refresh pattern alerts asynchronously. Called after feeding or nap mutations. */
+  fun refreshPatternAlerts() = loadPatternAlerts()
 
   /**
    * Refresh child data from API to sync with latest changes (e.g., new feedings added elsewhere).

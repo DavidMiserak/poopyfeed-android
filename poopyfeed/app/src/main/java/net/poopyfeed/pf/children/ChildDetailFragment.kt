@@ -114,6 +114,7 @@ class ChildDetailFragment : Fragment() {
               if (created) {
                 handle.set("feeding_created", false)
                 viewModel.refresh()
+                viewModel.refreshPatternAlerts()
               }
             }
           } catch (_: IllegalStateException) {}
@@ -126,6 +127,7 @@ class ChildDetailFragment : Fragment() {
               if (created) {
                 handle.set("nap_created", false)
                 viewModel.refresh()
+                viewModel.refreshPatternAlerts()
               }
             }
           } catch (_: IllegalStateException) {}
@@ -171,6 +173,18 @@ class ChildDetailFragment : Fragment() {
     }
     binding.buttonEdit.visibility = if (state.canEdit) View.VISIBLE else View.GONE
     binding.buttonShare.visibility = if (state.isOwner) View.VISIBLE else View.GONE
+
+    // Pattern alerts (feeding and nap warnings)
+    val alerts = state.patternAlerts
+    if (alerts != null && alerts.hasAnyAlert) {
+      binding.cardPatternAlerts.visibility = View.VISIBLE
+      binding.rowFeedingAlert.visibility = if (alerts.feeding.alert) View.VISIBLE else View.GONE
+      binding.textFeedingAlert.text = alerts.feeding.message
+      binding.rowNapAlert.visibility = if (alerts.nap.alert) View.VISIBLE else View.GONE
+      binding.textNapAlert.text = alerts.nap.message
+    } else {
+      binding.cardPatternAlerts.visibility = View.GONE
+    }
 
     val summary = state.dashboardSummary
     if (summary != null) {

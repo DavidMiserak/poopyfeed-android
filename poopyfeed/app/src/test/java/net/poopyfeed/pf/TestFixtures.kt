@@ -11,6 +11,8 @@ import net.poopyfeed.pf.data.models.FeedingListResponse
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.Notification
+import net.poopyfeed.pf.data.models.PatternAlert
+import net.poopyfeed.pf.data.models.PatternAlertsResponse
 import net.poopyfeed.pf.data.models.ShareInvite
 import net.poopyfeed.pf.data.models.SummaryDiapers
 import net.poopyfeed.pf.data.models.SummaryFeedings
@@ -285,4 +287,27 @@ object TestFixtures {
         )
     return DashboardSummaryResponse(today = today, weekly = weekly, unreadCount = unreadCount)
   }
+
+  fun mockPatternAlert(
+      alert: Boolean = false,
+      message: String? = null,
+      data_points: Int = 0,
+  ) = PatternAlert(alert = alert, message = message, data_points = data_points)
+
+  fun mockPatternAlertsResponse(
+      childId: Int = 1,
+      feedingAlert: Boolean = false,
+      feedingMessage: String? = null,
+      feedingDataPoints: Int = 0,
+      napAlert: Boolean = false,
+      napMessage: String? = null,
+      napDataPoints: Int = 0,
+  ) =
+      PatternAlertsResponse(
+          child_id = childId,
+          feeding =
+              PatternAlert(
+                  alert = feedingAlert, message = feedingMessage, data_points = feedingDataPoints),
+          nap = PatternAlert(alert = napAlert, message = napMessage, data_points = napDataPoints),
+      )
 }
