@@ -87,7 +87,7 @@ clean:
 # Testing
 test:
 	@echo "Running unit tests..."
-	cd poopyfeed && $(GRADLE) testDebugUnitTest
+	cd poopyfeed && $(GRADLE) testDebugUnitTest koverVerifyDebug
 
 test-e2e:
 	@echo "Running E2E tests on connected device/emulator..."

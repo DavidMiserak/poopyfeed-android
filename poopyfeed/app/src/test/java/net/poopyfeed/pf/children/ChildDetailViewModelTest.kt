@@ -57,7 +57,7 @@ class ChildDetailViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is ChildDetailUiState.Ready)
-        assertEquals(mockChild.name, (state as ChildDetailUiState.Ready).child.name)
+        assertEquals(mockChild.name, state.child.name)
       }
 
   @Test
@@ -72,7 +72,7 @@ class ChildDetailViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is ChildDetailUiState.Ready)
-        val ready = state as ChildDetailUiState.Ready
+        val ready = state
         assertTrue(ready.ageFormatted.contains("Other"))
       }
 }

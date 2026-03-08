@@ -61,7 +61,7 @@ class CreateInviteViewModelTest {
 
         val state = viewModel.uiState.value
         assertIs<CreateInviteUiState.Ready>(state)
-        assert((state as CreateInviteUiState.Ready).selectedRole == "co-parent")
+        assert(state.selectedRole == "co-parent")
         assertNull(state.roleError)
       }
 
@@ -73,7 +73,7 @@ class CreateInviteViewModelTest {
 
         val state = viewModel.uiState.value
         assertIs<CreateInviteUiState.Ready>(state)
-        assert((state as CreateInviteUiState.Ready).roleError != null)
+        assert(state.roleError != null)
       }
 
   @Test
