@@ -51,6 +51,8 @@ class ChildDetailViewModelTest {
         val mockChild = TestFixtures.mockChild()
         coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
 
         val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
         advanceUntilIdle()
@@ -66,6 +68,8 @@ class ChildDetailViewModelTest {
         val mockChild = TestFixtures.mockChild(gender = "other")
         coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
 
         val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
         advanceUntilIdle()
@@ -74,5 +78,45 @@ class ChildDetailViewModelTest {
         assertTrue(state is ChildDetailUiState.Ready)
         val ready = state
         assertTrue(ready.ageFormatted.contains("Other"))
+      }
+
+  @Test
+  fun `Ready state includes dashboardSummary when getDashboardSummary succeeds`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        val mockSummary =
+            TestFixtures.mockDashboardSummaryResponse(
+                todayFeedings = 5, todayDiapers = 3, todayNaps = 2)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns ApiResult.Success(mockSummary)
+
+        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        val ready = state
+        assertEquals(mockSummary, ready.dashboardSummary)
+        assertEquals(5, ready.dashboardSummary?.today?.feedings?.count)
+        assertEquals(3, ready.dashboardSummary?.today?.diapers?.count)
+        assertEquals(2, ready.dashboardSummary?.today?.sleep?.naps)
+      }
+
+  @Test
+  fun `Ready state has null dashboardSummary when getDashboardSummary fails`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("failed"))
+
+        val viewModel = ChildDetailViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        assertEquals(null, state.dashboardSummary)
       }
 }

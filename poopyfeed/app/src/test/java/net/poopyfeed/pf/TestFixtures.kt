@@ -3,6 +3,7 @@ package net.poopyfeed.pf
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.data.models.ChildShare
+import net.poopyfeed.pf.data.models.DashboardSummaryResponse
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.models.DiaperListResponse
 import net.poopyfeed.pf.data.models.Feeding
@@ -11,7 +12,12 @@ import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.models.ShareInvite
+import net.poopyfeed.pf.data.models.SummaryDiapers
+import net.poopyfeed.pf.data.models.SummaryFeedings
+import net.poopyfeed.pf.data.models.SummarySleep
+import net.poopyfeed.pf.data.models.TodaySummary
 import net.poopyfeed.pf.data.models.UserProfile
+import net.poopyfeed.pf.data.models.WeeklySummary
 
 /**
  * Shared test fixtures for API models. Use in unit tests to avoid duplicating mock construction and
@@ -250,4 +256,33 @@ object TestFixtures {
           isActive = isActive,
           createdAt = createdAt,
           inviteUrl = inviteUrl)
+
+  fun mockDashboardSummaryResponse(
+      childId: Int = 1,
+      todayFeedings: Int = 5,
+      todayDiapers: Int = 3,
+      todayNaps: Int = 2,
+      unreadCount: Int = 0,
+  ): DashboardSummaryResponse {
+    val today =
+        TodaySummary(
+            childId = childId,
+            period = "today",
+            feedings =
+                SummaryFeedings(count = todayFeedings, totalOz = 12.0, bottle = 3, breast = 2),
+            diapers = SummaryDiapers(count = todayDiapers, wet = 1, dirty = 1, both = 1),
+            sleep = SummarySleep(naps = todayNaps, totalMinutes = 90, avgDuration = 45),
+            lastUpdated = TS,
+        )
+    val weekly =
+        WeeklySummary(
+            childId = childId,
+            period = "2024-01-09 to 2024-01-15",
+            feedings = SummaryFeedings(count = 35, totalOz = 84.0, bottle = 20, breast = 15),
+            diapers = SummaryDiapers(count = 21, wet = 7, dirty = 7, both = 7),
+            sleep = SummarySleep(naps = 14, totalMinutes = 630, avgDuration = 45),
+            lastUpdated = TS,
+        )
+    return DashboardSummaryResponse(today = today, weekly = weekly, unreadCount = unreadCount)
+  }
 }

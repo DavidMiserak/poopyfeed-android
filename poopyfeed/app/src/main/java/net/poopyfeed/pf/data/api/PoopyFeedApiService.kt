@@ -95,6 +95,13 @@ interface PoopyFeedApiService {
   /** Delete a child profile. DELETE /api/v1/children/{childId}/ */
   @DELETE("children/{childId}/") suspend fun deleteChild(@Path("childId") childId: Int)
 
+  /**
+   * Batch dashboard summary: today + weekly + unread_count. GET
+   * /api/v1/children/{childId}/dashboard-summary/
+   */
+  @GET("children/{childId}/dashboard-summary/")
+  suspend fun getDashboardSummary(@Path("childId") childId: Int): DashboardSummaryResponse
+
   // ========================
   // Feeding Endpoints
   // ========================

@@ -136,8 +136,21 @@ class ChildDetailFragment : Fragment() {
 
   private fun updateUiState(state: ChildDetailUiState) {
     when (state) {
-      is ChildDetailUiState.Loading -> Unit
-      is ChildDetailUiState.Ready -> bindReadyState(state)
+      is ChildDetailUiState.Loading -> {
+        binding.layoutSkeleton.visibility = View.VISIBLE
+        binding.cardHero.visibility = View.GONE
+        binding.cardActivityStatus.visibility = View.GONE
+        binding.cardToday.visibility = View.GONE
+        binding.cardTracking.visibility = View.GONE
+      }
+      is ChildDetailUiState.Ready -> {
+        binding.layoutSkeleton.visibility = View.GONE
+        binding.cardHero.visibility = View.VISIBLE
+        binding.cardActivityStatus.visibility = View.VISIBLE
+        binding.cardToday.visibility = View.VISIBLE
+        binding.cardTracking.visibility = View.VISIBLE
+        bindReadyState(state)
+      }
       is ChildDetailUiState.Error ->
           Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
     }
@@ -158,6 +171,22 @@ class ChildDetailFragment : Fragment() {
     }
     binding.buttonEdit.visibility = if (state.canEdit) View.VISIBLE else View.GONE
     binding.buttonShare.visibility = if (state.isOwner) View.VISIBLE else View.GONE
+
+    val summary = state.dashboardSummary
+    if (summary != null) {
+      binding.todaySkeleton.visibility = View.GONE
+      binding.todayContent.visibility = View.VISIBLE
+      binding.textTodaySummary.text =
+          getString(
+              R.string.child_detail_today_summary,
+              summary.today.feedings.count,
+              summary.today.diapers.count,
+              summary.today.sleep.naps,
+          )
+    } else {
+      binding.todaySkeleton.visibility = View.VISIBLE
+      binding.todayContent.visibility = View.GONE
+    }
   }
 
   private fun openEditChild() {

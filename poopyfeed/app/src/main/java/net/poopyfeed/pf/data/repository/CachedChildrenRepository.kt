@@ -151,6 +151,20 @@ constructor(
       }
 
   /**
+   * Batch dashboard summary (today + weekly + unread_count) for the child dashboard. One-shot; no
+   * local cache. Used by child detail screen to show Today card and optionally update unread badge.
+   */
+  suspend fun getDashboardSummary(childId: Int): ApiResult<DashboardSummaryResponse> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.getDashboardSummary(childId)
+          ApiResult.Success(response)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /**
    * Clear all local cache (e.g., on logout). Resets sync status so UI can show NotSynced until next
    * refresh.
    */

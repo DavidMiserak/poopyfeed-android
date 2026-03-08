@@ -139,6 +139,8 @@
     <string name="child_detail_feedings">Feedings</string>
     <string name="child_detail_diapers">Diapers</string>
     <string name="child_detail_naps">Naps</string>
+    <string name="child_detail_today_loading">Loading today summary</string>
+    <string name="child_detail_today_summary">Today: %1$d feedings, %2$d diapers, %3$d naps</string>
     <string name="child_detail_edit_button">Edit</string>
     <string name="child_detail_share_button">Share</string>
     <string name="child_detail_delete_button">Delete Child</string>

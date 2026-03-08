@@ -100,6 +100,20 @@ constructor(
           ApiResult.Error(e.toApiError())
         }
       }
+
+  /**
+   * Batch dashboard summary (today + weekly + unread_count) for the child dashboard. One-shot; no
+   * local cache.
+   */
+  suspend fun getDashboardSummary(childId: Int): ApiResult<DashboardSummaryResponse> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.getDashboardSummary(childId)
+          ApiResult.Success(response)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
 }
 
 /** Repository for feeding operations. */

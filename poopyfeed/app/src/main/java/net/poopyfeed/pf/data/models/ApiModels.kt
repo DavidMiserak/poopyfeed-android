@@ -297,6 +297,62 @@ data class Notification(
 
 @Serializable data class UnreadCountResponse(val count: Int)
 
+/** Feedings summary subset from dashboard-summary today/weekly. */
+@Serializable
+data class SummaryFeedings(
+    val count: Int = 0,
+    @SerialName("total_oz") val totalOz: Double = 0.0,
+    val bottle: Int = 0,
+    val breast: Int = 0,
+)
+
+/** Diapers summary subset from dashboard-summary today/weekly. */
+@Serializable
+data class SummaryDiapers(
+    val count: Int = 0,
+    val wet: Int = 0,
+    val dirty: Int = 0,
+    val both: Int = 0,
+)
+
+/** Sleep summary subset from dashboard-summary today/weekly. */
+@Serializable
+data class SummarySleep(
+    val naps: Int = 0,
+    @SerialName("total_minutes") val totalMinutes: Int = 0,
+    @SerialName("avg_duration") val avgDuration: Int = 0,
+)
+
+/** Today summary from GET .../dashboard-summary/ (today object). */
+@Serializable
+data class TodaySummary(
+    @SerialName("child_id") val childId: Int,
+    val period: String = "today",
+    val feedings: SummaryFeedings = SummaryFeedings(),
+    val diapers: SummaryDiapers = SummaryDiapers(),
+    val sleep: SummarySleep = SummarySleep(),
+    @SerialName("last_updated") val lastUpdated: String = "",
+)
+
+/** Weekly summary from GET .../dashboard-summary/ (weekly object). */
+@Serializable
+data class WeeklySummary(
+    @SerialName("child_id") val childId: Int,
+    val period: String = "",
+    val feedings: SummaryFeedings = SummaryFeedings(),
+    val diapers: SummaryDiapers = SummaryDiapers(),
+    val sleep: SummarySleep = SummarySleep(),
+    @SerialName("last_updated") val lastUpdated: String = "",
+)
+
+/** Batch response from GET /api/v1/children/{childId}/dashboard-summary/ */
+@Serializable
+data class DashboardSummaryResponse(
+    val today: TodaySummary,
+    val weekly: WeeklySummary,
+    @SerialName("unread_count") val unreadCount: Int = 0,
+)
+
 @Serializable data class MarkAllReadResponse(val updated: Int)
 
 /** Request body for PATCH notification (mark as read). */

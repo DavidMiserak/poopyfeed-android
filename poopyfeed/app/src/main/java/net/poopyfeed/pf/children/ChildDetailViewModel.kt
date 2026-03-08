@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
+import net.poopyfeed.pf.data.models.DashboardSummaryResponse
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.util.formatAge
 import net.poopyfeed.pf.util.formatRelativeTime
@@ -21,7 +23,10 @@ sealed interface ChildDetailUiState {
   /** Loading child data. */
   data object Loading : ChildDetailUiState
 
-  /** Child loaded and displayed. */
+  /**
+   * Child loaded and displayed. [dashboardSummary] is null until batch load completes (show
+   * skeleton).
+   */
   data class Ready(
       val child: Child,
       val ageFormatted: String,
@@ -30,6 +35,7 @@ sealed interface ChildDetailUiState {
       val lastNapFormatted: String,
       val isOwner: Boolean,
       val canEdit: Boolean,
+      val dashboardSummary: DashboardSummaryResponse? = null,
   ) : ChildDetailUiState
 
   /** Failed to load child; [message] is user-facing. */
@@ -57,7 +63,26 @@ constructor(
 
   init {
     observeChild()
+    loadDashboardSummary()
     refresh()
+  }
+
+  /** Loads batch dashboard summary (today + weekly + unread). Updates Ready state when done. */
+  private fun loadDashboardSummary() {
+    viewModelScope.launch {
+      when (val result = repo.getDashboardSummary(childId)) {
+        is ApiResult.Success -> {
+          val current = _uiState.value
+          if (current is ChildDetailUiState.Ready) {
+            _uiState.value = current.copy(dashboardSummary = result.data)
+          }
+        }
+        is ApiResult.Error -> {
+          // Leave dashboardSummary null so Today card shows skeleton/error; no toast to avoid noise
+        }
+        else -> Unit
+      }
+    }
   }
 
   /**
@@ -99,6 +124,7 @@ constructor(
                 lastNapFormatted = lastNapFormatted,
                 isOwner = isOwner,
                 canEdit = canEdit,
+                dashboardSummary = (_uiState.value as? ChildDetailUiState.Ready)?.dashboardSummary,
             )
       }
     }
