@@ -385,4 +385,62 @@ class MainActivityViewModelTest {
 
     kotlin.test.assertEquals(0, viewModel.unreadCount.value)
   }
+
+  @Test
+  fun `setPendingDeepLink stores uri string`() = runTest {
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockSyncScheduler,
+            mockContext)
+
+    val testUri = "poopyfeed://app/children/123"
+    viewModel.setPendingDeepLink(testUri)
+
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    kotlin.test.assertEquals(testUri, viewModel.pendingDeepLink.value)
+  }
+
+  @Test
+  fun `clearPendingDeepLink sets null`() = runTest {
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockSyncScheduler,
+            mockContext)
+
+    val testUri = "poopyfeed://app/children/123"
+    viewModel.setPendingDeepLink(testUri)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.clearPendingDeepLink()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    kotlin.test.assertNull(viewModel.pendingDeepLink.value)
+  }
+
+  @Test
+  fun `scheduleSyncWhenForeground calls syncScheduler enqueueIfPending`() = runTest {
+    coEvery { mockSyncScheduler.enqueueIfPending() } returns Unit
+
+    val viewModel =
+        MainActivityViewModel(
+            mockAuthRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockNotificationsRepository,
+            mockSyncScheduler,
+            mockContext)
+    viewModel.scheduleSyncWhenForeground()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify { mockSyncScheduler.enqueueIfPending() }
+  }
 }

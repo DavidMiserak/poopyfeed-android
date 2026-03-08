@@ -88,12 +88,13 @@ class PoopyFeedMessagingService : FirebaseMessagingService() {
   private fun showNotification(title: String, body: String, eventType: String, childId: String?) {
     val channelId = getChannelId(eventType)
 
+    // Build deep link URI from child_id (if present)
+    val deepLinkUri = childId?.let { "poopyfeed://app/children/$it" }
+
     val intent =
         Intent(this, MainActivity::class.java).apply {
           flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-          if (childId != null) {
-            putExtra("child_id", childId)
-          }
+          if (deepLinkUri != null) putExtra("deep_link", deepLinkUri)
         }
 
     val pendingIntent =

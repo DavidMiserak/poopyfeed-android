@@ -72,6 +72,20 @@ constructor(
   private val _bannerError = MutableSharedFlow<String>(replay = 0)
   val bannerError: SharedFlow<String> = _bannerError.asSharedFlow()
 
+  /** Pending deep link URI (saved while user is unauthenticated, navigated after login). */
+  private val _pendingDeepLink = MutableStateFlow<String?>(null)
+  val pendingDeepLink: StateFlow<String?> = _pendingDeepLink.asStateFlow()
+
+  /** Set pending deep link URI (called when incoming intent arrives before auth). */
+  fun setPendingDeepLink(uri: String) {
+    _pendingDeepLink.value = uri
+  }
+
+  /** Clear pending deep link URI (called after navigation). */
+  fun clearPendingDeepLink() {
+    _pendingDeepLink.value = null
+  }
+
   /** Performs logout (API session + local cache + token) and triggers navigation to Login. */
   fun logout() {
     viewModelScope.launch {

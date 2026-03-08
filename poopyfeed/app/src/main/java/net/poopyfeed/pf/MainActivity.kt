@@ -1,6 +1,7 @@
 package net.poopyfeed.pf
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -54,29 +55,55 @@ class MainActivity : AppCompatActivity() {
 
     setupLifecycleObservers()
     setupNavigation()
-    handleNotificationIntent(intent)
+    handleIncomingIntent(intent)
   }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
-    handleNotificationIntent(intent)
+    handleIncomingIntent(intent)
   }
 
-  private fun handleNotificationIntent(intent: Intent) {
-    val childIdStr = intent.getStringExtra("child_id") ?: return
-    val childId = childIdStr.toIntOrNull() ?: return
-    if (tokenManager.getToken() == null) return
-    intent.removeExtra("child_id")
+  private fun handleIncomingIntent(intent: Intent?) {
+    if (intent == null) return
 
-    binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
+    // New format: deep_link URI string extra (from FCM)
+    val uriString =
+        intent.getStringExtra("deep_link")
+            // Legacy format: child_id extra (backward compatibility)
+            ?: intent.getStringExtra("child_id")?.toIntOrNull()?.let {
+              "poopyfeed://app/children/$it"
+            }
+            // Direct URL scheme launch (from browser/share)
+            ?: intent.data?.toString()
+            ?: return
+
+    intent.removeExtra("deep_link")
+    intent.removeExtra("child_id")
+    // Clear intent data so rotation doesn't re-trigger
+    intent.data = null
+
+    if (tokenManager.getToken() == null) {
+      viewModel.setPendingDeepLink(uriString)
+      return
+    }
+    navigateToDeepLink(uriString)
+  }
+
+  private fun navigateToDeepLink(uriString: String) {
+    binding.root.post { // post to ensure NavController is initialized
       val navController = findNavController(R.id.nav_host_fragment_content_main)
       val currentDest = navController.currentDestination?.id
-      if (currentDest == R.id.LoginFragment || currentDest == R.id.SignupFragment) return@post
-
-      navController.navigate(
-          R.id.ChildDetailFragment, Bundle().apply { putInt("childId", childId) })
-      viewModel.refreshUnreadCount()
+      if (currentDest == R.id.LoginFragment || currentDest == R.id.SignupFragment) {
+        viewModel.setPendingDeepLink(uriString)
+        return@post
+      }
+      try {
+        navController.navigate(Uri.parse(uriString))
+        viewModel.refreshUnreadCount()
+      } catch (e: IllegalArgumentException) {
+        // Unrecognized URI — ignore silently
+      }
     }
   }
 
@@ -104,6 +131,14 @@ class MainActivity : AppCompatActivity() {
           while (true) {
             delay(30_000)
             viewModel.refreshUnreadCount()
+          }
+        }
+        launch {
+          viewModel.pendingDeepLink.collect { uriString ->
+            if (uriString != null && tokenManager.getToken() != null) {
+              navigateToDeepLink(uriString)
+              viewModel.clearPendingDeepLink()
+            }
           }
         }
       }

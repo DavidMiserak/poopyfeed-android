@@ -62,6 +62,8 @@
         android:label="@string/children_list_title"
         tools:layout="@layout/fragment_children_list">
 
+        <deepLink app:uri="poopyfeed://app/children" />
+
         <action
             android:id="@+id/action_childrenList_to_childDetail"
             app:destination="@id/ChildDetailFragment" />
@@ -82,6 +84,8 @@
         android:name="net.poopyfeed.pf.children.ChildDetailFragment"
         android:label="@string/children_list_title"
         tools:layout="@layout/fragment_child_detail">
+
+        <deepLink app:uri="poopyfeed://app/children/{childId}" />
 
         <argument
             android:name="childId"
@@ -142,6 +146,8 @@
         android:label="@string/feedings_list_title"
         tools:layout="@layout/fragment_feedings_list">
 
+        <deepLink app:uri="poopyfeed://app/children/{childId}/feedings" />
+
         <argument
             android:name="childId"
             app:argType="integer" />
@@ -159,6 +165,8 @@
         android:name="net.poopyfeed.pf.diapers.DiapersListFragment"
         android:label="@string/diapers_list_title"
         tools:layout="@layout/fragment_diapers_list">
+
+        <deepLink app:uri="poopyfeed://app/children/{childId}/diapers" />
 
         <argument
             android:name="childId"
@@ -178,6 +186,8 @@
         android:label="@string/naps_list_title"
         tools:layout="@layout/fragment_naps_list">
 
+        <deepLink app:uri="poopyfeed://app/children/{childId}/naps" />
+
         <argument
             android:name="childId"
             app:argType="integer" />
@@ -195,6 +205,8 @@
         android:name="net.poopyfeed.pf.notifications.NotificationsFragment"
         android:label="@string/notifications_title"
         tools:layout="@layout/fragment_notifications">
+
+        <deepLink app:uri="poopyfeed://app/notifications" />
 
         <action
             android:id="@+id/action_notificationsFragment_to_childDetail"

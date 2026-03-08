@@ -10,9 +10,14 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.DeviceTokenDeleteRequest
+import net.poopyfeed.pf.data.models.DeviceTokenRequest
+import net.poopyfeed.pf.data.models.DeviceTokenResponse
 import net.poopyfeed.pf.data.models.MarkAllReadResponse
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.models.PaginatedResponse
+import net.poopyfeed.pf.data.models.QuietHours
+import net.poopyfeed.pf.data.models.QuietHoursUpdate
 import net.poopyfeed.pf.data.models.UnreadCountResponse
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -158,5 +163,93 @@ class NotificationsRepositoryTest {
     assertIs<ApiResult.Error<Notification>>(result)
     assertIs<ApiError.HttpError>(result.error)
     assertEquals(404, result.error.statusCode)
+  }
+
+  @Test
+  fun `getQuietHours success returns Success with quiet hours`() = runTest {
+    val quietHours = QuietHours(enabled = true, startTime = "22:00:00", endTime = "07:00:00")
+    io.mockk.coEvery { apiService.getQuietHours() } returns quietHours
+
+    val result = repository.getQuietHours()
+
+    assertIs<ApiResult.Success<QuietHours>>(result)
+    assertEquals(true, result.data.enabled)
+  }
+
+  @Test
+  fun `getQuietHours network error returns Error`() = runTest {
+    io.mockk.coEvery { apiService.getQuietHours() } throws IOException("Network down")
+
+    val result = repository.getQuietHours()
+
+    assertIs<ApiResult.Error<QuietHours>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `updateQuietHours success returns Success with updated quiet hours`() = runTest {
+    val request = QuietHoursUpdate(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
+    val updatedQuietHours =
+        QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
+    io.mockk.coEvery { apiService.updateQuietHours(request) } returns updatedQuietHours
+
+    val result = repository.updateQuietHours(request)
+
+    assertIs<ApiResult.Success<QuietHours>>(result)
+    assertEquals(false, result.data.enabled)
+  }
+
+  @Test
+  fun `updateQuietHours network error returns Error`() = runTest {
+    val request = QuietHoursUpdate(enabled = true, startTime = "22:00:00", endTime = "07:00:00")
+    io.mockk.coEvery { apiService.updateQuietHours(request) } throws IOException("Network down")
+
+    val result = repository.updateQuietHours(request)
+
+    assertIs<ApiResult.Error<QuietHours>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `registerDeviceToken success returns Success`() = runTest {
+    val token = "device-token-123"
+    val response = DeviceTokenResponse(status = "registered")
+    io.mockk.coEvery { apiService.registerDeviceToken(DeviceTokenRequest(token)) } returns response
+
+    val result = repository.registerDeviceToken(token)
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
+  fun `registerDeviceToken network error returns Error`() = runTest {
+    io.mockk.coEvery { apiService.registerDeviceToken(any()) } throws IOException("Network down")
+
+    val result = repository.registerDeviceToken("token")
+
+    assertIs<ApiResult.Error<Unit>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
+  }
+
+  @Test
+  fun `unregisterDeviceToken success returns Success`() = runTest {
+    val token = "device-token-456"
+    val response = DeviceTokenResponse(status = "unregistered")
+    io.mockk.coEvery { apiService.unregisterDeviceToken(DeviceTokenDeleteRequest(token)) } returns
+        response
+
+    val result = repository.unregisterDeviceToken(token)
+
+    assertIs<ApiResult.Success<Unit>>(result)
+  }
+
+  @Test
+  fun `unregisterDeviceToken network error returns Error`() = runTest {
+    io.mockk.coEvery { apiService.unregisterDeviceToken(any()) } throws IOException("Network down")
+
+    val result = repository.unregisterDeviceToken("token")
+
+    assertIs<ApiResult.Error<Unit>>(result)
+    assertIs<ApiError.NetworkError>(result.error)
   }
 }
