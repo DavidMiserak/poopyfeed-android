@@ -276,6 +276,83 @@ class SharingViewModelTest {
       }
 
   @Test
+  fun `load when listInvites Success and listShares Loading keeps Loading state`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Loading()
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        assertIs<SharingUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `toggleInvite when API returns Success triggers refresh`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 1,
+                token = "t1",
+                role = "caregiver",
+                roleDisplay = "Caregiver",
+                isActive = true,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.toggleInvite(7, 1) } returns ApiResult.Success(invite)
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        viewModel.toggleInvite(invite)
+        advanceUntilIdle()
+
+        io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listInvites(7) }
+        io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listShares(7) }
+      }
+
+  @Test
+  fun `deleteInvite when API returns Success triggers refresh`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 2,
+                token = "t2",
+                role = "co-parent",
+                roleDisplay = "Co-parent",
+                isActive = false,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.deleteInvite(7, 2) } returns ApiResult.Success(Unit)
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        viewModel.deleteInvite(invite)
+        advanceUntilIdle()
+
+        io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listInvites(7) }
+        io.mockk.coVerify(atLeast = 2) { mockSharingRepository.listShares(7) }
+      }
+
+  @Test
   fun `deleteInvite when API returns Loading does not emit error`() =
       runTest(testDispatcher) {
         coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())

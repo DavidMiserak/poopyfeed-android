@@ -77,6 +77,19 @@ class CreateInviteViewModelTest {
       }
 
   @Test
+  fun `submit with empty role sets roleError`() =
+      runTest(testDispatcher) {
+        viewModel.setRole("")
+        advanceUntilIdle()
+        viewModel.submit()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertIs<CreateInviteUiState.Ready>(state)
+        assert(state.roleError != null)
+      }
+
+  @Test
   fun `submit with role success emits InviteCreated`() =
       runTest(testDispatcher) {
         viewModel.setRole("caregiver")
