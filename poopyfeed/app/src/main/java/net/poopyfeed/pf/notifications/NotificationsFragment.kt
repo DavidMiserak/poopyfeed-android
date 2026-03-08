@@ -161,9 +161,7 @@ class NotificationsFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.unreadCountInvalidated.collect {
-          mainActivityViewModel.refreshUnreadCount()
-        }
+        viewModel.unreadCountInvalidated.collect { mainActivityViewModel.refreshUnreadCount() }
       }
     }
   }

@@ -321,9 +321,7 @@ data class QuietHoursUpdate(
     @SerialName("start_time")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val startTime: String? = null,
-    @SerialName("end_time")
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val endTime: String? = null,
+    @SerialName("end_time") @EncodeDefault(EncodeDefault.Mode.NEVER) val endTime: String? = null,
 )
 
 /**

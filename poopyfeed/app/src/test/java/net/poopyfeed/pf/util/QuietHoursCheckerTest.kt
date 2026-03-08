@@ -1,8 +1,8 @@
 package net.poopyfeed.pf.util
 
-import net.poopyfeed.pf.data.models.QuietHours
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import net.poopyfeed.pf.data.models.QuietHours
 import org.junit.Test
 
 class QuietHoursCheckerTest {

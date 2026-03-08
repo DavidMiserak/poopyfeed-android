@@ -169,9 +169,7 @@ class AccountSettingsFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.quietHours.collect { qh ->
-          if (qh != null) bindQuietHours(qh)
-        }
+        viewModel.quietHours.collect { qh -> if (qh != null) bindQuietHours(qh) }
       }
     }
 
@@ -208,11 +206,9 @@ class AccountSettingsFragment : Fragment() {
   private fun bindQuietHours(qh: QuietHours) {
     binding.switchQuietHoursEnabled.isChecked = qh.enabled
     binding.editQuietHoursStart.setText(
-        if (qh.startTime.length >= 5) qh.startTime.substring(0, 5) else qh.startTime
-    )
+        if (qh.startTime.length >= 5) qh.startTime.substring(0, 5) else qh.startTime)
     binding.editQuietHoursEnd.setText(
-        if (qh.endTime.length >= 5) qh.endTime.substring(0, 5) else qh.endTime
-    )
+        if (qh.endTime.length >= 5) qh.endTime.substring(0, 5) else qh.endTime)
   }
 
   private fun saveQuietHours() {

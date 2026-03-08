@@ -46,7 +46,8 @@ class AccountSettingsViewModelTest {
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
 
-  private val defaultQuietHours = QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
+  private val defaultQuietHours =
+      QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
 
   @Before
   fun setup() {
@@ -57,7 +58,8 @@ class AccountSettingsViewModelTest {
         "Data format error. Please try again."
     every { mockContext.getString(R.string.error_unknown) } returns
         "Something went wrong. Please try again."
-    coEvery { mockNotificationsRepository.getQuietHours() } returns ApiResult.Success(defaultQuietHours)
+    coEvery { mockNotificationsRepository.getQuietHours() } returns
+        ApiResult.Success(defaultQuietHours)
   }
 
   @After
@@ -763,7 +765,8 @@ class AccountSettingsViewModelTest {
     every { mockTokenManager.getToken() } returns "test-token"
     val profile = TestFixtures.mockUserProfile()
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
-    every { mockContext.getString(R.string.quiet_hours_error_invalid_time) } returns "Enter times in HH:MM format."
+    every { mockContext.getString(R.string.quiet_hours_error_invalid_time) } returns
+        "Enter times in HH:MM format."
 
     val viewModel =
         AccountSettingsViewModel(

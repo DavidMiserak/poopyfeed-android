@@ -148,7 +148,7 @@ constructor(
       when (val result = notificationsRepository.getQuietHours()) {
         is ApiResult.Success -> _quietHours.value = result.data
         is ApiResult.Error -> _quietHours.value = null
-        is ApiResult.Loading -> { }
+        is ApiResult.Loading -> {}
       }
     }
   }
@@ -158,50 +158,51 @@ constructor(
    * and emits [quietHoursSaveSuccess]; on error emits [quietHoursSaveError].
    */
   fun saveQuietHours(enabled: Boolean, startTime: String, endTime: String) {
-    val startNormalized = normalizeTimeForApi(startTime) ?: run {
-      viewModelScope.launch {
-        _quietHoursSaveError.emit(context.getString(R.string.quiet_hours_error_invalid_time))
-      }
-      return
-    }
-    val endNormalized = normalizeTimeForApi(endTime) ?: run {
-      viewModelScope.launch {
-        _quietHoursSaveError.emit(context.getString(R.string.quiet_hours_error_invalid_time))
-      }
-      return
-    }
+    val startNormalized =
+        normalizeTimeForApi(startTime)
+            ?: run {
+              viewModelScope.launch {
+                _quietHoursSaveError.emit(
+                    context.getString(R.string.quiet_hours_error_invalid_time))
+              }
+              return
+            }
+    val endNormalized =
+        normalizeTimeForApi(endTime)
+            ?: run {
+              viewModelScope.launch {
+                _quietHoursSaveError.emit(
+                    context.getString(R.string.quiet_hours_error_invalid_time))
+              }
+              return
+            }
 
     viewModelScope.launch {
       _quietHoursSaving.value = true
-      when (
-        val result =
+      when (val result =
           notificationsRepository.updateQuietHours(
-            QuietHoursUpdate(
-              enabled = enabled,
-              startTime = startNormalized,
-              endTime = endNormalized,
-            )
-          )
-      ) {
+              QuietHoursUpdate(
+                  enabled = enabled,
+                  startTime = startNormalized,
+                  endTime = endNormalized,
+              ))) {
         is ApiResult.Success -> {
           _quietHours.value = result.data
           _quietHoursSaveSuccess.emit(Unit)
         }
         is ApiResult.Error -> {
           _quietHoursSaveError.emit(
-            result.error.getUserMessage(context)
-              .ifEmpty { context.getString(R.string.quiet_hours_error_save) }
-          )
+              result.error.getUserMessage(context).ifEmpty {
+                context.getString(R.string.quiet_hours_error_save)
+              })
         }
-        is ApiResult.Loading -> { }
+        is ApiResult.Loading -> {}
       }
       _quietHoursSaving.value = false
     }
   }
 
-  /**
-   * Normalizes "HH:MM" or "HH:MM:SS" to "HH:MM:SS" for API. Returns null if invalid.
-   */
+  /** Normalizes "HH:MM" or "HH:MM:SS" to "HH:MM:SS" for API. Returns null if invalid. */
   private fun normalizeTimeForApi(value: String): String? {
     val trimmed = value.trim()
     if (trimmed.isEmpty()) return null

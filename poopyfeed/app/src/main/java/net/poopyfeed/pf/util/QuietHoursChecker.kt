@@ -1,23 +1,23 @@
 package net.poopyfeed.pf.util
 
-import net.poopyfeed.pf.data.models.QuietHours
 import java.util.Calendar
 import java.util.TimeZone
+import net.poopyfeed.pf.data.models.QuietHours
 
 /**
- * Checks whether the current time falls within a user's quiet hours in a given timezone.
- * Used for local enforcement (e.g. when FCM is implemented, suppress displaying notifications
- * during quiet hours).
+ * Checks whether the current time falls within a user's quiet hours in a given timezone. Used for
+ * local enforcement (e.g. when FCM is implemented, suppress displaying notifications during quiet
+ * hours).
  *
- * Logic matches backend [notifications.models.QuietHours.is_quiet_now]: same-day range
- * (start <= end) means quiet when start <= now <= end; overnight range (start > end) means
- * quiet when now >= start || now <= end. Times are interpreted in the user's profile timezone.
+ * Logic matches backend [notifications.models.QuietHours.is_quiet_now]: same-day range (start <=
+ * end) means quiet when start <= now <= end; overnight range (start > end) means quiet when now >=
+ * start || now <= end. Times are interpreted in the user's profile timezone.
  */
 object QuietHoursChecker {
 
   /**
-   * Returns true if [quietHours] is enabled and the current time in [timezoneId] falls within
-   * the configured window. Returns false if [quietHours] is null or disabled.
+   * Returns true if [quietHours] is enabled and the current time in [timezoneId] falls within the
+   * configured window. Returns false if [quietHours] is null or disabled.
    *
    * @param quietHours Loaded quiet hours (e.g. from API); null or enabled=false → false
    * @param timezoneId IANA timezone ID (e.g. "America/New_York") from user profile
@@ -49,9 +49,7 @@ object QuietHoursChecker {
     }
   }
 
-  /**
-   * Parses "HH:mm:ss" or "HH:mm" to seconds since midnight. Returns null if invalid.
-   */
+  /** Parses "HH:mm:ss" or "HH:mm" to seconds since midnight. Returns null if invalid. */
   private fun parseTimeToSecondsSinceMidnight(value: String): Int? {
     val trimmed = value.trim()
     if (trimmed.isEmpty()) return null

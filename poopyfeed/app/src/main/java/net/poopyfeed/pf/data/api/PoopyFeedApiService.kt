@@ -263,8 +263,7 @@ interface PoopyFeedApiService {
   ): Notification
 
   /** Get quiet hours. GET /api/v1/notifications/quiet-hours/ */
-  @GET("notifications/quiet-hours/")
-  suspend fun getQuietHours(): QuietHours
+  @GET("notifications/quiet-hours/") suspend fun getQuietHours(): QuietHours
 
   /** Update quiet hours. PATCH /api/v1/notifications/quiet-hours/ */
   @PATCH("notifications/quiet-hours/")
