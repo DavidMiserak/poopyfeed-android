@@ -6,6 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.DeviceTokenDeleteRequest
+import net.poopyfeed.pf.data.models.DeviceTokenRequest
 import net.poopyfeed.pf.data.models.MarkReadRequest
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.models.PaginatedResponse
@@ -85,6 +87,28 @@ constructor(
         try {
           val response = apiService.updateQuietHours(request)
           ApiResult.Success(response)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /** Register an FCM device token with the backend. */
+  suspend fun registerDeviceToken(token: String): ApiResult<Unit> =
+      withContext(ioDispatcher) {
+        try {
+          apiService.registerDeviceToken(DeviceTokenRequest(token = token))
+          ApiResult.Success(Unit)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /** Unregister an FCM device token from the backend. */
+  suspend fun unregisterDeviceToken(token: String): ApiResult<Unit> =
+      withContext(ioDispatcher) {
+        try {
+          apiService.unregisterDeviceToken(DeviceTokenDeleteRequest(token = token))
+          ApiResult.Success(Unit)
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

@@ -25,6 +25,7 @@ import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.notifications.PoopyFeedMessagingService
 
 /** UI state for the account settings screen. */
 sealed interface AccountSettingsUiState {
@@ -146,10 +147,25 @@ constructor(
   private fun loadQuietHours() {
     viewModelScope.launch {
       when (val result = notificationsRepository.getQuietHours()) {
-        is ApiResult.Success -> _quietHours.value = result.data
+        is ApiResult.Success -> {
+          _quietHours.value = result.data
+          cacheQuietHours(result.data)
+        }
         is ApiResult.Error -> _quietHours.value = null
         is ApiResult.Loading -> {}
       }
+    }
+  }
+
+  /** Persist quiet hours to SharedPreferences for use by PoopyFeedMessagingService. */
+  private fun cacheQuietHours(qh: QuietHours) {
+    val prefs =
+        context.getSharedPreferences(PoopyFeedMessagingService.PREFS_NAME, Context.MODE_PRIVATE)
+    prefs.edit().apply {
+      putBoolean(PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED, qh.enabled)
+      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_START, qh.startTime)
+      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_END, qh.endTime)
+      apply()
     }
   }
 
@@ -188,6 +204,7 @@ constructor(
               ))) {
         is ApiResult.Success -> {
           _quietHours.value = result.data
+          cacheQuietHours(result.data)
           _quietHoursSaveSuccess.emit(Unit)
         }
         is ApiResult.Error -> {

@@ -275,4 +275,12 @@ interface PoopyFeedApiService {
   /** Update quiet hours. PATCH /api/v1/notifications/quiet-hours/ */
   @PATCH("notifications/quiet-hours/")
   suspend fun updateQuietHours(@Body request: QuietHoursUpdate): QuietHours
+
+  /** Register FCM device token. POST /api/v1/notifications/devices/ */
+  @POST("notifications/devices/")
+  suspend fun registerDeviceToken(@Body request: DeviceTokenRequest): DeviceTokenResponse
+
+  /** Unregister FCM device token. Uses HTTP method override for DELETE with body. */
+  @HTTP(method = "DELETE", path = "notifications/devices/", hasBody = true)
+  suspend fun unregisterDeviceToken(@Body request: DeviceTokenDeleteRequest): DeviceTokenResponse
 }

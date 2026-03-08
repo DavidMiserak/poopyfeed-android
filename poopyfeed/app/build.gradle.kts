@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("org.jetbrains.kotlinx.kover") version "0.9.7"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -113,6 +114,11 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.test.rules)
     kspAndroidTest(libs.hilt.compiler)
+
+    // Google services (e.g. Firebase)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 }
 
 kover {

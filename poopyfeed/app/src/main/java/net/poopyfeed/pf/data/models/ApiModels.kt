@@ -369,6 +369,19 @@ data class QuietHours(
     @SerialName("end_time") val endTime: String,
 )
 
+/** Request body for POST /api/v1/notifications/devices/ — register FCM token. */
+@Serializable
+data class DeviceTokenRequest(
+    val token: String,
+    val platform: String = "android",
+)
+
+/** Request body for DELETE /api/v1/notifications/devices/ — unregister FCM token. */
+@Serializable data class DeviceTokenDeleteRequest(val token: String)
+
+/** Response from device token registration/unregistration. */
+@Serializable data class DeviceTokenResponse(val status: String)
+
 /** Request body for PATCH /api/v1/notifications/quiet-hours/. All fields optional. */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
