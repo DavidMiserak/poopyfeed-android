@@ -1,5 +1,6 @@
 package net.poopyfeed.pf
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -18,10 +19,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.ActivityMainBinding
+import net.poopyfeed.pf.di.TokenManager
 
 /**
  * Single-activity host for the app. Hosts the NavHostFragment, shows/hides AppBar and FAB based on
@@ -30,6 +33,8 @@ import net.poopyfeed.pf.databinding.ActivityMainBinding
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+  @Inject lateinit var tokenManager: TokenManager
 
   private lateinit var binding: ActivityMainBinding
   private lateinit var appBarConfiguration: AppBarConfiguration
@@ -49,6 +54,30 @@ class MainActivity : AppCompatActivity() {
 
     setupLifecycleObservers()
     setupNavigation()
+    handleNotificationIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    handleNotificationIntent(intent)
+  }
+
+  private fun handleNotificationIntent(intent: Intent) {
+    val childIdStr = intent.getStringExtra("child_id") ?: return
+    val childId = childIdStr.toIntOrNull() ?: return
+    if (tokenManager.getToken() == null) return
+    intent.removeExtra("child_id")
+
+    binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
+      val navController = findNavController(R.id.nav_host_fragment_content_main)
+      val currentDest = navController.currentDestination?.id
+      if (currentDest == R.id.LoginFragment || currentDest == R.id.SignupFragment) return@post
+
+      navController.navigate(
+          R.id.ChildDetailFragment, Bundle().apply { putInt("childId", childId) })
+      viewModel.refreshUnreadCount()
+    }
   }
 
   private fun setupLifecycleObservers() {
