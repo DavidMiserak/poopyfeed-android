@@ -12,10 +12,11 @@ import net.poopyfeed.pf.R
  * Utility functions for formatting dates and times. All functions handle ISO 8601 strings from the
  * backend (always UTC).
  *
- * Timezone behavior: Absolute timestamps ([formatTimestampForDisplay]) and relative times
- * ([formatRelativeTime]) are displayed using the device default timezone and locale (e.g. Android
- * [DateUtils] uses the system timezone). [formatAge] uses the device local date for "today" so
- * child age is correct by location.
+ * Timezone behavior (FR-20): Absolute timestamps ([formatTimestampForDisplay],
+ * [formatDateForDisplay]) are converted from UTC and displayed in the **device's local timezone**
+ * so users see correct local date/time. [DateUtils] uses the system default timezone. Relative
+ * times ([formatRelativeTime], [formatRelativeTimeShort]) are timezone-agnostic (epoch diff).
+ * [formatAge] uses the device local date for "today" so child age is correct by location.
  */
 
 /**
@@ -150,14 +151,27 @@ fun formatNapDuration(context: Context, startIso: String, endIso: String): Strin
 }
 
 /**
- * Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM") using the device
- * default timezone and locale.
+ * Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM") in the device's
+ * local timezone.
  */
 fun formatTimestampForDisplay(context: Context, isoString: String): String {
   return try {
     val millis = Instant.parse(isoString).toEpochMilliseconds()
     val dateFlags = DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
     DateUtils.formatDateTime(context, millis, dateFlags)
+  } catch (e: Exception) {
+    isoString
+  }
+}
+
+/**
+ * Formats an ISO 8601 datetime string as date-only for display (e.g. "Jan 15, 2024") in the
+ * device's local timezone.
+ */
+fun formatDateForDisplay(context: Context, isoString: String): String {
+  return try {
+    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    DateUtils.formatDateTime(context, millis, DateUtils.FORMAT_SHOW_DATE)
   } catch (e: Exception) {
     isoString
   }

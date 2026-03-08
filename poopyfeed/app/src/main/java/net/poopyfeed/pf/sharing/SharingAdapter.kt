@@ -5,14 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import java.util.Locale
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.data.models.ChildShare
 import net.poopyfeed.pf.databinding.ItemInviteLinkBinding
 import net.poopyfeed.pf.databinding.ItemSectionHeaderBinding
 import net.poopyfeed.pf.databinding.ItemSharingBinding
+import net.poopyfeed.pf.util.formatDateForDisplay
 
 /** Callbacks for invite link row actions. */
 interface SharingInviteCallbacks {
@@ -88,27 +87,13 @@ class SharingAdapter(
       binding.textInviteRole.text = invite.roleDisplay
       binding.chipPaused.visibility =
           if (invite.isActive) android.view.View.GONE else android.view.View.VISIBLE
-      binding.textInviteCreated.text = formatCreated(invite.createdAt)
+      binding.textInviteCreated.text = formatDateForDisplay(binding.root.context, invite.createdAt)
       binding.buttonCopy.setOnClickListener { callbacks.onCopyLink(invite) }
       binding.buttonToggle.text =
           binding.root.context.getString(
               if (invite.isActive) R.string.invite_link_pause else R.string.invite_link_resume)
       binding.buttonToggle.setOnClickListener { callbacks.onToggleInvite(invite) }
       binding.buttonDelete.setOnClickListener { callbacks.onDeleteInvite(invite) }
-    }
-
-    private fun formatCreated(iso: String): String {
-      return try {
-        val inFormat =
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
-              timeZone = java.util.TimeZone.getTimeZone("UTC")
-            }
-        val outFormat = SimpleDateFormat("MMM d, yyyy", Locale.US)
-        val date = inFormat.parse(iso.replace("Z", "").take(19))
-        if (date != null) outFormat.format(date) else iso
-      } catch (_: Exception) {
-        iso
-      }
     }
   }
 

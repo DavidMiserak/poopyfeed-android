@@ -1,6 +1,7 @@
 package net.poopyfeed.pf.util
 
 import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import io.mockk.every
 import io.mockk.mockk
 import java.util.TimeZone
@@ -11,8 +12,13 @@ import net.poopyfeed.pf.R
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /** Unit tests for DateTimeUtils. */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class DateTimeUtilsTest {
 
   private lateinit var mockContext: Context
@@ -287,6 +293,62 @@ class DateTimeUtilsTest {
     val invalid = "not-a-date"
     val result = formatTimestampForDisplay(mockContext, invalid)
     assertEquals(invalid, result)
+  }
+
+  /**
+   * Same UTC instant displayed in different default timezones produces different strings (UTC →
+   * device timezone). 2024-01-15T18:00:00Z is 6:00 PM Jan 15 in UTC and 10:00 AM Jan 15 in
+   * America/Los_Angeles (UTC−8). Uses application context so DateUtils formats under Robolectric.
+   */
+  @Test
+  fun `formatTimestampForDisplay uses device timezone`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val iso = "2024-01-15T18:00:00Z"
+
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    val resultUtc = formatTimestampForDisplay(context, iso)
+
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
+    val resultLa = formatTimestampForDisplay(context, iso)
+
+    assertNotEquals(resultUtc, resultLa)
+  }
+
+  // === formatDateForDisplay Tests ===
+
+  @Test
+  fun `formatDateForDisplay with valid ISO returns non-empty date string`() {
+    val result = formatDateForDisplay(mockContext, "2024-01-15T18:00:00Z")
+    assert(result.isNotEmpty()) { "Expected formatted date, got empty" }
+    assert(result.contains("2024") || result.contains("15") || result.contains("Jan")) {
+      "Expected date parts in result: $result"
+    }
+  }
+
+  @Test
+  fun `formatDateForDisplay with invalid string returns string unchanged`() {
+    val invalid = "not-a-date"
+    val result = formatDateForDisplay(mockContext, invalid)
+    assertEquals(invalid, result)
+  }
+
+  /**
+   * Instant that falls on different calendar days: 2024-01-16T00:00:00Z is midnight Jan 16 in UTC
+   * and 4:00 PM Jan 15 in America/Los_Angeles (UTC−8), so date-only output differs by timezone.
+   * Uses application context so DateUtils formats under Robolectric.
+   */
+  @Test
+  fun `formatDateForDisplay uses device timezone`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val iso = "2024-01-16T00:00:00Z"
+
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    val resultUtc = formatDateForDisplay(context, iso)
+
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
+    val resultLa = formatDateForDisplay(context, iso)
+
+    assertNotEquals(resultUtc, resultLa)
   }
 
   // === formatNapDuration Tests ===
