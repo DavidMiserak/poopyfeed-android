@@ -59,13 +59,17 @@ constructor(
     refresh()
   }
 
+  /** Offline-first: when cache has data, show it (Ready) even if we haven't synced this session. */
   private fun observeDiapers() {
     viewModelScope.launch {
       combine(repo.listDiapersCached(childId), repo.hasSyncedFlow(childId)) { result, hasSynced ->
             when {
-              !hasSynced -> DiapersListUiState.Loading
-              result is ApiResult.Success && result.data.isEmpty() -> DiapersListUiState.Empty
-              result is ApiResult.Success -> DiapersListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isNotEmpty() ->
+                  DiapersListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isEmpty() && hasSynced ->
+                  DiapersListUiState.Empty
+              result is ApiResult.Success && result.data.isEmpty() && !hasSynced ->
+                  DiapersListUiState.Loading
               result is ApiResult.Error ->
                   DiapersListUiState.Error(result.error.getUserMessage(context))
               else -> DiapersListUiState.Loading
@@ -82,7 +86,7 @@ constructor(
         val result = repo.refreshDiapers(childId)
         when {
           result is ApiResult.Error && _uiState.value is DiapersListUiState.Loading ->
-              _uiState.value = DiapersListUiState.Empty
+              _uiState.value = DiapersListUiState.Error(result.error.getUserMessage(context))
           result is ApiResult.Error && _uiState.value is DiapersListUiState.Ready ->
               _uiState.value = DiapersListUiState.Error(result.error.getUserMessage(context))
         }

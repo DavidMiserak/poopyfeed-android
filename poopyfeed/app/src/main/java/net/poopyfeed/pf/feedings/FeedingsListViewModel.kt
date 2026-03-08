@@ -59,13 +59,17 @@ constructor(
     refresh()
   }
 
+  /** Offline-first: when cache has data, show it (Ready) even if we haven't synced this session. */
   private fun observeFeedings() {
     viewModelScope.launch {
       combine(repo.listFeedingsCached(childId), repo.hasSyncedFlow(childId)) { result, hasSynced ->
             when {
-              !hasSynced -> FeedingsListUiState.Loading
-              result is ApiResult.Success && result.data.isEmpty() -> FeedingsListUiState.Empty
-              result is ApiResult.Success -> FeedingsListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isNotEmpty() ->
+                  FeedingsListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isEmpty() && hasSynced ->
+                  FeedingsListUiState.Empty
+              result is ApiResult.Success && result.data.isEmpty() && !hasSynced ->
+                  FeedingsListUiState.Loading
               result is ApiResult.Error ->
                   FeedingsListUiState.Error(result.error.getUserMessage(context))
               else -> FeedingsListUiState.Loading
@@ -82,7 +86,7 @@ constructor(
         val result = repo.refreshFeedings(childId)
         when {
           result is ApiResult.Error && _uiState.value is FeedingsListUiState.Loading ->
-              _uiState.value = FeedingsListUiState.Empty
+              _uiState.value = FeedingsListUiState.Error(result.error.getUserMessage(context))
           result is ApiResult.Error && _uiState.value is FeedingsListUiState.Ready ->
               _uiState.value = FeedingsListUiState.Error(result.error.getUserMessage(context))
         }

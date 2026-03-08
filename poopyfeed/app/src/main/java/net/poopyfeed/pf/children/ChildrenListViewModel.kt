@@ -64,18 +64,19 @@ constructor(
   }
 
   /**
-   * Observes children from cache and synced status. Combines both flows to produce the UI state:
-   * - Loading: if not yet synced
-   * - Empty: if synced but no children
-   * - Ready: if children present
+   * Observes children from cache and synced status. Offline-first: when cache has data, show it
+   * (Ready) even if we haven't synced this session. Loading/Error only when cache is empty.
    */
   private fun observeChildren() {
     viewModelScope.launch {
       combine(repo.listChildrenCached(), repo.hasSyncedFlow) { result, hasSynced ->
             when {
-              !hasSynced -> ChildrenListUiState.Loading
-              result is ApiResult.Success && result.data.isEmpty() -> ChildrenListUiState.Empty
-              result is ApiResult.Success -> ChildrenListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isNotEmpty() ->
+                  ChildrenListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isEmpty() && hasSynced ->
+                  ChildrenListUiState.Empty
+              result is ApiResult.Success && result.data.isEmpty() && !hasSynced ->
+                  ChildrenListUiState.Loading
               result is ApiResult.Error ->
                   ChildrenListUiState.Error(result.error.getUserMessage(context))
               else -> ChildrenListUiState.Loading

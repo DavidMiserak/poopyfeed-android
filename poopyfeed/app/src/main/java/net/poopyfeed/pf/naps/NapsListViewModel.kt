@@ -61,13 +61,17 @@ constructor(
     refresh()
   }
 
+  /** Offline-first: when cache has data, show it (Ready) even if we haven't synced this session. */
   private fun observeNaps() {
     viewModelScope.launch {
       combine(repo.listNapsCached(childId), repo.hasSyncedFlow(childId)) { result, hasSynced ->
             when {
-              !hasSynced -> NapsListUiState.Loading
-              result is ApiResult.Success && result.data.isEmpty() -> NapsListUiState.Empty
-              result is ApiResult.Success -> NapsListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isNotEmpty() ->
+                  NapsListUiState.Ready(result.data)
+              result is ApiResult.Success && result.data.isEmpty() && hasSynced ->
+                  NapsListUiState.Empty
+              result is ApiResult.Success && result.data.isEmpty() && !hasSynced ->
+                  NapsListUiState.Loading
               result is ApiResult.Error ->
                   NapsListUiState.Error(result.error.getUserMessage(context))
               else -> NapsListUiState.Loading
@@ -84,7 +88,7 @@ constructor(
         val result = repo.refreshNaps(childId)
         when {
           result is ApiResult.Error && _uiState.value is NapsListUiState.Loading ->
-              _uiState.value = NapsListUiState.Empty
+              _uiState.value = NapsListUiState.Error(result.error.getUserMessage(context))
           result is ApiResult.Error && _uiState.value is NapsListUiState.Ready ->
               _uiState.value = NapsListUiState.Error(result.error.getUserMessage(context))
         }
