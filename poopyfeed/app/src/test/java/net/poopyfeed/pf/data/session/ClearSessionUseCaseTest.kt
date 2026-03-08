@@ -12,12 +12,14 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,6 +32,8 @@ class ClearSessionUseCaseTest {
   private val cachedFeedingsRepository: CachedFeedingsRepository = mockk(relaxed = true)
   private val cachedDiapersRepository: CachedDiapersRepository = mockk(relaxed = true)
   private val cachedNapsRepository: CachedNapsRepository = mockk(relaxed = true)
+  private val syncScheduler: SyncScheduler = mockk(relaxed = true)
+  private val pendingSyncDao: PendingSyncDao = mockk(relaxed = true)
 
   private val useCase =
       ClearSessionUseCase(
@@ -40,6 +44,8 @@ class ClearSessionUseCaseTest {
           cachedFeedingsRepository = cachedFeedingsRepository,
           cachedDiapersRepository = cachedDiapersRepository,
           cachedNapsRepository = cachedNapsRepository,
+          syncScheduler = syncScheduler,
+          pendingSyncDao = pendingSyncDao,
       )
 
   @org.junit.Before
@@ -70,5 +76,15 @@ class ClearSessionUseCaseTest {
     verify { cachedDiapersRepository.clearSessionCache() }
     verify { cachedNapsRepository.clearSessionCache() }
     verify { tokenManager.clearToken() }
+  }
+
+  @Test
+  fun `invoke cancels sync and clears pending queue`() = runTest {
+    coEvery { cachedChildrenRepository.clearCache() } returns Unit
+
+    useCase()
+
+    verify { syncScheduler.cancel() }
+    coVerify { pendingSyncDao.clearAll() }
   }
 }

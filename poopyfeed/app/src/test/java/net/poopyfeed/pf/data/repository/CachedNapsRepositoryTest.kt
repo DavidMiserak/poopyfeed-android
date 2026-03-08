@@ -10,16 +10,19 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.UpdateNapRequest
+import net.poopyfeed.pf.sync.SyncScheduler
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -29,14 +32,21 @@ class CachedNapsRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var napDao: NapDao
+  private lateinit var pendingSyncDao: PendingSyncDao
+  private lateinit var syncScheduler: SyncScheduler
   private lateinit var repository: CachedNapsRepository
   private val testDispatcher = UnconfinedTestDispatcher()
+  private val json = Json { ignoreUnknownKeys = true }
 
   @Before
   fun setup() {
     apiService = io.mockk.mockk()
     napDao = io.mockk.mockk()
-    repository = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
+    pendingSyncDao = io.mockk.mockk(relaxed = true)
+    syncScheduler = io.mockk.mockk(relaxed = true)
+    repository =
+        CachedNapsRepository(
+            apiService, napDao, pendingSyncDao, syncScheduler, json, ioDispatcher = testDispatcher)
   }
 
   @Test
@@ -150,6 +160,26 @@ class CachedNapsRepositoryTest {
 
     assertIs<ApiResult.Success<Nap>>(result)
     assertEquals(2, result.data.id)
+  }
+
+  @Test
+  fun `createNap network error queues offline and returns Success`() = runTest {
+    val request =
+        CreateNapRequest(
+            start_time = "2024-01-15T10:00:00Z",
+            end_time = null,
+        )
+    io.mockk.coEvery { apiService.createNap(any(), any()) } throws IOException("Network down")
+    io.mockk.coEvery { napDao.upsertNap(any()) } returns Unit
+
+    val result = repository.createNap(childId = 1, request = request)
+
+    assertIs<ApiResult.Success<Nap>>(result)
+    kotlin.test.assertTrue(result.data.id < 0)
+    assertEquals("2024-01-15T10:00:00Z", result.data.start_time)
+    io.mockk.coVerify { napDao.upsertNap(match { it.id < 0 }) }
+    io.mockk.coVerify { pendingSyncDao.upsert(match { it.entityType == "nap" }) }
+    io.mockk.verify { syncScheduler.enqueue() }
   }
 
   @Test

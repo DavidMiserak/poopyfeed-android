@@ -4,6 +4,7 @@ import android.view.View
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
+import androidx.work.testing.WorkManagerTestInitHelper
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -37,6 +38,7 @@ class HomeFragmentTest {
 
   @Before
   fun setup() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
   }

@@ -10,15 +10,18 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.DiaperEntity
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.models.PaginatedResponse
+import net.poopyfeed.pf.sync.SyncScheduler
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -28,14 +31,26 @@ class CachedDiapersRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var diaperDao: DiaperDao
+  private lateinit var pendingSyncDao: PendingSyncDao
+  private lateinit var syncScheduler: SyncScheduler
   private lateinit var repository: CachedDiapersRepository
   private val testDispatcher = UnconfinedTestDispatcher()
+  private val json = Json { ignoreUnknownKeys = true }
 
   @Before
   fun setup() {
     apiService = io.mockk.mockk()
     diaperDao = io.mockk.mockk()
-    repository = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
+    pendingSyncDao = io.mockk.mockk(relaxed = true)
+    syncScheduler = io.mockk.mockk(relaxed = true)
+    repository =
+        CachedDiapersRepository(
+            apiService,
+            diaperDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
   }
 
   @Test
@@ -144,6 +159,26 @@ class CachedDiapersRepositoryTest {
 
     assertIs<ApiResult.Success<Diaper>>(result)
     assertEquals(2, result.data.id)
+  }
+
+  @Test
+  fun `createDiaper network error queues offline and returns Success`() = runTest {
+    val request =
+        CreateDiaperRequest(
+            change_type = "wet",
+            timestamp = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { apiService.createDiaper(any(), any()) } throws IOException("Network down")
+    io.mockk.coEvery { diaperDao.upsertDiaper(any()) } returns Unit
+
+    val result = repository.createDiaper(childId = 1, request = request)
+
+    assertIs<ApiResult.Success<Diaper>>(result)
+    kotlin.test.assertTrue(result.data.id < 0)
+    assertEquals("wet", result.data.change_type)
+    io.mockk.coVerify { diaperDao.upsertDiaper(match { it.id < 0 }) }
+    io.mockk.coVerify { pendingSyncDao.upsert(match { it.entityType == "diaper" }) }
+    io.mockk.verify { syncScheduler.enqueue() }
   }
 
   @Test

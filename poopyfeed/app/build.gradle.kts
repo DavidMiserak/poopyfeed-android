@@ -93,6 +93,11 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    // WorkManager + Hilt integration
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.work.compiler)
+
     // UI Components
     implementation(libs.androidx.swiperefreshlayout)
 
@@ -106,6 +111,7 @@ dependencies {
     testImplementation(libs.androidx.fragment.testing)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.androidx.navigation.testing)
+    testImplementation(libs.work.testing)
     kspTest(libs.hilt.compiler)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -137,6 +143,7 @@ kover {
                     "net.poopyfeed.pf.di",
                     "net.poopyfeed.pf.data.api",
                     "net.poopyfeed.pf.data.models",
+                    "net.poopyfeed.pf.sync",
                 )
 
                 // Exclude UI shell classes

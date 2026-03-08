@@ -10,15 +10,18 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.models.PaginatedResponse
+import net.poopyfeed.pf.sync.SyncScheduler
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -28,14 +31,26 @@ class CachedFeedingsRepositoryTest {
 
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var feedingDao: FeedingDao
+  private lateinit var pendingSyncDao: PendingSyncDao
+  private lateinit var syncScheduler: SyncScheduler
   private lateinit var repository: CachedFeedingsRepository
   private val testDispatcher = UnconfinedTestDispatcher()
+  private val json = Json { ignoreUnknownKeys = true }
 
   @Before
   fun setup() {
     apiService = io.mockk.mockk()
     feedingDao = io.mockk.mockk()
-    repository = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+    pendingSyncDao = io.mockk.mockk(relaxed = true)
+    syncScheduler = io.mockk.mockk(relaxed = true)
+    repository =
+        CachedFeedingsRepository(
+            apiService,
+            feedingDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
   }
 
   @Test
@@ -149,6 +164,29 @@ class CachedFeedingsRepositoryTest {
 
     assertIs<ApiResult.Success<Feeding>>(result)
     assertEquals(2, result.data.id)
+  }
+
+  @Test
+  fun `createFeeding network error queues offline and returns Success`() = runTest {
+    val request =
+        CreateFeedingRequest(
+            feeding_type = "bottle",
+            amount_oz = 4.0,
+            durationMinutes = null,
+            side = null,
+            timestamp = "2024-01-15T10:00:00Z",
+        )
+    io.mockk.coEvery { apiService.createFeeding(any(), any()) } throws IOException("Network down")
+    io.mockk.coEvery { feedingDao.upsertFeeding(any()) } returns Unit
+
+    val result = repository.createFeeding(childId = 1, request = request)
+
+    assertIs<ApiResult.Success<Feeding>>(result)
+    kotlin.test.assertTrue(result.data.id < 0) // negative temp ID
+    assertEquals("bottle", result.data.feeding_type)
+    io.mockk.coVerify { feedingDao.upsertFeeding(match { it.id < 0 }) }
+    io.mockk.coVerify { pendingSyncDao.upsert(match { it.entityType == "feeding" }) }
+    io.mockk.verify { syncScheduler.enqueue() }
   }
 
   @Test

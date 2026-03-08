@@ -12,11 +12,18 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  *
  * Schema version 1: children, feedings, diapers, naps. Version 2: children can_edit,
  * feeding_reminder_interval. Version 3: feedings duration_minutes, side. Version 4: children
- * custom_bottle_low_oz, custom_bottle_mid_oz, custom_bottle_high_oz.
+ * custom_bottle_low_oz, custom_bottle_mid_oz, custom_bottle_high_oz. Version 5: pending_sync table
+ * for offline-first background sync.
  */
 @Database(
-    entities = [ChildEntity::class, FeedingEntity::class, DiaperEntity::class, NapEntity::class],
-    version = 4,
+    entities =
+        [
+            ChildEntity::class,
+            FeedingEntity::class,
+            DiaperEntity::class,
+            NapEntity::class,
+            PendingSyncEntity::class],
+    version = 5,
     exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
@@ -27,6 +34,8 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
   abstract fun diaperDao(): DiaperDao
 
   abstract fun napDao(): NapDao
+
+  abstract fun pendingSyncDao(): PendingSyncDao
 
   companion object {
     private const val DATABASE_NAME = "poopyfeed_db"
@@ -56,6 +65,24 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
           }
         }
 
+    private val MIGRATION_4_5 =
+        object : Migration(4, 5) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS pending_sync (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  entity_type TEXT NOT NULL,
+                  child_id INTEGER NOT NULL,
+                  request_json TEXT NOT NULL,
+                  temp_local_id INTEGER NOT NULL,
+                  sync_status TEXT NOT NULL DEFAULT 'pending',
+                  error_message TEXT,
+                  created_at INTEGER NOT NULL,
+                  retry_count INTEGER NOT NULL DEFAULT 0
+                )""")
+          }
+        }
+
     @Volatile private var instance: PoopyFeedDatabase? = null
 
     fun getInstance(context: Context): PoopyFeedDatabase {
@@ -64,7 +91,7 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
             instance
                 ?: Room.databaseBuilder(
                         context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build()
                     .also { instance = it }
           }

@@ -6,6 +6,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
@@ -13,6 +14,7 @@ import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.notifications.PoopyFeedMessagingService
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /**
  * Clears local session data: Room cache (children + CASCADE to feedings/diapers/naps), in-memory
@@ -29,6 +31,8 @@ constructor(
     private val cachedFeedingsRepository: CachedFeedingsRepository,
     private val cachedDiapersRepository: CachedDiapersRepository,
     private val cachedNapsRepository: CachedNapsRepository,
+    private val syncScheduler: SyncScheduler,
+    private val pendingSyncDao: PendingSyncDao,
 ) {
 
   suspend operator fun invoke() {
@@ -49,6 +53,8 @@ constructor(
         .remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_END)
         .apply()
 
+    syncScheduler.cancel()
+    pendingSyncDao.clearAll()
     cachedChildrenRepository.clearCache()
     cachedFeedingsRepository.clearSessionCache()
     cachedDiapersRepository.clearSessionCache()

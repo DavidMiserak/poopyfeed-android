@@ -1,5 +1,7 @@
 package net.poopyfeed.pf.data.repository
 
+import java.io.IOException
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.ChildDao
 import net.poopyfeed.pf.data.db.ChildEntity
@@ -20,9 +23,15 @@ import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
+import net.poopyfeed.pf.data.db.PendingSyncDao
+import net.poopyfeed.pf.data.db.PendingSyncEntity
 import net.poopyfeed.pf.data.models.*
 import net.poopyfeed.pf.data.models.toApiError
 import net.poopyfeed.pf.di.IoDispatcher
+import net.poopyfeed.pf.sync.SyncScheduler
+
+/** Thread-safe counter for generating negative temporary IDs for offline-created entities. */
+private val tempIdCounter = AtomicInteger(0)
 
 /**
  * Enhanced repository with local Room caching.
@@ -174,12 +183,15 @@ constructor(
   }
 }
 
-/** Cached Feedings Repository with local Room support. */
+/** Cached Feedings Repository with local Room support and offline-first create. */
 class CachedFeedingsRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
     private val feedingDao: FeedingDao,
+    private val pendingSyncDao: PendingSyncDao,
+    private val syncScheduler: SyncScheduler,
+    private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
@@ -228,7 +240,7 @@ constructor(
         }
       }
 
-  /** Create feeding: API-first, then cache. */
+  /** Create feeding: API-first, falls back to offline queue on network error. */
   suspend fun createFeeding(childId: Int, request: CreateFeedingRequest): ApiResult<Feeding> =
       withContext(ioDispatcher) {
         try {
@@ -237,6 +249,41 @@ constructor(
           val entity = FeedingEntity.fromApiModel(feeding)
           feedingDao.upsertFeeding(entity)
           ApiResult.Success(feeding)
+        } catch (e: IOException) {
+          val tempId = tempIdCounter.decrementAndGet()
+          val now = request.timestamp
+          feedingDao.upsertFeeding(
+              FeedingEntity(
+                  id = tempId,
+                  child = childId,
+                  feeding_type = request.feeding_type,
+                  amount_oz = request.amount_oz,
+                  timestamp = now,
+                  created_at = now,
+                  updated_at = now,
+                  duration_minutes = request.durationMinutes,
+                  side = request.side,
+              ))
+          pendingSyncDao.upsert(
+              PendingSyncEntity(
+                  entityType = "feeding",
+                  childId = childId,
+                  requestJson = json.encodeToString(CreateFeedingRequest.serializer(), request),
+                  tempLocalId = tempId,
+              ))
+          syncScheduler.enqueue()
+          ApiResult.Success(
+              Feeding(
+                  id = tempId,
+                  child = childId,
+                  feeding_type = request.feeding_type,
+                  amount_oz = request.amount_oz,
+                  timestamp = now,
+                  created_at = now,
+                  updated_at = now,
+                  duration_minutes = request.durationMinutes,
+                  side = request.side,
+              ))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -296,12 +343,15 @@ constructor(
   }
 }
 
-/** Cached Diapers Repository with local Room support. */
+/** Cached Diapers Repository with local Room support and offline-first create. */
 class CachedDiapersRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
     private val diaperDao: DiaperDao,
+    private val pendingSyncDao: PendingSyncDao,
+    private val syncScheduler: SyncScheduler,
+    private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
@@ -350,6 +400,7 @@ constructor(
         }
       }
 
+  /** Create diaper: API-first, falls back to offline queue on network error. */
   suspend fun createDiaper(childId: Int, request: CreateDiaperRequest): ApiResult<Diaper> =
       withContext(ioDispatcher) {
         try {
@@ -358,6 +409,35 @@ constructor(
           val entity = DiaperEntity.fromApiModel(diaper)
           diaperDao.upsertDiaper(entity)
           ApiResult.Success(diaper)
+        } catch (e: IOException) {
+          val tempId = tempIdCounter.decrementAndGet()
+          val now = request.timestamp
+          diaperDao.upsertDiaper(
+              DiaperEntity(
+                  id = tempId,
+                  child = childId,
+                  change_type = request.change_type,
+                  timestamp = now,
+                  created_at = now,
+                  updated_at = now,
+              ))
+          pendingSyncDao.upsert(
+              PendingSyncEntity(
+                  entityType = "diaper",
+                  childId = childId,
+                  requestJson = json.encodeToString(CreateDiaperRequest.serializer(), request),
+                  tempLocalId = tempId,
+              ))
+          syncScheduler.enqueue()
+          ApiResult.Success(
+              Diaper(
+                  id = tempId,
+                  child = childId,
+                  change_type = request.change_type,
+                  timestamp = now,
+                  created_at = now,
+                  updated_at = now,
+              ))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }
@@ -415,12 +495,15 @@ constructor(
   }
 }
 
-/** Cached Naps Repository with local Room support. */
+/** Cached Naps Repository with local Room support and offline-first create. */
 class CachedNapsRepository
 @Inject
 constructor(
     private val apiService: PoopyFeedApiService,
     private val napDao: NapDao,
+    private val pendingSyncDao: PendingSyncDao,
+    private val syncScheduler: SyncScheduler,
+    private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
@@ -469,6 +552,7 @@ constructor(
         }
       }
 
+  /** Create nap: API-first, falls back to offline queue on network error. */
   suspend fun createNap(childId: Int, request: CreateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {
         try {
@@ -477,6 +561,35 @@ constructor(
           val entity = NapEntity.fromApiModel(nap)
           napDao.upsertNap(entity)
           ApiResult.Success(nap)
+        } catch (e: IOException) {
+          val tempId = tempIdCounter.decrementAndGet()
+          val now = request.start_time
+          napDao.upsertNap(
+              NapEntity(
+                  id = tempId,
+                  child = childId,
+                  start_time = now,
+                  end_time = request.end_time,
+                  created_at = now,
+                  updated_at = now,
+              ))
+          pendingSyncDao.upsert(
+              PendingSyncEntity(
+                  entityType = "nap",
+                  childId = childId,
+                  requestJson = json.encodeToString(CreateNapRequest.serializer(), request),
+                  tempLocalId = tempId,
+              ))
+          syncScheduler.enqueue()
+          ApiResult.Success(
+              Nap(
+                  id = tempId,
+                  child = childId,
+                  start_time = now,
+                  end_time = request.end_time,
+                  created_at = now,
+                  updated_at = now,
+              ))
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

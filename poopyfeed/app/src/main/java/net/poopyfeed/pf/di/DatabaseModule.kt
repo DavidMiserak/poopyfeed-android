@@ -1,6 +1,7 @@
 package net.poopyfeed.pf.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,6 +12,7 @@ import net.poopyfeed.pf.data.db.ChildDao
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.NapDao
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.db.PoopyFeedDatabase
 
 /** Hilt module for Room database and DAOs. */
@@ -30,4 +32,13 @@ object DatabaseModule {
   @Provides @Singleton fun provideDiaperDao(db: PoopyFeedDatabase): DiaperDao = db.diaperDao()
 
   @Provides @Singleton fun provideNapDao(db: PoopyFeedDatabase): NapDao = db.napDao()
+
+  @Provides
+  @Singleton
+  fun providePendingSyncDao(db: PoopyFeedDatabase): PendingSyncDao = db.pendingSyncDao()
+
+  @Provides
+  @Singleton
+  fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+      WorkManager.getInstance(context)
 }

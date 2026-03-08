@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
@@ -16,13 +17,18 @@ import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
+import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.models.*
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CachedTrackingRepositoriesTest {
 
   private val testDispatcher = UnconfinedTestDispatcher()
+  private val pendingSyncDao = io.mockk.mockk<PendingSyncDao>(relaxed = true)
+  private val syncScheduler = io.mockk.mockk<SyncScheduler>(relaxed = true)
+  private val json = Json { ignoreUnknownKeys = true }
 
   // --- CachedFeedingsRepository ---
 
@@ -32,7 +38,14 @@ class CachedTrackingRepositoriesTest {
         val feedingDao = io.mockk.mockk<FeedingDao>()
         io.mockk.every { feedingDao.getFeedingsFlow(1) } returns flowOf(emptyList())
         val apiService = io.mockk.mockk<PoopyFeedApiService>()
-        val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+        val repo =
+            CachedFeedingsRepository(
+                apiService,
+                feedingDao,
+                pendingSyncDao,
+                syncScheduler,
+                json,
+                ioDispatcher = testDispatcher)
 
         val results = repo.listFeedingsCached(1).toList()
 
@@ -54,7 +67,14 @@ class CachedTrackingRepositoriesTest {
             updated_at = "2024-01-15T12:00:00Z")
     io.mockk.every { feedingDao.getFeedingsFlow(1) } returns flowOf(listOf(entity))
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
-    val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedFeedingsRepository(
+            apiService,
+            feedingDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val results = repo.listFeedingsCached(1).toList()
 
@@ -70,7 +90,14 @@ class CachedTrackingRepositoriesTest {
     val listItem = TestFixtures.mockFeedingListResponse()
     io.mockk.coEvery { apiService.listFeedings(1, 1) } returns
         PaginatedResponse(1, results = listOf(listItem))
-    val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedFeedingsRepository(
+            apiService,
+            feedingDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val result = repo.refreshFeedings(1)
 
@@ -98,7 +125,14 @@ class CachedTrackingRepositoriesTest {
                 count = 2, next = "http://api/feedings/?page=2", results = listOf(list1))
         io.mockk.coEvery { apiService.listFeedings(1, 2) } returns
             PaginatedResponse(count = 2, next = null, results = listOf(list2))
-        val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+        val repo =
+            CachedFeedingsRepository(
+                apiService,
+                feedingDao,
+                pendingSyncDao,
+                syncScheduler,
+                json,
+                ioDispatcher = testDispatcher)
 
         val result = repo.refreshFeedings(1)
 
@@ -127,7 +161,14 @@ class CachedTrackingRepositoriesTest {
         )
     io.mockk.coEvery { apiService.createFeeding(1, request) } returns feedingResponse
     io.mockk.coEvery { apiService.deleteFeeding(1, 1) } returns Unit
-    val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedFeedingsRepository(
+            apiService,
+            feedingDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val createResult = repo.createFeeding(1, request)
     assertIs<ApiResult.Success<Feeding>>(createResult)
@@ -141,7 +182,14 @@ class CachedTrackingRepositoriesTest {
     val feedingDao = io.mockk.mockk<FeedingDao>()
     val apiService = io.mockk.mockk<PoopyFeedApiService>()
     io.mockk.coEvery { apiService.listFeedings(1, 1) } throws IOException("Network down")
-    val repo = CachedFeedingsRepository(apiService, feedingDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedFeedingsRepository(
+            apiService,
+            feedingDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val result = repo.refreshFeedings(1)
 
@@ -167,7 +215,14 @@ class CachedTrackingRepositoriesTest {
     val listItem = TestFixtures.mockDiaperListResponse(change_type = "wet")
     io.mockk.coEvery { apiService.listDiapers(1, 1) } returns
         PaginatedResponse(1, results = listOf(listItem))
-    val repo = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedDiapersRepository(
+            apiService,
+            diaperDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val listResults = repo.listDiapersCached(1).toList()
     assertIs<ApiResult.Success<List<Diaper>>>(listResults[0])
@@ -188,7 +243,14 @@ class CachedTrackingRepositoriesTest {
     val request = CreateDiaperRequest("dirty", "2024-01-15T14:00:00Z")
     io.mockk.coEvery { apiService.createDiaper(1, request) } returns diaperResponse
     io.mockk.coEvery { apiService.deleteDiaper(1, 1) } returns Unit
-    val repo = CachedDiapersRepository(apiService, diaperDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedDiapersRepository(
+            apiService,
+            diaperDao,
+            pendingSyncDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     assertIs<ApiResult.Success<Diaper>>(repo.createDiaper(1, request))
     assertIs<ApiResult.Success<Unit>>(repo.deleteDiaper(1, 1))
@@ -214,7 +276,9 @@ class CachedTrackingRepositoriesTest {
         TestFixtures.mockNapListResponse(ended_at = null, updated_at = "2024-01-15T13:00:00Z")
     io.mockk.coEvery { apiService.listNaps(1, 1) } returns
         PaginatedResponse(1, results = listOf(listItem))
-    val repo = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedNapsRepository(
+            apiService, napDao, pendingSyncDao, syncScheduler, json, ioDispatcher = testDispatcher)
 
     val listResults = repo.listNapsCached(1).toList()
     assertIs<ApiResult.Success<List<Nap>>>(listResults[0])
@@ -234,7 +298,9 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { apiService.createNap(1, createRequest) } returns napResponse
     io.mockk.coEvery { apiService.updateNap(1, 1, updateRequest) } returns napResponse
     io.mockk.coEvery { apiService.deleteNap(1, 1) } returns Unit
-    val repo = CachedNapsRepository(apiService, napDao, ioDispatcher = testDispatcher)
+    val repo =
+        CachedNapsRepository(
+            apiService, napDao, pendingSyncDao, syncScheduler, json, ioDispatcher = testDispatcher)
 
     assertIs<ApiResult.Success<Nap>>(repo.createNap(1, createRequest))
     assertIs<ApiResult.Success<Nap>>(repo.updateNap(1, 1, updateRequest))
