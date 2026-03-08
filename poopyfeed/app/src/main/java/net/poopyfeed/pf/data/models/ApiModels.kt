@@ -303,6 +303,30 @@ data class Notification(
 @Serializable data class MarkReadRequest(@SerialName("is_read") val isRead: Boolean = true)
 
 /**
+ * Global quiet hours from GET /api/v1/notifications/quiet-hours/. Times are "HH:MM:SS" in user
+ * timezone; overnight ranges (e.g. 22:00–07:00) supported.
+ */
+@Serializable
+data class QuietHours(
+    val enabled: Boolean,
+    @SerialName("start_time") val startTime: String,
+    @SerialName("end_time") val endTime: String,
+)
+
+/** Request body for PATCH /api/v1/notifications/quiet-hours/. All fields optional. */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+data class QuietHoursUpdate(
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val enabled: Boolean? = null,
+    @SerialName("start_time")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val startTime: String? = null,
+    @SerialName("end_time")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val endTime: String? = null,
+)
+
+/**
  * Share invite (from GET /api/v1/children/{id}/invites/). Token-based; no "pending for user"
  * endpoint. Accept via POST /api/v1/invites/accept/ with { "token": "..." }.
  */

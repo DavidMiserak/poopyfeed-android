@@ -54,6 +54,17 @@
     <string name="account_saved_message">Account settings updated.</string>
     <string name="account_load_error">Unable to load account settings. Please try again.</string>
 
+    <!-- Quiet hours section -->
+    <string name="quiet_hours_title">Quiet Hours</string>
+    <string name="quiet_hours_description">Suppress non-critical notifications during this time window (in your timezone).</string>
+    <string name="quiet_hours_enabled">Enable quiet hours</string>
+    <string name="quiet_hours_start_hint">Start (e.g. 22:00)</string>
+    <string name="quiet_hours_end_hint">End (e.g. 07:00)</string>
+    <string name="quiet_hours_save">Save Quiet Hours</string>
+    <string name="quiet_hours_saved">Quiet hours saved.</string>
+    <string name="quiet_hours_error_invalid_time">Enter times in HH:MM format (e.g. 22:00 or 07:00).</string>
+    <string name="quiet_hours_error_save">Failed to save quiet hours. Please try again.</string>
+
     <!-- Password change section -->
     <string name="account_password_section_title">Security</string>
     <string name="account_current_password_label">Current password</string>

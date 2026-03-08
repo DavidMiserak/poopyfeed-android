@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.data.models.QuietHours
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.databinding.FragmentAccountSettingsBinding
 
@@ -62,10 +63,13 @@ class AccountSettingsFragment : Fragment() {
       viewModel.saveProfile(firstName, lastName, timezone)
     }
 
-    // SECTION 2: Security - Change password button (shows confirmation dialog)
+    // SECTION 2: Quiet Hours - Save button
+    binding.buttonQuietHoursSave.setOnClickListener { saveQuietHours() }
+
+    // SECTION 3: Security - Change password button (shows confirmation dialog)
     binding.buttonChangePassword.setOnClickListener { showPasswordChangeDialog() }
 
-    // SECTION 3: Danger Zone - Delete account button (shows confirmation dialog)
+    // SECTION 4: Danger Zone - Delete account button (shows confirmation dialog)
     binding.buttonDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
 
     viewLifecycleOwner.lifecycleScope.launch {
@@ -162,6 +166,60 @@ class AccountSettingsFragment : Fragment() {
         }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.quietHours.collect { qh ->
+          if (qh != null) bindQuietHours(qh)
+        }
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.quietHoursSaving.collect { saving ->
+          binding.buttonQuietHoursSave.isEnabled = !saving
+          binding.progressQuietHours.visibility = if (saving) View.VISIBLE else View.GONE
+        }
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.quietHoursSaveSuccess.collect {
+          Snackbar.make(binding.root, getString(R.string.quiet_hours_saved), Snackbar.LENGTH_SHORT)
+              .show()
+          binding.textQuietHoursError.visibility = View.GONE
+        }
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.quietHoursSaveError.collect { message ->
+          Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+          binding.textQuietHoursError.text = message
+          binding.textQuietHoursError.visibility = View.VISIBLE
+        }
+      }
+    }
+  }
+
+  private fun bindQuietHours(qh: QuietHours) {
+    binding.switchQuietHoursEnabled.isChecked = qh.enabled
+    binding.editQuietHoursStart.setText(
+        if (qh.startTime.length >= 5) qh.startTime.substring(0, 5) else qh.startTime
+    )
+    binding.editQuietHoursEnd.setText(
+        if (qh.endTime.length >= 5) qh.endTime.substring(0, 5) else qh.endTime
+    )
+  }
+
+  private fun saveQuietHours() {
+    val enabled = binding.switchQuietHoursEnabled.isChecked
+    val startTime = binding.editQuietHoursStart.text?.toString()?.trim().orEmpty()
+    val endTime = binding.editQuietHoursEnd.text?.toString()?.trim().orEmpty()
+    viewModel.saveQuietHours(enabled, startTime, endTime)
   }
 
   private fun bindProfile(profile: UserProfile, timezones: List<String>) {

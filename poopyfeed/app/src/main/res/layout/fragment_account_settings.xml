@@ -215,7 +215,152 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SECTION 2: Password Change Card -->
+        <!-- SECTION 2: Quiet Hours Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_quiet_hours"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_profile">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_12">
+
+                <TextView
+                    android:id="@+id/text_quiet_hours_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quiet_hours_title"
+                    android:textAppearance="@style/TextAppearance.Pf.LabelLarge"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_quiet_hours_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="@string/quiet_hours_description"
+                    android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_quiet_hours_title" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_quiet_hours_enabled"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/quiet_hours_enabled"
+                    android:checked="false"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_quiet_hours_description" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_quiet_hours_start"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:hint="@string/quiet_hours_start_hint"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/switch_quiet_hours_enabled">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_quiet_hours_start"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="time"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dm_sans"
+                        android:imeOptions="actionNext" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_quiet_hours_end"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:hint="@string/quiet_hours_end_hint"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius_md"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius_md"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_layout_quiet_hours_start">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_quiet_hours_end"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="time"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dm_sans"
+                        android:imeOptions="actionDone" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/text_quiet_hours_error"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:visibility="gone"
+                    android:textAppearance="@style/TextAppearance.Pf.BodyMedium"
+                    android:textColor="?attr/colorError"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_layout_quiet_hours_end" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_quiet_hours_save"
+                    style="@style/Widget.Pf.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:text="@string/quiet_hours_save"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_quiet_hours_error" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_quiet_hours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_6"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/button_quiet_hours_save" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SECTION 3: Password Change Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_password"
             style="@style/Widget.Pf.CardView.Frosted"
@@ -224,7 +369,7 @@
             android:layout_marginTop="@dimen/spacing_12"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_profile">
+            app:layout_constraintTop_toBottomOf="@id/card_quiet_hours">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

@@ -261,4 +261,12 @@ interface PoopyFeedApiService {
       @Path("id") id: Int,
       @Body request: MarkReadRequest
   ): Notification
+
+  /** Get quiet hours. GET /api/v1/notifications/quiet-hours/ */
+  @GET("notifications/quiet-hours/")
+  suspend fun getQuietHours(): QuietHours
+
+  /** Update quiet hours. PATCH /api/v1/notifications/quiet-hours/ */
+  @PATCH("notifications/quiet-hours/")
+  suspend fun updateQuietHours(@Body request: QuietHoursUpdate): QuietHours
 }

@@ -9,6 +9,8 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.MarkReadRequest
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.models.PaginatedResponse
+import net.poopyfeed.pf.data.models.QuietHours
+import net.poopyfeed.pf.data.models.QuietHoursUpdate
 import net.poopyfeed.pf.data.models.toApiError
 import net.poopyfeed.pf.di.IoDispatcher
 
@@ -61,6 +63,28 @@ constructor(
         try {
           val notification = apiService.markNotificationRead(id, MarkReadRequest())
           ApiResult.Success(notification)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /** Get quiet hours (created with defaults if missing). */
+  suspend fun getQuietHours(): ApiResult<QuietHours> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.getQuietHours()
+          ApiResult.Success(response)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /** Update quiet hours. */
+  suspend fun updateQuietHours(request: QuietHoursUpdate): ApiResult<QuietHours> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.updateQuietHours(request)
+          ApiResult.Success(response)
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())
         }

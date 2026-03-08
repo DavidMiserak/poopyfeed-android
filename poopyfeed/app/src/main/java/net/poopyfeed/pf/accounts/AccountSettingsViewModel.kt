@@ -7,16 +7,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.QuietHours
+import net.poopyfeed.pf.data.models.QuietHoursUpdate
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 
@@ -71,6 +77,7 @@ class AccountSettingsViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
+    private val notificationsRepository: NotificationsRepository,
     private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
@@ -79,6 +86,19 @@ constructor(
   private val _uiState: MutableStateFlow<AccountSettingsUiState> =
       MutableStateFlow(AccountSettingsUiState.Loading)
   val uiState: StateFlow<AccountSettingsUiState> = _uiState.asStateFlow()
+
+  /** Loaded quiet hours; null until loaded or on error. */
+  private val _quietHours: MutableStateFlow<QuietHours?> = MutableStateFlow(null)
+  val quietHours: StateFlow<QuietHours?> = _quietHours.asStateFlow()
+
+  private val _quietHoursSaving: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val quietHoursSaving: StateFlow<Boolean> = _quietHoursSaving.asStateFlow()
+
+  private val _quietHoursSaveSuccess: MutableSharedFlow<Unit> = MutableSharedFlow(replay = 0)
+  val quietHoursSaveSuccess: SharedFlow<Unit> = _quietHoursSaveSuccess.asSharedFlow()
+
+  private val _quietHoursSaveError: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
+  val quietHoursSaveError: SharedFlow<String> = _quietHoursSaveError.asSharedFlow()
 
   private val allTimezones: List<String> by lazy { TimeZone.getAvailableIDs().toList().sorted() }
 
@@ -105,6 +125,7 @@ constructor(
           val profile = result.data
           tokenManager.saveProfileTimezone(profile.timezone)
           _uiState.value = AccountSettingsUiState.Ready(profile = profile, timezones = allTimezones)
+          loadQuietHours()
         }
         is ApiResult.Error -> {
           val error = result.error
@@ -120,6 +141,85 @@ constructor(
         }
       }
     }
+  }
+
+  private fun loadQuietHours() {
+    viewModelScope.launch {
+      when (val result = notificationsRepository.getQuietHours()) {
+        is ApiResult.Success -> _quietHours.value = result.data
+        is ApiResult.Error -> _quietHours.value = null
+        is ApiResult.Loading -> { }
+      }
+    }
+  }
+
+  /**
+   * Saves quiet hours. Validates time format (HH:MM or HH:MM:SS). On success updates [quietHours]
+   * and emits [quietHoursSaveSuccess]; on error emits [quietHoursSaveError].
+   */
+  fun saveQuietHours(enabled: Boolean, startTime: String, endTime: String) {
+    val startNormalized = normalizeTimeForApi(startTime) ?: run {
+      viewModelScope.launch {
+        _quietHoursSaveError.emit(context.getString(R.string.quiet_hours_error_invalid_time))
+      }
+      return
+    }
+    val endNormalized = normalizeTimeForApi(endTime) ?: run {
+      viewModelScope.launch {
+        _quietHoursSaveError.emit(context.getString(R.string.quiet_hours_error_invalid_time))
+      }
+      return
+    }
+
+    viewModelScope.launch {
+      _quietHoursSaving.value = true
+      when (
+        val result =
+          notificationsRepository.updateQuietHours(
+            QuietHoursUpdate(
+              enabled = enabled,
+              startTime = startNormalized,
+              endTime = endNormalized,
+            )
+          )
+      ) {
+        is ApiResult.Success -> {
+          _quietHours.value = result.data
+          _quietHoursSaveSuccess.emit(Unit)
+        }
+        is ApiResult.Error -> {
+          _quietHoursSaveError.emit(
+            result.error.getUserMessage(context)
+              .ifEmpty { context.getString(R.string.quiet_hours_error_save) }
+          )
+        }
+        is ApiResult.Loading -> { }
+      }
+      _quietHoursSaving.value = false
+    }
+  }
+
+  /**
+   * Normalizes "HH:MM" or "HH:MM:SS" to "HH:MM:SS" for API. Returns null if invalid.
+   */
+  private fun normalizeTimeForApi(value: String): String? {
+    val trimmed = value.trim()
+    if (trimmed.isEmpty()) return null
+    val parts = trimmed.split(":")
+    if (parts.size == 2) {
+      val h = parts[0].toIntOrNull() ?: return null
+      val m = parts[1].toIntOrNull() ?: return null
+      if (h in 0..23 && m in 0..59) return "%02d:%02d:00".format(h, m)
+      return null
+    }
+    if (parts.size == 3) {
+      val h = parts[0].toIntOrNull() ?: return null
+      val m = parts[1].toIntOrNull() ?: return null
+      val s = parts[2].toIntOrNull() ?: return null
+      if (h in 0..23 && m in 0..59 && s in 0..59) return "%02d:%02d:%02d".format(h, m, s)
+      return null
+    }
+    return null
   }
 
   /**

@@ -13,6 +13,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -21,8 +22,10 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.QuietHours
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
@@ -38,9 +41,12 @@ class AccountSettingsViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
+
+  private val defaultQuietHours = QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
 
   @Before
   fun setup() {
@@ -51,6 +57,7 @@ class AccountSettingsViewModelTest {
         "Data format error. Please try again."
     every { mockContext.getString(R.string.error_unknown) } returns
         "Something went wrong. Please try again."
+    coEvery { mockNotificationsRepository.getQuietHours() } returns ApiResult.Success(defaultQuietHours)
   }
 
   @After
@@ -68,7 +75,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -85,7 +96,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -103,7 +118,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -121,7 +140,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -145,7 +168,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -170,7 +197,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -196,7 +227,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -217,7 +252,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, "different-password")
@@ -238,7 +277,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, "short", "short")
@@ -259,7 +302,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword("", NEW_PASSWORD, NEW_PASSWORD)
@@ -283,7 +330,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -306,7 +357,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -327,7 +382,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("")
@@ -352,7 +411,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("wrong-password")
@@ -374,7 +437,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -398,7 +465,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Transition to PasswordChanged state
@@ -418,7 +489,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -434,7 +509,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -459,7 +538,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -478,7 +561,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
@@ -497,7 +584,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Ready>(viewModel.uiState.value)
@@ -522,7 +613,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -542,7 +637,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -558,7 +657,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.saveProfile("New", "Name", "Europe/Berlin")
@@ -573,7 +676,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.saveProfile("New", "Name", "UTC")
@@ -593,7 +700,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -611,7 +722,11 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, "", "")
@@ -630,12 +745,99 @@ class AccountSettingsViewModelTest {
 
     val viewModel =
         AccountSettingsViewModel(
-            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.DeletingAccount>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `saveQuietHours with invalid start time emits error and does not call API`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    every { mockContext.getString(R.string.quiet_hours_error_invalid_time) } returns "Enter times in HH:MM format."
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val errors = mutableListOf<String>()
+    val job = launch { viewModel.quietHoursSaveError.collect { errors.add(it) } }
+    viewModel.saveQuietHours(false, "invalid", "07:00")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertTrue(errors.size == 1)
+    assertTrue(errors[0].contains("HH:MM") || errors[0].isNotEmpty())
+    coVerify(exactly = 0) { mockNotificationsRepository.updateQuietHours(any()) }
+    job.cancel()
+  }
+
+  @Test
+  fun `saveQuietHours success updates quietHours and emits success`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    val updated = QuietHours(enabled = true, startTime = "22:00:00", endTime = "07:00:00")
+    coEvery { mockNotificationsRepository.updateQuietHours(any()) } returns
+        ApiResult.Success(updated)
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val successes = mutableListOf<Unit>()
+    val job = launch { viewModel.quietHoursSaveSuccess.collect { successes.add(it) } }
+    viewModel.saveQuietHours(true, "22:00", "07:00")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertEquals(updated, viewModel.quietHours.value)
+    assertTrue(successes.size == 1)
+    coVerify(exactly = 1) { mockNotificationsRepository.updateQuietHours(any()) }
+    job.cancel()
+  }
+
+  @Test
+  fun `saveQuietHours when API returns Error emits error`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val profile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(profile)
+    coEvery { mockNotificationsRepository.updateQuietHours(any()) } returns
+        ApiResult.Error(ApiError.NetworkError("Server error"))
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockClearSessionUseCase,
+            mockTokenManager,
+            mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val errors = mutableListOf<String>()
+    val job = launch { viewModel.quietHoursSaveError.collect { errors.add(it) } }
+    viewModel.saveQuietHours(true, "22:00", "07:00")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertTrue(errors.size == 1)
+    coVerify(exactly = 1) { mockNotificationsRepository.updateQuietHours(any()) }
+    job.cancel()
   }
 }
