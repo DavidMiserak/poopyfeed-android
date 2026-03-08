@@ -72,6 +72,21 @@ class EditChildViewModelTest {
       }
 
   @Test
+  fun `init when child has can_edit false emits Ready with canEditReminder false`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, can_edit = false)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertIs<EditChildUiState.Ready>(state)
+        assertEquals(child.name, state.child.name)
+        assertEquals(false, state.canEditReminder)
+      }
+
+  @Test
   fun `init when getChildCached emits null emits Error`() =
       runTest(testDispatcher) {
         coEvery { mockRepository.getChildCached(1) } returns flowOf(null)
