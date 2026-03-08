@@ -59,6 +59,13 @@ constructor(
   private val _errorMessage = MutableSharedFlow<String>(replay = 0)
   val errorMessage: SharedFlow<String> = _errorMessage.asSharedFlow()
 
+  /**
+   * One-shot: emitted when unread count may have changed (e.g. after mark all read or mark single
+   * read). MainActivity should call refreshUnreadCount() so the bottom nav badge updates.
+   */
+  private val _unreadCountInvalidated = MutableSharedFlow<Unit>(replay = 0)
+  val unreadCountInvalidated: SharedFlow<Unit> = _unreadCountInvalidated.asSharedFlow()
+
   /** Next page to request when loading more (2 after first page, then 3, 4, …). */
   private var nextPageToLoad = 2
 
@@ -130,7 +137,10 @@ constructor(
   fun markAllRead() {
     viewModelScope.launch {
       when (val result = repo.markAllRead()) {
-        is ApiResult.Success -> refresh()
+        is ApiResult.Success -> {
+          _unreadCountInvalidated.emit(Unit)
+          refresh()
+        }
         is ApiResult.Error -> _errorMessage.emit(result.error.getUserMessage(context))
         else -> Unit
       }
@@ -145,6 +155,7 @@ constructor(
     viewModelScope.launch {
       when (val result = repo.markAsRead(notificationId)) {
         is ApiResult.Success -> {
+          _unreadCountInvalidated.emit(Unit)
           _navigateToChild.emit(childId)
           refresh()
         }

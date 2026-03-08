@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.MainActivityViewModel
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentNotificationsBinding
 
@@ -32,6 +34,7 @@ class NotificationsFragment : Fragment() {
     get() = _binding!!
 
   private val viewModel: NotificationsViewModel by viewModels()
+  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
   private lateinit var adapter: NotificationAdapter
 
   override fun onCreateView(
@@ -152,6 +155,14 @@ class NotificationsFragment : Fragment() {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.errorMessage.collect { message ->
           Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.unreadCountInvalidated.collect {
+          mainActivityViewModel.refreshUnreadCount()
         }
       }
     }
