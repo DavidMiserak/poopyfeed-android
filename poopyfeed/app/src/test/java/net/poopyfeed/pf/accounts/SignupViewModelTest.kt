@@ -1,10 +1,13 @@
 package net.poopyfeed.pf.accounts
 
 import android.content.Context
+import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlin.test.assertEquals
@@ -19,6 +22,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
@@ -29,6 +33,7 @@ class SignupViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+  private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
   private lateinit var viewModel: SignupViewModel
@@ -42,7 +47,19 @@ class SignupViewModelTest {
         "Data format error. Please try again."
     every { mockContext.getString(R.string.error_unknown) } returns
         "Something went wrong. Please try again."
-    viewModel = SignupViewModel(mockAuthRepository, mockTokenManager, mockContext)
+
+    // Mock FirebaseMessaging to throw so registerFcmToken()'s try-catch handles it
+    mockkStatic(FirebaseMessaging::class)
+    every { FirebaseMessaging.getInstance() } throws
+        IllegalStateException("Firebase not initialized in tests")
+    // Mock Log to prevent "not mocked" RuntimeException inside catch blocks
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    every { Log.w(any(), any<String>(), any()) } returns 0
+
+    viewModel =
+        SignupViewModel(
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
   }
 
   @After
