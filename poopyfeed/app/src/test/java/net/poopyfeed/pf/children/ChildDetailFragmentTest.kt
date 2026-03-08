@@ -15,6 +15,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -23,7 +24,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [ChildDetailFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -64,7 +64,13 @@ class ChildDetailFragmentTest {
     ) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment
+          ?.view
+          ?.findViewById<android.widget.TextView>(R.id.text_child_name)
+          ?.text
+          ?.isNotEmpty() == true
+    }
     return fragment!!
   }
 
@@ -131,7 +137,7 @@ class ChildDetailFragmentTest {
     ) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment?.view?.findViewById<View>(R.id.text_child_name) != null }
 
     assertNotNull(fragment)
     assertNotNull(fragment!!.requireView().findViewById<View>(R.id.text_child_name))

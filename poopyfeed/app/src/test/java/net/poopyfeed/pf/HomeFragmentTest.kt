@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [HomeFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -54,7 +53,7 @@ class HomeFragmentTest {
     launchFragmentInHiltContainer<HomeFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(20) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment?.view != null }
     return fragment!!
   }
 
@@ -63,7 +62,7 @@ class HomeFragmentTest {
     every { tokenManager.getToken() } returns null
 
     launchFragment()
-    repeat(10) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.LoginFragment }
 
     assertEquals(R.id.LoginFragment, navController.currentDestination?.id)
   }
@@ -75,7 +74,13 @@ class HomeFragmentTest {
         ApiResult.Success(TestFixtures.mockUserProfile(email = "sarah@example.com"))
 
     val fragment = launchFragment()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment
+          .requireView()
+          .findViewById<android.widget.TextView>(R.id.text_welcome)
+          .text
+          .isNotEmpty()
+    }
 
     val welcomeText =
         fragment
@@ -96,10 +101,10 @@ class HomeFragmentTest {
         ApiResult.Success(TestFixtures.mockUserProfile())
 
     val fragment = launchFragment()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment.requireView().findViewById<View>(R.id.card_my_children).isShown }
 
     fragment.requireView().findViewById<View>(R.id.card_my_children).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.ChildrenListFragment }
 
     assertEquals(R.id.ChildrenListFragment, navController.currentDestination?.id)
   }

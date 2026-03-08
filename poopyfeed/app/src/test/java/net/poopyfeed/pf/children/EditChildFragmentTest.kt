@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -21,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [EditChildFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -61,7 +61,10 @@ class EditChildFragmentTest {
     ) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.findViewById<android.widget.EditText>(R.id.input_name)?.text?.isNotEmpty() ==
+          true
+    }
     return fragment!!
   }
 
@@ -89,7 +92,7 @@ class EditChildFragmentTest {
     ) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment?.view?.findViewById<View>(R.id.input_name) != null }
 
     assertNotNull(fragment)
     assertNotNull(fragment!!.requireView().findViewById<View>(R.id.input_name))

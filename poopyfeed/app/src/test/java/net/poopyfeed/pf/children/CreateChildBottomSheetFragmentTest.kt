@@ -17,6 +17,7 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateChildRequest
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -26,7 +27,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [CreateChildBottomSheetFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -58,7 +58,7 @@ class CreateChildBottomSheetFragmentTest {
     ) {
       fragment = this
     }
-    repeat(20) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment?.view?.findViewById<View>(R.id.button_save)?.isEnabled == true }
     return fragment!!
   }
 
@@ -87,7 +87,7 @@ class CreateChildBottomSheetFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.input_dob).setText("2024-01-15")
     root.findViewById<View>(R.id.radio_girl).performClick()
     root.findViewById<View>(R.id.button_save).performClick()
-    repeat(15) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { root.findViewById<TextInputLayout>(R.id.layout_name).error != null }
 
     val nameLayout = root.findViewById<TextInputLayout>(R.id.layout_name)
     assertNotNull(nameLayout.error)
@@ -112,7 +112,7 @@ class CreateChildBottomSheetFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.input_dob).setText("2024-01-15")
     root.findViewById<View>(R.id.radio_girl).performClick()
     root.findViewById<View>(R.id.button_save).performClick()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { !fragment.isAdded }
 
     coVerify { repo.createChild(CreateChildRequest("Baby", "2024-01-15", "F")) }
   }

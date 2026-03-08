@@ -18,6 +18,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfileUpdate
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -26,7 +27,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [AccountSettingsFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -69,7 +69,13 @@ class AccountSettingsFragmentTest {
     launchFragmentInHiltContainer<AccountSettingsFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment
+          ?.view
+          ?.findViewById<android.widget.EditText>(R.id.edit_text_account_email)
+          ?.text
+          ?.isNotEmpty() == true
+    }
     return fragment!!
   }
 
@@ -125,7 +131,7 @@ class AccountSettingsFragmentTest {
         .findViewById<android.widget.AutoCompleteTextView>(R.id.auto_complete_account_timezone)
         .setText("America/Los_Angeles")
     root.findViewById<View>(R.id.button_account_save).performClick()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { root.findViewById<View>(R.id.progress_account).visibility == View.GONE }
 
     coVerify {
       authRepository.updateProfile(
@@ -146,7 +152,7 @@ class AccountSettingsFragmentTest {
     launchFragmentInHiltContainer<AccountSettingsFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.LoginFragment }
 
     assertEquals(R.id.LoginFragment, navController.currentDestination?.id)
   }

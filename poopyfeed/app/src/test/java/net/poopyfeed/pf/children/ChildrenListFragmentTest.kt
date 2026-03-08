@@ -21,6 +21,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [ChildrenListFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -74,7 +74,13 @@ class ChildrenListFragmentTest {
     launchFragmentInHiltContainer<ChildrenListFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(20) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.recycler_children).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
+      } == true
+    }
     return fragment!!
   }
 
@@ -115,7 +121,7 @@ class ChildrenListFragmentTest {
     every { repo.hasSyncedFlow } returns MutableStateFlow(false)
     coEvery { repo.refreshChildren() } coAnswers
         {
-          kotlinx.coroutines.delay(10)
+          kotlinx.coroutines.delay(5)
           ApiResult.Error(ApiError.HttpError(500, "Server Error", "Something went wrong"))
         }
 
@@ -123,9 +129,12 @@ class ChildrenListFragmentTest {
     launchFragmentInHiltContainer<ChildrenListFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    // Idle enough for: observeChildren to set Loading, refresh() to resume after delay and set
-    // Error, fragment collect to update UI
-    repeat(80) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil(maxIterations = 400) {
+      fragment?.view?.let { root ->
+        root.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE &&
+            root.findViewById<View>(R.id.progress_loading).visibility == View.GONE
+      } == true
+    }
 
     coVerify { repo.refreshChildren() }
     val f = fragment!!
@@ -155,7 +164,9 @@ class ChildrenListFragmentTest {
 
     val retryButton = fragment.requireView().findViewById<View>(R.id.button_retry)
     retryButton.performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment.requireView().findViewById<View>(R.id.progress_loading).visibility == View.GONE
+    }
 
     coVerify(atLeast = 2) { repo.refreshChildren() }
   }

@@ -19,6 +19,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -27,7 +28,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [LoginFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -60,7 +60,7 @@ class LoginFragmentTest {
     launchFragmentInHiltContainer<LoginFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(20) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { fragment?.view?.findViewById<View>(R.id.button_login)?.isEnabled == true }
     return fragment!!
   }
 
@@ -82,7 +82,9 @@ class LoginFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.edit_text_email).setText("not-an-email")
     root.findViewById<android.widget.EditText>(R.id.edit_text_password).setText("password123")
     root.findViewById<View>(R.id.button_login).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      root.findViewById<TextInputLayout>(R.id.input_layout_email).error != null
+    }
 
     val emailLayout = root.findViewById<TextInputLayout>(R.id.input_layout_email)
     assertNotNull(emailLayout.error)
@@ -101,7 +103,9 @@ class LoginFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.edit_text_email).setText("user@example.com")
     root.findViewById<android.widget.EditText>(R.id.edit_text_password).setText("")
     root.findViewById<View>(R.id.button_login).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      root.findViewById<TextInputLayout>(R.id.input_layout_password).error != null
+    }
 
     val passwordLayout = root.findViewById<TextInputLayout>(R.id.input_layout_password)
     assertNotNull(passwordLayout.error)
@@ -117,7 +121,7 @@ class LoginFragmentTest {
     val fragment = launchFragment()
     val signupLink = fragment.requireView().findViewById<View>(R.id.text_go_to_signup)
     signupLink.performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.SignupFragment }
 
     assertEquals(R.id.SignupFragment, navController.currentDestination?.id)
   }
@@ -135,7 +139,7 @@ class LoginFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.edit_text_email).setText("user@example.com")
     root.findViewById<android.widget.EditText>(R.id.edit_text_password).setText("password123")
     root.findViewById<View>(R.id.button_login).performClick()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.ChildrenListFragment }
 
     assertEquals(R.id.ChildrenListFragment, navController.currentDestination?.id)
   }
@@ -151,7 +155,7 @@ class LoginFragmentTest {
     root.findViewById<android.widget.EditText>(R.id.edit_text_email).setText("user@example.com")
     root.findViewById<android.widget.EditText>(R.id.edit_text_password).setText("wrong")
     root.findViewById<View>(R.id.button_login).performClick()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { root.findViewById<View>(R.id.progress_login).visibility == View.GONE }
 
     assertEquals(R.id.LoginFragment, navController.currentDestination?.id)
     assertEquals(true, root.findViewById<View>(R.id.button_login).isEnabled)

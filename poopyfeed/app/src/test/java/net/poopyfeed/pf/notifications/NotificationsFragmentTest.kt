@@ -14,6 +14,7 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.repository.NotificationsRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -21,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [NotificationsFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -59,7 +59,13 @@ class NotificationsFragmentTest {
     launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.recycler_notifications).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
+      } == true
+    }
     return fragment!!
   }
 
@@ -84,7 +90,9 @@ class NotificationsFragmentTest {
     launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.findViewById<View>(R.id.layout_empty_state)?.visibility == View.VISIBLE
+    }
 
     val root = fragment!!.requireView()
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_empty_state).visibility)
@@ -101,7 +109,9 @@ class NotificationsFragmentTest {
     launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.findViewById<View>(R.id.layout_error_state)?.visibility == View.VISIBLE
+    }
 
     val root = fragment!!.requireView()
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_error_state).visibility)

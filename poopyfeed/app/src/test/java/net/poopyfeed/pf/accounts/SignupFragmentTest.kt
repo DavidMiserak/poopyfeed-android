@@ -16,6 +16,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
+import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -24,7 +25,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLooper
 
 /** UI tests for [SignupFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -54,7 +54,9 @@ class SignupFragmentTest {
     launchFragmentInHiltContainer<SignupFragment>(beforeAdd = ::installNavController) {
       fragment = this
     }
-    repeat(20) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      fragment?.view?.findViewById<View>(R.id.button_signup)?.isEnabled == true
+    }
     return fragment!!
   }
 
@@ -81,7 +83,9 @@ class SignupFragmentTest {
         .findViewById<android.widget.EditText>(R.id.edit_text_signup_confirm_password)
         .setText("password123")
     root.findViewById<View>(R.id.button_signup).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      root.findViewById<TextInputLayout>(R.id.input_layout_signup_email).error != null
+    }
 
     val emailLayout = root.findViewById<TextInputLayout>(R.id.input_layout_signup_email)
     assertNotNull(emailLayout.error)
@@ -103,7 +107,9 @@ class SignupFragmentTest {
         .findViewById<android.widget.EditText>(R.id.edit_text_signup_confirm_password)
         .setText("short")
     root.findViewById<View>(R.id.button_signup).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      root.findViewById<TextInputLayout>(R.id.input_layout_signup_password).error != null
+    }
 
     val passwordLayout = root.findViewById<TextInputLayout>(R.id.input_layout_signup_password)
     assertNotNull(passwordLayout.error)
@@ -127,7 +133,9 @@ class SignupFragmentTest {
         .findViewById<android.widget.EditText>(R.id.edit_text_signup_confirm_password)
         .setText("different")
     root.findViewById<View>(R.id.button_signup).performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil {
+      root.findViewById<TextInputLayout>(R.id.input_layout_signup_confirm_password).error != null
+    }
 
     val confirmLayout =
         root.findViewById<TextInputLayout>(R.id.input_layout_signup_confirm_password)
@@ -144,7 +152,7 @@ class SignupFragmentTest {
     val fragment = launchFragment()
     val loginLink = fragment.requireView().findViewById<View>(R.id.text_go_to_login)
     loginLink.performClick()
-    repeat(5) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.LoginFragment }
 
     assertEquals(R.id.LoginFragment, navController.currentDestination?.id)
   }
@@ -167,7 +175,7 @@ class SignupFragmentTest {
         .findViewById<android.widget.EditText>(R.id.edit_text_signup_confirm_password)
         .setText("password123")
     root.findViewById<View>(R.id.button_signup).performClick()
-    repeat(40) { ShadowLooper.idleMainLooper() }
+    idleMainLooperUntil { navController.currentDestination?.id == R.id.ChildrenListFragment }
 
     assertEquals(R.id.ChildrenListFragment, navController.currentDestination?.id)
   }
