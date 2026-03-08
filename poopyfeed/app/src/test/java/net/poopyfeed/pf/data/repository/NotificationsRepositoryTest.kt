@@ -66,6 +66,19 @@ class NotificationsRepositoryTest {
   }
 
   @Test
+  fun `listNotifications with no args uses default page 1`() = runTest {
+    val response =
+        PaginatedResponse<Notification>(
+            count = 0, next = null, previous = null, results = emptyList())
+    io.mockk.coEvery { apiService.listNotifications(1) } returns response
+
+    val result = repository.listNotifications()
+
+    assertIs<ApiResult.Success<PaginatedResponse<Notification>>>(result)
+    io.mockk.coVerify { apiService.listNotifications(1) }
+  }
+
+  @Test
   fun `listNotifications with page 2 calls api with page 2`() = runTest {
     val response =
         PaginatedResponse<Notification>(

@@ -119,6 +119,18 @@ class ChildrenRepositoryTest {
   }
 
   @Test
+  fun `getChild emits Loading then Error on exception`() = runTest {
+    coEvery { apiService.getChild(1) } throws java.io.IOException("Network down")
+
+    val results = repository.getChild(1).toList()
+
+    assertEquals(2, results.size)
+    assertIs<ApiResult.Loading<*>>(results[0])
+    assertIs<ApiResult.Error<Child>>(results[1])
+    assertIs<ApiError.NetworkError>((results[1] as ApiResult.Error).error)
+  }
+
+  @Test
   fun `updateChild returns Success`() = runTest {
     val request =
         net.poopyfeed.pf.data.models.UpdateChildRequest(

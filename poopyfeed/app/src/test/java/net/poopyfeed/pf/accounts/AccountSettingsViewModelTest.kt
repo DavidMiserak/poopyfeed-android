@@ -490,6 +490,52 @@ class AccountSettingsViewModelTest {
   }
 
   @Test
+  fun `clearPasswordChangeState when Ready does not call loadProfile`() = runTest {
+    every { mockTokenManager.getToken() } returns "token"
+    coEvery { mockAuthRepository.getProfile() } returns
+        ApiResult.Success(TestFixtures.mockUserProfile())
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertIs<AccountSettingsUiState.Ready>(viewModel.uiState.value)
+    viewModel.clearPasswordChangeState()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify(exactly = 1) { mockAuthRepository.getProfile() }
+  }
+
+  @Test
+  fun `clearPasswordChangeState from PasswordChangeError reloads profile`() = runTest {
+    every { mockTokenManager.getToken() } returns "test-token"
+    val initialProfile = TestFixtures.mockUserProfile()
+    coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
+    val apiError =
+        ApiError.HttpError(
+            statusCode = 400,
+            errorMessage = "Bad Request",
+            detail = "Current password is incorrect.")
+    coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
+        ApiResult.Error(apiError)
+
+    val viewModel =
+        AccountSettingsViewModel(
+            mockAuthRepository, mockClearSessionUseCase, mockTokenManager, mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertIs<AccountSettingsUiState.PasswordChangeError>(viewModel.uiState.value)
+
+    viewModel.clearPasswordChangeState()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify(atLeast = 2) { mockAuthRepository.getProfile() }
+  }
+
+  @Test
   fun `loadProfile when getProfile returns Loading keeps Loading state`() = runTest {
     every { mockTokenManager.getToken() } returns "test-token"
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Loading()

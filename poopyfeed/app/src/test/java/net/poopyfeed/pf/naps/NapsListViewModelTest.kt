@@ -172,4 +172,37 @@ class NapsListViewModelTest {
 
         assert(emissions.size == 1)
       }
+
+  @Test
+  fun `observeNaps when result is Loading and hasSynced true shows Loading`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Loading())
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshNaps(1) } returns ApiResult.Success(emptyList())
+
+        viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<NapsListUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `endNap when updateNap returns Error emits deleteError`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Success(emptyList()))
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshNaps(1) } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.updateNap(1, 10, any()) } returns
+            ApiResult.Error(ApiError.NetworkError("offline"))
+
+        viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+        val emissions = mutableListOf<String>()
+        val job = launch { viewModel.deleteError.collect { emissions.add(it) } }
+        viewModel.endNap(10)
+        advanceUntilIdle()
+        job.cancel()
+
+        assert(emissions.size == 1)
+      }
 }

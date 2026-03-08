@@ -164,4 +164,94 @@ class PendingInvitesViewModelTest {
 
         assertTrue(messages.isNotEmpty())
       }
+
+  @Test
+  fun `loadInvites when getPendingInvites returns Loading stays Loading`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Loading()
+
+        viewModel =
+            PendingInvitesViewModel(
+                mockSharingRepository,
+                mockChildrenRepository,
+                mockCachedChildrenRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        assertIs<PendingInvitesUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `loadInvites with invite when getChild returns Error still emits Ready with null childName`() =
+      runTest(testDispatcher) {
+        val invite = TestFixtures.mockShareInvite(id = 1, child = 5)
+        coEvery { mockSharingRepository.getPendingInvites() } returns
+            ApiResult.Success(listOf(invite))
+        every { mockChildrenRepository.getChild(5) } returns
+            flowOf(ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("down")))
+
+        viewModel =
+            PendingInvitesViewModel(
+                mockSharingRepository,
+                mockChildrenRepository,
+                mockCachedChildrenRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        assertIs<PendingInvitesUiState.Ready>(viewModel.uiState.value)
+        val ready = viewModel.uiState.value as PendingInvitesUiState.Ready
+        assertTrue(ready.invites.size == 1)
+        assertTrue(ready.invites[0].childName == null)
+      }
+
+  @Test
+  fun `acceptByToken when API returns Loading does not emit navigate or error`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.acceptInvite("t") } returns ApiResult.Loading()
+
+        viewModel =
+            PendingInvitesViewModel(
+                mockSharingRepository,
+                mockChildrenRepository,
+                mockCachedChildrenRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        val ids = mutableListOf<Int>()
+        val job = launch { viewModel.navigateToChild.collect { ids.add(it) } }
+        viewModel.acceptByToken("t")
+        advanceUntilIdle()
+        job.cancel()
+        assertTrue(ids.isEmpty())
+      }
+
+  @Test
+  fun `refresh calls loadInvites again`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.getPendingInvites() } returns ApiResult.Success(emptyList())
+
+        viewModel =
+            PendingInvitesViewModel(
+                mockSharingRepository,
+                mockChildrenRepository,
+                mockCachedChildrenRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        assertIs<PendingInvitesUiState.Empty>(viewModel.uiState.value)
+
+        coEvery { mockSharingRepository.getPendingInvites() } returns
+            ApiResult.Success(listOf(TestFixtures.mockShareInvite(id = 2, child = 6)))
+        every { mockChildrenRepository.getChild(6) } returns
+            flowOf(ApiResult.Success(TestFixtures.mockChild(id = 6, name = "Baby Jane")))
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertIs<PendingInvitesUiState.Ready>(viewModel.uiState.value)
+        val ready = viewModel.uiState.value as PendingInvitesUiState.Ready
+        assertTrue(ready.invites.size == 1 && ready.invites[0].childName == "Baby Jane")
+      }
 }

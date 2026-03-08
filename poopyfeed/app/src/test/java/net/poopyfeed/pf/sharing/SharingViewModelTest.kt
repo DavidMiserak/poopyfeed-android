@@ -70,6 +70,38 @@ class SharingViewModelTest {
       }
 
   @Test
+  fun `init with invites emits Ready with InviteRow items`() =
+      runTest(testDispatcher) {
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 1,
+                token = "t1",
+                role = "caregiver",
+                roleDisplay = "Caregiver",
+                isActive = true,
+                createdAt = "",
+                inviteUrl = null)
+        val invites = listOf(invite)
+        val shares = emptyList<net.poopyfeed.pf.data.models.ChildShare>()
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(invites)
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(shares)
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+
+        assertIs<SharingUiState.Ready>(viewModel.uiState.value)
+        val ready = viewModel.uiState.value as SharingUiState.Ready
+        val inviteRows = ready.items.filterIsInstance<SharingListItem.InviteRow>()
+        assertTrue(inviteRows.size == 1)
+        assertTrue(inviteRows[0].invite.id == 1)
+      }
+
+  @Test
   fun `init when listInvites fails emits Error`() =
       runTest(testDispatcher) {
         coEvery { mockSharingRepository.listInvites(7) } returns
@@ -241,5 +273,36 @@ class SharingViewModelTest {
         advanceUntilIdle()
 
         assertIs<SharingUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `deleteInvite when API returns Loading does not emit error`() =
+      runTest(testDispatcher) {
+        coEvery { mockSharingRepository.listInvites(7) } returns ApiResult.Success(emptyList())
+        coEvery { mockSharingRepository.listShares(7) } returns ApiResult.Success(emptyList())
+        val invite =
+            net.poopyfeed.pf.data.models.ChildInvite(
+                id = 2,
+                token = "t2",
+                role = "co-parent",
+                roleDisplay = "Co-parent",
+                isActive = false,
+                createdAt = "",
+                inviteUrl = null)
+        coEvery { mockSharingRepository.deleteInvite(7, 2) } returns ApiResult.Loading()
+
+        viewModel =
+            SharingViewModel(
+                savedStateHandle,
+                mockSharingRepository,
+                mockContext,
+            )
+        advanceUntilIdle()
+        val messages = mutableListOf<String>()
+        val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
+        viewModel.deleteInvite(invite)
+        advanceUntilIdle()
+        job.cancel()
+        assertTrue(messages.isEmpty())
       }
 }

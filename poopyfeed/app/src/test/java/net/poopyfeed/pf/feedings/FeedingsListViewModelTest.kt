@@ -108,6 +108,19 @@ class FeedingsListViewModelTest {
       }
 
   @Test
+  fun `observeFeedings when result is Loading and hasSynced true shows Loading`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listFeedingsCached(1) } returns flowOf(ApiResult.Loading())
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshFeedings(1) } returns ApiResult.Success(emptyList())
+
+        viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<FeedingsListUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
   fun `deleteFeeding error emits deleteError`() =
       runTest(testDispatcher) {
         coEvery { mockRepository.listFeedingsCached(1) } returns

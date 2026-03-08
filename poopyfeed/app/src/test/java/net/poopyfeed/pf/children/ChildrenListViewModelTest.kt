@@ -96,6 +96,19 @@ class ChildrenListViewModelTest {
   }
 
   @Test
+  fun `observeChildren when result is Loading and hasSynced true shows Loading`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listChildrenCached() } returns flowOf(ApiResult.Loading())
+        coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+
+        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<ChildrenListUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
   fun `deleteChild when Error emits deleteError`() =
       runTest(testDispatcher) {
         coEvery { mockRepository.listChildrenCached() } returns

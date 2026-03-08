@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -226,5 +227,61 @@ class ChildDetailQuickLogViewModelTest {
         advanceUntilIdle()
 
         assertEquals(BottleAmounts(2.0, 4.0, 6.0), viewModel.bottleAmounts.value)
+      }
+
+  @Test
+  fun `bottleAmounts uses child custom bottle oz when set`() =
+      runTest(testDispatcher) {
+        val child =
+            TestFixtures.mockChild(
+                id = childId,
+                custom_bottle_low_oz = "3",
+                custom_bottle_mid_oz = "5",
+                custom_bottle_high_oz = "7",
+            )
+        every { childrenRepo.getChildCached(childId) } returns flowOf(child)
+        viewModel =
+            ChildDetailQuickLogViewModel(
+                savedStateHandle,
+                childrenRepo,
+                diapersRepo,
+                feedingsRepo,
+                napsRepo,
+                mockContext,
+            )
+        val values = mutableListOf<BottleAmounts>()
+        val job = launch { viewModel.bottleAmounts.collect { values.add(it) } }
+        advanceUntilIdle()
+        job.cancel()
+
+        assertEquals(BottleAmounts(3.0, 5.0, 7.0), values.last())
+      }
+
+  @Test
+  fun `bottleAmounts uses default 2 when child custom bottle oz is null`() =
+      runTest(testDispatcher) {
+        val child =
+            TestFixtures.mockChild(
+                id = childId,
+                custom_bottle_low_oz = "3",
+                custom_bottle_mid_oz = null,
+                custom_bottle_high_oz = "7",
+            )
+        every { childrenRepo.getChildCached(childId) } returns flowOf(child)
+        viewModel =
+            ChildDetailQuickLogViewModel(
+                savedStateHandle,
+                childrenRepo,
+                diapersRepo,
+                feedingsRepo,
+                napsRepo,
+                mockContext,
+            )
+        val values = mutableListOf<BottleAmounts>()
+        val job = launch { viewModel.bottleAmounts.collect { values.add(it) } }
+        advanceUntilIdle()
+        job.cancel()
+
+        assertEquals(BottleAmounts(3.0, 2.0, 7.0), values.last())
       }
 }

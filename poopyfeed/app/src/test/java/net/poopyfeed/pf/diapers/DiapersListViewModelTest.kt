@@ -108,6 +108,19 @@ class DiapersListViewModelTest {
       }
 
   @Test
+  fun `observeDiapers when result is Loading and hasSynced true shows Loading`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listDiapersCached(1) } returns flowOf(ApiResult.Loading())
+        coEvery { mockRepository.hasSyncedFlow(1) } returns flowOf(true)
+        coEvery { mockRepository.refreshDiapers(1) } returns ApiResult.Success(emptyList())
+
+        viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertIs<DiapersListUiState.Loading>(viewModel.uiState.value)
+      }
+
+  @Test
   fun `deleteDiaper error emits deleteError`() =
       runTest(testDispatcher) {
         coEvery { mockRepository.listDiapersCached(1) } returns

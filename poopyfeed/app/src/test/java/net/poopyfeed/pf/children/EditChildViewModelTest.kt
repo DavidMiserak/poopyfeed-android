@@ -488,4 +488,68 @@ class EditChildViewModelTest {
 
         assertEquals(0, emitted.size)
       }
+
+  @Test
+  fun `save when state is not Ready does not call updateChild`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.getChildCached(1) } returns kotlinx.coroutines.flow.flow {}
+        coEvery { mockRepository.updateChild(1, any()) } returns
+            ApiResult.Success(TestFixtures.mockChild(id = 1))
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        assertIs<EditChildUiState.Loading>(viewModel.uiState.value)
+
+        viewModel.save("Alice", "2024-01-15", "F", null, null, null, null)
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { mockRepository.updateChild(any(), any()) }
+      }
+
+  @Test
+  fun `save with bottle amount over 50 emits ValidationError`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, "60", "65", "70")
+
+        assertIs<EditChildUiState.ValidationError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditChildUiState.ValidationError).bottleError)
+        coVerify(exactly = 0) { mockRepository.updateChild(any(), any()) }
+      }
+
+  @Test
+  fun `save with bottle amount non-numeric emits ValidationError`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1)
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+        viewModel.save("Alice", "2024-01-15", "F", null, "4", "x", "6")
+
+        assertIs<EditChildUiState.ValidationError>(viewModel.uiState.value)
+        assertEquals(
+            "Error message",
+            (viewModel.uiState.value as EditChildUiState.ValidationError).bottleError)
+        coVerify(exactly = 0) { mockRepository.updateChild(any(), any()) }
+      }
+
+  @Test
+  fun `init when getChildCached emits twice does not overwrite Ready state`() =
+      runTest(testDispatcher) {
+        val child = TestFixtures.mockChild(id = 1, name = "Alice")
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(child, child)
+
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertIs<EditChildUiState.Ready>(viewModel.uiState.value)
+        assertEquals("Alice", (viewModel.uiState.value as EditChildUiState.Ready).child.name)
+      }
 }
