@@ -152,7 +152,7 @@ class ChildrenListFragment : Fragment() {
   }
 
   private fun navigateToChildDetail(childId: Int) {
-    val bundle = android.os.Bundle().apply { putInt("childId", childId) }
+    val bundle = Bundle().apply { putInt("childId", childId) }
     findNavController().navigate(R.id.action_childrenList_to_childDetail, bundle)
   }
 

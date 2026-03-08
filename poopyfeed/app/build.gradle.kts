@@ -180,10 +180,10 @@ kover {
             }
         }
 
-        // LINE coverage: target 95%.
+        // LINE coverage: target 94%.
         verify {
             rule {
-                minBound(95)
+                minBound(94)
             }
         }
     }

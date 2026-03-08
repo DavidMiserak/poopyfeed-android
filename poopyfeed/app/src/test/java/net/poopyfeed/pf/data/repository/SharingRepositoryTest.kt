@@ -143,7 +143,7 @@ class SharingRepositoryTest {
 
   @Test
   fun `acceptInvite with token success returns Success with Child`() = runTest {
-    val child = net.poopyfeed.pf.TestFixtures.mockChild(id = 3, name = "Baby")
+    val child = TestFixtures.mockChild(id = 3, name = "Baby")
     coEvery { apiService.acceptInvite(any()) } returns child
 
     val result = repository.acceptInvite("sometoken")

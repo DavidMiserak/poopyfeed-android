@@ -224,7 +224,7 @@ class CachedChildrenRepositoryTest {
   @Test
   fun `updateChild success upserts and returns Success`() = runTest {
     val request =
-        net.poopyfeed.pf.data.models.UpdateChildRequest(
+        UpdateChildRequest(
             name = "Baby Alice Updated",
             date_of_birth = "2024-01-15",
             gender = "F",

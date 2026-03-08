@@ -111,7 +111,7 @@ data class Feeding(
 data class FeedingListResponse(
     val id: Int,
     val feeding_type: String,
-    @kotlinx.serialization.SerialName("fed_at") val fed_at: String,
+    @SerialName("fed_at") val fed_at: String,
     val amount_oz: String? = null,
     val created_at: String,
     val updated_at: String,
@@ -173,7 +173,7 @@ data class CreateDiaperRequest(
 data class DiaperListResponse(
     val id: Int,
     val change_type: String,
-    @kotlinx.serialization.SerialName("changed_at") val changed_at: String,
+    @SerialName("changed_at") val changed_at: String,
     val created_at: String,
     val updated_at: String
 ) {
@@ -224,8 +224,8 @@ data class UpdateNapRequest(
 @Serializable
 data class NapListResponse(
     val id: Int,
-    @kotlinx.serialization.SerialName("napped_at") val napped_at: String,
-    @kotlinx.serialization.SerialName("ended_at") val ended_at: String? = null,
+    @SerialName("napped_at") val napped_at: String,
+    @SerialName("ended_at") val ended_at: String? = null,
     val created_at: String,
     val updated_at: String
 ) {

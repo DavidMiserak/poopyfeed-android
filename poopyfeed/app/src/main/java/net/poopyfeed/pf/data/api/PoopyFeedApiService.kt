@@ -90,10 +90,7 @@ interface PoopyFeedApiService {
 
   /** Update a child's profile (partial). PATCH /api/v1/children/{childId}/ */
   @PATCH("children/{childId}/")
-  suspend fun updateChild(
-      @Path("childId") childId: Int,
-      @Body request: net.poopyfeed.pf.data.models.UpdateChildRequest
-  ): Child
+  suspend fun updateChild(@Path("childId") childId: Int, @Body request: UpdateChildRequest): Child
 
   /** Delete a child profile. DELETE /api/v1/children/{childId}/ */
   @DELETE("children/{childId}/") suspend fun deleteChild(@Path("childId") childId: Int)

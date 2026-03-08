@@ -257,7 +257,7 @@ class TrackingRepositoriesTest {
 
     val request = CreateShareRequest(role = "co-parent")
     val response =
-        net.poopyfeed.pf.data.models.ShareInviteResponse(
+        ShareInviteResponse(
             id = 10,
             token = "abc123",
             role = "co-parent",
@@ -269,7 +269,7 @@ class TrackingRepositoriesTest {
 
     val result = repository.createShare(1, request)
 
-    assertIs<ApiResult.Success<net.poopyfeed.pf.data.models.ShareInviteResponse>>(result)
+    assertIs<ApiResult.Success<ShareInviteResponse>>(result)
     assertEquals("abc123", result.data.token)
   }
 
@@ -287,16 +287,14 @@ class TrackingRepositoriesTest {
   fun `SharingRepository acceptInvite http error returns Error`() = runTest {
     val repository = SharingRepository(apiService)
 
-    val errorResponse =
-        retrofit2.Response.error<net.poopyfeed.pf.data.models.Child>(
-            400, "Bad request".toResponseBody(null))
+    val errorResponse = retrofit2.Response.error<Child>(400, "Bad request".toResponseBody(null))
 
     io.mockk.coEvery { apiService.acceptInvite(any()) } throws
         retrofit2.HttpException(errorResponse)
 
     val result = repository.acceptInvite("badtoken")
 
-    assertIs<ApiResult.Error<net.poopyfeed.pf.data.models.Child>>(result)
+    assertIs<ApiResult.Error<Child>>(result)
     assertIs<ApiError.HttpError>(result.error)
     assertEquals(400, result.error.statusCode)
   }
@@ -305,13 +303,13 @@ class TrackingRepositoriesTest {
   fun `SharingRepository acceptInvite success returns Child`() = runTest {
     val repository = SharingRepository(apiService)
 
-    val child = net.poopyfeed.pf.TestFixtures.mockChild(id = 1, name = "Baby")
+    val child = TestFixtures.mockChild(id = 1, name = "Baby")
 
     io.mockk.coEvery { apiService.acceptInvite(any()) } returns child
 
     val result = repository.acceptInvite("valid-token")
 
-    assertIs<ApiResult.Success<net.poopyfeed.pf.data.models.Child>>(result)
+    assertIs<ApiResult.Success<Child>>(result)
     assertEquals(1, result.data.id)
   }
 }

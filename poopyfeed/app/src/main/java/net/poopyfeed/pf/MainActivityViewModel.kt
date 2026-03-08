@@ -114,8 +114,7 @@ constructor(
       _timezoneBanner.value =
           TimezoneBannerState.Saving(deviceTimezone = deviceTz, profileTimezone = profileTz)
 
-      val result = authRepository.updateProfile(UserProfileUpdate(timezone = deviceTz))
-      when (result) {
+      when (val result = authRepository.updateProfile(UserProfileUpdate(timezone = deviceTz))) {
         is ApiResult.Success -> {
           tokenManager.saveProfileTimezone(deviceTz)
           _timezoneBanner.value = TimezoneBannerState.Hidden

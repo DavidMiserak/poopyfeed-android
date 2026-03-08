@@ -274,8 +274,7 @@ constructor(
   /** Deletes the child from the API and cache. Emits [deleteSuccess] or [deleteError]. */
   fun deleteChild() {
     viewModelScope.launch {
-      val result = repo.deleteChild(childId)
-      when (result) {
+      when (val result = repo.deleteChild(childId)) {
         is ApiResult.Success -> _deleteSuccess.emit(Unit)
         is ApiResult.Error -> _deleteError.emit(result.error.getUserMessage(context))
         is ApiResult.Loading -> {

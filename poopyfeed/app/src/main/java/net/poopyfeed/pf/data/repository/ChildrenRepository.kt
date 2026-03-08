@@ -80,10 +80,7 @@ constructor(
       }
 
   /** Update an existing child profile (partial update). */
-  suspend fun updateChild(
-      childId: Int,
-      request: net.poopyfeed.pf.data.models.UpdateChildRequest
-  ): ApiResult<Child> =
+  suspend fun updateChild(childId: Int, request: UpdateChildRequest): ApiResult<Child> =
       withContext(ioDispatcher) {
         try {
           val child = apiService.updateChild(childId, request)
