@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "635637455070",
+    "project_id": "poopyfeed",
+    "storage_bucket": "poopyfeed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635637455070:android:5634bd9151cfc35de60a4f",
+        "android_client_info": {
+          "package_name": "net.poopyfeed.pf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRjgC7BinSq28e3MKXaUxDms72QCsZGuA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
