@@ -417,6 +417,7 @@
                 style="@style/Widget.Pf.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:contentDescription="@string/a11y_go_to_feedings"
                 android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
@@ -465,6 +466,7 @@
                         android:layout_height="24dp"
                         android:src="@drawable/ic_chevron_right"
                         android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
@@ -477,6 +479,7 @@
                 style="@style/Widget.Pf.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:contentDescription="@string/a11y_go_to_diapers"
                 android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
@@ -525,6 +528,7 @@
                         android:layout_height="24dp"
                         android:src="@drawable/ic_chevron_right"
                         android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
@@ -537,6 +541,7 @@
                 style="@style/Widget.Pf.CardView"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:contentDescription="@string/a11y_go_to_naps"
                 android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
@@ -585,6 +590,7 @@
                         android:layout_height="24dp"
                         android:src="@drawable/ic_chevron_right"
                         android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>

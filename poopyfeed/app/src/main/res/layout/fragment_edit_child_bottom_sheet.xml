@@ -21,6 +21,7 @@
         android:layout_marginBottom="@dimen/spacing_8"
         android:background="@drawable/ic_drag_handle"
         android:contentDescription="@null"
+        android:importantForAccessibility="no"
         android:alpha="0.3" />
 
     <!-- Title -->
@@ -367,6 +368,7 @@
               android:layout_height="20dp"
               android:indeterminate="true"
               android:contentDescription="@null"
+              android:importantForAccessibility="no"
               android:layout_marginEnd="@dimen/spacing_8" />
 
           <TextView
@@ -468,7 +470,8 @@
           android:layout_gravity="center"
           android:indeterminate="true"
           android:visibility="gone"
-          android:contentDescription="@null" />
+          android:contentDescription="@null"
+          android:importantForAccessibility="no" />
 
     </FrameLayout>
 

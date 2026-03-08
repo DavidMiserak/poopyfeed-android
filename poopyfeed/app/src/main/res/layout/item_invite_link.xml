@@ -62,7 +62,7 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
+                android:minHeight="48dp"
                 android:text="@string/invite_link_copy" />
 
             <com.google.android.material.button.MaterialButton
@@ -70,7 +70,7 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
+                android:minHeight="48dp"
                 android:text="@string/invite_link_pause" />
 
             <com.google.android.material.button.MaterialButton
@@ -78,7 +78,7 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
+                android:minHeight="48dp"
                 android:text="@string/invite_link_delete" />
 
         </LinearLayout>

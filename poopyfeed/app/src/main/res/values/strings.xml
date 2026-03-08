@@ -340,4 +340,9 @@
     <string name="a11y_retry">Retry</string>
     <string name="a11y_dismiss">Dismiss</string>
     <string name="a11y_use_device_timezone">Use device timezone</string>
+    <string name="a11y_go_to_feedings">Feedings. Double tap to open.</string>
+    <string name="a11y_go_to_diapers">Diapers. Double tap to open.</string>
+    <string name="a11y_go_to_naps">Naps. Double tap to open.</string>
+    <string name="a11y_copy_invite_link">Copy invite link</string>
+    <string name="a11y_close">Close</string>
 </resources>
