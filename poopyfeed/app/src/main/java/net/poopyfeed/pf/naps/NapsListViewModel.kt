@@ -88,9 +88,9 @@ constructor(
         val result = repo.refreshNaps(childId)
         when {
           result is ApiResult.Error && _uiState.value is NapsListUiState.Loading ->
-              _uiState.value = NapsListUiState.Error(result.error.getUserMessage(context))
+              _uiState.value = NapsListUiState.Empty
           result is ApiResult.Error && _uiState.value is NapsListUiState.Ready ->
-              _uiState.value = NapsListUiState.Error(result.error.getUserMessage(context))
+              Unit // keep showing cached list so user can view logs offline
         }
       } finally {
         _isRefreshing.value = false

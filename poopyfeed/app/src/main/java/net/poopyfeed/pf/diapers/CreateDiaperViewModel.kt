@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** UI state for the create diaper bottom sheet. */
 sealed interface CreateDiaperUiState {
@@ -35,6 +36,7 @@ class CreateDiaperViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedDiapersRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -57,7 +59,10 @@ constructor(
       val result = repo.createDiaper(childId, request)
       _uiState.value =
           when (result) {
-            is ApiResult.Success -> CreateDiaperUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              CreateDiaperUiState.Success
+            }
             is ApiResult.Error -> CreateDiaperUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> CreateDiaperUiState.Saving
           }

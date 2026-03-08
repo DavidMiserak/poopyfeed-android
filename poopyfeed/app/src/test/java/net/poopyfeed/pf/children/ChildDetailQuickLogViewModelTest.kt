@@ -23,6 +23,7 @@ import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,6 +38,7 @@ class ChildDetailQuickLogViewModelTest {
   private lateinit var diapersRepo: CachedDiapersRepository
   private lateinit var feedingsRepo: CachedFeedingsRepository
   private lateinit var napsRepo: CachedNapsRepository
+  private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var viewModel: ChildDetailQuickLogViewModel
 
   private val childId = 1
@@ -50,6 +52,7 @@ class ChildDetailQuickLogViewModelTest {
     diapersRepo = mockk()
     feedingsRepo = mockk()
     napsRepo = mockk()
+    mockSyncScheduler = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     every { childrenRepo.getChildCached(childId) } returns
         flowOf(TestFixtures.mockChild(id = childId))
@@ -60,6 +63,7 @@ class ChildDetailQuickLogViewModelTest {
             diapersRepo,
             feedingsRepo,
             napsRepo,
+            mockSyncScheduler,
             mockContext,
         )
   }
@@ -203,6 +207,7 @@ class ChildDetailQuickLogViewModelTest {
                 diapersRepo,
                 feedingsRepo,
                 napsRepo,
+                mockSyncScheduler,
                 mockContext,
             )
         advanceUntilIdle()
@@ -222,6 +227,7 @@ class ChildDetailQuickLogViewModelTest {
                 diapersRepo,
                 feedingsRepo,
                 napsRepo,
+                mockSyncScheduler,
                 mockContext,
             )
         advanceUntilIdle()
@@ -247,6 +253,7 @@ class ChildDetailQuickLogViewModelTest {
                 diapersRepo,
                 feedingsRepo,
                 napsRepo,
+                mockSyncScheduler,
                 mockContext,
             )
         val values = mutableListOf<BottleAmounts>()
@@ -275,6 +282,7 @@ class ChildDetailQuickLogViewModelTest {
                 diapersRepo,
                 feedingsRepo,
                 napsRepo,
+                mockSyncScheduler,
                 mockContext,
             )
         val values = mutableListOf<BottleAmounts>()

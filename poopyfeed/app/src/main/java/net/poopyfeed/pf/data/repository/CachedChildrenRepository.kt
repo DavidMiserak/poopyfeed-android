@@ -251,44 +251,55 @@ constructor(
           feedingDao.upsertFeeding(entity)
           ApiResult.Success(feeding)
         } catch (e: IOException) {
-          val tempId = tempIdCounter.decrementAndGet()
-          val now = request.timestamp
-          feedingDao.upsertFeeding(
-              FeedingEntity(
-                  id = tempId,
-                  child = childId,
-                  feeding_type = request.feeding_type,
-                  amount_oz = request.amount_oz,
-                  timestamp = now,
-                  created_at = now,
-                  updated_at = now,
-                  duration_minutes = request.durationMinutes,
-                  side = request.side,
-              ))
-          pendingSyncDao.upsert(
-              PendingSyncEntity(
-                  entityType = "feeding",
-                  childId = childId,
-                  requestJson = json.encodeToString(CreateFeedingRequest.serializer(), request),
-                  tempLocalId = tempId,
-              ))
-          syncScheduler.enqueue()
-          ApiResult.Success(
-              Feeding(
-                  id = tempId,
-                  child = childId,
-                  feeding_type = request.feeding_type,
-                  amount_oz = request.amount_oz,
-                  timestamp = now,
-                  created_at = now,
-                  updated_at = now,
-                  duration_minutes = request.durationMinutes,
-                  side = request.side,
-              ))
+          createFeedingOffline(childId, request)
         } catch (e: Exception) {
-          ApiResult.Error(e.toApiError())
+          if (e.toApiError() is ApiError.NetworkError) {
+            createFeedingOffline(childId, request)
+          } else {
+            ApiResult.Error(e.toApiError())
+          }
         }
       }
+
+  private suspend fun createFeedingOffline(
+      childId: Int,
+      request: CreateFeedingRequest
+  ): ApiResult<Feeding> {
+    val tempId = tempIdCounter.decrementAndGet()
+    val now = request.timestamp
+    feedingDao.upsertFeeding(
+        FeedingEntity(
+            id = tempId,
+            child = childId,
+            feeding_type = request.feeding_type,
+            amount_oz = request.amount_oz,
+            timestamp = now,
+            created_at = now,
+            updated_at = now,
+            duration_minutes = request.durationMinutes,
+            side = request.side,
+        ))
+    pendingSyncDao.upsert(
+        PendingSyncEntity(
+            entityType = "feeding",
+            childId = childId,
+            requestJson = json.encodeToString(CreateFeedingRequest.serializer(), request),
+            tempLocalId = tempId,
+        ))
+    syncScheduler.enqueue()
+    return ApiResult.Success(
+        Feeding(
+            id = tempId,
+            child = childId,
+            feeding_type = request.feeding_type,
+            amount_oz = request.amount_oz,
+            timestamp = now,
+            created_at = now,
+            updated_at = now,
+            duration_minutes = request.durationMinutes,
+            side = request.side,
+        ))
+  }
 
   /** Delete feeding: API-first, then cache. */
   suspend fun deleteFeeding(childId: Int, feedingId: Int): ApiResult<Unit> =
@@ -412,38 +423,49 @@ constructor(
           diaperDao.upsertDiaper(entity)
           ApiResult.Success(diaper)
         } catch (e: IOException) {
-          val tempId = tempIdCounter.decrementAndGet()
-          val now = request.timestamp
-          diaperDao.upsertDiaper(
-              DiaperEntity(
-                  id = tempId,
-                  child = childId,
-                  change_type = request.change_type,
-                  timestamp = now,
-                  created_at = now,
-                  updated_at = now,
-              ))
-          pendingSyncDao.upsert(
-              PendingSyncEntity(
-                  entityType = "diaper",
-                  childId = childId,
-                  requestJson = json.encodeToString(CreateDiaperRequest.serializer(), request),
-                  tempLocalId = tempId,
-              ))
-          syncScheduler.enqueue()
-          ApiResult.Success(
-              Diaper(
-                  id = tempId,
-                  child = childId,
-                  change_type = request.change_type,
-                  timestamp = now,
-                  created_at = now,
-                  updated_at = now,
-              ))
+          createDiaperOffline(childId, request)
         } catch (e: Exception) {
-          ApiResult.Error(e.toApiError())
+          if (e.toApiError() is ApiError.NetworkError) {
+            createDiaperOffline(childId, request)
+          } else {
+            ApiResult.Error(e.toApiError())
+          }
         }
       }
+
+  private suspend fun createDiaperOffline(
+      childId: Int,
+      request: CreateDiaperRequest
+  ): ApiResult<Diaper> {
+    val tempId = tempIdCounter.decrementAndGet()
+    val now = request.timestamp
+    diaperDao.upsertDiaper(
+        DiaperEntity(
+            id = tempId,
+            child = childId,
+            change_type = request.change_type,
+            timestamp = now,
+            created_at = now,
+            updated_at = now,
+        ))
+    pendingSyncDao.upsert(
+        PendingSyncEntity(
+            entityType = "diaper",
+            childId = childId,
+            requestJson = json.encodeToString(CreateDiaperRequest.serializer(), request),
+            tempLocalId = tempId,
+        ))
+    syncScheduler.enqueue()
+    return ApiResult.Success(
+        Diaper(
+            id = tempId,
+            child = childId,
+            change_type = request.change_type,
+            timestamp = now,
+            created_at = now,
+            updated_at = now,
+        ))
+  }
 
   suspend fun deleteDiaper(childId: Int, diaperId: Int): ApiResult<Unit> =
       withContext(ioDispatcher) {
@@ -565,38 +587,46 @@ constructor(
           napDao.upsertNap(entity)
           ApiResult.Success(nap)
         } catch (e: IOException) {
-          val tempId = tempIdCounter.decrementAndGet()
-          val now = request.start_time
-          napDao.upsertNap(
-              NapEntity(
-                  id = tempId,
-                  child = childId,
-                  start_time = now,
-                  end_time = request.end_time,
-                  created_at = now,
-                  updated_at = now,
-              ))
-          pendingSyncDao.upsert(
-              PendingSyncEntity(
-                  entityType = "nap",
-                  childId = childId,
-                  requestJson = json.encodeToString(CreateNapRequest.serializer(), request),
-                  tempLocalId = tempId,
-              ))
-          syncScheduler.enqueue()
-          ApiResult.Success(
-              Nap(
-                  id = tempId,
-                  child = childId,
-                  start_time = now,
-                  end_time = request.end_time,
-                  created_at = now,
-                  updated_at = now,
-              ))
+          createNapOffline(childId, request)
         } catch (e: Exception) {
-          ApiResult.Error(e.toApiError())
+          if (e.toApiError() is ApiError.NetworkError) {
+            createNapOffline(childId, request)
+          } else {
+            ApiResult.Error(e.toApiError())
+          }
         }
       }
+
+  private suspend fun createNapOffline(childId: Int, request: CreateNapRequest): ApiResult<Nap> {
+    val tempId = tempIdCounter.decrementAndGet()
+    val now = request.start_time
+    napDao.upsertNap(
+        NapEntity(
+            id = tempId,
+            child = childId,
+            start_time = now,
+            end_time = request.end_time,
+            created_at = now,
+            updated_at = now,
+        ))
+    pendingSyncDao.upsert(
+        PendingSyncEntity(
+            entityType = "nap",
+            childId = childId,
+            requestJson = json.encodeToString(CreateNapRequest.serializer(), request),
+            tempLocalId = tempId,
+        ))
+    syncScheduler.enqueue()
+    return ApiResult.Success(
+        Nap(
+            id = tempId,
+            child = childId,
+            start_time = now,
+            end_time = request.end_time,
+            created_at = now,
+            updated_at = now,
+        ))
+  }
 
   suspend fun updateNap(childId: Int, napId: Int, request: UpdateNapRequest): ApiResult<Nap> =
       withContext(ioDispatcher) {

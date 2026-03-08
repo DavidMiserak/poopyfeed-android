@@ -44,6 +44,7 @@ class NapAdapter(
       val ctx = binding.root.context
       val timeSummary = formatRelativeTime(ctx, nap.start_time)
       binding.textStartTime.text = ctx.getString(R.string.nap_record_start, timeSummary)
+      binding.textSavedLocally.visibility = if (nap.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_nap_item, timeSummary)
       if (nap.end_time == null) {
         binding.textDuration.visibility = View.GONE

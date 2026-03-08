@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** UI state for the create nap bottom sheet. */
 sealed interface CreateNapUiState {
@@ -35,6 +36,7 @@ class CreateNapViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedNapsRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -50,7 +52,10 @@ constructor(
       val result = repo.createNap(childId, request)
       _uiState.value =
           when (result) {
-            is ApiResult.Success -> CreateNapUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              CreateNapUiState.Success
+            }
             is ApiResult.Error -> CreateNapUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> CreateNapUiState.Saving
           }

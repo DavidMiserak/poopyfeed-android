@@ -1,6 +1,7 @@
 package net.poopyfeed.pf.diapers
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -47,6 +48,7 @@ class DiaperAdapter(
       binding.textChangeType.text = typeLabel
       val timeSummary = formatRelativeTime(ctx, diaper.timestamp)
       binding.textTime.text = timeSummary
+      binding.textSavedLocally.visibility = if (diaper.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_diaper_item, timeSummary)
       binding.root.setOnClickListener { onItemClick(diaper) }
       binding.root.setOnLongClickListener {

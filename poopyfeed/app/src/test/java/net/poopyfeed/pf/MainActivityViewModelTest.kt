@@ -23,6 +23,7 @@ import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +36,7 @@ class MainActivityViewModelTest {
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
+  private val mockSyncScheduler: SyncScheduler = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
 
   @Before
@@ -65,6 +67,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.checkTimezoneMismatch()
 
@@ -85,6 +88,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.checkTimezoneMismatch()
 
@@ -109,6 +113,7 @@ class MainActivityViewModelTest {
               mockClearSessionUseCase,
               mockTokenManager,
               mockNotificationsRepository,
+              mockSyncScheduler,
               mockContext)
       viewModel.checkTimezoneMismatch()
 
@@ -127,6 +132,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.dismissTimezoneBanner()
 
@@ -149,6 +155,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
 
     // Manually create Visible state by setting up the mock to create the condition
@@ -194,6 +201,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
 
     // Trigger Visible state by calling checkTimezoneMismatch
@@ -232,6 +240,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
 
     viewModel.checkTimezoneMismatch()
@@ -255,6 +264,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
 
     // Start with Hidden state (default)
@@ -282,6 +292,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.logout()
 
@@ -305,6 +316,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.checkTimezoneMismatch()
     testDispatcher.scheduler.advanceUntilIdle()
@@ -329,6 +341,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.refreshUnreadCount()
     testDispatcher.scheduler.advanceUntilIdle()
@@ -347,6 +360,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.refreshUnreadCount()
     testDispatcher.scheduler.advanceUntilIdle()
@@ -364,6 +378,7 @@ class MainActivityViewModelTest {
             mockClearSessionUseCase,
             mockTokenManager,
             mockNotificationsRepository,
+            mockSyncScheduler,
             mockContext)
     viewModel.refreshUnreadCount()
     testDispatcher.scheduler.advanceUntilIdle()

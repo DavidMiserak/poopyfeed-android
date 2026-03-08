@@ -68,6 +68,7 @@ class FeedingAdapter(
       }
       val timeSummary = formatRelativeTime(ctx, feeding.timestamp)
       binding.textTime.text = timeSummary
+      binding.textSavedLocally.visibility = if (feeding.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_feeding_item, timeSummary)
       binding.root.setOnClickListener { onItemClick(feeding) }
       binding.root.setOnLongClickListener {

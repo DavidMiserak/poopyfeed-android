@@ -23,6 +23,7 @@ import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** UI state for quick-log diaper creation (instant log with time = now). */
 sealed interface QuickLogDiaperUiState {
@@ -79,6 +80,7 @@ constructor(
     private val diapersRepo: CachedDiapersRepository,
     private val feedingsRepo: CachedFeedingsRepository,
     private val napsRepo: CachedNapsRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -126,7 +128,10 @@ constructor(
       val result = diapersRepo.createDiaper(childId, request)
       _diaperState.value =
           when (result) {
-            is ApiResult.Success -> QuickLogDiaperUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              QuickLogDiaperUiState.Success
+            }
             is ApiResult.Error -> QuickLogDiaperUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> QuickLogDiaperUiState.Saving
           }
@@ -150,7 +155,10 @@ constructor(
       val result = feedingsRepo.createFeeding(childId, request)
       _feedingState.value =
           when (result) {
-            is ApiResult.Success -> QuickLogFeedingUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              QuickLogFeedingUiState.Success
+            }
             is ApiResult.Error -> QuickLogFeedingUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> QuickLogFeedingUiState.Saving
           }
@@ -166,7 +174,10 @@ constructor(
       val result = napsRepo.createNap(childId, request)
       _napState.value =
           when (result) {
-            is ApiResult.Success -> QuickLogNapUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              QuickLogNapUiState.Success
+            }
             is ApiResult.Error -> QuickLogNapUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> QuickLogNapUiState.Saving
           }

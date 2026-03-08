@@ -18,6 +18,7 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -29,6 +30,7 @@ class CreateNapViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedNapsRepository
+  private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var viewModel: CreateNapViewModel
 
   @Before
@@ -37,8 +39,9 @@ class CreateNapViewModelTest {
     mockContext = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockSyncScheduler = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateNapViewModel(savedStateHandle, mockRepository, mockContext)
+    viewModel = CreateNapViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockContext)
   }
 
   @After

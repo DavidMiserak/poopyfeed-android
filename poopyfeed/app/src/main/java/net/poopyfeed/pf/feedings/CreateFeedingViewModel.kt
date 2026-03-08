@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** UI state for the create feeding bottom sheet. */
 sealed interface CreateFeedingUiState {
@@ -40,6 +41,7 @@ class CreateFeedingViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedFeedingsRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -98,7 +100,10 @@ constructor(
       val result = repo.createFeeding(childId, request)
       _uiState.value =
           when (result) {
-            is ApiResult.Success -> CreateFeedingUiState.Success
+            is ApiResult.Success -> {
+              syncScheduler.enqueueIfPending()
+              CreateFeedingUiState.Success
+            }
             is ApiResult.Error -> CreateFeedingUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> CreateFeedingUiState.Saving
           }

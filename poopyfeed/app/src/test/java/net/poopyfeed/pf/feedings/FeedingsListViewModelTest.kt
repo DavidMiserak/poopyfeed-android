@@ -158,7 +158,7 @@ class FeedingsListViewModelTest {
       }
 
   @Test
-  fun `refresh when Error and state Ready sets Error`() =
+  fun `refresh when Error and state Ready keeps Ready so user can view logs offline`() =
       runTest(testDispatcher) {
         val feedings = listOf(TestFixtures.mockFeeding())
         coEvery { mockRepository.listFeedingsCached(1) } returns flowOf(ApiResult.Success(feedings))
@@ -172,6 +172,6 @@ class FeedingsListViewModelTest {
         viewModel.refresh()
         advanceUntilIdle()
 
-        assertIs<FeedingsListUiState.Error>(viewModel.uiState.value)
+        assertIs<FeedingsListUiState.Ready>(viewModel.uiState.value)
       }
 }

@@ -136,7 +136,7 @@ class NapsListViewModelTest {
       }
 
   @Test
-  fun `refresh when Error and state Ready sets Error`() =
+  fun `refresh when Error and state Ready keeps Ready so user can view logs offline`() =
       runTest(testDispatcher) {
         val naps = listOf(TestFixtures.mockNap())
         coEvery { mockRepository.listNapsCached(1) } returns flowOf(ApiResult.Success(naps))
@@ -150,7 +150,7 @@ class NapsListViewModelTest {
         viewModel.refresh()
         advanceUntilIdle()
 
-        assertIs<NapsListUiState.Error>(viewModel.uiState.value)
+        assertIs<NapsListUiState.Ready>(viewModel.uiState.value)
       }
 
   @Test

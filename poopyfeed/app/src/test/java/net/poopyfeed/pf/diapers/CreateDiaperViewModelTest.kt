@@ -18,6 +18,7 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -29,6 +30,7 @@ class CreateDiaperViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedDiapersRepository
+  private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var viewModel: CreateDiaperViewModel
 
   @Before
@@ -37,8 +39,10 @@ class CreateDiaperViewModelTest {
     mockContext = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockSyncScheduler = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateDiaperViewModel(savedStateHandle, mockRepository, mockContext)
+    viewModel =
+        CreateDiaperViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockContext)
   }
 
   @After

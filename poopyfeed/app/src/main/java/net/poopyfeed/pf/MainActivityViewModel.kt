@@ -20,6 +20,7 @@ import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.data.session.ClearSessionUseCase
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** Banner state for timezone mismatch between device and profile. */
 sealed interface TimezoneBannerState {
@@ -45,6 +46,7 @@ constructor(
     private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     private val notificationsRepository: NotificationsRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -133,6 +135,14 @@ constructor(
   /** Dismisses the timezone banner for the session without updating profile. */
   fun dismissTimezoneBanner() {
     _timezoneBanner.value = TimezoneBannerState.Hidden
+  }
+
+  /**
+   * Schedules background sync if there are pending offline-created items. Call when app comes to
+   * foreground so saved-local items are pushed once the device is online.
+   */
+  fun scheduleSyncWhenForeground() {
+    viewModelScope.launch { syncScheduler.enqueueIfPending() }
   }
 
   /**

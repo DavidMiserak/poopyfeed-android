@@ -157,7 +157,7 @@ class DiapersListViewModelTest {
       }
 
   @Test
-  fun `refresh when Error and state Ready sets Error`() =
+  fun `refresh when Error and state Ready keeps Ready so user can view logs offline`() =
       runTest(testDispatcher) {
         val diapers = listOf(TestFixtures.mockDiaper())
         coEvery { mockRepository.listDiapersCached(1) } returns flowOf(ApiResult.Success(diapers))
@@ -171,6 +171,6 @@ class DiapersListViewModelTest {
         viewModel.refresh()
         advanceUntilIdle()
 
-        assertIs<DiapersListUiState.Error>(viewModel.uiState.value)
+        assertIs<DiapersListUiState.Ready>(viewModel.uiState.value)
       }
 }

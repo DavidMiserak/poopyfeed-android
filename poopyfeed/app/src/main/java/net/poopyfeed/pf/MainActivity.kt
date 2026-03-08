@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.checkTimezoneMismatch()
         viewModel.refreshUnreadCount()
+        viewModel.scheduleSyncWhenForeground()
         launch { viewModel.logoutNavigateToLogin.collect { navigateToLoginAfterLogout() } }
         launch { viewModel.timezoneBanner.collect { bindTimezoneBannerState(it) } }
         launch {
