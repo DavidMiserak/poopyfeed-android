@@ -1,5 +1,6 @@
 package net.poopyfeed.pf.notifications
 
+import android.os.Build
 import android.view.View
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
@@ -22,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.util.ReflectionHelpers
 
 /** UI tests for [NotificationsFragment] using Hilt + Robolectric. */
 @HiltAndroidTest
@@ -116,5 +118,50 @@ class NotificationsFragmentTest {
     val root = fragment!!.requireView()
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_error_state).visibility)
     assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_notifications).visibility)
+  }
+
+  @Test
+  fun `permission request on API 33+ does not crash fragment`() {
+    // Set SDK to 33 (API 33+) so permission request logic runs
+    ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 33)
+
+    // Robolectric denies all permissions by default
+    var fragment: NotificationsFragment? = null
+    launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
+      fragment = this
+    }
+    idleMainLooperUntil {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.recycler_notifications).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
+      } == true
+    }
+
+    val root = fragment!!.requireView()
+    // Verify fragment loads gracefully despite permission request
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_notifications).visibility)
+  }
+
+  @Test
+  fun `permission logic skipped on API below 33`() {
+    // Set SDK to 32 (below API 33) so permission request logic doesn't run
+    ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 32)
+
+    var fragment: NotificationsFragment? = null
+    launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
+      fragment = this
+    }
+    idleMainLooperUntil {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.recycler_notifications).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
+            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
+      } == true
+    }
+
+    val root = fragment!!.requireView()
+    // Verify fragment loads normally on pre-API 33
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_notifications).visibility)
   }
 }

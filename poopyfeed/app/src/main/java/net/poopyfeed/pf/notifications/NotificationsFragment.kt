@@ -1,10 +1,15 @@
 package net.poopyfeed.pf.notifications
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,6 +41,17 @@ class NotificationsFragment : Fragment() {
   private val viewModel: NotificationsViewModel by viewModels()
   private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
   private lateinit var adapter: NotificationAdapter
+
+  private val requestPermissionLauncher =
+      registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (!isGranted) {
+          Snackbar.make(
+                  binding.root,
+                  getString(R.string.notifications_permission_denied),
+                  Snackbar.LENGTH_LONG)
+              .show()
+        }
+      }
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -86,6 +102,8 @@ class NotificationsFragment : Fragment() {
     binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
       viewModel.refresh()
     }
+
+    requestNotificationPermissionIfNeeded()
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -162,6 +180,16 @@ class NotificationsFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.unreadCountInvalidated.collect { mainActivityViewModel.refreshUnreadCount() }
+      }
+    }
+  }
+
+  private fun requestNotificationPermissionIfNeeded() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (ContextCompat.checkSelfPermission(
+          requireContext(), Manifest.permission.POST_NOTIFICATIONS) !=
+          PackageManager.PERMISSION_GRANTED) {
+        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
       }
     }
   }

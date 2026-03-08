@@ -332,6 +332,7 @@
     <string name="notifications_retry">Retry</string>
     <string name="notifications_load_more">Load more</string>
     <string name="notification_meta">%1$s for %2$s</string>
+    <string name="notifications_permission_denied">Enable notifications in Settings to receive activity alerts.</string>
 
     <!-- Accessibility (TalkBack) -->
     <string name="a11y_child_card">%1$s. Double tap to view.</string>
