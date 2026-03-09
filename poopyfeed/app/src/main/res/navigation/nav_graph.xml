@@ -112,6 +112,10 @@
         <action
             android:id="@+id/action_childDetail_to_editChild"
             app:destination="@id/EditChildFragment" />
+
+        <action
+            android:id="@+id/action_childDetail_to_timeline"
+            app:destination="@id/TimelineFragment" />
     </fragment>
 
     <dialog
@@ -198,6 +202,19 @@
         <action
             android:id="@+id/action_napsList_to_editNap"
             app:destination="@id/editNapBottomSheet" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/TimelineFragment"
+        android:name="net.poopyfeed.pf.ui.timeline.TimelineFragment"
+        android:label="@string/timeline_title"
+        tools:layout="@layout/fragment_timeline">
+
+        <deepLink app:uri="poopyfeed://app/children/{childId}/timeline" />
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
     </fragment>
 
     <fragment

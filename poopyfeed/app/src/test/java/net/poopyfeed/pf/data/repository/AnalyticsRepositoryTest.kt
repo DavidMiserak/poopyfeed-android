@@ -71,4 +71,42 @@ class AnalyticsRepositoryTest {
     assertTrue(result is ApiResult.Error)
     assertTrue(result.error is ApiError.UnknownError)
   }
+
+  @Test
+  fun `getTimeline success returns ApiResult Success with paginated events`() = runTest {
+    val mockEvents =
+        listOf(
+            TestFixtures.mockTimelineEvent(at = "2026-03-09T14:00:00Z"),
+            TestFixtures.mockTimelineEvent(at = "2026-03-09T10:00:00Z"),
+        )
+    val mockResponse = TestFixtures.mockPaginatedResponse(results = mockEvents)
+    coEvery { mockApiService.getTimeline(1, 1, 100) } returns mockResponse
+
+    val result = repository.getTimeline(1)
+
+    assertTrue(result is ApiResult.Success)
+    assertEquals(mockResponse, result.data)
+    assertEquals(2, result.data.results.size)
+  }
+
+  @Test
+  fun `getTimeline HTTP error returns ApiResult Error`() = runTest {
+    val httpException = HttpException(Response.error<Unit>(500, mockk(relaxed = true)))
+    coEvery { mockApiService.getTimeline(1, 1, 100) } throws httpException
+
+    val result = repository.getTimeline(1)
+
+    assertTrue(result is ApiResult.Error)
+    assertTrue(result.error is ApiError.HttpError)
+  }
+
+  @Test
+  fun `getTimeline network error returns ApiResult Error`() = runTest {
+    coEvery { mockApiService.getTimeline(1, 1, 100) } throws java.io.IOException("Network error")
+
+    val result = repository.getTimeline(1)
+
+    assertTrue(result is ApiResult.Error)
+    assertTrue(result.error is ApiError.NetworkError)
+  }
 }

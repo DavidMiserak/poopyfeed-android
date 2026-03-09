@@ -59,7 +59,7 @@ class SyncWorkerTest {
     return TestListenableWorkerBuilder<SyncWorker>(context)
         .setWorkerFactory(
             TestSyncWorkerFactory(pendingSyncDao, apiService, feedingDao, diaperDao, napDao, json))
-        .build() as SyncWorker
+        .build()
   }
 
   @Test

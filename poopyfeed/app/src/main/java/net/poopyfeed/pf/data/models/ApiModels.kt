@@ -556,3 +556,41 @@ data class UserProfileUpdate(
     val email: String? = null,
     val timezone: String? = null
 )
+
+/** Timeline feeding event payload. */
+@Serializable
+data class TimelineFeedingPayload(
+    val id: Int,
+    @SerialName("fed_at") val fedAt: String,
+    @SerialName("feeding_type") val feedingType: String,
+    @SerialName("amount_oz") val amountOz: String? = null,
+    @SerialName("duration_minutes") val durationMinutes: Int? = null,
+    val side: String? = null,
+)
+
+/** Timeline diaper change event payload. */
+@Serializable
+data class TimelineDiaperPayload(
+    val id: Int,
+    @SerialName("changed_at") val changedAt: String,
+    @SerialName("change_type") val changeType: String,
+)
+
+/** Timeline nap event payload. */
+@Serializable
+data class TimelineNapPayload(
+    val id: Int,
+    @SerialName("napped_at") val nappedAt: String,
+    @SerialName("ended_at") val endedAt: String? = null,
+    @SerialName("duration_minutes") val durationMinutes: Int? = null,
+)
+
+/** Timeline event from /api/v1/analytics/children/{childId}/timeline/. */
+@Serializable
+data class TimelineEvent(
+    val type: String,
+    val at: String,
+    val feeding: TimelineFeedingPayload? = null,
+    val diaper: TimelineDiaperPayload? = null,
+    val nap: TimelineNapPayload? = null,
+)

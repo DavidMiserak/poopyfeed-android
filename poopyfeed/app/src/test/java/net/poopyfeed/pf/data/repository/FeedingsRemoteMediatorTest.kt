@@ -11,6 +11,7 @@ import io.mockk.mockk
 import java.io.IOException
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -68,8 +69,11 @@ class FeedingsRemoteMediatorTest {
     val result = mediator.load(LoadType.REFRESH, state)
 
     // Verify result
-    assertTrue(result is MediatorResult.Success)
-    assertFalse((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertFalse(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
 
     // Verify API was called with correct parameters
     coVerify { mockApiService.listFeedings(childId, 1, 20) }
@@ -99,8 +103,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.REFRESH, state)
 
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
   }
 
   @Test
@@ -111,8 +118,11 @@ class FeedingsRemoteMediatorTest {
     val result = mediator.load(LoadType.APPEND, state)
 
     // Should return success without calling API
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
 
     // Verify no API call was made
     coVerify(exactly = 0) { mockApiService.listFeedings(any(), any(), any()) }
@@ -134,8 +144,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.APPEND, state)
 
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
   }
 
   @Test
@@ -144,8 +157,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.PREPEND, state)
 
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
 
     // Verify no API call was made
     coVerify(exactly = 0) { mockApiService.listFeedings(any(), any(), any()) }
@@ -160,8 +176,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.APPEND, state)
 
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
 
     // Verify no API call for empty state
     coVerify(exactly = 0) { mockApiService.listFeedings(any(), any(), any()) }
@@ -177,8 +196,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.REFRESH, state)
 
-    assertTrue(result is MediatorResult.Error)
-    assertTrue((result as MediatorResult.Error).throwable is IOException)
+    if (result is MediatorResult.Error) {
+      assertTrue(result.throwable is IOException)
+    } else {
+      fail("Expected MediatorResult.Error")
+    }
   }
 
   @Test
@@ -191,8 +213,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.REFRESH, state)
 
-    assertTrue(result is MediatorResult.Error)
-    assertTrue((result as MediatorResult.Error).throwable is HttpException)
+    if (result is MediatorResult.Error) {
+      assertTrue(result.throwable is HttpException)
+    } else {
+      fail("Expected MediatorResult.Error")
+    }
   }
 
   @Test
@@ -223,8 +248,11 @@ class FeedingsRemoteMediatorTest {
 
     val result = mediator.load(LoadType.REFRESH, state)
 
-    assertTrue(result is MediatorResult.Success)
-    assertTrue((result as MediatorResult.Success).endOfPaginationReached)
+    if (result is MediatorResult.Success) {
+      assertTrue(result.endOfPaginationReached)
+    } else {
+      fail("Expected MediatorResult.Success")
+    }
 
     // Verify empty list was still upserted
     coVerify { mockDao.upsertFeedings(emptyList()) }

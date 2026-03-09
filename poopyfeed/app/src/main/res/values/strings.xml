@@ -142,6 +142,7 @@
     <string name="child_detail_feedings">Feedings</string>
     <string name="child_detail_diapers">Diapers</string>
     <string name="child_detail_naps">Naps</string>
+    <string name="child_detail_timeline">Timeline</string>
     <string name="child_detail_today_loading">Loading today summary</string>
     <string name="child_detail_today_summary">Today: %1$d feedings, %2$d diapers, %3$d naps</string>
     <string name="child_detail_edit_button">Edit</string>
@@ -245,6 +246,9 @@
     <string name="naps_delete_confirm_message">This nap will be removed.</string>
     <string name="naps_delete_confirm">Delete</string>
 
+    <!-- Timeline -->
+    <string name="timeline_title">Timeline</string>
+
     <!-- Create Feeding -->
     <string name="create_feeding_title">Log Feeding</string>
     <string name="create_feeding_type_label">Type</string>
@@ -347,6 +351,7 @@
     <string name="a11y_go_to_feedings">Feedings. Double tap to open.</string>
     <string name="a11y_go_to_diapers">Diapers. Double tap to open.</string>
     <string name="a11y_go_to_naps">Naps. Double tap to open.</string>
+    <string name="a11y_go_to_timeline">Timeline. Double tap to open.</string>
     <string name="a11y_copy_invite_link">Copy invite link</string>
     <string name="a11y_close">Close</string>
 </resources>

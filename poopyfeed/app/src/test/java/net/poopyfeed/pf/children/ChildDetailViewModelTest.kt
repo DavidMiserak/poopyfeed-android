@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -164,11 +165,15 @@ class ChildDetailViewModelTest {
         assertTrue(state is ChildDetailUiState.Ready)
         val ready = state
         assertEquals(mockAlerts, ready.patternAlerts)
-        assertTrue(ready.patternAlerts?.hasAnyAlert == true)
-        assertTrue(ready.patternAlerts?.feeding?.alert == true)
-        assertEquals(
-            "Baby usually feeds every 3h — it's been 3h 30m", ready.patternAlerts?.feeding?.message)
-        assertTrue(ready.patternAlerts?.nap?.alert == false)
+        val alerts = ready.patternAlerts
+        if (alerts != null) {
+          assertTrue(alerts.hasAnyAlert == true)
+          assertTrue(alerts.feeding.alert == true)
+          assertEquals("Baby usually feeds every 3h — it's been 3h 30m", alerts.feeding.message)
+          assertTrue(alerts.nap.alert == false)
+        } else {
+          fail("Expected non-null patternAlerts")
+        }
       }
 
   @Test

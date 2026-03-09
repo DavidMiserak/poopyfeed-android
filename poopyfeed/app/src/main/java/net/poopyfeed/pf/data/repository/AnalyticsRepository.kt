@@ -6,7 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.PatternAlertsResponse
+import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.models.toApiError
 import net.poopyfeed.pf.di.IoDispatcher
 
@@ -26,6 +28,21 @@ constructor(
       withContext(ioDispatcher) {
         try {
           val response = apiService.getPatternAlerts(childId)
+          ApiResult.Success(response)
+        } catch (e: Exception) {
+          ApiResult.Error(e.toApiError())
+        }
+      }
+
+  /** Get timeline events for a child (merged feedings, diapers, naps). */
+  suspend fun getTimeline(
+      childId: Int,
+      page: Int = 1,
+      pageSize: Int = 100,
+  ): ApiResult<PaginatedResponse<TimelineEvent>> =
+      withContext(ioDispatcher) {
+        try {
+          val response = apiService.getTimeline(childId, page, pageSize)
           ApiResult.Success(response)
         } catch (e: Exception) {
           ApiResult.Error(e.toApiError())

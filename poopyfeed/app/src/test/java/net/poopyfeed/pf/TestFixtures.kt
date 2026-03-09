@@ -18,6 +18,10 @@ import net.poopyfeed.pf.data.models.ShareInvite
 import net.poopyfeed.pf.data.models.SummaryDiapers
 import net.poopyfeed.pf.data.models.SummaryFeedings
 import net.poopyfeed.pf.data.models.SummarySleep
+import net.poopyfeed.pf.data.models.TimelineDiaperPayload
+import net.poopyfeed.pf.data.models.TimelineEvent
+import net.poopyfeed.pf.data.models.TimelineFeedingPayload
+import net.poopyfeed.pf.data.models.TimelineNapPayload
 import net.poopyfeed.pf.data.models.TodaySummary
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.WeeklySummary
@@ -338,4 +342,64 @@ object TestFixtures {
       previous: String? = null,
   ): PaginatedResponse<T> =
       PaginatedResponse(count = count, next = next, previous = previous, results = results)
+
+  /** Mock timeline feeding payload. */
+  fun mockTimelineFeedingPayload(
+      id: Int = 1,
+      fedAt: String = TS12,
+      feedingType: String = "bottle",
+      amountOz: String? = "4.0",
+      durationMinutes: Int? = null,
+      side: String? = null,
+  ) =
+      TimelineFeedingPayload(
+          id = id,
+          fedAt = fedAt,
+          feedingType = feedingType,
+          amountOz = amountOz,
+          durationMinutes = durationMinutes,
+          side = side,
+      )
+
+  /** Mock timeline diaper payload. */
+  fun mockTimelineDiaperPayload(
+      id: Int = 1,
+      changedAt: String = TS14_30,
+      changeType: String = "wet",
+  ) =
+      TimelineDiaperPayload(
+          id = id,
+          changedAt = changedAt,
+          changeType = changeType,
+      )
+
+  /** Mock timeline nap payload. */
+  fun mockTimelineNapPayload(
+      id: Int = 1,
+      nappedAt: String = TS13,
+      endedAt: String = TS14,
+      durationMinutes: Int = 60,
+  ) =
+      TimelineNapPayload(
+          id = id,
+          nappedAt = nappedAt,
+          endedAt = endedAt,
+          durationMinutes = durationMinutes,
+      )
+
+  /** Mock timeline event (feeding, diaper, or nap). */
+  fun mockTimelineEvent(
+      type: String = "feeding",
+      at: String = TS12,
+      feeding: TimelineFeedingPayload? = mockTimelineFeedingPayload(),
+      diaper: TimelineDiaperPayload? = null,
+      nap: TimelineNapPayload? = null,
+  ) =
+      TimelineEvent(
+          type = type,
+          at = at,
+          feeding = feeding,
+          diaper = diaper,
+          nap = nap,
+      )
 }

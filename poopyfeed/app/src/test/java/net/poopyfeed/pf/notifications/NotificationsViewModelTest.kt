@@ -55,8 +55,6 @@ class NotificationsViewModelTest {
         advanceUntilIdle()
 
         coVerify { mockRepository.pagedNotifications() }
-        // Verify pagingData flow exists
-        assertTrue(viewModel.pagingData != null)
       }
 
   @Test

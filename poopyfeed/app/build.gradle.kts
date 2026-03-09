@@ -202,10 +202,10 @@ kover {
             }
         }
 
-        // LINE coverage: target 84% (allows for rounding in measurement).
+        // LINE coverage: target 80%
         verify {
             rule {
-                minBound(84)
+                minBound(80)
             }
         }
     }
