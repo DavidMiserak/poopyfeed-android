@@ -110,7 +110,8 @@ interface PoopyFeedApiService {
   @GET("children/{childId}/feedings/")
   suspend fun listFeedings(
       @Path("childId") childId: Int,
-      @Query("page") page: Int = 1
+      @Query("page") page: Int = 1,
+      @Query("page_size") pageSize: Int = 20
   ): PaginatedResponse<FeedingListResponse>
 
   /** Create a new feeding record. POST /api/v1/children/{childId}/feedings/ */

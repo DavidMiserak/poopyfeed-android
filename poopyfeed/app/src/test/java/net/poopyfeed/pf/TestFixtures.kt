@@ -11,6 +11,7 @@ import net.poopyfeed.pf.data.models.FeedingListResponse
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.Notification
+import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.PatternAlert
 import net.poopyfeed.pf.data.models.PatternAlertsResponse
 import net.poopyfeed.pf.data.models.ShareInvite
@@ -309,5 +310,33 @@ object TestFixtures {
               PatternAlert(
                   alert = feedingAlert, message = feedingMessage, data_points = feedingDataPoints),
           nap = PatternAlert(alert = napAlert, message = napMessage, data_points = napDataPoints),
+      )
+
+  /** Mock paginated response for feedings (used in RemoteMediator tests). */
+  fun mockPaginatedFeedingsResponse(
+      results: List<FeedingListResponse> = listOf(mockFeedingListResponse()),
+      count: Int = results.size,
+      next: String? = null,
+      previous: String? = null,
+  ): PaginatedResponse<FeedingListResponse> =
+      PaginatedResponse(
+          count = count,
+          next = next,
+          previous = previous,
+          results = results
+      )
+
+  /** Mock paginated response for generic type (base pagination pattern). */
+  inline fun <reified T> mockPaginatedResponse(
+      results: List<T>,
+      count: Int = results.size,
+      next: String? = null,
+      previous: String? = null,
+  ): PaginatedResponse<T> =
+      PaginatedResponse(
+          count = count,
+          next = next,
+          previous = previous,
+          results = results
       )
 }
