@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
@@ -42,6 +43,7 @@ class ChildDetailViewModelTest {
     mockAnalyticsRepository = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     every { mockContext.getString(any()) } returns "formatted_time"
+    every { mockContext.getString(R.string.child_detail_never) } returns "Never"
   }
 
   @After
@@ -195,6 +197,59 @@ class ChildDetailViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state is ChildDetailUiState.Ready)
         assertEquals(null, state.patternAlerts)
+      }
+
+  @Test
+  fun `Ready state formats last activity as Never when child has no last feeding diaper or nap`() =
+      runTest(testDispatcher) {
+        val mockChild =
+            TestFixtures.mockChild(
+                last_feeding = null,
+                last_diaper_change = null,
+                last_nap = null,
+            )
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
+
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        val ready = state
+        assertEquals("Never", ready.lastFeedingFormatted)
+        assertEquals("Never", ready.lastDiaperFormatted)
+        assertEquals("Never", ready.lastNapFormatted)
+      }
+
+  @Test
+  fun `Ready state includes non-empty last activity when child has last feeding diaper and nap`() =
+      runTest(testDispatcher) {
+        val mockChild = TestFixtures.mockChild()
+        coEvery { mockRepository.getChildCached(1) } returns flowOf(mockChild)
+        coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        coEvery { mockRepository.getDashboardSummary(1) } returns
+            ApiResult.Success(TestFixtures.mockDashboardSummaryResponse())
+        coEvery { mockAnalyticsRepository.getPatternAlerts(1) } returns
+            ApiResult.Success(TestFixtures.mockPatternAlertsResponse())
+
+        val viewModel =
+            ChildDetailViewModel(
+                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ChildDetailUiState.Ready)
+        val ready = state
+        assertTrue(ready.lastFeedingFormatted.isNotEmpty())
+        assertTrue(ready.lastDiaperFormatted.isNotEmpty())
+        assertTrue(ready.lastNapFormatted.isNotEmpty())
       }
 
   @Test

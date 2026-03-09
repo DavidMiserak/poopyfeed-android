@@ -19,6 +19,7 @@ import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -124,6 +125,47 @@ class ChildDetailFragmentTest {
 
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.button_edit).visibility)
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.chip_role).visibility)
+  }
+
+  @Test
+  fun `ready state shows Recent Activity section with last feeding diaper and nap`() {
+    val fragment = launchFragment()
+    val root = fragment.requireView()
+
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.label_recent_activity).visibility)
+    val lastFeeding = root.findViewById<android.widget.TextView>(R.id.label_feeding).text.toString()
+    val lastDiaper = root.findViewById<android.widget.TextView>(R.id.label_diaper).text.toString()
+    val lastNap = root.findViewById<android.widget.TextView>(R.id.label_nap).text.toString()
+    assertNotNull(lastFeeding)
+    assertNotNull(lastDiaper)
+    assertNotNull(lastNap)
+    assertTrue(lastFeeding.isNotEmpty())
+    assertTrue(lastDiaper.isNotEmpty())
+    assertTrue(lastNap.isNotEmpty())
+  }
+
+  @Test
+  fun `ready state shows Never in Recent Activity when child has no last feeding diaper or nap`() {
+    every { repo.getChildCached(childId) } returns
+        flowOf(
+            TestFixtures.mockChild(
+                id = childId,
+                name = "Test Child",
+                last_feeding = null,
+                last_diaper_change = null,
+                last_nap = null,
+            ),
+        )
+
+    val fragment = launchFragment()
+    val root = fragment.requireView()
+
+    assertEquals(
+        "Never", root.findViewById<android.widget.TextView>(R.id.label_feeding).text.toString())
+    assertEquals(
+        "Never", root.findViewById<android.widget.TextView>(R.id.label_diaper).text.toString())
+    assertEquals(
+        "Never", root.findViewById<android.widget.TextView>(R.id.label_nap).text.toString())
   }
 
   @Test
