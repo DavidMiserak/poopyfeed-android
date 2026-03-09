@@ -166,7 +166,10 @@ constructor(
       items.add(TimelineItem.Event(events[i]))
       if (i < events.lastIndex) {
         val newerMs = parseEpochMs(events[i].at)
-        val olderMs = parseEpochMs(events[i + 1].at)
+        // For naps, use end time as the effective boundary (nap occupies time until it ends)
+        val olderEvent = events[i + 1]
+        val olderEffectiveEnd = olderEvent.nap?.endedAt ?: olderEvent.at
+        val olderMs = parseEpochMs(olderEffectiveEnd)
         if (newerMs != null && olderMs != null) {
           val gapMinutes = (newerMs - olderMs) / 60_000
           if (gapMinutes >= GAP_THRESHOLD_MINUTES) {
@@ -174,7 +177,7 @@ constructor(
                 TimelineItem.Gap(
                     durationMinutes = gapMinutes,
                     newerEventAt = events[i].at,
-                    olderEventAt = events[i + 1].at,
+                    olderEventAt = olderEffectiveEnd,
                 ))
           }
         }
