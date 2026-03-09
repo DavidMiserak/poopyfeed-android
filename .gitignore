@@ -57,6 +57,9 @@ temp/
 *.orig
 kls_database.db
 
+# Git worktrees
+.worktrees/
+
 # SonarQube Scanner files
 .scannerwork/
 
