@@ -319,12 +319,7 @@ object TestFixtures {
       next: String? = null,
       previous: String? = null,
   ): PaginatedResponse<FeedingListResponse> =
-      PaginatedResponse(
-          count = count,
-          next = next,
-          previous = previous,
-          results = results
-      )
+      PaginatedResponse(count = count, next = next, previous = previous, results = results)
 
   /** Mock paginated response for notifications (network-only pagination). */
   fun mockPaginatedNotificationsResponse(
@@ -333,12 +328,7 @@ object TestFixtures {
       next: String? = null,
       previous: String? = null,
   ): PaginatedResponse<Notification> =
-      PaginatedResponse(
-          count = count,
-          next = next,
-          previous = previous,
-          results = results
-      )
+      PaginatedResponse(count = count, next = next, previous = previous, results = results)
 
   /** Mock paginated response for generic type (base pagination pattern). */
   inline fun <reified T> mockPaginatedResponse(
@@ -347,10 +337,5 @@ object TestFixtures {
       next: String? = null,
       previous: String? = null,
   ): PaginatedResponse<T> =
-      PaginatedResponse(
-          count = count,
-          next = next,
-          previous = previous,
-          results = results
-      )
+      PaginatedResponse(count = count, next = next, previous = previous, results = results)
 }

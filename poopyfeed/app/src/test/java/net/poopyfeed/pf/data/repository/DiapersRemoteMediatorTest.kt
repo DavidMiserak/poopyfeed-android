@@ -8,6 +8,9 @@ import androidx.paging.RemoteMediator.MediatorResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import java.io.IOException
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -19,9 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 
 /**
  * Unit tests for DiapersRemoteMediator.
@@ -57,8 +57,7 @@ class DiapersRemoteMediatorTest {
             results = listOf(mockDiaper1, mockDiaper2),
             count = 40,
             next = "http://api.example.com/diapers/?page=2",
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listDiapers(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildDiapers(childId) } returns Unit
@@ -92,8 +91,7 @@ class DiapersRemoteMediatorTest {
             results = listOf(mockDiaper),
             count = 5,
             next = null, // No next page
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listDiapers(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildDiapers(childId) } returns Unit
@@ -129,8 +127,7 @@ class DiapersRemoteMediatorTest {
         TestFixtures.mockPaginatedResponse(
             results = listOf(mockDiaper),
             next = null, // Last page
-            previous = "http://api.example.com/diapers/?page=2"
-        )
+            previous = "http://api.example.com/diapers/?page=2")
 
     coEvery { mockApiService.listDiapers(childId, any(), 20) } returns mockResponse
     coEvery { mockDao.upsertDiapers(any()) } returns Unit
@@ -188,8 +185,7 @@ class DiapersRemoteMediatorTest {
 
   @Test
   fun testHttpErrorReturnsErrorResult() = runTest {
-    val httpException =
-        HttpException(Response.error<String>(500, mockk(relaxed = true)))
+    val httpException = HttpException(Response.error<String>(500, mockk(relaxed = true)))
 
     coEvery { mockApiService.listDiapers(childId, 1, 20) } throws httpException
 
@@ -219,11 +215,7 @@ class DiapersRemoteMediatorTest {
   fun testEmptyResponseIsHandledCorrectly() = runTest {
     val mockResponse: PaginatedResponse<DiaperListResponse> =
         TestFixtures.mockPaginatedResponse(
-            results = emptyList(),
-            count = 0,
-            next = null,
-            previous = null
-        )
+            results = emptyList(), count = 0, next = null, previous = null)
 
     coEvery { mockApiService.listDiapers(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildDiapers(childId) } returns Unit
@@ -242,17 +234,12 @@ class DiapersRemoteMediatorTest {
 
   @Test
   fun testConvertsDiaperListResponseToEntityCorrectly() = runTest {
-    val mockDiaper = TestFixtures.mockDiaperListResponse(
-        id = 999,
-        change_type = "poop",
-        changed_at = "2024-01-15T10:00:00Z"
-    )
+    val mockDiaper =
+        TestFixtures.mockDiaperListResponse(
+            id = 999, change_type = "poop", changed_at = "2024-01-15T10:00:00Z")
     val mockResponse =
         TestFixtures.mockPaginatedResponse(
-            results = listOf(mockDiaper),
-            next = null,
-            previous = null
-        )
+            results = listOf(mockDiaper), next = null, previous = null)
 
     coEvery { mockApiService.listDiapers(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildDiapers(childId) } returns Unit
@@ -277,7 +264,6 @@ class DiapersRemoteMediatorTest {
         pages = emptyList(),
         anchorPosition = anchorPosition.takeIf { itemCount > 0 },
         config = PagingConfig(pageSize = 20),
-        leadingPlaceholderCount = 0
-    )
+        leadingPlaceholderCount = 0)
   }
 }

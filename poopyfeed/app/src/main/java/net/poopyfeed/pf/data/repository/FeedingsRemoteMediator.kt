@@ -4,11 +4,11 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import java.io.IOException
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
 import retrofit2.HttpException
-import java.io.IOException
 
 private const val FEEDINGS_PAGE_SIZE = 20
 private const val FEEDINGS_STARTING_PAGE = 1
@@ -46,8 +46,9 @@ class FeedingsRemoteMediator(
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-              val lastItem = state.lastItemOrNull()
-                  ?: return MediatorResult.Success(endOfPaginationReached = true)
+              val lastItem =
+                  state.lastItemOrNull()
+                      ?: return MediatorResult.Success(endOfPaginationReached = true)
               // Calculate next page: anchorPosition / pageSize + 2
               (state.anchorPosition ?: 0) / FEEDINGS_PAGE_SIZE + 2
             }
@@ -55,11 +56,7 @@ class FeedingsRemoteMediator(
 
       // Fetch from API
       val response =
-          apiService.listFeedings(
-              childId = childId,
-              page = loadKey,
-              pageSize = FEEDINGS_PAGE_SIZE
-          )
+          apiService.listFeedings(childId = childId, page = loadKey, pageSize = FEEDINGS_PAGE_SIZE)
 
       // Clear database on REFRESH to avoid duplicates
       if (loadType == LoadType.REFRESH) {
@@ -68,9 +65,7 @@ class FeedingsRemoteMediator(
 
       // Convert API response to entities
       val entities =
-          response.results
-              .map { it.toFeeding(childId) }
-              .map { FeedingEntity.fromApiModel(it) }
+          response.results.map { it.toFeeding(childId) }.map { FeedingEntity.fromApiModel(it) }
 
       // Upsert into Room
       dao.upsertFeedings(entities)

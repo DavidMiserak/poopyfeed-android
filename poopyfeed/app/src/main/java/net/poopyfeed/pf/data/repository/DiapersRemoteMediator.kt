@@ -4,11 +4,11 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import java.io.IOException
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.DiaperEntity
 import retrofit2.HttpException
-import java.io.IOException
 
 private const val DIAPERS_PAGE_SIZE = 20
 private const val DIAPERS_STARTING_PAGE = 1
@@ -46,8 +46,9 @@ class DiapersRemoteMediator(
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-              val lastItem = state.lastItemOrNull()
-                  ?: return MediatorResult.Success(endOfPaginationReached = true)
+              val lastItem =
+                  state.lastItemOrNull()
+                      ?: return MediatorResult.Success(endOfPaginationReached = true)
               // Calculate next page: anchorPosition / pageSize + 2
               (state.anchorPosition ?: 0) / DIAPERS_PAGE_SIZE + 2
             }
@@ -55,11 +56,7 @@ class DiapersRemoteMediator(
 
       // Fetch from API
       val response =
-          apiService.listDiapers(
-              childId = childId,
-              page = loadKey,
-              pageSize = DIAPERS_PAGE_SIZE
-          )
+          apiService.listDiapers(childId = childId, page = loadKey, pageSize = DIAPERS_PAGE_SIZE)
 
       // Clear database on REFRESH to avoid duplicates
       if (loadType == LoadType.REFRESH) {
@@ -68,9 +65,7 @@ class DiapersRemoteMediator(
 
       // Convert API response to entities
       val entities =
-          response.results
-              .map { it.toDiaper(childId) }
-              .map { DiaperEntity.fromApiModel(it) }
+          response.results.map { it.toDiaper(childId) }.map { DiaperEntity.fromApiModel(it) }
 
       // Upsert into Room
       dao.upsertDiapers(entities)

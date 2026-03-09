@@ -4,11 +4,11 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import java.io.IOException
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
 import retrofit2.HttpException
-import java.io.IOException
 
 private const val NAPS_PAGE_SIZE = 20
 private const val NAPS_STARTING_PAGE = 1
@@ -46,8 +46,9 @@ class NapsRemoteMediator(
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-              val lastItem = state.lastItemOrNull()
-                  ?: return MediatorResult.Success(endOfPaginationReached = true)
+              val lastItem =
+                  state.lastItemOrNull()
+                      ?: return MediatorResult.Success(endOfPaginationReached = true)
               // Calculate next page: anchorPosition / pageSize + 2
               (state.anchorPosition ?: 0) / NAPS_PAGE_SIZE + 2
             }
@@ -55,11 +56,7 @@ class NapsRemoteMediator(
 
       // Fetch from API
       val response =
-          apiService.listNaps(
-              childId = childId,
-              page = loadKey,
-              pageSize = NAPS_PAGE_SIZE
-          )
+          apiService.listNaps(childId = childId, page = loadKey, pageSize = NAPS_PAGE_SIZE)
 
       // Clear database on REFRESH to avoid duplicates
       if (loadType == LoadType.REFRESH) {
@@ -67,10 +64,7 @@ class NapsRemoteMediator(
       }
 
       // Convert API response to entities
-      val entities =
-          response.results
-              .map { it.toNap(childId) }
-              .map { NapEntity.fromApiModel(it) }
+      val entities = response.results.map { it.toNap(childId) }.map { NapEntity.fromApiModel(it) }
 
       // Upsert into Room
       dao.upsertNaps(entities)

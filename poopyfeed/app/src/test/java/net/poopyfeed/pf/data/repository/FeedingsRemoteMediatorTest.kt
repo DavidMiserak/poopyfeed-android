@@ -8,6 +8,9 @@ import androidx.paging.RemoteMediator.MediatorResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import java.io.IOException
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -17,9 +20,6 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 
 /**
  * Unit tests for FeedingsRemoteMediator.
@@ -55,8 +55,7 @@ class FeedingsRemoteMediatorTest {
             results = listOf(mockFeeding1, mockFeeding2),
             count = 40,
             next = "http://api.example.com/feedings/?page=2",
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listFeedings(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildFeedings(childId) } returns Unit
@@ -90,8 +89,7 @@ class FeedingsRemoteMediatorTest {
             results = listOf(mockFeeding),
             count = 5,
             next = null, // No next page
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listFeedings(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildFeedings(childId) } returns Unit
@@ -127,8 +125,7 @@ class FeedingsRemoteMediatorTest {
         TestFixtures.mockPaginatedFeedingsResponse(
             results = listOf(mockFeeding),
             next = null, // Last page
-            previous = "http://api.example.com/feedings/?page=2"
-        )
+            previous = "http://api.example.com/feedings/?page=2")
 
     coEvery { mockApiService.listFeedings(childId, any(), 20) } returns mockResponse
     coEvery { mockDao.upsertFeedings(any()) } returns Unit
@@ -186,8 +183,7 @@ class FeedingsRemoteMediatorTest {
 
   @Test
   fun testHttpErrorReturnsErrorResult() = runTest {
-    val httpException =
-        HttpException(Response.error<String>(500, mockk(relaxed = true)))
+    val httpException = HttpException(Response.error<String>(500, mockk(relaxed = true)))
 
     coEvery { mockApiService.listFeedings(childId, 1, 20) } throws httpException
 
@@ -217,11 +213,7 @@ class FeedingsRemoteMediatorTest {
   fun testEmptyResponseIsHandledCorrectly() = runTest {
     val mockResponse =
         TestFixtures.mockPaginatedFeedingsResponse(
-            results = emptyList(),
-            count = 0,
-            next = null,
-            previous = null
-        )
+            results = emptyList(), count = 0, next = null, previous = null)
 
     coEvery { mockApiService.listFeedings(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildFeedings(childId) } returns Unit
@@ -240,19 +232,16 @@ class FeedingsRemoteMediatorTest {
 
   @Test
   fun testConvertsFeedingListResponseToEntityCorrectly() = runTest {
-    val mockFeeding = TestFixtures.mockFeedingListResponse(
-        id = 999,
-        feeding_type = "breast",
-        amount_oz = null,
-        duration_minutes = 15,
-        side = "left"
-    )
+    val mockFeeding =
+        TestFixtures.mockFeedingListResponse(
+            id = 999,
+            feeding_type = "breast",
+            amount_oz = null,
+            duration_minutes = 15,
+            side = "left")
     val mockResponse =
         TestFixtures.mockPaginatedFeedingsResponse(
-            results = listOf(mockFeeding),
-            next = null,
-            previous = null
-        )
+            results = listOf(mockFeeding), next = null, previous = null)
 
     coEvery { mockApiService.listFeedings(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildFeedings(childId) } returns Unit
@@ -277,7 +266,6 @@ class FeedingsRemoteMediatorTest {
         pages = emptyList(),
         anchorPosition = anchorPosition.takeIf { itemCount > 0 },
         config = PagingConfig(pageSize = 20),
-        leadingPlaceholderCount = 0
-    )
+        leadingPlaceholderCount = 0)
   }
 }

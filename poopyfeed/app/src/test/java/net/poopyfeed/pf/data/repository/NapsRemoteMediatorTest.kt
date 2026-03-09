@@ -8,6 +8,9 @@ import androidx.paging.RemoteMediator.MediatorResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import java.io.IOException
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
@@ -19,9 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 
 /**
  * Unit tests for NapsRemoteMediator.
@@ -57,8 +57,7 @@ class NapsRemoteMediatorTest {
             results = listOf(mockNap1, mockNap2),
             count = 40,
             next = "http://api.example.com/naps/?page=2",
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listNaps(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildNaps(childId) } returns Unit
@@ -92,8 +91,7 @@ class NapsRemoteMediatorTest {
             results = listOf(mockNap),
             count = 5,
             next = null, // No next page
-            previous = null
-        )
+            previous = null)
 
     coEvery { mockApiService.listNaps(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildNaps(childId) } returns Unit
@@ -129,8 +127,7 @@ class NapsRemoteMediatorTest {
         TestFixtures.mockPaginatedResponse(
             results = listOf(mockNap),
             next = null, // Last page
-            previous = "http://api.example.com/naps/?page=2"
-        )
+            previous = "http://api.example.com/naps/?page=2")
 
     coEvery { mockApiService.listNaps(childId, any(), 20) } returns mockResponse
     coEvery { mockDao.upsertNaps(any()) } returns Unit
@@ -188,8 +185,7 @@ class NapsRemoteMediatorTest {
 
   @Test
   fun testHttpErrorReturnsErrorResult() = runTest {
-    val httpException =
-        HttpException(Response.error<String>(500, mockk(relaxed = true)))
+    val httpException = HttpException(Response.error<String>(500, mockk(relaxed = true)))
 
     coEvery { mockApiService.listNaps(childId, 1, 20) } throws httpException
 
@@ -219,11 +215,7 @@ class NapsRemoteMediatorTest {
   fun testEmptyResponseIsHandledCorrectly() = runTest {
     val mockResponse: PaginatedResponse<NapListResponse> =
         TestFixtures.mockPaginatedResponse(
-            results = emptyList(),
-            count = 0,
-            next = null,
-            previous = null
-        )
+            results = emptyList(), count = 0, next = null, previous = null)
 
     coEvery { mockApiService.listNaps(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildNaps(childId) } returns Unit
@@ -242,17 +234,11 @@ class NapsRemoteMediatorTest {
 
   @Test
   fun testConvertsNapListResponseToEntityCorrectly() = runTest {
-    val mockNap = TestFixtures.mockNapListResponse(
-        id = 999,
-        napped_at = "2024-01-15T10:00:00Z",
-        ended_at = "2024-01-15T11:00:00Z"
-    )
+    val mockNap =
+        TestFixtures.mockNapListResponse(
+            id = 999, napped_at = "2024-01-15T10:00:00Z", ended_at = "2024-01-15T11:00:00Z")
     val mockResponse =
-        TestFixtures.mockPaginatedResponse(
-            results = listOf(mockNap),
-            next = null,
-            previous = null
-        )
+        TestFixtures.mockPaginatedResponse(results = listOf(mockNap), next = null, previous = null)
 
     coEvery { mockApiService.listNaps(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildNaps(childId) } returns Unit
@@ -277,7 +263,6 @@ class NapsRemoteMediatorTest {
         pages = emptyList(),
         anchorPosition = anchorPosition.takeIf { itemCount > 0 },
         config = PagingConfig(pageSize = 20),
-        leadingPlaceholderCount = 0
-    )
+        leadingPlaceholderCount = 0)
   }
 }
