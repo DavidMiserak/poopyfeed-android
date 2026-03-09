@@ -220,13 +220,43 @@ class ChildDetailFragment : Fragment() {
     if (summary != null) {
       binding.todaySkeleton.visibility = View.GONE
       binding.todayContent.visibility = View.VISIBLE
-      binding.textTodaySummary.text =
-          getString(
-              R.string.child_detail_today_summary,
-              summary.today.feedings.count,
-              summary.today.diapers.count,
-              summary.today.sleep.naps,
-          )
+
+      val today = summary.today
+      binding.textTodayFeedingsCount.text = today.feedings.count.toString()
+      binding.textTodayDiapersCount.text = today.diapers.count.toString()
+      binding.textTodayNapsCount.text = today.sleep.naps.toString()
+
+      // Feedings detail: total oz (hide if zero)
+      if (today.feedings.totalOz > 0) {
+        binding.textTodayFeedingsDetail.visibility = View.VISIBLE
+        binding.textTodayFeedingsDetail.text =
+            getString(R.string.child_detail_today_oz, today.feedings.totalOz)
+      } else {
+        binding.textTodayFeedingsDetail.visibility = View.GONE
+      }
+
+      // Diapers detail: wet/dirty breakdown (hide if zero)
+      val wet = today.diapers.wet + today.diapers.both
+      val dirty = today.diapers.dirty + today.diapers.both
+      if (today.diapers.count > 0) {
+        binding.textTodayDiapersDetail.visibility = View.VISIBLE
+        binding.textTodayDiapersDetail.text =
+            getString(R.string.child_detail_today_diapers_detail, wet, dirty)
+      } else {
+        binding.textTodayDiapersDetail.visibility = View.GONE
+      }
+
+      // Naps detail: total minutes (hide if zero)
+      val totalMin = today.sleep.totalMinutes
+      if (totalMin > 0) {
+        binding.textTodayNapsDetail.visibility = View.VISIBLE
+        binding.textTodayNapsDetail.text =
+            if (totalMin >= 60)
+                getString(R.string.child_detail_today_nap_minutes, totalMin / 60, totalMin % 60)
+            else getString(R.string.child_detail_today_nap_minutes_short, totalMin)
+      } else {
+        binding.textTodayNapsDetail.visibility = View.GONE
+      }
     } else {
       binding.todaySkeleton.visibility = View.VISIBLE
       binding.todayContent.visibility = View.GONE

@@ -481,7 +481,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_12"
-            android:minHeight="72dp"
             app:layout_goneMarginTop="@dimen/spacing_12"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -490,48 +489,211 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="72dp"
-                android:padding="@dimen/spacing_8">
+                android:minHeight="72dp">
 
                 <!-- Skeleton: visible while dashboardSummary is null -->
                 <View
                     android:id="@+id/today_skeleton"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:minHeight="56dp"
+                    android:minHeight="96dp"
                     android:background="?attr/colorSurfaceVariant"
                     android:alpha="0.6"
                     android:contentDescription="@string/child_detail_today_loading"
                     android:importantForAccessibility="yes" />
 
-                <!-- Real counts: visible when dashboardSummary is loaded -->
+                <!-- Real counts: three stat columns -->
                 <LinearLayout
                     android:id="@+id/today_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
+                    android:orientation="vertical"
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <View
-                        android:layout_width="@dimen/accent_stripe_width"
-                        android:layout_height="match_parent"
-                        android:minHeight="24dp"
-                        android:background="?attr/colorTertiary"
-                        android:alpha="0.7" />
-
+                    <!-- Section label -->
                     <TextView
-                        android:id="@+id/text_today_summary"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/spacing_8"
-                        android:fontFamily="@font/dm_sans"
-                        android:textSize="@dimen/text_body_medium"
-                        android:textColor="?attr/colorOnSurface"
-                        tools:text="5 feedings, 3 diapers, 2 naps" />
+                        android:paddingStart="@dimen/spacing_8"
+                        android:paddingEnd="@dimen/spacing_8"
+                        android:paddingTop="@dimen/spacing_6"
+                        android:fontFamily="@font/fredoka"
+                        android:text="@string/child_detail_today_label"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_body_small" />
+
+                    <!-- Stat columns row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingStart="@dimen/spacing_4"
+                        android:paddingEnd="@dimen/spacing_4"
+                        android:paddingTop="@dimen/spacing_4"
+                        android:paddingBottom="@dimen/spacing_6"
+                        android:baselineAligned="false">
+
+                        <!-- Feedings stat -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="@dimen/spacing_2"
+                            android:paddingBottom="@dimen/spacing_2">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🍼"
+                                android:textSize="22sp" />
+
+                            <TextView
+                                android:id="@+id/text_today_feedings_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/fredoka"
+                                android:textSize="@dimen/text_headline_small"
+                                android:textColor="?attr/colorPrimary"
+                                android:textStyle="bold"
+                                tools:text="5" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/dm_sans"
+                                android:text="@string/child_detail_today_feedings"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_body_small" />
+
+                            <TextView
+                                android:id="@+id/text_today_feedings_detail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_1"
+                                android:fontFamily="@font/dm_sans"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/text_label_small"
+                                tools:text="12.5 oz" />
+
+                        </LinearLayout>
+
+                        <!-- Vertical divider -->
+                        <View
+                            android:layout_width="@dimen/divider_thickness"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="@dimen/spacing_4"
+                            android:layout_marginBottom="@dimen/spacing_4"
+                            android:background="?attr/colorOutline"
+                            android:alpha="0.4" />
+
+                        <!-- Diapers stat -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="@dimen/spacing_2"
+                            android:paddingBottom="@dimen/spacing_2">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="💩"
+                                android:textSize="22sp" />
+
+                            <TextView
+                                android:id="@+id/text_today_diapers_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/fredoka"
+                                android:textSize="@dimen/text_headline_small"
+                                android:textColor="?attr/colorSecondary"
+                                android:textStyle="bold"
+                                tools:text="3" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/dm_sans"
+                                android:text="@string/child_detail_today_diapers"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_body_small" />
+
+                            <TextView
+                                android:id="@+id/text_today_diapers_detail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_1"
+                                android:fontFamily="@font/dm_sans"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/text_label_small"
+                                tools:text="2 wet, 1 dirty" />
+
+                        </LinearLayout>
+
+                        <!-- Vertical divider -->
+                        <View
+                            android:layout_width="@dimen/divider_thickness"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="@dimen/spacing_4"
+                            android:layout_marginBottom="@dimen/spacing_4"
+                            android:background="?attr/colorOutline"
+                            android:alpha="0.4" />
+
+                        <!-- Naps stat -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="@dimen/spacing_2"
+                            android:paddingBottom="@dimen/spacing_2">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="😴"
+                                android:textSize="22sp" />
+
+                            <TextView
+                                android:id="@+id/text_today_naps_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/fredoka"
+                                android:textSize="@dimen/text_headline_small"
+                                android:textColor="?attr/colorTertiary"
+                                android:textStyle="bold"
+                                tools:text="2" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/dm_sans"
+                                android:text="@string/child_detail_today_naps"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_body_small" />
+
+                            <TextView
+                                android:id="@+id/text_today_naps_detail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_1"
+                                android:fontFamily="@font/dm_sans"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="@dimen/text_label_small"
+                                tools:text="1h 45m total" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </LinearLayout>
+
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -148,6 +148,14 @@
     <string name="child_detail_section_track">Track</string>
     <string name="child_detail_section_insights">Insights</string>
     <string name="child_detail_today_loading">Loading today summary</string>
+    <string name="child_detail_today_label">Today</string>
+    <string name="child_detail_today_feedings">feedings</string>
+    <string name="child_detail_today_diapers">diapers</string>
+    <string name="child_detail_today_naps">naps</string>
+    <string name="child_detail_today_oz">%1$.1f oz</string>
+    <string name="child_detail_today_nap_minutes">%1$dh %2$dm total</string>
+    <string name="child_detail_today_nap_minutes_short">%1$dm total</string>
+    <string name="child_detail_today_diapers_detail">%1$d wet, %2$d dirty</string>
     <string name="child_detail_today_summary">Today: %1$d feedings, %2$d diapers, %3$d naps</string>
     <string name="child_detail_edit_button">Edit</string>
     <string name="child_detail_share_button">Share</string>
