@@ -246,7 +246,10 @@ interface PoopyFeedApiService {
 
   /** Get paginated list of notifications. GET /api/v1/notifications/ */
   @GET("notifications/")
-  suspend fun listNotifications(@Query("page") page: Int = 1): PaginatedResponse<Notification>
+  suspend fun listNotifications(
+      @Query("page") page: Int = 1,
+      @Query("page_size") pageSize: Int = 20
+  ): PaginatedResponse<Notification>
 
   /** Get all per-child notification preferences. GET /api/v1/notifications/preferences/ */
   @GET("notifications/preferences/")

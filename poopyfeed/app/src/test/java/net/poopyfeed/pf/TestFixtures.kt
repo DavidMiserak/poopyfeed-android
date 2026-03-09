@@ -326,6 +326,20 @@ object TestFixtures {
           results = results
       )
 
+  /** Mock paginated response for notifications (network-only pagination). */
+  fun mockPaginatedNotificationsResponse(
+      results: List<Notification> = listOf(mockNotification()),
+      count: Int = results.size,
+      next: String? = null,
+      previous: String? = null,
+  ): PaginatedResponse<Notification> =
+      PaginatedResponse(
+          count = count,
+          next = next,
+          previous = previous,
+          results = results
+      )
+
   /** Mock paginated response for generic type (base pagination pattern). */
   inline fun <reified T> mockPaginatedResponse(
       results: List<T>,
