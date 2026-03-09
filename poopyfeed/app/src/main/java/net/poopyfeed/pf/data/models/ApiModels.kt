@@ -593,4 +593,8 @@ data class TimelineEvent(
     val feeding: TimelineFeedingPayload? = null,
     val diaper: TimelineDiaperPayload? = null,
     val nap: TimelineNapPayload? = null,
+    @SerialName("gap_after_minutes") val gapAfterMinutes: Long? = null,
+    @SerialName("gap_after_start") val gapAfterStart: String? = null,
+    @SerialName("gap_after_end") val gapAfterEnd: String? = null,
+    @SerialName("is_nap_eligible") val isNapEligible: Boolean? = null,
 )

@@ -394,6 +394,10 @@ object TestFixtures {
       feeding: TimelineFeedingPayload? = mockTimelineFeedingPayload(),
       diaper: TimelineDiaperPayload? = null,
       nap: TimelineNapPayload? = null,
+      gapAfterMinutes: Long? = null,
+      gapAfterStart: String? = null,
+      gapAfterEnd: String? = null,
+      isNapEligible: Boolean? = null,
   ) =
       TimelineEvent(
           type = type,
@@ -401,5 +405,9 @@ object TestFixtures {
           feeding = feeding,
           diaper = diaper,
           nap = nap,
+          gapAfterMinutes = gapAfterMinutes,
+          gapAfterStart = gapAfterStart,
+          gapAfterEnd = gapAfterEnd,
+          isNapEligible = isNapEligible,
       )
 }

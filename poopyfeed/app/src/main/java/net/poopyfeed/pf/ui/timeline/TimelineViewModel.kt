@@ -156,39 +156,29 @@ constructor(
   }
 
   /**
-   * Interleaves [TimelineItem.Gap] markers between consecutive events when the time difference
-   * exceeds [GAP_THRESHOLD_MINUTES]. Events are newest-first, so each gap represents the quiet
-   * period between the newer event and the older one below it.
+   * Interleaves [TimelineItem.Gap] markers from backend-provided gap metadata. The backend
+   * computes gaps across all events and provides [gap_after_minutes] for each event. Events are
+   * newest-first, so each event's gap represents the quiet period between that event and the
+   * next (older) event.
+   *
+   * Only gaps >= [GAP_THRESHOLD_MINUTES] are displayed (backend provides null for smaller gaps).
    */
   private fun interleaveGaps(events: List<TimelineEvent>): List<TimelineItem> {
     if (events.isEmpty()) return emptyList()
     val items = mutableListOf<TimelineItem>()
-    for (i in events.indices) {
-      val newerEvent = events[i]
-      items.add(TimelineItem.Event(newerEvent))
-      if (i < events.lastIndex) {
-        // For naps, treat the effective "start" of the newer event as nappedAt so we don't
-        // incorrectly include the nap duration itself inside the preceding gap when the backend
-        // uses endedAt for TimelineEvent.at.
-        val newerEffectiveStart = newerEvent.nap?.nappedAt ?: newerEvent.at
-        val newerMs = parseEpochMs(newerEffectiveStart)
-
-        // For naps, use end time as the effective boundary for the *older* event (nap occupies time
-        // until it ends). This ensures the gap after a nap starts when the nap finishes.
-        val olderEvent = events[i + 1]
-        val olderEffectiveEnd = olderEvent.nap?.endedAt ?: olderEvent.at
-        val olderMs = parseEpochMs(olderEffectiveEnd)
-        if (newerMs != null && olderMs != null) {
-          val gapMinutes = (newerMs - olderMs) / 60_000
-          if (gapMinutes >= GAP_THRESHOLD_MINUTES) {
-            items.add(
-                TimelineItem.Gap(
-                    durationMinutes = gapMinutes,
-                    newerEventAt = newerEffectiveStart,
-                    olderEventAt = olderEffectiveEnd,
-                ))
-          }
-        }
+    for (event in events) {
+      items.add(TimelineItem.Event(event))
+      // Backend provides gap metadata; only show if >= threshold
+      if (event.gapAfterMinutes != null &&
+          event.gapAfterMinutes >= GAP_THRESHOLD_MINUTES &&
+          event.gapAfterStart != null &&
+          event.gapAfterEnd != null) {
+        items.add(
+            TimelineItem.Gap(
+                durationMinutes = event.gapAfterMinutes,
+                newerEventAt = event.gapAfterStart,
+                olderEventAt = event.gapAfterEnd,
+            ))
       }
     }
     return items
