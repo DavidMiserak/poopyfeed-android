@@ -143,6 +143,10 @@
     <string name="child_detail_diapers">Diapers</string>
     <string name="child_detail_naps">Naps</string>
     <string name="child_detail_timeline">Timeline</string>
+    <string name="child_detail_timeline_subtitle">View 7-day activity history</string>
+    <string name="child_detail_section_recent_activity">Recent Activity</string>
+    <string name="child_detail_section_track">Track</string>
+    <string name="child_detail_section_insights">Insights</string>
     <string name="child_detail_today_loading">Loading today summary</string>
     <string name="child_detail_today_summary">Today: %1$d feedings, %2$d diapers, %3$d naps</string>
     <string name="child_detail_edit_button">Edit</string>

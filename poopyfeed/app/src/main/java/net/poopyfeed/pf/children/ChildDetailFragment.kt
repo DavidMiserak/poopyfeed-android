@@ -44,6 +44,20 @@ class ChildDetailFragment : Fragment() {
 
     binding.buttonEdit.setOnClickListener { openEditChild() }
 
+    // Tappable "Last X" status cards — shortcut to activity lists
+    binding.cardFeeding.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_feedingsList, bundle)
+    }
+    binding.cardDiaper.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_diapersList, bundle)
+    }
+    binding.cardNap.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_childDetail_to_napsList, bundle)
+    }
+
     binding.buttonFeedings.setOnClickListener {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
       findNavController().navigate(R.id.action_childDetail_to_feedingsList, bundle)
@@ -145,16 +159,28 @@ class ChildDetailFragment : Fragment() {
       is ChildDetailUiState.Loading -> {
         binding.layoutSkeleton.visibility = View.VISIBLE
         binding.cardHero.visibility = View.GONE
-        binding.cardActivityStatus.visibility = View.GONE
+        binding.labelRecentActivity.visibility = View.GONE
+        binding.cardFeeding.visibility = View.GONE
+        binding.cardDiaper.visibility = View.GONE
+        binding.cardNap.visibility = View.GONE
         binding.cardToday.visibility = View.GONE
+        binding.labelTrack.visibility = View.GONE
         binding.cardTracking.visibility = View.GONE
+        binding.labelInsights.visibility = View.GONE
+        binding.buttonTimeline.visibility = View.GONE
       }
       is ChildDetailUiState.Ready -> {
         binding.layoutSkeleton.visibility = View.GONE
         binding.cardHero.visibility = View.VISIBLE
-        binding.cardActivityStatus.visibility = View.VISIBLE
+        binding.labelRecentActivity.visibility = View.VISIBLE
+        binding.cardFeeding.visibility = View.VISIBLE
+        binding.cardDiaper.visibility = View.VISIBLE
+        binding.cardNap.visibility = View.VISIBLE
         binding.cardToday.visibility = View.VISIBLE
+        binding.labelTrack.visibility = View.VISIBLE
         binding.cardTracking.visibility = View.VISIBLE
+        binding.labelInsights.visibility = View.VISIBLE
+        binding.buttonTimeline.visibility = View.VISIBLE
         bindReadyState(state)
       }
       is ChildDetailUiState.Error ->
