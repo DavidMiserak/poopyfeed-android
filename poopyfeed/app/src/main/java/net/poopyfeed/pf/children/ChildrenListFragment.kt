@@ -68,7 +68,6 @@ class ChildrenListFragment : Fragment() {
               binding.recyclerChildren.visibility = View.GONE
               binding.layoutEmptyState.visibility = View.GONE
               binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = true
             }
             is ChildrenListUiState.Ready -> {
               binding.progressLoading.visibility = View.GONE
@@ -102,8 +101,7 @@ class ChildrenListFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         viewModel.isRefreshing.collect { refreshing ->
-          binding.swipeRefresh.isRefreshing =
-              refreshing || viewModel.uiState.value is ChildrenListUiState.Loading
+          binding.swipeRefresh.isRefreshing = refreshing
         }
       }
     }
