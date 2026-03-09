@@ -34,6 +34,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
 
   private val viewModel: CreateNapViewModel by viewModels()
   private var selectedTimestamp: String = Clock.System.now().toString()
+  private var selectedEndTimestamp: String? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -47,7 +48,10 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     updateTimestampDisplay()
-    binding.buttonChangeTime.setOnClickListener { showDateTimePickers() }
+    updateEndTimeDisplay()
+    updateEndTimeButtonLabel()
+    binding.buttonChangeTime.setOnClickListener { showStartDateTimePickers() }
+    binding.buttonChangeEndTime.setOnClickListener { showEndDateTimePickers() }
     binding.buttonStartNap.setOnClickListener { startNap() }
 
     viewLifecycleOwner.lifecycleScope.launch {
@@ -86,6 +90,18 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
         else formatTimestampForDisplay(requireContext(), selectedTimestamp)
   }
 
+  private fun updateEndTimeDisplay() {
+    binding.textEndTime.text =
+        selectedEndTimestamp?.let { formatTimestampForDisplay(requireContext(), it) }
+            ?: getString(R.string.create_nap_end_not_set)
+  }
+
+  private fun updateEndTimeButtonLabel() {
+    binding.buttonChangeEndTime.text =
+        if (selectedEndTimestamp == null) getString(R.string.edit_nap_set_end_time)
+        else getString(R.string.create_nap_change_time)
+  }
+
   private fun isNow(iso: String): Boolean {
     return try {
       val instant = kotlinx.datetime.Instant.parse(iso)
@@ -96,10 +112,26 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-  private fun showDateTimePickers() {
+  private fun showStartDateTimePickers() {
+    showDateTimePickers(selectedTimestamp) {
+      selectedTimestamp = it
+      updateTimestampDisplay()
+    }
+  }
+
+  private fun showEndDateTimePickers() {
+    val initial = selectedEndTimestamp ?: selectedTimestamp
+    showDateTimePickers(initial) {
+      selectedEndTimestamp = it
+      updateEndTimeDisplay()
+      updateEndTimeButtonLabel()
+    }
+  }
+
+  private fun showDateTimePickers(initialIso: String, onSelected: (String) -> Unit) {
     val cal = Calendar.getInstance()
     try {
-      val instant = kotlinx.datetime.Instant.parse(selectedTimestamp)
+      val instant = kotlinx.datetime.Instant.parse(initialIso)
       cal.timeInMillis = instant.toEpochMilliseconds()
     } catch (_: Exception) {}
     val datePicker =
@@ -119,9 +151,8 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
         cal.set(Calendar.MINUTE, timePicker.minute)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MILLISECOND, 0)
-        selectedTimestamp =
-            kotlinx.datetime.Instant.fromEpochMilliseconds(cal.timeInMillis).toString()
-        updateTimestampDisplay()
+        val iso = kotlinx.datetime.Instant.fromEpochMilliseconds(cal.timeInMillis).toString()
+        onSelected(iso)
       }
       timePicker.show(parentFragmentManager, "time")
     }
@@ -129,7 +160,22 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun startNap() {
-    viewModel.createNap(selectedTimestamp)
+    val endTime = selectedEndTimestamp
+    if (endTime != null) {
+      try {
+        val startMs = kotlinx.datetime.Instant.parse(selectedTimestamp).toEpochMilliseconds()
+        val endMs = kotlinx.datetime.Instant.parse(endTime).toEpochMilliseconds()
+        if (endMs <= startMs) {
+          Snackbar.make(
+                  binding.root,
+                  getString(R.string.create_nap_end_must_be_after_start),
+                  Snackbar.LENGTH_LONG)
+              .show()
+          return
+        }
+      } catch (_: Exception) {}
+    }
+    viewModel.createNap(selectedTimestamp, selectedEndTimestamp)
   }
 
   override fun onDestroyView() {

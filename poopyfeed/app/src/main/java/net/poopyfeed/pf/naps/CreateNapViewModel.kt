@@ -28,7 +28,8 @@ sealed interface CreateNapUiState {
 }
 
 /**
- * ViewModel for [CreateNapBottomSheetFragment]. Creates a nap with start time only (in progress).
+ * ViewModel for [CreateNapBottomSheetFragment]. Creates a nap with start time and optional end
+ * time.
  */
 @HiltViewModel
 class CreateNapViewModel
@@ -45,10 +46,10 @@ constructor(
   private val _uiState: MutableStateFlow<CreateNapUiState> = MutableStateFlow(CreateNapUiState.Idle)
   val uiState: StateFlow<CreateNapUiState> = _uiState.asStateFlow()
 
-  fun createNap(startTime: String) {
+  fun createNap(startTime: String, endTime: String? = null) {
     viewModelScope.launch {
       _uiState.value = CreateNapUiState.Saving
-      val request = CreateNapRequest(start_time = startTime, end_time = null)
+      val request = CreateNapRequest(start_time = startTime, end_time = endTime)
       val result = repo.createNap(childId, request)
       _uiState.value =
           when (result) {

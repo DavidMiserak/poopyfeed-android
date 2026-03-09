@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
@@ -59,6 +60,25 @@ class CreateNapViewModelTest {
         advanceUntilIdle()
 
         coVerify { mockRepository.createNap(1, any()) }
+        assertIs<CreateNapUiState.Success>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createNap with end time passes end_time in request`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createNap(1, any()) } returns
+            ApiResult.Success(TestFixtures.mockNap(end_time = "2024-01-15T14:00:00Z"))
+
+        viewModel.createNap("2024-01-15T12:00:00Z", "2024-01-15T14:00:00Z")
+        advanceUntilIdle()
+
+        coVerify {
+          mockRepository.createNap(
+              1,
+              match<CreateNapRequest> {
+                it.start_time == "2024-01-15T12:00:00Z" && it.end_time == "2024-01-15T14:00:00Z"
+              })
+        }
         assertIs<CreateNapUiState.Success>(viewModel.uiState.value)
       }
 
