@@ -112,20 +112,19 @@ class TimelineAdapter(
         }
         event.diaper != null -> {
           val diaper = event.diaper
+          val changeType = diaper.changeType.lowercase()
           val emoji =
               when {
-                diaper.changeType.contains("poop", ignoreCase = true) &&
-                    diaper.changeType.contains("wet", ignoreCase = true) -> "🔄"
-                diaper.changeType.contains("poop", ignoreCase = true) -> "💩"
-                diaper.changeType.contains("wet", ignoreCase = true) -> "💧"
+                changeType == "both" -> "💧💩"
+                changeType == "dirty" -> "💩"
+                changeType == "wet" -> "💧"
                 else -> "🔄"
               }
           val summary =
               when {
-                diaper.changeType.contains("poop", ignoreCase = true) &&
-                    diaper.changeType.contains("wet", ignoreCase = true) -> "Wet & dirty diaper"
-                diaper.changeType.contains("poop", ignoreCase = true) -> "Dirty diaper"
-                diaper.changeType.contains("wet", ignoreCase = true) -> "Wet diaper"
+                changeType == "both" -> "Wet & dirty diaper"
+                changeType == "dirty" -> "Dirty diaper"
+                changeType == "wet" -> "Wet diaper"
                 else -> "Diaper change"
               }
           emoji to summary
