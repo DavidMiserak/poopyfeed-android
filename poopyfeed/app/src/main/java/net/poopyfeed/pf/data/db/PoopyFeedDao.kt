@@ -1,5 +1,6 @@
 package net.poopyfeed.pf.data.db
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -63,6 +64,10 @@ interface FeedingDao {
   @Query("SELECT * FROM feedings WHERE child = :childId ORDER BY timestamp DESC LIMIT 1")
   suspend fun getLatestFeeding(childId: Int): FeedingEntity?
 
+  /** Get feedings for a child as a PagingSource (for Paging 3). */
+  @Query("SELECT * FROM feedings WHERE child = :childId ORDER BY timestamp DESC")
+  fun pagingSourceFeedings(childId: Int): PagingSource<Int, FeedingEntity>
+
   /** Insert or update a feeding. */
   @Upsert suspend fun upsertFeeding(feeding: FeedingEntity)
 
@@ -95,6 +100,10 @@ interface DiaperDao {
   /** Get the most recent diaper change. */
   @Query("SELECT * FROM diapers WHERE child = :childId ORDER BY timestamp DESC LIMIT 1")
   suspend fun getLatestDiaper(childId: Int): DiaperEntity?
+
+  /** Get diapers for a child as a PagingSource (for Paging 3). */
+  @Query("SELECT * FROM diapers WHERE child = :childId ORDER BY timestamp DESC")
+  fun pagingSourceDiapers(childId: Int): PagingSource<Int, DiaperEntity>
 
   /** Insert or update a diaper. */
   @Upsert suspend fun upsertDiaper(diaper: DiaperEntity)
@@ -131,6 +140,10 @@ interface NapDao {
   /** Get ongoing naps (end_time is NULL). */
   @Query("SELECT * FROM naps WHERE child = :childId AND end_time IS NULL")
   suspend fun getOngoingNaps(childId: Int): List<NapEntity>
+
+  /** Get naps for a child as a PagingSource (for Paging 3). */
+  @Query("SELECT * FROM naps WHERE child = :childId ORDER BY start_time DESC")
+  fun pagingSourceNaps(childId: Int): PagingSource<Int, NapEntity>
 
   /** Insert or update a nap. */
   @Upsert suspend fun upsertNap(nap: NapEntity)
