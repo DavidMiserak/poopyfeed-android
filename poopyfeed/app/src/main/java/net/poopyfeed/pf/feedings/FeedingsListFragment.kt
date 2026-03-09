@@ -53,18 +53,15 @@ class FeedingsListFragment : Fragment() {
             onDeleteClick = { feeding -> showDeleteConfirmationDialog(feeding.id) },
         )
     binding.recyclerFeedings.layoutManager = LinearLayoutManager(requireContext())
-    binding.recyclerFeedings.adapter = adapter.withLoadStateFooter(
-        footer = PagingLoadStateAdapter { adapter.retry() }
-    )
+    binding.recyclerFeedings.adapter =
+        adapter.withLoadStateFooter(footer = PagingLoadStateAdapter { adapter.retry() })
 
     binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
     // Collect paging data
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.pagingData.collect { pagingData ->
-          adapter.submitData(pagingData)
-        }
+        viewModel.pagingData.collect { pagingData -> adapter.submitData(pagingData) }
       }
     }
 

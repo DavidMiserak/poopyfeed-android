@@ -53,18 +53,15 @@ class DiapersListFragment : Fragment() {
             onDeleteClick = { diaper -> showDeleteConfirmationDialog(diaper.id) },
         )
     binding.recyclerDiapers.layoutManager = LinearLayoutManager(requireContext())
-    binding.recyclerDiapers.adapter = adapter.withLoadStateFooter(
-        footer = PagingLoadStateAdapter { adapter.retry() }
-    )
+    binding.recyclerDiapers.adapter =
+        adapter.withLoadStateFooter(footer = PagingLoadStateAdapter { adapter.retry() })
 
     binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
     // Collect paging data
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.pagingData.collect { pagingData ->
-          adapter.submitData(pagingData)
-        }
+        viewModel.pagingData.collect { pagingData -> adapter.submitData(pagingData) }
       }
     }
 

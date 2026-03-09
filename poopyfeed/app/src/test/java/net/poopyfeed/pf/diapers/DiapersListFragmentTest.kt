@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
-import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.idleMainLooperUntil
@@ -41,8 +40,7 @@ class DiapersListFragmentTest {
   fun setup() {
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-    every { repo.pagedDiapers(childId) } returns
-        flowOf(PagingData.empty<Diaper>())
+    every { repo.pagedDiapers(childId) } returns flowOf(PagingData.empty<Diaper>())
   }
 
   private fun installNavController(activity: android.app.Activity) {
@@ -77,7 +75,8 @@ class DiapersListFragmentTest {
   fun `adapter is set up on recycler`() {
     val fragment = launchFragment()
     val root = fragment.requireView()
-    val recycler = root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_diapers)
+    val recycler =
+        root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_diapers)
     assert(recycler.adapter != null)
   }
 }

@@ -55,9 +55,9 @@ constructor(
   /** Get paginated notifications using Paging 3 library. */
   fun pagedNotifications(): Flow<PagingData<Notification>> {
     return Pager(
-        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-        pagingSourceFactory = { NotificationsPagingSource(apiService) }
-    ).flow
+            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+            pagingSourceFactory = { NotificationsPagingSource(apiService) })
+        .flow
   }
 
   /** Mark all notifications as read. Returns number of updated items. */

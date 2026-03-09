@@ -14,7 +14,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
-import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
@@ -43,11 +42,7 @@ class NotificationsFragmentTest {
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
     // Mock pagingData to return a list of notifications
     coEvery { repo.pagedNotifications() } returns
-        flowOf(
-            PagingData.from(
-                listOf(TestFixtures.mockNotification())
-            )
-        )
+        flowOf(PagingData.from(listOf(TestFixtures.mockNotification())))
   }
 
   private fun installNavController(activity: android.app.Activity) {
@@ -80,7 +75,6 @@ class NotificationsFragmentTest {
     assertEquals(View.GONE, root.findViewById<View>(R.id.layout_empty_state).visibility)
     assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
   }
-
 
   @Test
   fun `permission request on API 33+ does not crash fragment`() {

@@ -40,8 +40,7 @@ class NapsListFragmentTest {
   fun setup() {
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-    every { repo.pagedNaps(childId) } returns
-        flowOf(PagingData.empty<Nap>())
+    every { repo.pagedNaps(childId) } returns flowOf(PagingData.empty<Nap>())
   }
 
   private fun installNavController(activity: android.app.Activity) {

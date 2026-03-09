@@ -4,17 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
-import javax.inject.Inject
 
 /**
- * ViewModel for [FeedingsListFragment]. Exposes paginated feedings for a child with
- * delete support.
+ * ViewModel for [FeedingsListFragment]. Exposes paginated feedings for a child with delete support.
  */
 @HiltViewModel
 class FeedingsListViewModel

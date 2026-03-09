@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
-import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import org.junit.After
 import org.junit.Before
@@ -41,11 +40,7 @@ class NotificationsViewModelTest {
     every { mockContext.getString(any()) } returns "Error message"
     // Mock pagingData flow
     coEvery { mockRepository.pagedNotifications() } returns
-        flowOf(
-            PagingData.from(
-                listOf(TestFixtures.mockNotification())
-            )
-        )
+        flowOf(PagingData.from(listOf(TestFixtures.mockNotification())))
   }
 
   @After
@@ -73,7 +68,8 @@ class NotificationsViewModelTest {
         advanceUntilIdle()
 
         val invalidations = mutableListOf<Unit>()
-        val collectJob = this.launch { viewModel.unreadCountInvalidated.collect { invalidations.add(it) } }
+        val collectJob =
+            this.launch { viewModel.unreadCountInvalidated.collect { invalidations.add(it) } }
         viewModel.markAllRead()
         advanceUntilIdle()
         collectJob.cancel()
@@ -113,7 +109,8 @@ class NotificationsViewModelTest {
         val navIds = mutableListOf<Int>()
         val navJob = this.launch { viewModel.navigateToChild.collect { navIds.add(it) } }
         val invalidations = mutableListOf<Unit>()
-        val invalidJob = this.launch { viewModel.unreadCountInvalidated.collect { invalidations.add(it) } }
+        val invalidJob =
+            this.launch { viewModel.unreadCountInvalidated.collect { invalidations.add(it) } }
 
         viewModel.markAsReadAndNavigate(10, 42)
         advanceUntilIdle()

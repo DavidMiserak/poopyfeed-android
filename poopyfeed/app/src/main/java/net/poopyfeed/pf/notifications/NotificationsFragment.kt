@@ -97,9 +97,8 @@ class NotificationsFragment : Fragment() {
               viewModel.markAsReadAndNavigate(notification.id, notification.childId)
             })
     binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
-    binding.recyclerNotifications.adapter = adapter.withLoadStateFooter(
-        footer = PagingLoadStateAdapter { adapter.retry() }
-    )
+    binding.recyclerNotifications.adapter =
+        adapter.withLoadStateFooter(footer = PagingLoadStateAdapter { adapter.retry() })
 
     binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
@@ -108,9 +107,7 @@ class NotificationsFragment : Fragment() {
     // Collect paginated notifications and submit to adapter
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.pagingData.collect { pagingData ->
-          adapter.submitData(pagingData)
-        }
+        viewModel.pagingData.collect { pagingData -> adapter.submitData(pagingData) }
       }
     }
 
@@ -123,9 +120,11 @@ class NotificationsFragment : Fragment() {
               loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
 
           // Show/hide empty state
-          val isEmptyAfterRefresh = loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
+          val isEmptyAfterRefresh =
+              loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
           binding.layoutEmptyState.visibility = if (isEmptyAfterRefresh) View.VISIBLE else View.GONE
-          binding.recyclerNotifications.visibility = if (isEmptyAfterRefresh) View.GONE else View.VISIBLE
+          binding.recyclerNotifications.visibility =
+              if (isEmptyAfterRefresh) View.GONE else View.VISIBLE
 
           // Show/hide error state
           val refreshError = loadStates.refresh as? LoadState.Error

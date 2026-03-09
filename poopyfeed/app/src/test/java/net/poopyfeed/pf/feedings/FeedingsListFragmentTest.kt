@@ -40,8 +40,7 @@ class FeedingsListFragmentTest {
   fun setup() {
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-    every { repo.pagedFeedings(childId) } returns
-        flowOf(PagingData.empty<Feeding>())
+    every { repo.pagedFeedings(childId) } returns flowOf(PagingData.empty<Feeding>())
   }
 
   private fun installNavController(activity: android.app.Activity) {
@@ -76,7 +75,8 @@ class FeedingsListFragmentTest {
   fun `adapter is set up on recycler`() {
     val fragment = launchFragment()
     val root = fragment.requireView()
-    val recycler = root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_feedings)
+    val recycler =
+        root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_feedings)
     assert(recycler.adapter != null)
   }
 }

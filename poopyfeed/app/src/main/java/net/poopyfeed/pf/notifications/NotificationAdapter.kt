@@ -12,11 +12,14 @@ import net.poopyfeed.pf.util.formatRelativeTime
 
 /**
  * RecyclerView adapter for displaying a list of notifications using Paging 3. Shows notification
- * message, timestamp, actor/child metadata, and unread indicator. Tap triggers [onNotificationClick].
+ * message, timestamp, actor/child metadata, and unread indicator. Tap triggers
+ * [onNotificationClick].
  */
 class NotificationAdapter(
     private val onNotificationClick: (Notification) -> Unit,
-) : PagingDataAdapter<Notification, NotificationAdapter.NotificationViewHolder>(NotificationDiffCallback()) {
+) :
+    PagingDataAdapter<Notification, NotificationAdapter.NotificationViewHolder>(
+        NotificationDiffCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
     val inflater = LayoutInflater.from(parent.context)

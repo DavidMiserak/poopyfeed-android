@@ -59,7 +59,8 @@ class NotificationAdapterTest {
     val parent = createParent()
     val holder = adapter.onCreateViewHolder(parent, 0)
     holder.bind(notif)
-    val dotUnread = holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
+    val dotUnread =
+        holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
     assertEquals(android.view.View.VISIBLE, dotUnread.visibility)
   }
 
@@ -69,7 +70,8 @@ class NotificationAdapterTest {
     val parent = createParent()
     val holder = adapter.onCreateViewHolder(parent, 0)
     holder.bind(notif)
-    val dotUnread = holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
+    val dotUnread =
+        holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
     assertEquals(android.view.View.GONE, dotUnread.visibility)
   }
 

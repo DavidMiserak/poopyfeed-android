@@ -54,18 +54,15 @@ class NapsListFragment : Fragment() {
             onEndNapClick = { nap -> viewModel.endNap(nap.id) },
         )
     binding.recyclerNaps.layoutManager = LinearLayoutManager(requireContext())
-    binding.recyclerNaps.adapter = adapter.withLoadStateFooter(
-        footer = PagingLoadStateAdapter { adapter.retry() }
-    )
+    binding.recyclerNaps.adapter =
+        adapter.withLoadStateFooter(footer = PagingLoadStateAdapter { adapter.retry() })
 
     binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
     // Collect paging data
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.pagingData.collect { pagingData ->
-          adapter.submitData(pagingData)
-        }
+        viewModel.pagingData.collect { pagingData -> adapter.submitData(pagingData) }
       }
     }
 
