@@ -141,7 +141,8 @@ interface PoopyFeedApiService {
   @GET("children/{childId}/diapers/")
   suspend fun listDiapers(
       @Path("childId") childId: Int,
-      @Query("page") page: Int = 1
+      @Query("page") page: Int = 1,
+      @Query("page_size") pageSize: Int = 20
   ): PaginatedResponse<DiaperListResponse>
 
   /** Create a new diaper change record. POST /api/v1/children/{childId}/diapers/ */
