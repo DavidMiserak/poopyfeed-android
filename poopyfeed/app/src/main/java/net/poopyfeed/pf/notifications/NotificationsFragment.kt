@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,71 +94,56 @@ class NotificationsFragment : Fragment() {
         NotificationAdapter(
             onNotificationClick = { notification ->
               viewModel.markAsReadAndNavigate(notification.id, notification.childId)
-            },
-            onLoadMoreClick = { viewModel.loadNextPage() })
+            })
     binding.recyclerNotifications.adapter = adapter
     binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
 
-    binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
-    binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
-      viewModel.refresh()
-    }
+    binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
     requestNotificationPermissionIfNeeded()
 
+    // Collect paginated notifications and submit to adapter
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is NotificationsListUiState.Loading -> {
-              binding.progressLoading.visibility = View.VISIBLE
-              binding.recyclerNotifications.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = true
-            }
-            is NotificationsListUiState.Ready -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerNotifications.visibility = View.VISIBLE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              val list =
-                  state.notifications.map { NotificationsListItem.NotificationItem(it) } +
-                      if (state.hasNextPage) {
-                        listOf(NotificationsListItem.LoadMoreFooter(state.isLoadingMore))
-                      } else {
-                        emptyList()
-                      }
-              adapter.submitList(list)
-            }
-            is NotificationsListUiState.Empty -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerNotifications.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.VISIBLE
-              binding.layoutErrorState.visibility = View.GONE
-            }
-            is NotificationsListUiState.Error -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerNotifications.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.VISIBLE
-              binding.layoutErrorState
-                  .findViewById<android.widget.TextView>(R.id.text_error_message)
-                  .text = state.message
-            }
+        viewModel.pagingData.collect { pagingData ->
+          adapter.submitData(pagingData)
+        }
+      }
+    }
+
+    // Handle load states (loading spinner)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        adapter.loadStateFlow.collect { loadStates ->
+          // Show/hide refresh spinner on initial load
+          binding.swipeRefresh.isRefreshing =
+              loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+
+          // Show/hide empty state
+          val isEmptyAfterRefresh = loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
+          binding.layoutEmptyState.visibility = if (isEmptyAfterRefresh) View.VISIBLE else View.GONE
+          binding.recyclerNotifications.visibility = if (isEmptyAfterRefresh) View.GONE else View.VISIBLE
+
+          // Show/hide error state
+          val refreshError = loadStates.refresh as? LoadState.Error
+          if (refreshError != null) {
+            binding.layoutErrorState.visibility = View.VISIBLE
+            binding.recyclerNotifications.visibility = View.GONE
+            binding.layoutEmptyState.visibility = View.GONE
+            binding.layoutErrorState
+                .findViewById<android.widget.TextView>(R.id.text_error_message)
+                .text = refreshError.error.message ?: "Unknown error"
+          } else {
+            binding.layoutErrorState.visibility = View.GONE
           }
+
           requireActivity().invalidateOptionsMenu()
         }
       }
     }
 
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.isRefreshing.collect { refreshing ->
-          binding.swipeRefresh.isRefreshing =
-              refreshing || viewModel.uiState.value is NotificationsListUiState.Loading
-        }
-      }
+    binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
+      adapter.refresh()
     }
 
     viewLifecycleOwner.lifecycleScope.launch {

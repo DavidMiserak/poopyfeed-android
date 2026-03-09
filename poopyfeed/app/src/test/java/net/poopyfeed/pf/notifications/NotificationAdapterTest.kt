@@ -1,36 +1,31 @@
 package net.poopyfeed.pf.notifications
 
 import android.app.Activity
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.Notification
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
-/** Unit tests for [NotificationAdapter] view types and binding. */
+/** Unit tests for [NotificationAdapter] binding and click handling. */
 @RunWith(RobolectricTestRunner::class)
 class NotificationAdapterTest {
 
   private lateinit var adapter: NotificationAdapter
   private lateinit var activity: Activity
   private var clickedNotification: Notification? = null
-  private var loadMoreClicked = false
 
   @Before
   fun setup() {
     clickedNotification = null
-    loadMoreClicked = false
     adapter =
         NotificationAdapter(
             onNotificationClick = { clickedNotification = it },
-            onLoadMoreClick = { loadMoreClicked = true },
         )
     activity = Robolectric.buildActivity(Activity::class.java).create().get()
     activity.setTheme(com.google.android.material.R.style.Theme_MaterialComponents_DayNight)
@@ -46,45 +41,11 @@ class NotificationAdapterTest {
       }
 
   @Test
-  fun `getItemViewType returns notification type for NotificationItem`() {
-    val list =
-        listOf(
-            NotificationsListItem.NotificationItem(TestFixtures.mockNotification()),
-        )
-    adapter.submitList(list)
-    assertEquals(0, adapter.getItemViewType(0))
-  }
-
-  @Test
-  fun `getItemViewType returns load more type for LoadMoreFooter`() {
-    val list =
-        listOf(
-            NotificationsListItem.LoadMoreFooter(isLoading = false),
-        )
-    adapter.submitList(list)
-    assertEquals(1, adapter.getItemViewType(0))
-  }
-
-  @Test
-  fun `submitList with notification and load more creates correct view types`() {
-    val list =
-        listOf(
-            NotificationsListItem.NotificationItem(TestFixtures.mockNotification(id = 1)),
-            NotificationsListItem.LoadMoreFooter(isLoading = true),
-        )
-    adapter.submitList(list)
-    assertEquals(0, adapter.getItemViewType(0))
-    assertEquals(1, adapter.getItemViewType(1))
-  }
-
-  @Test
   fun `bind notification item populates message and click fires callback`() {
     val notif = TestFixtures.mockNotification(id = 5, message = "Baby was fed")
-    val list = listOf(NotificationsListItem.NotificationItem(notif))
-    adapter.submitList(list)
     val parent = createParent()
     val holder = adapter.onCreateViewHolder(parent, 0)
-    adapter.onBindViewHolder(holder, 0)
+    holder.bind(notif)
     val messageView = holder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_message)
     assertEquals("Baby was fed", messageView.text.toString())
     holder.itemView.performClick()
@@ -93,39 +54,54 @@ class NotificationAdapterTest {
   }
 
   @Test
-  fun `bind load more footer loading hides button and shows progress`() {
-    val list = listOf(NotificationsListItem.LoadMoreFooter(isLoading = true))
-    adapter.submitList(list)
+  fun `bind notification with unread shows unread indicator`() {
+    val notif = TestFixtures.mockNotification(id = 1, isRead = false)
     val parent = createParent()
-    val holder = adapter.onCreateViewHolder(parent, 1)
-    adapter.onBindViewHolder(holder, 0)
-    val button = holder.itemView.findViewById<View>(net.poopyfeed.pf.R.id.button_load_more)
-    val progress = holder.itemView.findViewById<View>(net.poopyfeed.pf.R.id.progress_load_more)
-    assertEquals(View.GONE, button.visibility)
-    assertEquals(View.VISIBLE, progress.visibility)
+    val holder = adapter.onCreateViewHolder(parent, 0)
+    holder.bind(notif)
+    val dotUnread = holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
+    assertEquals(android.view.View.VISIBLE, dotUnread.visibility)
   }
 
   @Test
-  fun `bind load more footer not loading shows button and click fires callback`() {
-    val list = listOf(NotificationsListItem.LoadMoreFooter(isLoading = false))
-    adapter.submitList(list)
+  fun `bind notification with read hides unread indicator`() {
+    val notif = TestFixtures.mockNotification(id = 1, isRead = true)
     val parent = createParent()
-    val holder = adapter.onCreateViewHolder(parent, 1)
-    adapter.onBindViewHolder(holder, 0)
-    val button = holder.itemView.findViewById<View>(net.poopyfeed.pf.R.id.button_load_more)
-    assertEquals(View.VISIBLE, button.visibility)
-    button.performClick()
-    assertTrue(loadMoreClicked)
+    val holder = adapter.onCreateViewHolder(parent, 0)
+    holder.bind(notif)
+    val dotUnread = holder.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.dot_unread)
+    assertEquals(android.view.View.GONE, dotUnread.visibility)
   }
 
   @Test
-  fun `item count matches submitted list`() {
-    val list =
-        listOf(
-            NotificationsListItem.NotificationItem(TestFixtures.mockNotification(id = 1)),
-            NotificationsListItem.NotificationItem(TestFixtures.mockNotification(id = 2)),
-        )
-    adapter.submitList(list)
-    assertEquals(2, adapter.itemCount)
+  fun `notification diff callback identifies same items by id`() {
+    val diff = NotificationAdapter.NotificationDiffCallback()
+    val notif1 = TestFixtures.mockNotification(id = 1, message = "Old message")
+    val notif2 = TestFixtures.mockNotification(id = 1, message = "New message")
+    assertEquals(true, diff.areItemsTheSame(notif1, notif2))
+  }
+
+  @Test
+  fun `notification diff callback identifies different items by id`() {
+    val diff = NotificationAdapter.NotificationDiffCallback()
+    val notif1 = TestFixtures.mockNotification(id = 1)
+    val notif2 = TestFixtures.mockNotification(id = 2)
+    assertEquals(false, diff.areItemsTheSame(notif1, notif2))
+  }
+
+  @Test
+  fun `notification diff callback detects content changes`() {
+    val diff = NotificationAdapter.NotificationDiffCallback()
+    val notif1 = TestFixtures.mockNotification(id = 1, message = "Old", isRead = false)
+    val notif2 = TestFixtures.mockNotification(id = 1, message = "New", isRead = true)
+    assertEquals(false, diff.areContentsTheSame(notif1, notif2))
+  }
+
+  @Test
+  fun `notification diff callback ignores unchanged content`() {
+    val diff = NotificationAdapter.NotificationDiffCallback()
+    val notif1 = TestFixtures.mockNotification(id = 1, message = "Same")
+    val notif2 = TestFixtures.mockNotification(id = 1, message = "Same")
+    assertEquals(true, diff.areContentsTheSame(notif1, notif2))
   }
 }
