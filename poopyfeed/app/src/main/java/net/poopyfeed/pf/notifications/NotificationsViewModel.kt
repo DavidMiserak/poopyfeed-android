@@ -3,9 +3,11 @@ package net.poopyfeed.pf.notifications
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -65,6 +67,9 @@ constructor(
    */
   private val _unreadCountInvalidated = MutableSharedFlow<Unit>(replay = 0)
   val unreadCountInvalidated: SharedFlow<Unit> = _unreadCountInvalidated.asSharedFlow()
+
+  /** Paging 3 flow for paginated notifications. */
+  val pagingData: Flow<PagingData<Notification>> = repo.pagedNotifications()
 
   /** Next page to request when loading more (2 after first page, then 3, 4, …). */
   private var nextPageToLoad = 2
