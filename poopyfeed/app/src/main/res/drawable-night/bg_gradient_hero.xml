@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark mode hero gradient: muted rose → orange on dark background -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:startColor="@color/rose_dark_container"
+        android:centerColor="#5c1a2e"
+        android:endColor="@color/orange_dark_container"
+        android:type="linear" />
+    <corners android:radius="@dimen/corner_radius_lg" />
+</shape>

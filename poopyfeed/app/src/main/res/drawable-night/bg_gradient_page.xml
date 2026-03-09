@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark mode page gradient: subtle warm tint on dark surface -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:startColor="#1f1518"
+        android:centerColor="#1a1a1e"
+        android:endColor="#1c1814"
+        android:type="linear" />
+</shape>
