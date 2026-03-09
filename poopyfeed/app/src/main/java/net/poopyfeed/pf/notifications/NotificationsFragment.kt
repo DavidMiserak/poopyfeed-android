@@ -136,7 +136,8 @@ class NotificationsFragment : Fragment() {
               binding.recyclerNotifications.visibility = View.GONE
               binding.layoutErrorState
                   .findViewById<android.widget.TextView>(R.id.text_error_message)
-                  .text = (loadStates.refresh as? LoadState.Error)?.error?.message ?: "Unknown error"
+                  .text =
+                  (loadStates.refresh as? LoadState.Error)?.error?.message ?: "Unknown error"
             }
             // Data loaded - show list
             loadStates.refresh is LoadState.NotLoading && adapter.itemCount > 0 -> {

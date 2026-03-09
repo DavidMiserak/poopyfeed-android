@@ -46,11 +46,13 @@ class NapsRemoteMediator(
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
+              // Get the last item or return end of pagination
               val lastItem =
                   state.lastItemOrNull()
                       ?: return MediatorResult.Success(endOfPaginationReached = true)
-              // Calculate next page: anchorPosition / pageSize + 2
-              (state.anchorPosition ?: 0) / NAPS_PAGE_SIZE + 2
+              // Calculate next page based on loaded items count
+              // Total pages loaded = ceil(itemCount / pageSize), next page = current + 1
+              (state.pages.sumOf { it.data.size } / NAPS_PAGE_SIZE) + 2
             }
           }
 
