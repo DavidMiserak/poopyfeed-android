@@ -33,7 +33,13 @@ constructor(
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
 
   fun deleteNap(napId: Int) {
-    // TODO: Implement delete with error handling
+    viewModelScope.launch {
+      when (repo.deleteNap(childId, napId)) {
+        is ApiResult.Success -> _deleteError.value = null
+        is ApiResult.Error -> _deleteError.value = "Failed to delete nap"
+        is ApiResult.Loading -> {}
+      }
+    }
   }
 
   fun endNap(napId: Int) {

@@ -2,6 +2,7 @@ package net.poopyfeed.pf.feedings
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 
@@ -31,6 +34,12 @@ constructor(
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
 
   fun deleteFeeding(feedingId: Int) {
-    // TODO: Implement delete with error handling (Task 13)
+    viewModelScope.launch {
+      when (repo.deleteFeeding(childId, feedingId)) {
+        is ApiResult.Success -> _deleteError.value = null
+        is ApiResult.Error -> _deleteError.value = "Failed to delete feeding"
+        is ApiResult.Loading -> {}
+      }
+    }
   }
 }

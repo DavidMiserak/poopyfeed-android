@@ -2,6 +2,7 @@ package net.poopyfeed.pf.diapers
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 
@@ -28,6 +31,12 @@ constructor(
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
 
   fun deleteDiaper(diaperId: Int) {
-    // TODO: Implement delete with error handling
+    viewModelScope.launch {
+      when (repo.deleteDiaper(childId, diaperId)) {
+        is ApiResult.Success -> _deleteError.value = null
+        is ApiResult.Error -> _deleteError.value = "Failed to delete diaper"
+        is ApiResult.Loading -> {}
+      }
+    }
   }
 }

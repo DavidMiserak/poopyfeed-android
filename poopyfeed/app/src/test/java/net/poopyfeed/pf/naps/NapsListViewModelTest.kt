@@ -66,13 +66,31 @@ class NapsListViewModelTest {
   }
 
   @Test
-  fun `deleteNap method exists`() {
+  fun `deleteNap calls repository and clears error on success`() = runTest {
     every { mockRepository.pagedNaps(1) } returns flowOf()
+    coEvery { mockRepository.deleteNap(1, 10) } returns ApiResult.Success(Unit)
 
     viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel.deleteError.value // access to initialize
 
-    // Should not throw
     viewModel.deleteNap(10)
+    advanceUntilIdle()
+
+    coVerify { mockRepository.deleteNap(1, 10) }
+    assert(viewModel.deleteError.value == null)
+  }
+
+  @Test
+  fun `deleteNap sets error on failure`() = runTest {
+    every { mockRepository.pagedNaps(1) } returns flowOf()
+    coEvery { mockRepository.deleteNap(1, 10) } returns
+        ApiResult.Error(ApiError.NetworkError("offline"))
+
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel.deleteNap(10)
+    advanceUntilIdle()
+
+    assert(viewModel.deleteError.value == "Failed to delete nap")
   }
 
   @Test
