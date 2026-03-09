@@ -67,7 +67,9 @@ class TimelineFragment : Fragment() {
         launch {
           viewModel.napCreationResult.collect { message ->
             if (message != null) {
-              Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+              _binding?.root?.let { root ->
+                Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show()
+              }
               viewModel.clearNapCreationResult()
             }
           }
@@ -77,6 +79,7 @@ class TimelineFragment : Fragment() {
   }
 
   private fun updateUI(state: TimelineUiState) {
+    val binding = _binding ?: return
     when (state) {
       is TimelineUiState.Loading -> {
         binding.recyclerTimeline.visibility = View.GONE

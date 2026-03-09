@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -317,32 +318,38 @@ constructor(
    */
   fun createNapFromGap(newerEventAt: String, olderEventAt: String) {
     viewModelScope.launch {
-      val newerMs = parseEpochMs(newerEventAt) ?: return@launch
-      val olderMs = parseEpochMs(olderEventAt) ?: return@launch
+      try {
+        val newerMs = parseEpochMs(newerEventAt) ?: return@launch
+        val olderMs = parseEpochMs(olderEventAt) ?: return@launch
 
-      // Nap starts 1 min after the older event, ends 1 min before the newer event
-      val napStartMs = olderMs + 60_000
-      val napEndMs = newerMs - 60_000
+        // Nap starts 1 min after the older event, ends 1 min before the newer event
+        val napStartMs = olderMs + 60_000
+        val napEndMs = newerMs - 60_000
 
-      if (napEndMs <= napStartMs) {
-        _napCreationResult.value = "Gap too small to add a nap"
-        return@launch
-      }
-
-      val napStart = Instant.fromEpochMilliseconds(napStartMs).toString()
-      val napEnd = Instant.fromEpochMilliseconds(napEndMs).toString()
-
-      val request = CreateNapRequest(start_time = napStart, end_time = napEnd)
-      when (val result = napsRepository.createNap(childId, request)) {
-        is ApiResult.Success -> {
-          syncScheduler.enqueueIfPending()
-          _napCreationResult.value = "Nap added"
-          refresh()
+        if (napEndMs <= napStartMs) {
+          _napCreationResult.value = "Gap too small to add a nap"
+          return@launch
         }
-        is ApiResult.Error -> {
-          _napCreationResult.value = result.error.getUserMessage(context)
+
+        val napStart = Instant.fromEpochMilliseconds(napStartMs).toString()
+        val napEnd = Instant.fromEpochMilliseconds(napEndMs).toString()
+
+        val request = CreateNapRequest(start_time = napStart, end_time = napEnd)
+        when (val result = napsRepository.createNap(childId, request)) {
+          is ApiResult.Success -> {
+            syncScheduler.enqueueIfPending()
+            _napCreationResult.value = "Nap added"
+            refresh()
+          }
+          is ApiResult.Error -> {
+            _napCreationResult.value = result.error.getUserMessage(context)
+          }
+          is ApiResult.Loading -> {}
         }
-        is ApiResult.Loading -> {}
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        _napCreationResult.value = e.message ?: "Could not add nap"
       }
     }
   }
