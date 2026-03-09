@@ -3,8 +3,8 @@ package net.poopyfeed.pf.diapers
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Diaper
@@ -18,7 +18,7 @@ import net.poopyfeed.pf.util.formatRelativeTime
 class DiaperAdapter(
     private val onItemClick: (Diaper) -> Unit,
     private val onDeleteClick: (Diaper) -> Unit,
-) : ListAdapter<Diaper, DiaperAdapter.DiaperViewHolder>(DiaperDiffCallback()) {
+) : PagingDataAdapter<Diaper, DiaperAdapter.DiaperViewHolder>(DiaperDiffCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiaperViewHolder {
     val inflater = LayoutInflater.from(parent.context)
@@ -27,7 +27,10 @@ class DiaperAdapter(
   }
 
   override fun onBindViewHolder(holder: DiaperViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    val diaper = getItem(position)
+    if (diaper != null) {
+      holder.bind(diaper)
+    }
   }
 
   class DiaperViewHolder(

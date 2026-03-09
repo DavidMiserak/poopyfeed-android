@@ -3,8 +3,8 @@ package net.poopyfeed.pf.naps
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Nap
@@ -21,7 +21,7 @@ class NapAdapter(
     private val onItemClick: (Nap) -> Unit,
     private val onDeleteClick: (Nap) -> Unit,
     private val onEndNapClick: (Nap) -> Unit,
-) : ListAdapter<Nap, NapAdapter.NapViewHolder>(NapDiffCallback()) {
+) : PagingDataAdapter<Nap, NapAdapter.NapViewHolder>(NapDiffCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NapViewHolder {
     val inflater = LayoutInflater.from(parent.context)
@@ -30,7 +30,10 @@ class NapAdapter(
   }
 
   override fun onBindViewHolder(holder: NapViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    val nap = getItem(position)
+    if (nap != null) {
+      holder.bind(nap)
+    }
   }
 
   class NapViewHolder(

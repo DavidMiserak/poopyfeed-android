@@ -3,8 +3,8 @@ package net.poopyfeed.pf.feedings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Feeding
@@ -19,7 +19,7 @@ import net.poopyfeed.pf.util.formatRelativeTime
 class FeedingAdapter(
     private val onItemClick: (Feeding) -> Unit,
     private val onDeleteClick: (Feeding) -> Unit,
-) : ListAdapter<Feeding, FeedingAdapter.FeedingViewHolder>(FeedingDiffCallback()) {
+) : PagingDataAdapter<Feeding, FeedingAdapter.FeedingViewHolder>(FeedingDiffCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedingViewHolder {
     val inflater = LayoutInflater.from(parent.context)
@@ -28,7 +28,10 @@ class FeedingAdapter(
   }
 
   override fun onBindViewHolder(holder: FeedingViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    val feeding = getItem(position)
+    if (feeding != null) {
+      holder.bind(feeding)
+    }
   }
 
   class FeedingViewHolder(
