@@ -127,17 +127,6 @@
     <!-- Text Styles (Fredoka) -->
     <!-- ===================== -->
 
-    <style name="TextAppearance.Pf.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">@font/fredoka</item>
-    </style>
-
-    <style name="TextAppearance.Pf.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:fontFamily">@font/fredoka</item>
-    </style>
-
     <style name="TextAppearance.Pf.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:fontFamily">@font/fredoka</item>

@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PoopyFeed</string>
-    <string name="action_settings">Settings</string>
     <string name="fab_description">Action button</string>
 
     <!-- Bottom navigation -->
@@ -70,7 +69,6 @@
     <string name="account_password_change_dialog_title">Change Password?</string>
     <string name="account_password_change_dialog_message">You\'ll be logged out and need to log in with your new password.</string>
     <string name="account_password_change_dialog_confirm">Change</string>
-    <string name="account_password_change_error">Failed to change password. Please check your current password and try again.</string>
 
     <!-- Account deletion section -->
     <string name="account_delete_section_title">Danger Zone</string>
@@ -79,13 +77,7 @@
     <string name="account_delete_dialog_title">Delete Account?</string>
     <string name="account_delete_dialog_message">This is permanent and cannot be undone. All data will be lost.\n\nEnter your password to confirm deletion.</string>
     <string name="account_delete_confirm_button">Permanently Delete</string>
-    <string name="account_delete_cancelled_message">Account deletion cancelled.</string>
     <string name="account_deleted_message">Account deleted successfully. You will be logged out.</string>
-    <string name="account_delete_error">Failed to delete account. Please check your password and try again.</string>
-
-    <!-- Form validation helpers -->
-    <string name="account_password_requirements">Password must be at least 8 characters</string>
-    <string name="account_password_strength_weak">Use a mix of uppercase, lowercase, numbers, and symbols for a stronger password</string>
 
     <!-- Timezone mismatch banner -->
     <string name="timezone_mismatch_title">Timezone Mismatch</string>
@@ -131,10 +123,6 @@
     <string name="icon_timeline">📊</string>
 
     <!-- Child Detail -->
-    <string name="child_detail_title">%1$s</string>
-    <string name="child_detail_age">%1$s</string>
-    <string name="child_detail_gender_male">Boy</string>
-    <string name="child_detail_gender_female">Girl</string>
     <string name="child_detail_last_feeding">%1$s</string>
     <string name="child_detail_last_diaper">%1$s</string>
     <string name="child_detail_last_nap">%1$s</string>
@@ -170,7 +158,6 @@
     <string name="child_detail_delete_title">Delete Child?</string>
     <string name="child_detail_delete_message">This will delete %1$s and all associated data. This action cannot be undone.</string>
     <string name="child_detail_delete_confirm">Delete</string>
-    <string name="child_detail_delete_success">Child deleted successfully.</string>
     <string name="child_detail_error_generic">Child not found.</string>
 
     <!-- Create Child / Bottom Sheet -->
@@ -180,11 +167,9 @@
     <string name="create_child_dob_label">Date of birth</string>
     <string name="create_child_dob_error">Date of birth is required.</string>
     <string name="create_child_gender_label">Gender</string>
-    <string name="create_child_gender_error">Gender is required.</string>
     <string name="create_child_gender_male">Boy</string>
     <string name="create_child_gender_female">Girl</string>
     <string name="create_child_save_button">Add Child</string>
-    <string name="create_child_saving">Saving…</string>
     <string name="create_child_success">Child added successfully!</string>
 
     <!-- Edit Child / Bottom Sheet -->
@@ -220,7 +205,6 @@
     <string name="notification_pref_naps">Naps</string>
     <string name="notification_pref_loading">Loading notification preferences&#8230;</string>
     <string name="notification_pref_saving">Saving&#8230;</string>
-    <string name="notification_pref_saved">Notification preference updated</string>
     <string name="notification_pref_error">Failed to load notification preferences</string>
 
     <!-- Feedings List -->
@@ -269,7 +253,6 @@
     <string name="timeline_empty_subtitle">No feedings, diapers, or naps logged for this day</string>
     <string name="timeline_error_title">Failed to load timeline</string>
     <string name="timeline_retry">Retry</string>
-    <string name="timeline_add_nap">Add nap</string>
     <string name="timeline_gap_duration">💤 %1$s quiet</string>
     <string name="timeline_add_nap_range">😴 Add nap · %1$s – %2$s</string>
 
@@ -277,15 +260,11 @@
     <string name="create_feeding_title">Log Feeding</string>
     <string name="create_feeding_type_label">Type</string>
     <string name="create_feeding_amount_label">Amount (oz)</string>
-    <string name="create_feeding_amount_error">Enter amount for bottle feeding.</string>
     <string name="create_feeding_minutes_label">Minutes</string>
-    <string name="create_feeding_minutes_error">Enter minutes for breast feeding.</string>
     <string name="create_feeding_side_label">Side</string>
-    <string name="create_feeding_side_error">Select side for breast feeding.</string>
     <string name="create_feeding_side_left">Left</string>
     <string name="create_feeding_side_right">Right</string>
     <string name="create_feeding_side_both">Both</string>
-    <string name="create_feeding_type_error">Select feeding type.</string>
     <string name="create_feeding_time_label">Time</string>
     <string name="create_feeding_change_time">Change time</string>
     <string name="create_feeding_save">Save</string>
@@ -295,7 +274,6 @@
     <string name="create_diaper_title">Log Diaper Change</string>
     <string name="edit_diaper_title">Edit diaper change</string>
     <string name="create_diaper_type_label">Change type</string>
-    <string name="create_diaper_type_error">Select change type.</string>
     <string name="create_diaper_time_label">Time</string>
     <string name="create_diaper_change_time">Change time</string>
     <string name="create_diaper_save">Save</string>
@@ -343,10 +321,8 @@
     <string name="invite_link_delete">Delete</string>
     <string name="invite_link_paused">Paused</string>
     <string name="create_invite_title">Create invite link</string>
-    <string name="create_invite_email_label">Email</string>
     <string name="create_invite_role_label">Role</string>
     <string name="create_invite_send">Create link</string>
-    <string name="create_invite_email_error">Enter a valid email address.</string>
     <string name="create_invite_role_error">Select a role.</string>
     <string name="create_invite_link_created">Invite link created</string>
     <string name="create_invite_share_hint">Share this code with the person you want to invite.</string>
@@ -360,7 +336,6 @@
     <string name="notifications_empty_title">No notifications yet</string>
     <string name="notifications_empty_body">When someone logs a feeding, diaper, or nap for a shared child, you\'ll see it here.</string>
     <string name="notifications_retry">Retry</string>
-    <string name="notifications_load_more">Load more</string>
     <string name="notification_meta">%1$s for %2$s</string>
     <string name="notifications_permission_denied">Enable notifications in Settings to receive activity alerts.</string>
 
@@ -370,7 +345,6 @@
     <string name="a11y_diaper_item">Diaper change, %1$s. Double tap for options.</string>
     <string name="a11y_nap_item">Nap, %1$s. Double tap for options.</string>
     <string name="a11y_notification_item">%1$s. Double tap to open child.</string>
-    <string name="a11y_load_more_notifications">Load more notifications</string>
     <string name="a11y_retry">Retry</string>
     <string name="a11y_dismiss">Dismiss</string>
     <string name="a11y_use_device_timezone">Use device timezone</string>
@@ -378,6 +352,4 @@
     <string name="a11y_go_to_diapers">Diapers. Double tap to open.</string>
     <string name="a11y_go_to_naps">Naps. Double tap to open.</string>
     <string name="a11y_go_to_timeline">Timeline. Double tap to open.</string>
-    <string name="a11y_copy_invite_link">Copy invite link</string>
-    <string name="a11y_close">Close</string>
 </resources>

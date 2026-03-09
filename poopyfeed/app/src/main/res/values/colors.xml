@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primary Colors (Peachy Rose) -->
-    <color name="rose_50">#fff5f7</color>
     <color name="rose_100">#ffe4e6</color>
     <color name="rose_200">#fecdd3</color>
-    <color name="rose_300">#fda4af</color>
     <color name="rose_400">#fb7185</color>
     <color name="rose_500">#f43f5e</color>
     <color name="rose_600">#e11d48</color>
@@ -13,32 +11,21 @@
     <color name="amber_400">#fbbf24</color>
     <color name="amber_600">#d97706</color>
     <color name="orange_400">#fb923c</color>
-    <color name="orange_500">#f97316</color>
 
     <!-- Neutral Grays -->
     <color name="slate_50">#f8fafc</color>
     <color name="slate_100">#f1f5f9</color>
     <color name="slate_200">#e2e8f0</color>
-    <color name="slate_300">#cbd5e1</color>
     <color name="slate_600">#475569</color>
-    <color name="slate_700">#334155</color>
     <color name="slate_900">#0f172a</color>
 
     <!-- Semantic Colors -->
-    <color name="emerald_500">#10b981</color>
-    <color name="emerald_50">#f0fdf4</color>
     <color name="red_500">#ef4444</color>
     <color name="red_50">#fef2f2</color>
 
     <!-- Background tints -->
     <color name="amber_50">#fffbeb</color>
-    <color name="amber_200">#fde68a</color>
     <color name="orange_50">#fff7ed</color>
-
-    <!-- Translucent overlays -->
-    <color name="white_95">#F2FFFFFF</color>
-    <color name="rose_400_20">#33fb7185</color>
-    <color name="orange_400_15">#26fb923c</color>
 
     <!-- Additional utilities -->
     <color name="white">#FFFFFFFF</color>
