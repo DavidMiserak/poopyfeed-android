@@ -409,17 +409,6 @@
     </issue>
 
     <issue
-        id="DisableBaselineAlignment"
-        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
-        errorLine1="            &lt;LinearLayout"
-        errorLine2="             ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/fragment_create_feeding_bottom_sheet.xml"
-            line="43"
-            column="14"/>
-    </issue>
-
-    <issue
         id="NestedWeights"
         message="Nested weights are bad for performance"
         errorLine1="                        android:layout_weight=&quot;1&quot;"
@@ -1306,7 +1295,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_create_feeding_bottom_sheet.xml"
-            line="63"
+            line="64"
             column="13"/>
     </issue>
 
@@ -1317,7 +1306,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_create_feeding_bottom_sheet.xml"
-            line="73"
+            line="74"
             column="13"/>
     </issue>
 
@@ -1328,7 +1317,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/fragment_create_feeding_bottom_sheet.xml"
-            line="83"
+            line="85"
             column="29"/>
     </issue>
 
@@ -1339,7 +1328,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/fragment_create_feeding_bottom_sheet.xml"
-            line="93"
+            line="95"
             column="29"/>
     </issue>
 

@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/spacing_16"
+            android:paddingStart="@dimen/spacing_16"
+            android:paddingEnd="@dimen/spacing_16"
             android:paddingVertical="@dimen/spacing_12"
             android:maxWidth="800dp">
 
@@ -44,7 +45,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:spacing="@dimen/spacing_12">
+                android:spacing="@dimen/spacing_12"
+                android:baselineAligned="false">
 
                 <!-- Left column: Type and Amount -->
                 <LinearLayout
