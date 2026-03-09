@@ -19,7 +19,7 @@ import net.poopyfeed.pf.util.EmailValidator
 
 /**
  * Signup screen. Collects email/password, validates with [EmailValidator], and delegates
- * registration to [SignupViewModel]. Navigates to [HomeFragment] on success or back to
+ * registration to [SignupViewModel]. Navigates to children list on success or back to
  * [LoginFragment].
  */
 @AndroidEntryPoint
@@ -55,7 +55,7 @@ class SignupFragment : Fragment() {
             }
             is SignupUiState.Success -> {
               setLoading(false)
-              navigateToHome()
+              navigateToChildrenList()
             }
             is SignupUiState.Error -> {
               setLoading(false)
@@ -111,7 +111,7 @@ class SignupFragment : Fragment() {
     binding.progressSignup.visibility = if (loading) View.VISIBLE else View.GONE
   }
 
-  private fun navigateToHome() {
+  private fun navigateToChildrenList() {
     val navController = findNavController()
     navController.navigate(R.id.action_signupFragment_to_childrenList)
   }

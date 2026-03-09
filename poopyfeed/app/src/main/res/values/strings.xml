@@ -4,7 +4,6 @@
     <string name="fab_description">Action button</string>
 
     <!-- Bottom navigation -->
-    <string name="nav_home">Home</string>
     <string name="nav_children">Children</string>
     <string name="nav_notifications">Notifications</string>
     <string name="nav_account">Account</string>
@@ -35,14 +34,8 @@
     <string name="signup_confirm_password_error">Passwords must match.</string>
     <string name="signup_go_to_login">Already have an account? Log in</string>
 
-    <!-- Home -->
+    <!-- General -->
     <string name="logout_button">Log out</string>
-    <string name="welcome_message">👋 Welcome, %1$s</string>
-    <string name="home_subtitle">Here is what is happening with your little one today.</string>
-    <string name="home_getting_started_title">Getting Started</string>
-    <string name="home_getting_started_body">Add your first child to start tracking feedings, diapers, and naps.</string>
-    <string name="pending_invites_card_title">You have %d pending invite(s)</string>
-    <string name="pending_invites_card_body">Tap to view and accept.</string>
 
     <!-- Account settings -->
     <string name="account_settings_title">Account settings</string>
@@ -216,10 +209,6 @@
     <string name="notification_pref_saving">Saving&#8230;</string>
     <string name="notification_pref_saved">Notification preference updated</string>
     <string name="notification_pref_error">Failed to load notification preferences</string>
-
-    <!-- Home - My Children Card -->
-    <string name="home_children_card_title">My Children</string>
-    <string name="home_children_card_body">View and manage your children\'s profiles.</string>
 
     <!-- Feedings List -->
     <string name="feedings_list_title">Feedings</string>

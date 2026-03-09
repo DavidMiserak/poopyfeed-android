@@ -171,8 +171,7 @@ class MainActivity : AppCompatActivity() {
     binding.root.findViewById<View>(R.id.nav_host_fragment_content_main).post {
       val navController = findNavController(R.id.nav_host_fragment_content_main)
       appBarConfiguration =
-          AppBarConfiguration(
-              setOf(R.id.HomeFragment, R.id.ChildrenListFragment, R.id.NotificationsFragment))
+          AppBarConfiguration(setOf(R.id.ChildrenListFragment, R.id.NotificationsFragment))
       setupActionBarWithNavController(navController, appBarConfiguration)
       NavigationUI.setupWithNavController(binding.bottomNav, navController)
       navController.addOnDestinationChangedListener { _, destination, _ ->

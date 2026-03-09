@@ -19,7 +19,7 @@ import net.poopyfeed.pf.util.EmailValidator
 
 /**
  * Login screen. Collects email/password, validates with [EmailValidator], and delegates auth to
- * [LoginViewModel]. Navigates to [HomeFragment] on success or to signup. Uses
+ * [LoginViewModel]. Navigates to children list on success or to signup. Uses
  * [repeatOnLifecycle][Lifecycle.State.STARTED] to collect [LoginViewModel.uiState].
  */
 @AndroidEntryPoint
@@ -44,7 +44,7 @@ class LoginFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     if (viewModel.checkExistingToken()) {
-      navigateToHome()
+      navigateToChildrenList()
       return
     }
 
@@ -60,7 +60,7 @@ class LoginFragment : Fragment() {
             }
             is LoginUiState.Success -> {
               setLoading(false)
-              navigateToHome()
+              navigateToChildrenList()
             }
             is LoginUiState.Error -> {
               setLoading(false)
@@ -110,7 +110,7 @@ class LoginFragment : Fragment() {
     binding.progressLogin.visibility = if (loading) View.VISIBLE else View.GONE
   }
 
-  private fun navigateToHome() {
+  private fun navigateToChildrenList() {
     val navController = findNavController()
     navController.navigate(R.id.action_loginFragment_to_childrenList)
   }

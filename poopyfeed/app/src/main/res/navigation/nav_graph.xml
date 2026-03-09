@@ -22,28 +22,7 @@
             app:destination="@id/SignupFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/HomeFragment"
-        android:name="net.poopyfeed.pf.HomeFragment"
-        android:label="@string/app_name"
-        tools:layout="@layout/fragment_home">
-
-        <action
-            android:id="@+id/action_homeFragment_to_loginFragment"
-            app:destination="@id/LoginFragment"
-            app:popUpTo="@id/HomeFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_homeFragment_to_childrenList"
-            app:destination="@id/ChildrenListFragment" />
-
-        <action
-            android:id="@+id/action_homeFragment_to_pendingInvitesFragment"
-            app:destination="@id/pendingInvitesFragment" />
-    </fragment>
-
-    <fragment
+<fragment
         android:id="@+id/pendingInvitesFragment"
         android:name="net.poopyfeed.pf.sharing.PendingInvitesFragment"
         android:label="@string/pending_invites_title"
