@@ -35,8 +35,7 @@ class PendingInviteAdapterTest {
     val viewHolder = adapter.onCreateViewHolder(parent, 0)
     adapter.onBindViewHolder(viewHolder, 0)
 
-    val titleView =
-        viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_title)
+    val titleView = viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_title)
     assertNotNull(titleView)
     val expected =
         themedContext.getString(net.poopyfeed.pf.R.string.pending_invite_for_child, "Baby Sam")
@@ -62,10 +61,8 @@ class PendingInviteAdapterTest {
     val viewHolder = adapter.onCreateViewHolder(parent, 0)
     adapter.onBindViewHolder(viewHolder, 0)
 
-    val titleView =
-        viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_title)
-    val roleView =
-        viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_role)
+    val titleView = viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_title)
+    val roleView = viewHolder.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_role)
     assertNotNull(titleView)
     assertNotNull(roleView)
 
@@ -73,8 +70,7 @@ class PendingInviteAdapterTest {
         themedContext.getString(net.poopyfeed.pf.R.string.pending_invite_for_role, "caregiver")
     assertEquals(expectedTitle, titleView.text.toString())
 
-    val expectedRole =
-        themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_caregiver)
+    val expectedRole = themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_caregiver)
     assertEquals(expectedRole, roleView.text.toString())
   }
 }

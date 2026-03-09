@@ -79,15 +79,13 @@ class SharingAdapterTest {
     adapter.onBindViewHolder(vh0, 0)
     val role0 =
         vh0.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_role)?.text?.toString()
-    assertEquals(
-        themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_co_parent), role0)
+    assertEquals(themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_co_parent), role0)
 
     val vh1 = adapter.onCreateViewHolder(parent, adapter.getItemViewType(1))
     adapter.onBindViewHolder(vh1, 1)
     val role1 =
         vh1.itemView.findViewById<TextView>(net.poopyfeed.pf.R.id.text_role)?.text?.toString()
-    assertEquals(
-        themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_caregiver), role1)
+    assertEquals(themedContext.getString(net.poopyfeed.pf.R.string.sharing_role_caregiver), role1)
   }
 
   @Test
@@ -112,11 +110,9 @@ class SharingAdapterTest {
     val vhActive = adapter.onCreateViewHolder(parent, adapter.getItemViewType(0))
     adapter.onBindViewHolder(vhActive, 0)
     val chipActive =
-        vhActive.itemView.findViewById<android.view.View>(
-            net.poopyfeed.pf.R.id.chip_paused)
+        vhActive.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.chip_paused)
     val toggleActive =
-        vhActive.itemView.findViewById<android.widget.Button>(
-            net.poopyfeed.pf.R.id.button_toggle)
+        vhActive.itemView.findViewById<android.widget.Button>(net.poopyfeed.pf.R.id.button_toggle)
     assertEquals(android.view.View.GONE, chipActive.visibility)
     assertEquals(
         themedContext.getString(net.poopyfeed.pf.R.string.invite_link_pause),
@@ -125,11 +121,9 @@ class SharingAdapterTest {
     val vhPaused = adapter.onCreateViewHolder(parent, adapter.getItemViewType(1))
     adapter.onBindViewHolder(vhPaused, 1)
     val chipPaused =
-        vhPaused.itemView.findViewById<android.view.View>(
-            net.poopyfeed.pf.R.id.chip_paused)
+        vhPaused.itemView.findViewById<android.view.View>(net.poopyfeed.pf.R.id.chip_paused)
     val togglePaused =
-        vhPaused.itemView.findViewById<android.widget.Button>(
-            net.poopyfeed.pf.R.id.button_toggle)
+        vhPaused.itemView.findViewById<android.widget.Button>(net.poopyfeed.pf.R.id.button_toggle)
     assertEquals(android.view.View.VISIBLE, chipPaused.visibility)
     assertEquals(
         themedContext.getString(net.poopyfeed.pf.R.string.invite_link_resume),
