@@ -631,7 +631,7 @@
                                 android:fontFamily="@font/dm_sans"
                                 android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="@dimen/text_label_small"
-                                tools:text="2 wet, 1 dirty" />
+                                tools:text="2 wet, 1 dirty, 1 both" />
 
                         </LinearLayout>
 
