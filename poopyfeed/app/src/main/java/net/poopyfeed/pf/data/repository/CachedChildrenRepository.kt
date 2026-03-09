@@ -367,11 +367,10 @@ constructor(
   @OptIn(ExperimentalPagingApi::class)
   fun pagedFeedings(childId: Int): Flow<PagingData<Feeding>> =
       Pager(
-          config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-          remoteMediator = FeedingsRemoteMediator(childId, apiService, feedingDao)
-      ) {
-        feedingDao.pagingSourceFeedings(childId)
-      }
+              config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+              remoteMediator = FeedingsRemoteMediator(childId, apiService, feedingDao)) {
+                feedingDao.pagingSourceFeedings(childId)
+              }
           .flow
           .map { pagingData -> pagingData.map { it.toApiModel() } }
 }
@@ -547,11 +546,10 @@ constructor(
   @OptIn(ExperimentalPagingApi::class)
   fun pagedDiapers(childId: Int): Flow<PagingData<Diaper>> =
       Pager(
-          config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-          remoteMediator = DiapersRemoteMediator(childId, apiService, diaperDao)
-      ) {
-        diaperDao.pagingSourceDiapers(childId)
-      }
+              config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+              remoteMediator = DiapersRemoteMediator(childId, apiService, diaperDao)) {
+                diaperDao.pagingSourceDiapers(childId)
+              }
           .flow
           .map { pagingData -> pagingData.map { it.toApiModel() } }
 }
@@ -718,11 +716,10 @@ constructor(
   @OptIn(ExperimentalPagingApi::class)
   fun pagedNaps(childId: Int): Flow<PagingData<Nap>> =
       Pager(
-          config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-          remoteMediator = NapsRemoteMediator(childId, apiService, napDao)
-      ) {
-        napDao.pagingSourceNaps(childId)
-      }
+              config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+              remoteMediator = NapsRemoteMediator(childId, apiService, napDao)) {
+                napDao.pagingSourceNaps(childId)
+              }
           .flow
           .map { pagingData -> pagingData.map { it.toApiModel() } }
 }
