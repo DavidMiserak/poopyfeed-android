@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.MainActivityViewModel
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentNotificationsBinding
+import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
 
 /**
  * In-app notifications center. Lists notifications with pull-to-refresh, "Load more" for
@@ -95,8 +96,10 @@ class NotificationsFragment : Fragment() {
             onNotificationClick = { notification ->
               viewModel.markAsReadAndNavigate(notification.id, notification.childId)
             })
-    binding.recyclerNotifications.adapter = adapter
     binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
+    binding.recyclerNotifications.adapter = adapter.withLoadStateFooter(
+        footer = PagingLoadStateAdapter { adapter.retry() }
+    )
 
     binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
