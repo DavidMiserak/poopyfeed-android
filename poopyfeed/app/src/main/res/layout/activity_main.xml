@@ -33,32 +33,19 @@
             app:titleTextColor="?attr/colorOnSurface">
 
             <!-- Custom toolbar content: heart + title (currently hidden in favor of Navigation-driven title) -->
-            <LinearLayout
+            <TextView
                 android:id="@+id/brand_mark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_home"
-                    android:contentDescription="@null"
-                    android:importantForAccessibility="no" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_4"
-                    android:text="@string/app_name"
-                    android:fontFamily="@font/fredoka"
-                    android:textSize="22sp"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+                android:gravity="center_vertical"
+                android:text="@string/app_name"
+                android:fontFamily="@font/fredoka"
+                android:textSize="22sp"
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold"
+                android:drawablePadding="@dimen/spacing_4"
+                app:drawableStartCompat="@drawable/ic_home" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 

@@ -35,36 +35,23 @@
             android:layout_marginEnd="-60dp" />
 
         <!-- Brand mark: heart + title -->
-        <LinearLayout
+        <TextView
             android:id="@+id/brand_mark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:text="@string/signup_title"
+            android:textSize="@dimen/text_headline_large"
+            android:fontFamily="@font/fredoka"
+            android:textColor="?attr/colorPrimary"
+            android:textStyle="bold"
+            android:drawablePadding="@dimen/spacing_4"
+            app:drawableStartCompat="@drawable/ic_home"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/text_signup_subtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintVertical_chainStyle="packed">
-
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_home"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_4"
-                android:text="@string/signup_title"
-                android:textSize="@dimen/text_headline_large"
-                android:fontFamily="@font/fredoka"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <!-- Subtitle -->
         <TextView
