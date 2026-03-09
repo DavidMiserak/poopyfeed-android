@@ -4,20 +4,27 @@ import android.os.Build
 import android.view.View
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.io.IOException
 import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -97,6 +104,77 @@ class NotificationsFragmentTest {
     val root = fragment!!.requireView()
     // Verify fragment loads gracefully despite permission request
     assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_notifications).visibility)
+  }
+
+  @Test
+  fun `empty state shows when paging returns no notifications`() {
+    val emptySource =
+        object : PagingSource<Int, Notification>() {
+          override suspend fun load(
+              params: PagingSource.LoadParams<Int>
+          ): PagingSource.LoadResult<Int, Notification> =
+              PagingSource.LoadResult.Page(
+                  data = emptyList(),
+                  prevKey = null,
+                  nextKey = null,
+              )
+
+          override fun getRefreshKey(state: PagingState<Int, Notification>) = null
+        }
+    coEvery { repo.pagedNotifications() } returns
+        Pager(PagingConfig(pageSize = 20), pagingSourceFactory = { emptySource }).flow
+
+    var fragment: NotificationsFragment? = null
+    launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
+      fragment = this
+    }
+    idleMainLooperUntil(maxIterations = 500) {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE
+      } == true
+    }
+
+    val root = fragment!!.requireView()
+    assertEquals(
+        "Empty state should be visible when paging returns no items",
+        View.VISIBLE,
+        root.findViewById<View>(R.id.layout_empty_state).visibility,
+    )
+    assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_notifications).visibility)
+    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
+  }
+
+  @Test
+  fun `error state shows when paging load fails`() {
+    val failingSource =
+        object : PagingSource<Int, Notification>() {
+          override suspend fun load(
+              params: PagingSource.LoadParams<Int>
+          ): PagingSource.LoadResult<Int, Notification> =
+              PagingSource.LoadResult.Error(IOException("test error"))
+
+          override fun getRefreshKey(state: PagingState<Int, Notification>) = null
+        }
+    coEvery { repo.pagedNotifications() } returns
+        Pager(PagingConfig(pageSize = 20), pagingSourceFactory = { failingSource }).flow
+
+    var fragment: NotificationsFragment? = null
+    launchFragmentInHiltContainer<NotificationsFragment>(beforeAdd = ::installNavController) {
+      fragment = this
+    }
+    idleMainLooperUntil {
+      fragment?.view?.let { v ->
+        v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
+      } == true
+    }
+
+    val root = fragment!!.requireView()
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_error_state).visibility)
+    assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_notifications).visibility)
+    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_empty_state).visibility)
+    val errorText =
+        root.findViewById<android.widget.TextView>(R.id.text_error_message).text.toString()
+    assertTrue(errorText.contains("test error") || errorText.isNotEmpty())
   }
 
   @Test

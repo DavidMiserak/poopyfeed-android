@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +42,13 @@ class NotificationsViewModelTest {
     // Mock pagingData flow
     coEvery { mockRepository.pagedNotifications() } returns
         flowOf(PagingData.from(listOf(TestFixtures.mockNotification())))
+    // Default listNotifications for refresh() in init
+    coEvery { mockRepository.listNotifications(1) } returns
+        ApiResult.Success(
+            TestFixtures.mockPaginatedNotificationsResponse(
+                results = listOf(TestFixtures.mockNotification(isRead = false)),
+            ),
+        )
   }
 
   @After
@@ -155,6 +163,38 @@ class NotificationsViewModelTest {
         collectJob.cancel()
 
         assertTrue(errors.isEmpty())
+      }
+
+  @Test
+  fun `hasUnread is true when first page has unread notification`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNotifications(1) } returns
+            ApiResult.Success(
+                TestFixtures.mockPaginatedNotificationsResponse(
+                    results = listOf(TestFixtures.mockNotification(id = 1, isRead = false)),
+                ),
+            )
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.hasUnread)
+      }
+
+  @Test
+  fun `hasUnread is false when first page has only read notifications`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.listNotifications(1) } returns
+            ApiResult.Success(
+                TestFixtures.mockPaginatedNotificationsResponse(
+                    results = listOf(TestFixtures.mockNotification(id = 1, isRead = true)),
+                ),
+            )
+
+        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.hasUnread)
       }
 
   @Test

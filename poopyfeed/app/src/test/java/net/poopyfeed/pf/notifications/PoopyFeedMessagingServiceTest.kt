@@ -71,6 +71,38 @@ class PoopyFeedMessagingServiceTest {
   }
 
   @Test
+  fun `getChannelIdForEventType returns feeding_reminders channel for feeding_reminder`() {
+    assertEquals(
+        PoopyFeedMessagingService.CHANNEL_FEEDING_REMINDERS,
+        PoopyFeedMessagingService.getChannelIdForEventType("feeding_reminder"),
+    )
+  }
+
+  @Test
+  fun `getChannelIdForEventType returns pattern_alerts channel for pattern_alert`() {
+    assertEquals(
+        PoopyFeedMessagingService.CHANNEL_PATTERN_ALERTS,
+        PoopyFeedMessagingService.getChannelIdForEventType("pattern_alert"),
+    )
+  }
+
+  @Test
+  fun `getChannelIdForEventType returns activity_alerts for activity and unknown types`() {
+    assertEquals(
+        PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS,
+        PoopyFeedMessagingService.getChannelIdForEventType("activity_alert"),
+    )
+    assertEquals(
+        PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS,
+        PoopyFeedMessagingService.getChannelIdForEventType(""),
+    )
+    assertEquals(
+        PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS,
+        PoopyFeedMessagingService.getChannelIdForEventType("other"),
+    )
+  }
+
+  @Test
   fun `shared preferences key constants are correct`() {
     assertEquals("poopyfeed_prefs", PoopyFeedMessagingService.PREFS_NAME)
     assertEquals("quiet_hours_enabled", PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED)

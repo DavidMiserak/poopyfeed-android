@@ -131,14 +131,17 @@ class PoopyFeedMessagingService : FirebaseMessagingService() {
     return QuietHours(enabled = true, startTime = startTime, endTime = endTime)
   }
 
-  private fun getChannelId(eventType: String): String =
-      when (eventType) {
-        "feeding_reminder" -> CHANNEL_FEEDING_REMINDERS
-        "pattern_alert" -> CHANNEL_PATTERN_ALERTS
-        else -> CHANNEL_ACTIVITY_ALERTS
-      }
+  private fun getChannelId(eventType: String): String = getChannelIdForEventType(eventType)
 
   companion object {
+    /** Maps FCM event_type to notification channel ID. Exposed for unit tests. */
+    internal fun getChannelIdForEventType(eventType: String): String =
+        when (eventType) {
+          "feeding_reminder" -> CHANNEL_FEEDING_REMINDERS
+          "pattern_alert" -> CHANNEL_PATTERN_ALERTS
+          else -> CHANNEL_ACTIVITY_ALERTS
+        }
+
     private const val TAG = "PoopyFeedFCM"
     const val PREFS_NAME = "poopyfeed_prefs"
     const val KEY_QUIET_HOURS_ENABLED = "quiet_hours_enabled"
