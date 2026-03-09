@@ -164,10 +164,17 @@ constructor(
     if (events.isEmpty()) return emptyList()
     val items = mutableListOf<TimelineItem>()
     for (i in events.indices) {
-      items.add(TimelineItem.Event(events[i]))
+      val newerEvent = events[i]
+      items.add(TimelineItem.Event(newerEvent))
       if (i < events.lastIndex) {
-        val newerMs = parseEpochMs(events[i].at)
-        // For naps, use end time as the effective boundary (nap occupies time until it ends)
+        // For naps, treat the effective "start" of the newer event as nappedAt so we don't
+        // incorrectly include the nap duration itself inside the preceding gap when the backend
+        // uses endedAt for TimelineEvent.at.
+        val newerEffectiveStart = newerEvent.nap?.nappedAt ?: newerEvent.at
+        val newerMs = parseEpochMs(newerEffectiveStart)
+
+        // For naps, use end time as the effective boundary for the *older* event (nap occupies time
+        // until it ends). This ensures the gap after a nap starts when the nap finishes.
         val olderEvent = events[i + 1]
         val olderEffectiveEnd = olderEvent.nap?.endedAt ?: olderEvent.at
         val olderMs = parseEpochMs(olderEffectiveEnd)
@@ -177,7 +184,7 @@ constructor(
             items.add(
                 TimelineItem.Gap(
                     durationMinutes = gapMinutes,
-                    newerEventAt = events[i].at,
+                    newerEventAt = newerEffectiveStart,
                     olderEventAt = olderEffectiveEnd,
                 ))
           }
