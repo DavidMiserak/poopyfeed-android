@@ -10,12 +10,15 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.databinding.ItemDiaperBinding
 import net.poopyfeed.pf.util.formatRelativeTime
+import net.poopyfeed.pf.util.formatTimeForDisplayWithTimezone
 
 /**
  * RecyclerView adapter for displaying a list of diaper changes. Shows change type (Wet/Dirty/Both)
- * and relative time. Tap triggers [onItemClick]; long-press triggers [onDeleteClick].
+ * and relative time with exact timestamp in the user's profile timezone. Tap triggers
+ * [onItemClick]; long-press triggers [onDeleteClick].
  */
 class DiaperAdapter(
+    private val profileTimezoneId: String?,
     private val onItemClick: (Diaper) -> Unit,
     private val onDeleteClick: (Diaper) -> Unit,
 ) : PagingDataAdapter<Diaper, DiaperAdapter.DiaperViewHolder>(DiaperDiffCallback()) {
@@ -23,7 +26,7 @@ class DiaperAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiaperViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ItemDiaperBinding.inflate(inflater, parent, false)
-    return DiaperViewHolder(binding, onItemClick, onDeleteClick)
+    return DiaperViewHolder(binding, profileTimezoneId, onItemClick, onDeleteClick)
   }
 
   override fun onBindViewHolder(holder: DiaperViewHolder, position: Int) {
@@ -35,6 +38,7 @@ class DiaperAdapter(
 
   class DiaperViewHolder(
       private val binding: ItemDiaperBinding,
+      private val profileTimezoneId: String?,
       private val onItemClick: (Diaper) -> Unit,
       private val onDeleteClick: (Diaper) -> Unit,
   ) : RecyclerView.ViewHolder(binding.root) {
@@ -49,7 +53,14 @@ class DiaperAdapter(
             else -> diaper.change_type.replaceFirstChar { it.uppercaseChar() }
           }
       binding.textChangeType.text = typeLabel
-      val timeSummary = formatRelativeTime(ctx, diaper.timestamp)
+      val relativeTime = formatRelativeTime(ctx, diaper.timestamp)
+      val absoluteTime =
+          formatTimeForDisplayWithTimezone(
+              ctx,
+              diaper.timestamp,
+              profileTimezoneId,
+          )
+      val timeSummary = "$relativeTime \u2022 $absoluteTime"
       binding.textTime.text = timeSummary
       binding.textSavedLocally.visibility = if (diaper.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_diaper_item, timeSummary)

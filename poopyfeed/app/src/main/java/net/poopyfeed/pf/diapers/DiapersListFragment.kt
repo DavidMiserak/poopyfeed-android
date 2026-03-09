@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentDiapersListBinding
+import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
 
 /**
@@ -32,6 +34,7 @@ class DiapersListFragment : Fragment() {
     get() = _binding!!
 
   private val viewModel: DiapersListViewModel by viewModels()
+  @Inject lateinit var tokenManager: TokenManager
   private lateinit var adapter: DiaperAdapter
 
   override fun onCreateView(
@@ -49,6 +52,7 @@ class DiapersListFragment : Fragment() {
     val childId = requireArguments().getInt("childId")
     adapter =
         DiaperAdapter(
+            profileTimezoneId = tokenManager.getProfileTimezone(),
             onItemClick = { diaper -> navigateToEditDiaper(childId, diaper.id) },
             onDeleteClick = { diaper -> showDeleteConfirmationDialog(diaper.id) },
         )

@@ -11,13 +11,15 @@ import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.databinding.ItemNapBinding
 import net.poopyfeed.pf.util.formatNapDuration
 import net.poopyfeed.pf.util.formatRelativeTime
+import net.poopyfeed.pf.util.formatTimeForDisplayWithTimezone
 
 /**
- * RecyclerView adapter for displaying a list of naps. Shows start time, duration or "In progress",
- * and "End Nap" button when [Nap.end_time] is null. Tap triggers [onItemClick]; long-press triggers
- * [onDeleteClick].
+ * RecyclerView adapter for displaying a list of naps. Shows start time (relative and exact in the
+ * user's profile timezone), duration or "In progress", and "End Nap" button when [Nap.end_time] is
+ * null. Tap triggers [onItemClick]; long-press triggers [onDeleteClick].
  */
 class NapAdapter(
+    private val profileTimezoneId: String?,
     private val onItemClick: (Nap) -> Unit,
     private val onDeleteClick: (Nap) -> Unit,
     private val onEndNapClick: (Nap) -> Unit,
@@ -26,7 +28,7 @@ class NapAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NapViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ItemNapBinding.inflate(inflater, parent, false)
-    return NapViewHolder(binding, onItemClick, onDeleteClick, onEndNapClick)
+    return NapViewHolder(binding, profileTimezoneId, onItemClick, onDeleteClick, onEndNapClick)
   }
 
   override fun onBindViewHolder(holder: NapViewHolder, position: Int) {
@@ -38,6 +40,7 @@ class NapAdapter(
 
   class NapViewHolder(
       private val binding: ItemNapBinding,
+      private val profileTimezoneId: String?,
       private val onItemClick: (Nap) -> Unit,
       private val onDeleteClick: (Nap) -> Unit,
       private val onEndNapClick: (Nap) -> Unit,
@@ -45,7 +48,14 @@ class NapAdapter(
 
     fun bind(nap: Nap) {
       val ctx = binding.root.context
-      val timeSummary = formatRelativeTime(ctx, nap.start_time)
+      val relativeTime = formatRelativeTime(ctx, nap.start_time)
+      val absoluteTime =
+          formatTimeForDisplayWithTimezone(
+              ctx,
+              nap.start_time,
+              profileTimezoneId,
+          )
+      val timeSummary = "$relativeTime \u2022 $absoluteTime"
       binding.textStartTime.text = ctx.getString(R.string.nap_record_start, timeSummary)
       binding.textSavedLocally.visibility = if (nap.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_nap_item, timeSummary)

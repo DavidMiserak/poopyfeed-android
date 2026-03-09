@@ -10,6 +10,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.databinding.ItemFeedingBinding
 import net.poopyfeed.pf.util.formatRelativeTime
+import net.poopyfeed.pf.util.formatTimeForDisplayWithTimezone
 
 /**
  * RecyclerView adapter for displaying a list of feedings. Shows type (Bottle/Breast); for bottle
@@ -17,6 +18,7 @@ import net.poopyfeed.pf.util.formatRelativeTime
  * triggers [onItemClick]; long-press triggers [onDeleteClick].
  */
 class FeedingAdapter(
+    private val profileTimezoneId: String?,
     private val onItemClick: (Feeding) -> Unit,
     private val onDeleteClick: (Feeding) -> Unit,
 ) : PagingDataAdapter<Feeding, FeedingAdapter.FeedingViewHolder>(FeedingDiffCallback()) {
@@ -24,7 +26,7 @@ class FeedingAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedingViewHolder {
     val inflater = LayoutInflater.from(parent.context)
     val binding = ItemFeedingBinding.inflate(inflater, parent, false)
-    return FeedingViewHolder(binding, onItemClick, onDeleteClick)
+    return FeedingViewHolder(binding, profileTimezoneId, onItemClick, onDeleteClick)
   }
 
   override fun onBindViewHolder(holder: FeedingViewHolder, position: Int) {
@@ -36,6 +38,7 @@ class FeedingAdapter(
 
   class FeedingViewHolder(
       private val binding: ItemFeedingBinding,
+      private val profileTimezoneId: String?,
       private val onItemClick: (Feeding) -> Unit,
       private val onDeleteClick: (Feeding) -> Unit,
   ) : RecyclerView.ViewHolder(binding.root) {
@@ -69,7 +72,14 @@ class FeedingAdapter(
         }
         else -> binding.textAmount.visibility = View.GONE
       }
-      val timeSummary = formatRelativeTime(ctx, feeding.timestamp)
+      val relativeTime = formatRelativeTime(ctx, feeding.timestamp)
+      val absoluteTime =
+          formatTimeForDisplayWithTimezone(
+              ctx,
+              feeding.timestamp,
+              profileTimezoneId,
+          )
+      val timeSummary = "$relativeTime \u2022 $absoluteTime"
       binding.textTime.text = timeSummary
       binding.textSavedLocally.visibility = if (feeding.id < 0) View.VISIBLE else View.GONE
       binding.root.contentDescription = ctx.getString(R.string.a11y_feeding_item, timeSummary)

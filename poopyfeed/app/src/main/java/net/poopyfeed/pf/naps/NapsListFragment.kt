@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentNapsListBinding
+import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
 
 /**
@@ -32,6 +34,7 @@ class NapsListFragment : Fragment() {
     get() = _binding!!
 
   private val viewModel: NapsListViewModel by viewModels()
+  @Inject lateinit var tokenManager: TokenManager
   private lateinit var adapter: NapAdapter
 
   override fun onCreateView(
@@ -49,6 +52,7 @@ class NapsListFragment : Fragment() {
     val childId = requireArguments().getInt("childId")
     adapter =
         NapAdapter(
+            profileTimezoneId = tokenManager.getProfileTimezone(),
             onItemClick = { nap -> navigateToEditNap(childId, nap.id) },
             onDeleteClick = { nap -> showDeleteConfirmationDialog(nap.id) },
             onEndNapClick = { nap -> viewModel.endNap(nap.id) },
