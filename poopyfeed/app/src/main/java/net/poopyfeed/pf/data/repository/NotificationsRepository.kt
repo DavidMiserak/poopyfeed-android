@@ -1,8 +1,12 @@
 package net.poopyfeed.pf.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.models.ApiResult
@@ -47,6 +51,14 @@ constructor(
           ApiResult.Error(e.toApiError())
         }
       }
+
+  /** Get paginated notifications using Paging 3 library. */
+  fun pagedNotifications(): Flow<PagingData<Notification>> {
+    return Pager(
+        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+        pagingSourceFactory = { NotificationsPagingSource(apiService) }
+    ).flow
+  }
 
   /** Mark all notifications as read. Returns number of updated items. */
   suspend fun markAllRead(): ApiResult<Int> =
