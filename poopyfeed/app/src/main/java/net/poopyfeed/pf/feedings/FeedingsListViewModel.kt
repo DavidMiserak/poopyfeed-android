@@ -28,8 +28,8 @@ constructor(
 
   val pagingData: Flow<PagingData<Feeding>> = repo.pagedFeedings(childId)
 
-  private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
-  val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+  private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
+  val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
 
   fun deleteFeeding(feedingId: Int) {
     // TODO: Implement delete with error handling (Task 13)

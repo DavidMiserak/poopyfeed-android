@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -17,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentFeedingsListBinding
+import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
 
 /**
  * Displays a list of feedings for a child with pull-to-refresh. FAB opens create feeding bottom
@@ -50,69 +52,45 @@ class FeedingsListFragment : Fragment() {
             onItemClick = { feeding -> navigateToEditFeeding(childId, feeding.id) },
             onDeleteClick = { feeding -> showDeleteConfirmationDialog(feeding.id) },
         )
-    binding.recyclerFeedings.adapter = adapter
     binding.recyclerFeedings.layoutManager = LinearLayoutManager(requireContext())
+    binding.recyclerFeedings.adapter = adapter.withLoadStateFooter(
+        footer = PagingLoadStateAdapter { adapter.retry() }
+    )
 
-    binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
-    binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
-      viewModel.refresh()
-    }
+    binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
+    // Collect paging data
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is FeedingsListUiState.Loading -> {
-              binding.progressLoading.visibility = View.VISIBLE
-              binding.recyclerFeedings.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = true
-            }
-            is FeedingsListUiState.Ready -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerFeedings.visibility = View.VISIBLE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              adapter.submitList(state.feedings)
-            }
-            is FeedingsListUiState.Empty -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerFeedings.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.VISIBLE
-              binding.layoutErrorState.visibility = View.GONE
-            }
-            is FeedingsListUiState.Error -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerFeedings.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.VISIBLE
-              binding.layoutErrorState
-                  .findViewById<android.widget.TextView>(R.id.text_error_message)
-                  .text = state.message
-            }
+        viewModel.pagingData.collect { pagingData ->
+          adapter.submitData(pagingData)
+        }
+      }
+    }
+
+    // Handle load states (loading spinner)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        adapter.loadStateFlow.collect { loadStates ->
+          // Show/hide refresh spinner on initial load
+          binding.swipeRefresh.isRefreshing =
+              loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+        }
+      }
+    }
+
+    // Handle delete errors
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.deleteError.collect { message ->
+          if (message != null) {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
           }
         }
       }
     }
 
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.isRefreshing.collect { refreshing ->
-          binding.swipeRefresh.isRefreshing =
-              refreshing || viewModel.uiState.value is FeedingsListUiState.Loading
-        }
-      }
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.deleteError.collect { message ->
-          Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        }
-      }
-    }
-
+    // Handle post-creation refresh
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         findNavController()
@@ -121,7 +99,7 @@ class FeedingsListFragment : Fragment() {
             ?.getStateFlow("feeding_created", false)
             ?.collect { created ->
               if (created) {
-                viewModel.refresh()
+                adapter.refresh()
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
@@ -131,6 +109,7 @@ class FeedingsListFragment : Fragment() {
       }
     }
 
+    // Handle post-update refresh
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         findNavController()
@@ -139,7 +118,7 @@ class FeedingsListFragment : Fragment() {
             ?.getStateFlow("feeding_updated", false)
             ?.collect { updated ->
               if (updated) {
-                viewModel.refresh()
+                adapter.refresh()
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
