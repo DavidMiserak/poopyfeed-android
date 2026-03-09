@@ -30,11 +30,21 @@ import net.poopyfeed.pf.sync.SyncScheduler
 sealed interface TimelineItem {
   data class Event(val event: TimelineEvent) : TimelineItem
 
+  /**
+   * Gap between two events. [showAddNapButton] is true when the gap is over
+   * [NAP_BUTTON_MIN_GAP_MINUTES], so the "Add nap" action is only offered for longer gaps.
+   */
   data class Gap(
       val durationMinutes: Long,
       val newerEventAt: String,
       val olderEventAt: String,
-  ) : TimelineItem
+      val showAddNapButton: Boolean = durationMinutes > NAP_BUTTON_MIN_GAP_MINUTES,
+  ) : TimelineItem {
+    companion object {
+      /** Minimum gap (minutes) above which the "Add nap" button is shown. */
+      const val NAP_BUTTON_MIN_GAP_MINUTES = 60L
+    }
+  }
 }
 
 /** UI state for the timeline screen. */
@@ -69,11 +79,6 @@ constructor(
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
-
-  companion object {
-    /** Minimum gap between events (in minutes) before showing a gap indicator. */
-    const val GAP_THRESHOLD_MINUTES = 60L
-  }
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
 
@@ -156,14 +161,14 @@ constructor(
   }
 
   /**
-   * Interleaves [TimelineItem.Gap] markers from backend-provided gap metadata. The backend
-   * computes gaps across all events and provides [gap_after_minutes] for each event. Events are
-   * newest-first, so each event's gap represents the quiet period between that event and the
-   * next (older) event.
+   * Interleaves [TimelineItem.Gap] markers from backend-provided gap metadata. The backend computes
+   * gaps across all events and provides [gap_after_minutes], [gap_after_start], and [gap_after_end]
+   * for each event. Events are newest-first, so each event's gap represents the quiet period
+   * between that event and the next (older) event.
    *
-   * Gap display is shifted: each event shows the gap from the next (older) event in the array,
-   * making gaps appear visually between the two events they connect in the reverse-chronological
-   * display. Only gaps >= [GAP_THRESHOLD_MINUTES] are displayed (backend provides null for smaller).
+   * All gaps the backend provides are shown. Gap display is shifted: each event shows the gap from
+   * the next (older) event in the array, making gaps appear visually between the two events they
+   * connect in the reverse-chronological display.
    */
   private fun interleaveGaps(events: List<TimelineEvent>): List<TimelineItem> {
     if (events.isEmpty()) return emptyList()
@@ -172,11 +177,9 @@ constructor(
       val event = events[i]
       items.add(TimelineItem.Event(event))
       // Shift gap display: show the next (older) event's gap on the current event
-      // This makes gaps appear visually between events in reverse-chronological display
       if (i < events.lastIndex) {
         val nextEvent = events[i + 1]
         if (nextEvent.gapAfterMinutes != null &&
-            nextEvent.gapAfterMinutes >= GAP_THRESHOLD_MINUTES &&
             nextEvent.gapAfterStart != null &&
             nextEvent.gapAfterEnd != null) {
           items.add(

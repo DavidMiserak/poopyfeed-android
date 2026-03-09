@@ -176,12 +176,19 @@ class TimelineAdapter(
       binding.textGapDuration.text =
           context.getString(R.string.timeline_gap_duration, durationLabel)
 
-      // Format button with time range in the user's profile timezone when available
-      val startTime = formatTimeForDisplayWithTimezone(context, gap.olderEventAt, profileTimezoneId)
-      val endTime = formatTimeForDisplayWithTimezone(context, gap.newerEventAt, profileTimezoneId)
-      binding.btnAddNap.text =
-          context.getString(R.string.timeline_add_nap_range, startTime, endTime)
-      binding.btnAddNap.setOnClickListener { onAddNapClick(gap) }
+      // Show "Add nap" button only for gaps over 60 minutes
+      if (gap.showAddNapButton) {
+        binding.btnAddNap.visibility = android.view.View.VISIBLE
+        val startTime =
+            formatTimeForDisplayWithTimezone(context, gap.olderEventAt, profileTimezoneId)
+        val endTime = formatTimeForDisplayWithTimezone(context, gap.newerEventAt, profileTimezoneId)
+        binding.btnAddNap.text =
+            context.getString(R.string.timeline_add_nap_range, startTime, endTime)
+        binding.btnAddNap.setOnClickListener { onAddNapClick(gap) }
+      } else {
+        binding.btnAddNap.visibility = android.view.View.GONE
+        binding.btnAddNap.setOnClickListener(null)
+      }
     }
   }
 

@@ -4,10 +4,14 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.unmockkAll
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -19,7 +23,9 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.models.TimelineNapPayload
@@ -231,9 +237,11 @@ class TimelineViewModelTest {
   fun `gap after nap uses end time not start time`() = runTest {
     val today = getTodayDateString()
     // Feeding at 15:00, nap 13:00–14:30, feeding at 10:00
-    // Gap between 15:00 feeding and nap ending@14:30 = 30min (< 5 min threshold, backend returns null)
+    // Gap between 15:00 feeding and nap ending@14:30 = 30min (< 5 min threshold, backend returns
+    // null)
     // Gap between nap start@13:00 and 10:00 feeding = 180min (3h), backend provides this
-    // With gap shifting: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00 shows nothing
+    // With gap shifting: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00
+    // shows nothing
     val events =
         listOf(
             TestFixtures.mockTimelineEvent(
@@ -265,9 +273,11 @@ class TimelineViewModelTest {
     val state = viewModel.uiState.first()
     assertIs<TimelineUiState.Ready>(state)
 
-    // Should show 1 gap: 15:00 feeding displays the nap's gap of 180 min (gap shift: show next event's gap)
+    // Should show 1 gap: 15:00 feeding displays the nap's gap of 180 min (gap shift: show next
+    // event's gap)
     val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
-    assertEquals(1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
+    assertEquals(
+        1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
     assertEquals(180L, gaps[0].durationMinutes)
   }
 
@@ -316,7 +326,8 @@ class TimelineViewModelTest {
     // Feeding at 15:00, nap 13:00–14:30 (at = 14:30), feeding at 10:00.
     // Gap between 15:00 feeding and nap end (14:30) = 30min (< 5 min threshold, suppressed)
     // Gap between nap start (13:00) and 10:00 feeding = 180min (3h), backend provides this
-    // With gap shift: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00 shows nothing
+    // With gap shift: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00
+    // shows nothing
     val events =
         listOf(
             TestFixtures.mockTimelineEvent(
@@ -351,8 +362,273 @@ class TimelineViewModelTest {
     assertIs<TimelineUiState.Ready>(state)
 
     val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
-    assertEquals(1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
+    assertEquals(
+        1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
     assertEquals(180L, gaps[0].durationMinutes)
+  }
+
+  @Test
+  fun `createNapFromGap with gap too small emits message and does not call repository`() = runTest {
+    createViewModel(events = emptyList())
+    // Gap of 1 min: nap would be older+1min to newer-1min = same instant → invalid
+    val newerEventAt = "2024-01-15T12:01:00Z"
+    val olderEventAt = "2024-01-15T12:00:00Z"
+
+    viewModel.createNapFromGap(newerEventAt, olderEventAt)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertEquals("Gap too small to add a nap", viewModel.napCreationResult.first())
+    coVerify(exactly = 0) { mockNapsRepository.createNap(any(), any()) }
+  }
+
+  @Test
+  fun `createNapFromGap with exactly 2 min gap emits gap too small and does not call repository`() =
+      runTest {
+        createViewModel(events = emptyList())
+        // 2 min gap: nap 12:01 to 12:01 → duration 0 → invalid
+        val newerEventAt = "2024-01-15T12:02:00Z"
+        val olderEventAt = "2024-01-15T12:00:00Z"
+
+        viewModel.createNapFromGap(newerEventAt, olderEventAt)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Gap too small to add a nap", viewModel.napCreationResult.first())
+        coVerify(exactly = 0) { mockNapsRepository.createNap(any(), any()) }
+      }
+
+  @Test
+  fun `createNapFromGap when API returns error emits error message`() = runTest {
+    createViewModel(events = emptyList())
+    coEvery { mockNapsRepository.createNap(123, any()) } returns
+        ApiResult.Error(ApiError.NetworkError("offline"))
+    coEvery { mockContext.getString(any<Int>()) } returns "Network error"
+    val newerEventAt = "2024-01-15T11:00:00Z"
+    val olderEventAt = "2024-01-15T10:00:00Z"
+
+    viewModel.createNapFromGap(newerEventAt, olderEventAt)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertEquals("Network error", viewModel.napCreationResult.first())
+    coVerify(exactly = 1) { mockNapsRepository.createNap(123, any()) }
+  }
+
+  @Test
+  fun `refresh calls getTimeline again`() = runTest {
+    createViewModel(events = emptyList())
+    coVerify(exactly = 1) { mockAnalyticsRepository.getTimeline(123) }
+
+    viewModel.refresh()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify(exactly = 2) { mockAnalyticsRepository.getTimeline(123) }
+  }
+
+  @Test
+  fun `createNapFromGap with invalid timestamps does not call repository or set result`() =
+      runTest {
+        createViewModel(events = emptyList())
+        viewModel.createNapFromGap("not-a-valid-iso-date", "2024-01-15T10:00:00Z")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify(exactly = 0) { mockNapsRepository.createNap(any(), any()) }
+        assertEquals(null, viewModel.napCreationResult.first())
+      }
+
+  @Test
+  fun `clearNapCreationResult clears nap creation result after success`() = runTest {
+    createViewModel(events = emptyList())
+    coEvery { mockNapsRepository.createNap(123, any()) } returns
+        ApiResult.Success(TestFixtures.mockNap(id = 1))
+    viewModel.createNapFromGap("2024-01-15T11:00:00Z", "2024-01-15T10:00:00Z")
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertEquals("Nap added", viewModel.napCreationResult.first())
+
+    viewModel.clearNapCreationResult()
+    assertEquals(null, viewModel.napCreationResult.first())
+  }
+
+  @Test
+  fun `day header for offset 2 or more shows weekday and date`() = runTest {
+    val today = getTodayDateString()
+    val yesterday = getYesterdayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(at = "${today}T14:00:00Z"),
+            TestFixtures.mockTimelineEvent(at = "${yesterday}T15:00:00Z"),
+        )
+    createViewModel(events = events)
+    viewModel.previousDay()
+    testDispatcher.scheduler.advanceUntilIdle()
+    viewModel.previousDay()
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    assertTrue(
+        state.dayHeader != "Today" && state.dayHeader != "Yesterday",
+        "Day 2+ should show weekday date, got: ${state.dayHeader}")
+    assertTrue(
+        state.dayHeader.matches(
+            Regex(
+                "^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \\d{1,2}$")),
+        "Day header should match 'Mon, Mar 4' pattern, got: ${state.dayHeader}")
+  }
+
+  @Test
+  fun `previousDay does not go past day 6`() = runTest {
+    val today = getTodayDateString()
+    val yesterday = getYesterdayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(at = "${today}T14:00:00Z"),
+            TestFixtures.mockTimelineEvent(at = "${yesterday}T15:00:00Z"),
+        )
+    createViewModel(events = events)
+    repeat(7) {
+      viewModel.previousDay()
+      testDispatcher.scheduler.advanceUntilIdle()
+    }
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    assertFalse(state.canGoPrevious, "At day 6, canGoPrevious should be false")
+  }
+
+  @Test
+  fun `nextDay on day 0 does nothing`() = runTest {
+    val today = getTodayDateString()
+    val events = listOf(TestFixtures.mockTimelineEvent(at = "${today}T14:00:00Z"))
+    createViewModel(events = events)
+    val stateBefore = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(stateBefore)
+    assertFalse(stateBefore.canGoNext)
+
+    viewModel.nextDay()
+    testDispatcher.scheduler.advanceUntilIdle()
+    val stateAfter = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(stateAfter)
+    assertEquals("Today", stateAfter.dayHeader)
+    assertFalse(stateAfter.canGoNext)
+  }
+
+  @Test
+  fun `gap of exactly 60 minutes does not show Add nap button`() = runTest {
+    val today = getTodayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T14:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = null),
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T10:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = 60L,
+                gapAfterStart = "${today}T14:00:00Z",
+                gapAfterEnd = "${today}T10:00:00Z"),
+        )
+    createViewModel(events = events)
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
+    assertEquals(1, gaps.size)
+    assertEquals(60L, gaps[0].durationMinutes)
+    assertFalse(gaps[0].showAddNapButton)
+  }
+
+  @Test
+  fun `events with unparseable at are excluded from day items`() = runTest {
+    val today = getTodayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(at = "${today}T10:00:00Z"),
+            TestFixtures.mockTimelineEvent(at = "not-a-valid-datetime"),
+        )
+    createViewModel(events = events)
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    val eventItems = state.items.filterIsInstance<TimelineItem.Event>()
+    assertEquals(1, eventItems.size, "Unparseable event.at should be excluded")
+    assertEquals("${today}T10:00:00Z", eventItems[0].event.at)
+  }
+
+  @Test
+  fun `createNapFromGap with valid gap calls repository with 1 min buffers and emits Nap added`() =
+      runTest {
+        createViewModel(events = emptyList())
+        coEvery { mockNapsRepository.createNap(123, any()) } returns
+            ApiResult.Success(TestFixtures.mockNap(id = 1))
+        // 60 min gap: 10:00 to 11:00 → nap 10:01 to 10:59
+        val newerEventAt = "2024-01-15T11:00:00Z"
+        val olderEventAt = "2024-01-15T10:00:00Z"
+
+        viewModel.createNapFromGap(newerEventAt, olderEventAt)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Nap added", viewModel.napCreationResult.first())
+        val requestSlot = slot<CreateNapRequest>()
+        coVerify { mockNapsRepository.createNap(123, capture(requestSlot)) }
+        assertEquals("2024-01-15T10:01:00Z", requestSlot.captured.start_time)
+        assertEquals("2024-01-15T10:59:00Z", requestSlot.captured.end_time)
+      }
+
+  @Test
+  fun `all gaps from backend are displayed regardless of duration`() = runTest {
+    val today = getTodayDateString()
+    // Backend sends gap of 59 min; we show all gaps the backend provides
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T14:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = null),
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T10:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = 59L,
+                gapAfterStart = "${today}T14:00:00Z",
+                gapAfterEnd = "${today}T10:00:00Z"),
+        )
+    createViewModel(events = events)
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
+    assertEquals(1, gaps.size)
+    assertEquals(59L, gaps[0].durationMinutes)
+    assertFalse(gaps[0].showAddNapButton, "Nap button should be hidden for gaps <= 60 min")
+  }
+
+  @Test
+  fun `gap over 60 minutes shows Add nap button`() = runTest {
+    val today = getTodayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T14:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = null),
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T10:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = 61L,
+                gapAfterStart = "${today}T14:00:00Z",
+                gapAfterEnd = "${today}T10:00:00Z"),
+        )
+    createViewModel(events = events)
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
+    assertEquals(1, gaps.size)
+    assertEquals(61L, gaps[0].durationMinutes)
+    assertTrue(gaps[0].showAddNapButton, "Nap button should be shown for gaps over 60 min")
   }
 
   @Test

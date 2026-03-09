@@ -33,7 +33,7 @@
             android:fontFamily="@font/dm_sans"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="@dimen/text_label_small"
-            tools:text="💤 2h 30m quiet" />
+            tools:text="🤷 2h 30m quiet" />
 
         <!-- Right dashed line -->
         <View
