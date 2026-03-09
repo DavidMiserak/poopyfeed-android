@@ -233,6 +233,7 @@ class TimelineViewModelTest {
     // Feeding at 15:00, nap 13:00–14:30, feeding at 10:00
     // Gap between 15:00 feeding and nap ending@14:30 = 30min (< 5 min threshold, backend returns null)
     // Gap between nap start@13:00 and 10:00 feeding = 180min (3h), backend provides this
+    // With gap shifting: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00 shows nothing
     val events =
         listOf(
             TestFixtures.mockTimelineEvent(
@@ -264,9 +265,9 @@ class TimelineViewModelTest {
     val state = viewModel.uiState.first()
     assertIs<TimelineUiState.Ready>(state)
 
-    // Should show 1 gap: between nap (13:00) and 10:00 feeding (180 min > 60 threshold)
+    // Should show 1 gap: 15:00 feeding displays the nap's gap of 180 min (gap shift: show next event's gap)
     val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
-    assertEquals(1, gaps.size, "Expected exactly 1 gap (between nap and 10:00 feeding)")
+    assertEquals(1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
     assertEquals(180L, gaps[0].durationMinutes)
   }
 
@@ -275,6 +276,7 @@ class TimelineViewModelTest {
     val today = getTodayDateString()
     // Feeding at 15:00, ongoing nap started at 13:00 (no end time)
     // Backend calculates gap from nap start (13:00) to feeding (15:00) = 120 min
+    // With gap shift: 15:00 feeding shows nap's gap (120), nap shows nothing (last event)
     val events =
         listOf(
             TestFixtures.mockTimelineEvent(
@@ -303,7 +305,7 @@ class TimelineViewModelTest {
     assertIs<TimelineUiState.Ready>(state)
 
     val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
-    assertEquals(1, gaps.size, "Expected 1 gap (ongoing nap uses start time as fallback)")
+    assertEquals(1, gaps.size, "Expected 1 gap (15:00 feeding shows nap's gap after gap shift)")
     assertEquals(120L, gaps[0].durationMinutes)
   }
 
@@ -314,6 +316,7 @@ class TimelineViewModelTest {
     // Feeding at 15:00, nap 13:00–14:30 (at = 14:30), feeding at 10:00.
     // Gap between 15:00 feeding and nap end (14:30) = 30min (< 5 min threshold, suppressed)
     // Gap between nap start (13:00) and 10:00 feeding = 180min (3h), backend provides this
+    // With gap shift: 15:00 feeding shows nap's gap (180), nap shows 10:00's gap (null), 10:00 shows nothing
     val events =
         listOf(
             TestFixtures.mockTimelineEvent(
@@ -348,7 +351,7 @@ class TimelineViewModelTest {
     assertIs<TimelineUiState.Ready>(state)
 
     val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
-    assertEquals(1, gaps.size, "Expected exactly 1 gap (between nap start and 10:00 feeding)")
+    assertEquals(1, gaps.size, "Expected exactly 1 gap (15:00 feeding shows nap's gap after gap shift)")
     assertEquals(180L, gaps[0].durationMinutes)
   }
 

@@ -161,24 +161,31 @@ constructor(
    * newest-first, so each event's gap represents the quiet period between that event and the
    * next (older) event.
    *
-   * Only gaps >= [GAP_THRESHOLD_MINUTES] are displayed (backend provides null for smaller gaps).
+   * Gap display is shifted: each event shows the gap from the next (older) event in the array,
+   * making gaps appear visually between the two events they connect in the reverse-chronological
+   * display. Only gaps >= [GAP_THRESHOLD_MINUTES] are displayed (backend provides null for smaller).
    */
   private fun interleaveGaps(events: List<TimelineEvent>): List<TimelineItem> {
     if (events.isEmpty()) return emptyList()
     val items = mutableListOf<TimelineItem>()
-    for (event in events) {
+    for (i in events.indices) {
+      val event = events[i]
       items.add(TimelineItem.Event(event))
-      // Backend provides gap metadata; only show if >= threshold
-      if (event.gapAfterMinutes != null &&
-          event.gapAfterMinutes >= GAP_THRESHOLD_MINUTES &&
-          event.gapAfterStart != null &&
-          event.gapAfterEnd != null) {
-        items.add(
-            TimelineItem.Gap(
-                durationMinutes = event.gapAfterMinutes,
-                newerEventAt = event.gapAfterStart,
-                olderEventAt = event.gapAfterEnd,
-            ))
+      // Shift gap display: show the next (older) event's gap on the current event
+      // This makes gaps appear visually between events in reverse-chronological display
+      if (i < events.lastIndex) {
+        val nextEvent = events[i + 1]
+        if (nextEvent.gapAfterMinutes != null &&
+            nextEvent.gapAfterMinutes >= GAP_THRESHOLD_MINUTES &&
+            nextEvent.gapAfterStart != null &&
+            nextEvent.gapAfterEnd != null) {
+          items.add(
+              TimelineItem.Gap(
+                  durationMinutes = nextEvent.gapAfterMinutes,
+                  newerEventAt = nextEvent.gapAfterStart,
+                  olderEventAt = nextEvent.gapAfterEnd,
+              ))
+        }
       }
     }
     return items
