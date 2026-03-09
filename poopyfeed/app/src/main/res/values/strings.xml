@@ -116,7 +116,7 @@
 
     <!-- Child card badges (emoji icons for feeding / diaper / nap) -->
     <string name="badge_icon_feeding">🍼</string>
-    <string name="badge_icon_diaper">🚼</string>
+    <string name="badge_icon_diaper">💩</string>
     <string name="badge_icon_nap">😴</string>
     <string name="icon_baby">👶</string>
     <string name="icon_warning">⚠️</string>
