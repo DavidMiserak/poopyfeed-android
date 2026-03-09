@@ -11,15 +11,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
 
 /** An item in the timeline list — either a real event or a gap marker between events. */
@@ -62,6 +65,7 @@ constructor(
     private val analyticsRepository: AnalyticsRepository,
     private val napsRepository: CachedNapsRepository,
     private val syncScheduler: SyncScheduler,
+    private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -80,6 +84,15 @@ constructor(
 
   /** Tracks fetch lifecycle: null = loading, empty = loaded OK, non-empty = error message. */
   private val _fetchStatus: MutableStateFlow<String?> = MutableStateFlow(null)
+
+  /**
+   * Timezone used for timeline day boundaries and headers. Prefers the user's profile timezone when
+   * available; falls back to the device timezone.
+   */
+  private val timelineTimeZone: TimeZone =
+      tokenManager.getProfileTimezone()?.let { tzId ->
+        runCatching { TimeZone.of(tzId) }.getOrNull() ?: TimeZone.currentSystemDefault()
+      } ?: TimeZone.currentSystemDefault()
 
   /** Combined UI state: filters allEvents by dayOffset, formats day header, checks boundaries. */
   val uiState: Flow<TimelineUiState> =
@@ -179,25 +192,34 @@ constructor(
   }
 
   /**
-   * Filters events for a specific day. Computes the date for (today - dayOffset) and filters events
-   * whose "at" timestamp falls within that day (ISO 8601 prefix match).
+   * Filters events for a specific day. Computes the local date for (today - dayOffset) in
+   * [timelineTimeZone] and includes only events whose UTC "at" timestamp converts to that same
+   * local date. This avoids relying on the raw ISO date prefix, which may differ from the user's
+   * local day near midnight in non-UTC timezones.
    */
   private fun filterEventsByDay(events: List<TimelineEvent>, dayOffset: Int): List<TimelineEvent> {
     val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-    val localTz = TimeZone.currentSystemDefault()
+    val localTz = timelineTimeZone
     val today = now.toLocalDateTime(localTz).date
     val targetDate = today.subtract(dayOffset)
 
-    val targetDatePrefix = targetDate.toString() // "YYYY-MM-DD"
-
-    // Filter events that fall on targetDate (newest-first, matching server order)
-    return events.filter { event -> event.at.startsWith(targetDatePrefix) }
+    // Filter events that fall on targetDate in the user's profile timezone (newest-first, matching
+    // server order)
+    return events.filter { event ->
+      val eventDate =
+          try {
+            Instant.parse(event.at).toLocalDateTime(localTz).date
+          } catch (_: Exception) {
+            null
+          }
+      eventDate == targetDate
+    }
   }
 
   /** Formats day header label based on offset: "Today", "Yesterday", or "Mon, Mar 4". */
   private fun formatDayHeader(dayOffset: Int): String {
     val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-    val localTz = TimeZone.currentSystemDefault()
+    val localTz = timelineTimeZone
     val today = now.toLocalDateTime(localTz).date
     val targetDate = today.subtract(dayOffset)
 
@@ -232,10 +254,7 @@ constructor(
 
   /** Subtracts days from a LocalDate. */
   private fun LocalDate.subtract(days: Int): LocalDate {
-    return Instant.fromEpochMilliseconds(
-            Instant.parse("${this}T00:00:00Z").toEpochMilliseconds() - (days * 86_400_000L))
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .date
+    return this.minus(DatePeriod(days = days))
   }
 
   /** One-shot event for nap creation result. Null = idle, non-null = show message then clear. */

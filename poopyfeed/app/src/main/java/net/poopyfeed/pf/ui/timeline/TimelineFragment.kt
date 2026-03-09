@@ -12,8 +12,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentTimelineBinding
+import net.poopyfeed.pf.di.TokenManager
 
 /**
  * Displays a 7-day timeline of feedings, diapers, and naps for a child with day navigation. All
@@ -27,6 +29,7 @@ class TimelineFragment : Fragment() {
     get() = _binding!!
 
   private val viewModel: TimelineViewModel by viewModels()
+  @Inject lateinit var tokenManager: TokenManager
   private lateinit var adapter: TimelineAdapter
 
   override fun onCreateView(
@@ -41,10 +44,14 @@ class TimelineFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    // Determine profile timezone (falls back to device when not set)
+    val profileTimezoneId = tokenManager.getProfileTimezone()
+
     // Setup adapter with gap nap callback
-    adapter = TimelineAdapter { gap ->
-      viewModel.createNapFromGap(gap.newerEventAt, gap.olderEventAt)
-    }
+    adapter =
+        TimelineAdapter(profileTimezoneId) { gap ->
+          viewModel.createNapFromGap(gap.newerEventAt, gap.olderEventAt)
+        }
     binding.recyclerTimeline.layoutManager = LinearLayoutManager(requireContext())
     binding.recyclerTimeline.adapter = adapter
 

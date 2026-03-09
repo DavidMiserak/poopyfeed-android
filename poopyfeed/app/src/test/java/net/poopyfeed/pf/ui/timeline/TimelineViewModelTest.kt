@@ -23,6 +23,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
+import net.poopyfeed.pf.di.TokenManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +36,7 @@ class TimelineViewModelTest {
   private val mockNapsRepository: net.poopyfeed.pf.data.repository.CachedNapsRepository = mockk()
   private val mockSyncScheduler: net.poopyfeed.pf.sync.SyncScheduler = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
+  private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private lateinit var viewModel: TimelineViewModel
 
   @Before
@@ -51,6 +53,7 @@ class TimelineViewModelTest {
 
   private fun createViewModel(events: List<TimelineEvent> = emptyList()) {
     val savedStateHandle = SavedStateHandle().apply { set("childId", 123) }
+    coEvery { mockTokenManager.getProfileTimezone() } returns null
     coEvery { mockAnalyticsRepository.getTimeline(123) } returns
         ApiResult.Success(PaginatedResponse(count = events.size, results = events))
     viewModel =
@@ -59,6 +62,7 @@ class TimelineViewModelTest {
             mockAnalyticsRepository,
             mockNapsRepository,
             mockSyncScheduler,
+            mockTokenManager,
             mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
   }
@@ -195,6 +199,25 @@ class TimelineViewModelTest {
   }
 
   @Test
+  fun `today header with only yesterday events shows empty today list`() = runTest {
+    val yesterday = getYesterdayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(at = "${yesterday}T10:00:00Z"),
+            TestFixtures.mockTimelineEvent(at = "${yesterday}T18:00:00Z"),
+        )
+
+    // Load ViewModel with only yesterday's events
+    createViewModel(events = events)
+
+    // Today page should have header "Today" and no items (no leakage from yesterday)
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    assertEquals("Today", state.dayHeader)
+    assertEquals(emptyList<TimelineItem>(), state.items)
+  }
+
+  @Test
   fun `API returning zero events shows Ready not Loading`() = runTest {
     createViewModel(events = emptyList())
 
@@ -215,6 +238,7 @@ class TimelineViewModelTest {
             mockAnalyticsRepository,
             mockNapsRepository,
             mockSyncScheduler,
+            mockTokenManager,
             mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
 

@@ -1,7 +1,9 @@
 package net.poopyfeed.pf.util
 
 import android.content.Context
+import android.text.format.DateFormat
 import android.text.format.DateUtils
+import java.util.Locale
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -158,6 +160,44 @@ fun formatTimeForDisplay(context: Context, isoString: String): String {
   return try {
     val millis = Instant.parse(isoString).toEpochMilliseconds()
     DateUtils.formatDateTime(context, millis, DateUtils.FORMAT_SHOW_TIME)
+  } catch (e: Exception) {
+    "—"
+  }
+}
+
+/**
+ * Formats an ISO 8601 datetime string as time-only for display (e.g. "2:30 PM") in the given
+ * timezone. Falls back to the device timezone when [timezoneId] is null or invalid. Respects the
+ * user's 12/24‑hour clock preference.
+ */
+fun formatTimeForDisplayWithTimezone(
+    context: Context,
+    isoString: String,
+    timezoneId: String?,
+): String {
+  return try {
+    val instant = Instant.parse(isoString)
+    val tz =
+        timezoneId?.let { runCatching { TimeZone.of(it) }.getOrNull() }
+            ?: TimeZone.currentSystemDefault()
+    val localDateTime = instant.toLocalDateTime(tz)
+
+    val is24Hour = DateFormat.is24HourFormat(context)
+    val hour = localDateTime.hour
+    val minute = localDateTime.minute
+
+    if (is24Hour) {
+      String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+    } else {
+      val hour12 =
+          when {
+            hour == 0 -> 12
+            hour > 12 -> hour - 12
+            else -> hour
+          }
+      val amPm = if (hour < 12) "AM" else "PM"
+      String.format(Locale.getDefault(), "%d:%02d %s", hour12, minute, amPm)
+    }
   } catch (e: Exception) {
     "—"
   }

@@ -351,6 +351,37 @@ class DateTimeUtilsTest {
     assertNotEquals(resultUtc, resultLa)
   }
 
+  // === formatTimeForDisplayWithTimezone Tests ===
+
+  @Test
+  fun `formatTimeForDisplayWithTimezone falls back to device timezone when id is null`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val iso = "2024-01-15T18:00:00Z"
+
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    val resultNullTz = formatTimeForDisplayWithTimezone(context, iso, null)
+
+    val resultDevice =
+        formatTimeForDisplayWithTimezone(
+            context,
+            iso,
+            TimeZone.getDefault().id,
+        )
+
+    assertEquals(resultDevice, resultNullTz)
+  }
+
+  @Test
+  fun `formatTimeForDisplayWithTimezone uses provided timezone id`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val iso = "2024-01-15T18:00:00Z"
+
+    val resultUtc = formatTimeForDisplayWithTimezone(context, iso, "UTC")
+    val resultLa = formatTimeForDisplayWithTimezone(context, iso, "America/Los_Angeles")
+
+    assertNotEquals(resultUtc, resultLa)
+  }
+
   // === formatNapDuration Tests ===
 
   @Test

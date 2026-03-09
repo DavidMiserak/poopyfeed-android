@@ -11,14 +11,20 @@ import com.google.android.material.color.MaterialColors
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.databinding.ItemTimelineEventBinding
 import net.poopyfeed.pf.databinding.ItemTimelineGapBinding
-import net.poopyfeed.pf.util.formatTimeForDisplay
+import net.poopyfeed.pf.util.formatTimeForDisplayWithTimezone
 
 /**
- * RecyclerView adapter for timeline items. Renders events with emoji, summary, local time, and
- * color-coded accent stripe, plus gap indicators between events with significant time gaps.
+ * RecyclerView adapter for timeline items. Renders events with emoji, summary, time in the user's
+ * profile timezone (when available), and color-coded accent stripe, plus gap indicators between
+ * events with significant time gaps.
+ *
+ * @param profileTimezoneId IANA timezone ID from the user's profile (e.g. "America/Los_Angeles"),
+ *   or null to fall back to the device timezone.
  */
-class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit) :
-    ListAdapter<TimelineItem, RecyclerView.ViewHolder>(TimelineItemDiffCallback()) {
+class TimelineAdapter(
+    private val profileTimezoneId: String?,
+    private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit,
+) : ListAdapter<TimelineItem, RecyclerView.ViewHolder>(TimelineItemDiffCallback()) {
 
   companion object {
     private const val VIEW_TYPE_EVENT = 0
@@ -48,8 +54,8 @@ class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit
 
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     when (val item = getItem(position)) {
-      is TimelineItem.Event -> (holder as EventViewHolder).bind(item.event)
-      is TimelineItem.Gap -> (holder as GapViewHolder).bind(item, onAddNapClick)
+      is TimelineItem.Event -> (holder as EventViewHolder).bind(item.event, profileTimezoneId)
+      is TimelineItem.Gap -> (holder as GapViewHolder).bind(item, onAddNapClick, profileTimezoneId)
     }
   }
 
@@ -57,13 +63,14 @@ class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit
   class EventViewHolder(private val binding: ItemTimelineEventBinding) :
       RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(event: TimelineEvent) {
+    fun bind(event: TimelineEvent, profileTimezoneId: String?) {
       val context = binding.root.context
       val (emoji, summary) = formatEvent(context, event)
 
       binding.eventEmoji.text = emoji
       binding.eventSummary.text = summary
-      binding.eventTime.text = formatTimeForDisplay(context, event.at)
+      binding.eventTime.text =
+          formatTimeForDisplayWithTimezone(context, event.at, profileTimezoneId)
 
       // Set accent stripe color based on event type
       val stripeColor =
@@ -151,7 +158,11 @@ class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit
   class GapViewHolder(private val binding: ItemTimelineGapBinding) :
       RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(gap: TimelineItem.Gap, onAddNapClick: (TimelineItem.Gap) -> Unit) {
+    fun bind(
+        gap: TimelineItem.Gap,
+        onAddNapClick: (TimelineItem.Gap) -> Unit,
+        profileTimezoneId: String?,
+    ) {
       val context = binding.root.context
       val hours = gap.durationMinutes / 60
       val mins = gap.durationMinutes % 60
@@ -163,9 +174,9 @@ class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit
           }
       binding.textGapDuration.text = "💤 $durationLabel quiet"
 
-      // Format button with time range (nap boundaries: +1min / -1min from events)
-      val startTime = formatTimeForDisplay(context, gap.olderEventAt)
-      val endTime = formatTimeForDisplay(context, gap.newerEventAt)
+      // Format button with time range in the user's profile timezone when available
+      val startTime = formatTimeForDisplayWithTimezone(context, gap.olderEventAt, profileTimezoneId)
+      val endTime = formatTimeForDisplayWithTimezone(context, gap.newerEventAt, profileTimezoneId)
       binding.btnAddNap.text = "😴 Add nap · $startTime – $endTime"
       binding.btnAddNap.setOnClickListener { onAddNapClick(gap) }
     }
