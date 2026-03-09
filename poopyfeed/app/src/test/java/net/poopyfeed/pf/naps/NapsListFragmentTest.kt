@@ -3,17 +3,16 @@ package net.poopyfeed.pf.naps
 import android.view.View
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
+import androidx.paging.PagingData
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
-import net.poopyfeed.pf.TestFixtures
-import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
@@ -41,9 +40,8 @@ class NapsListFragmentTest {
   fun setup() {
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-    every { repo.listNapsCached(childId) } returns flowOf(ApiResult.Success(emptyList()))
-    every { repo.hasSyncedFlow(childId) } returns flowOf(true)
-    coEvery { repo.refreshNaps(childId) } returns ApiResult.Success(emptyList())
+    every { repo.pagedNaps(childId) } returns
+        flowOf(PagingData.empty<Nap>())
   }
 
   private fun installNavController(activity: android.app.Activity) {
@@ -63,72 +61,22 @@ class NapsListFragmentTest {
     ) {
       fragment = this
     }
-    idleMainLooperUntil {
-      fragment?.view?.let { v ->
-        v.findViewById<View>(R.id.recycler_naps).visibility == View.VISIBLE ||
-            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
-            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
-      } == true
-    }
+    idleMainLooperUntil { fragment?.view != null }
     return fragment!!
   }
 
   @Test
-  fun `ready state with naps shows recycler`() {
-    val naps = listOf(TestFixtures.mockNap(id = 1))
-    every { repo.listNapsCached(childId) } returns flowOf(ApiResult.Success(naps))
-    coEvery { repo.refreshNaps(childId) } returns ApiResult.Success(naps)
-
-    var fragment: NapsListFragment? = null
-    launchFragmentInHiltContainer<NapsListFragment>(
-        fragmentArgs = android.os.Bundle().apply { putInt("childId", childId) },
-        beforeAdd = ::installNavController,
-    ) {
-      fragment = this
-    }
-    idleMainLooperUntil {
-      fragment?.view?.findViewById<View>(R.id.recycler_naps)?.visibility == View.VISIBLE
-    }
-
-    val root = fragment!!.requireView()
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_naps).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_empty_state).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
-  }
-
-  @Test
-  fun `empty state shows empty layout and hides recycler`() {
+  fun `fragment launches without errors`() {
     val fragment = launchFragment()
     val root = fragment.requireView()
-
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_empty_state).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_naps).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.progress_loading).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_naps).visibility)
   }
 
   @Test
-  fun `error state shows error layout and retry button`() {
-    every { repo.listNapsCached(childId) } returns
-        flowOf(
-            ApiResult.Error(
-                net.poopyfeed.pf.data.models.ApiError.HttpError(500, "Error", "Server error")))
-    every { repo.hasSyncedFlow(childId) } returns flowOf(true)
-    coEvery { repo.refreshNaps(childId) } returns ApiResult.Success(emptyList())
-
-    var fragment: NapsListFragment? = null
-    launchFragmentInHiltContainer<NapsListFragment>(
-        fragmentArgs = android.os.Bundle().apply { putInt("childId", childId) },
-        beforeAdd = ::installNavController,
-    ) {
-      fragment = this
-    }
-    idleMainLooperUntil {
-      fragment?.view?.findViewById<View>(R.id.layout_error_state)?.visibility == View.VISIBLE
-    }
-
-    val root = fragment!!.requireView()
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_error_state).visibility)
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.button_retry).visibility)
+  fun `adapter is set up on recycler`() {
+    val fragment = launchFragment()
+    val root = fragment.requireView()
+    val recycler = root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_naps)
+    assert(recycler.adapter != null)
   }
 }

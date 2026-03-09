@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -17,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentDiapersListBinding
+import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
 
 /**
  * Displays a list of diaper changes for a child with pull-to-refresh. FAB opens create diaper
@@ -50,69 +52,45 @@ class DiapersListFragment : Fragment() {
             onItemClick = { diaper -> navigateToEditDiaper(childId, diaper.id) },
             onDeleteClick = { diaper -> showDeleteConfirmationDialog(diaper.id) },
         )
-    binding.recyclerDiapers.adapter = adapter
     binding.recyclerDiapers.layoutManager = LinearLayoutManager(requireContext())
+    binding.recyclerDiapers.adapter = adapter.withLoadStateFooter(
+        footer = PagingLoadStateAdapter { adapter.retry() }
+    )
 
-    binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
-    binding.layoutErrorState.findViewById<View>(R.id.button_retry).setOnClickListener {
-      viewModel.refresh()
-    }
+    binding.swipeRefresh.setOnRefreshListener { adapter.refresh() }
 
+    // Collect paging data
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is DiapersListUiState.Loading -> {
-              binding.progressLoading.visibility = View.VISIBLE
-              binding.recyclerDiapers.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              binding.swipeRefresh.isRefreshing = true
-            }
-            is DiapersListUiState.Ready -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerDiapers.visibility = View.VISIBLE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.GONE
-              adapter.submitList(state.diapers)
-            }
-            is DiapersListUiState.Empty -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerDiapers.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.VISIBLE
-              binding.layoutErrorState.visibility = View.GONE
-            }
-            is DiapersListUiState.Error -> {
-              binding.progressLoading.visibility = View.GONE
-              binding.recyclerDiapers.visibility = View.GONE
-              binding.layoutEmptyState.visibility = View.GONE
-              binding.layoutErrorState.visibility = View.VISIBLE
-              binding.layoutErrorState
-                  .findViewById<android.widget.TextView>(R.id.text_error_message)
-                  .text = state.message
-            }
+        viewModel.pagingData.collect { pagingData ->
+          adapter.submitData(pagingData)
+        }
+      }
+    }
+
+    // Handle load states (loading spinner)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        adapter.loadStateFlow.collect { loadStates ->
+          // Show/hide refresh spinner on initial load
+          binding.swipeRefresh.isRefreshing =
+              loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+        }
+      }
+    }
+
+    // Handle delete errors
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.deleteError.collect { message ->
+          if (message != null) {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
           }
         }
       }
     }
 
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.isRefreshing.collect { refreshing ->
-          binding.swipeRefresh.isRefreshing =
-              refreshing || viewModel.uiState.value is DiapersListUiState.Loading
-        }
-      }
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.deleteError.collect { message ->
-          Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        }
-      }
-    }
-
+    // Handle post-creation refresh
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         findNavController()
@@ -121,7 +99,7 @@ class DiapersListFragment : Fragment() {
             ?.getStateFlow("diaper_created", false)
             ?.collect { created ->
               if (created) {
-                viewModel.refresh()
+                adapter.refresh()
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
@@ -131,6 +109,7 @@ class DiapersListFragment : Fragment() {
       }
     }
 
+    // Handle post-update refresh
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         findNavController()
@@ -139,7 +118,7 @@ class DiapersListFragment : Fragment() {
             ?.getStateFlow("diaper_updated", false)
             ?.collect { updated ->
               if (updated) {
-                viewModel.refresh()
+                adapter.refresh()
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle

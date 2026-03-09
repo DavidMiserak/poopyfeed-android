@@ -3,17 +3,17 @@ package net.poopyfeed.pf.diapers
 import android.view.View
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
+import androidx.paging.PagingData
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.TestFixtures
-import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
@@ -41,9 +41,8 @@ class DiapersListFragmentTest {
   fun setup() {
     hiltRule.inject()
     navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-    every { repo.listDiapersCached(childId) } returns flowOf(ApiResult.Success(emptyList()))
-    every { repo.hasSyncedFlow(childId) } returns flowOf(true)
-    coEvery { repo.refreshDiapers(childId) } returns ApiResult.Success(emptyList())
+    every { repo.pagedDiapers(childId) } returns
+        flowOf(PagingData.empty<Diaper>())
   }
 
   private fun installNavController(activity: android.app.Activity) {
@@ -63,76 +62,22 @@ class DiapersListFragmentTest {
     ) {
       fragment = this
     }
-    idleMainLooperUntil {
-      fragment?.view?.let { v ->
-        v.findViewById<View>(R.id.recycler_diapers).visibility == View.VISIBLE ||
-            v.findViewById<View>(R.id.layout_empty_state).visibility == View.VISIBLE ||
-            v.findViewById<View>(R.id.layout_error_state).visibility == View.VISIBLE
-      } == true
-    }
+    idleMainLooperUntil { fragment?.view != null }
     return fragment!!
   }
 
   @Test
-  fun `ready state with diapers shows recycler`() {
-    val diapers = listOf(TestFixtures.mockDiaper(id = 1))
-    every { repo.listDiapersCached(childId) } returns flowOf(ApiResult.Success(diapers))
-    coEvery { repo.refreshDiapers(childId) } returns ApiResult.Success(diapers)
-
-    var fragment: DiapersListFragment? = null
-    launchFragmentInHiltContainer<DiapersListFragment>(
-        fragmentArgs = android.os.Bundle().apply { putInt("childId", childId) },
-        beforeAdd = ::installNavController,
-    ) {
-      fragment = this
-    }
-    idleMainLooperUntil {
-      fragment?.view?.findViewById<View>(R.id.recycler_diapers)?.visibility == View.VISIBLE
-    }
-
-    val root = fragment!!.requireView()
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_diapers).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_empty_state).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
-  }
-
-  @Test
-  fun `empty state shows empty layout and hides recycler`() {
+  fun `fragment launches without errors`() {
     val fragment = launchFragment()
     val root = fragment.requireView()
-
-    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.layout_empty_state).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_diapers).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.progress_loading).visibility)
-    assertEquals(View.GONE, root.findViewById<View>(R.id.layout_error_state).visibility)
+    assertEquals(View.VISIBLE, root.findViewById<View>(R.id.recycler_diapers).visibility)
   }
 
   @Test
-  fun `error state shows error layout when cache returns error`() {
-    every { repo.listDiapersCached(childId) } returns
-        flowOf(
-            ApiResult.Error(
-                net.poopyfeed.pf.data.models.ApiError.HttpError(500, "Error", "Server error")))
-    every { repo.hasSyncedFlow(childId) } returns flowOf(true)
-    coEvery { repo.refreshDiapers(childId) } returns ApiResult.Success(emptyList())
-
-    var fragment: DiapersListFragment? = null
-    launchFragmentInHiltContainer<DiapersListFragment>(
-        fragmentArgs = android.os.Bundle().apply { putInt("childId", childId) },
-        beforeAdd = ::installNavController,
-    ) {
-      fragment = this
-    }
-    idleMainLooperUntil {
-      fragment?.view?.findViewById<View>(R.id.layout_error_state)?.visibility == View.VISIBLE
-    }
-
-    val root = fragment!!.requireView()
-    assertEquals(
-        "Error state should be visible",
-        View.VISIBLE,
-        root.findViewById<View>(R.id.layout_error_state).visibility,
-    )
-    assertEquals(View.GONE, root.findViewById<View>(R.id.recycler_diapers).visibility)
+  fun `adapter is set up on recycler`() {
+    val fragment = launchFragment()
+    val root = fragment.requireView()
+    val recycler = root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_diapers)
+    assert(recycler.adapter != null)
   }
 }

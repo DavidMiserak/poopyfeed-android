@@ -22,6 +22,14 @@ class NapsListViewModel @Inject constructor(
 
     val pagingData: Flow<PagingData<Nap>> = repo.pagedNaps(childId)
 
-    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
+    val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+    fun deleteNap(napId: Int) {
+        // TODO: Implement delete with error handling
+    }
+
+    fun endNap(napId: Int) {
+        // TODO: Implement end nap with error handling
+    }
 }

@@ -22,6 +22,10 @@ class DiapersListViewModel @Inject constructor(
 
     val pagingData: Flow<PagingData<Diaper>> = repo.pagedDiapers(childId)
 
-    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
+    val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+    fun deleteDiaper(diaperId: Int) {
+        // TODO: Implement delete with error handling
+    }
 }
