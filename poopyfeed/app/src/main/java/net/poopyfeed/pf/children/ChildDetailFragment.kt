@@ -242,8 +242,15 @@ class ChildDetailFragment : Fragment() {
       val dirty = today.diapers.dirty + today.diapers.both
       if (today.diapers.count > 0) {
         binding.textTodayDiapersDetail.visibility = View.VISIBLE
+        val total = today.diapers.count
         binding.textTodayDiapersDetail.text =
-            getString(R.string.child_detail_today_diapers_detail, wet, dirty)
+            resources.getQuantityString(
+                R.plurals.child_detail_today_diapers_detail,
+                total,
+                total,
+                wet,
+                dirty,
+            )
       } else {
         binding.textTodayDiapersDetail.visibility = View.GONE
       }
