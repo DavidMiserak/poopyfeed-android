@@ -47,8 +47,8 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.8.0 is available: 1.10.0"
-        errorLine1="kotlinxSerialization = &quot;1.8.0&quot;"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.8.1 is available: 1.10.0"
+        errorLine1="kotlinxSerialization = &quot;1.8.1&quot;"
         errorLine2="                       ~~~~~~~">
         <location
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
@@ -87,83 +87,6 @@
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
             line="30"
             column="12"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                        android:layout_weight=&quot;1&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_child_detail.xml"
-            line="238"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                        android:layout_weight=&quot;1&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_child_detail.xml"
-            line="304"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                        android:layout_weight=&quot;1&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_child_detail.xml"
-            line="370"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                android:layout_weight=&quot;1&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_timeline_event.xml"
-            line="47"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.fab_margin` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;fab_margin&quot;>@dimen/spacing_8&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="37"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UselessParent"
-        message="This `LinearLayout` layout or its `FrameLayout` parent is unnecessary"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_feeding_bottom_sheet.xml"
-            line="9"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="TooManyViews"
-        message="`fragment_child_detail.xml` has more than 80 views, bad for performance"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_child_detail.xml"
-            line="777"
-            column="22"/>
     </issue>
 
 </issues>

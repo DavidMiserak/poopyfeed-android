@@ -14,7 +14,8 @@
         android:paddingStart="@dimen/spacing_6"
         android:paddingEnd="@dimen/spacing_6"
         android:paddingTop="@dimen/spacing_6"
-        android:paddingBottom="@dimen/bottom_nav_inset">
+        android:paddingBottom="@dimen/bottom_nav_inset"
+        tools:ignore="TooManyViews,NestedWeights">
 
         <!-- Full skeleton: visible when Loading (no child yet). Same approximate layout to avoid CLS. -->
         <LinearLayout
