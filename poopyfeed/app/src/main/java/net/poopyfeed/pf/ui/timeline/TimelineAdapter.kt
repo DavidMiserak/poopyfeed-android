@@ -3,6 +3,7 @@ package net.poopyfeed.pf.ui.timeline
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.R as AppCompatR
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -77,7 +78,7 @@ class TimelineAdapter(
       val stripeColor =
           when {
             event.feeding != null ->
-                MaterialColors.getColor(binding.root, MaterialR.attr.colorPrimary)
+                MaterialColors.getColor(binding.root, AppCompatR.attr.colorPrimary)
             event.diaper != null ->
                 MaterialColors.getColor(binding.root, MaterialR.attr.colorSecondary)
             event.nap != null -> MaterialColors.getColor(binding.root, MaterialR.attr.colorTertiary)
