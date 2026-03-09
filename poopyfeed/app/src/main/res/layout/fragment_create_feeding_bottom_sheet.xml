@@ -61,6 +61,7 @@
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_bottle"
             android:textSize="@dimen/text_body_medium"
+            android:paddingStart="@dimen/spacing_6"
             android:paddingEnd="@dimen/spacing_6" />
 
         <RadioButton
@@ -71,6 +72,7 @@
             android:fontFamily="@font/dm_sans"
             android:text="@string/feeding_type_breast"
             android:textSize="@dimen/text_body_medium"
+            android:paddingStart="@dimen/spacing_6"
             android:paddingEnd="@dimen/spacing_6" />
     </RadioGroup>
 

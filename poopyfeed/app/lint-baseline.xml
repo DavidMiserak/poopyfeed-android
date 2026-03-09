@@ -1255,48 +1255,4 @@
             column="22"/>
     </issue>
 
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="            android:paddingEnd=&quot;@dimen/spacing_6&quot; />"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_feeding_bottom_sheet.xml"
-            line="64"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="            android:paddingEnd=&quot;@dimen/spacing_6&quot; />"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_feeding_bottom_sheet.xml"
-            line="74"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="                            android:paddingEnd=&quot;@dimen/spacing_6&quot; />"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/fragment_create_feeding_bottom_sheet.xml"
-            line="85"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="                            android:paddingEnd=&quot;@dimen/spacing_6&quot; />"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/fragment_create_feeding_bottom_sheet.xml"
-            line="95"
-            column="29"/>
-    </issue>
-
 </issues>
