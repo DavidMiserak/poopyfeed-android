@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -223,7 +224,7 @@ class EditChildFragment : Fragment() {
     child.custom_bottle_high_oz?.let { binding.inputBottleHigh.setText(it) }
 
     val showReminder = state.canEditReminder
-    binding.cardFeedingReminder.visibility = if (showReminder) View.VISIBLE else View.GONE
+    binding.cardFeedingReminder.isVisible = showReminder
 
     val isOwner = child.user_role == "owner"
     binding.cardDangerZone.visibility = if (isOwner) View.VISIBLE else View.GONE
@@ -295,7 +296,7 @@ class EditChildFragment : Fragment() {
           else -> "M"
         }
     val reminderHours =
-        if (binding.cardFeedingReminder.visibility == View.VISIBLE) {
+        if (binding.cardFeedingReminder.isVisible) {
           feedingReminderOptions
               .getOrNull(binding.spinnerFeedingReminder.selectedItemPosition)
               ?.second

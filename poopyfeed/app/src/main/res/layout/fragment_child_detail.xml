@@ -83,11 +83,10 @@
                     android:id="@+id/text_avatar_emoji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="👶"
+                    android:text="@string/icon_baby"
                     android:textSize="48sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="Hardcoded" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <!-- Child name -->
                 <TextView
@@ -135,7 +134,7 @@
                         android:id="@+id/chip_role"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Co-parent"
+                        android:text="@string/sharing_role_co_parent"
                         android:textSize="@dimen/text_label_small"
                         app:chipBackgroundColor="?attr/colorSecondaryContainer"
                         app:chipIcon="@drawable/ic_person"
@@ -220,14 +219,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🍼"
+                        android:text="@string/badge_icon_feeding"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_4"
-                        android:text="Last Feeding"
+                        android:text="@string/child_detail_last_feeding_title"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_medium"
                         android:textColor="?attr/colorOnSurface" />
@@ -286,14 +285,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="💩"
+                        android:text="@string/badge_icon_diaper"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_4"
-                        android:text="Last Diaper"
+                        android:text="@string/child_detail_last_diaper_title"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_medium"
                         android:textColor="?attr/colorOnSurface" />
@@ -352,14 +351,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="😴"
+                        android:text="@string/badge_icon_nap"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_4"
-                        android:text="Last Nap"
+                        android:text="@string/child_detail_last_nap_title"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_medium"
                         android:textColor="?attr/colorOnSurface" />
@@ -427,7 +426,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="⚠️"
+                            android:text="@string/icon_warning"
                             android:textSize="14sp" />
 
                         <TextView
@@ -455,7 +454,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="⚠️"
+                            android:text="@string/icon_warning"
                             android:textSize="14sp" />
 
                         <TextView
@@ -547,7 +546,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="🍼"
+                                android:text="@string/badge_icon_feeding"
                                 android:textSize="22sp" />
 
                             <TextView
@@ -602,7 +601,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="💩"
+                                android:text="@string/badge_icon_diaper"
                                 android:textSize="22sp" />
 
                             <TextView
@@ -657,7 +656,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="😴"
+                                android:text="@string/badge_icon_nap"
                                 android:textSize="22sp" />
 
                             <TextView
@@ -760,7 +759,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🍼"
+                            android:text="@string/badge_icon_feeding"
                             android:textSize="18sp"
                             android:layout_marginEnd="@dimen/spacing_4" />
 
@@ -823,7 +822,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="💩"
+                            android:text="@string/badge_icon_diaper"
                             android:textSize="18sp"
                             android:layout_marginEnd="@dimen/spacing_4" />
 
@@ -886,7 +885,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="😴"
+                            android:text="@string/badge_icon_nap"
                             android:textSize="18sp"
                             android:layout_marginEnd="@dimen/spacing_4" />
 
@@ -958,7 +957,7 @@
                     android:id="@+id/timeline_emoji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📊"
+                    android:text="@string/icon_timeline"
                     android:textSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

@@ -98,13 +98,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🍼"
+                        android:text="@string/badge_icon_feeding"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="56dp"
                         android:layout_height="wrap_content"
-                        android:text="Feeding"
+                        android:text="@string/child_card_feeding_label"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_small"
                         android:textColor="?attr/colorOnSurfaceVariant" />
@@ -132,13 +132,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="💩"
+                        android:text="@string/badge_icon_diaper"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="56dp"
                         android:layout_height="wrap_content"
-                        android:text="Diaper"
+                        android:text="@string/child_card_diaper_label"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_small"
                         android:textColor="?attr/colorOnSurfaceVariant" />
@@ -166,13 +166,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="😴"
+                        android:text="@string/badge_icon_nap"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="56dp"
                         android:layout_height="wrap_content"
-                        android:text="Nap"
+                        android:text="@string/child_card_nap_label"
                         android:fontFamily="@font/dm_sans"
                         android:textSize="@dimen/text_body_small"
                         android:textColor="?attr/colorOnSurfaceVariant" />

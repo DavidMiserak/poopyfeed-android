@@ -15,6 +15,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
+import java.util.Locale
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Feeding
@@ -125,7 +126,7 @@ class EditFeedingBottomSheetFragment : BottomSheetDialogFragment() {
     binding.radioSide.visibility = if (isBottle) View.GONE else View.VISIBLE
     if (isBottle) {
       if (feeding.amount_oz != null) {
-        binding.inputAmount.setText(feeding.amount_oz.toString())
+        binding.inputAmount.setText(String.format(Locale.getDefault(), "%.1f", feeding.amount_oz))
       } else {
         binding.inputAmount.text?.clear()
       }
@@ -133,7 +134,8 @@ class EditFeedingBottomSheetFragment : BottomSheetDialogFragment() {
     } else {
       binding.inputAmount.text?.clear()
       if (feeding.duration_minutes != null) {
-        binding.inputMinutes.setText(feeding.duration_minutes.toString())
+        binding.inputMinutes.setText(
+            String.format(Locale.getDefault(), "%d", feeding.duration_minutes))
       } else {
         binding.inputMinutes.text?.clear()
       }

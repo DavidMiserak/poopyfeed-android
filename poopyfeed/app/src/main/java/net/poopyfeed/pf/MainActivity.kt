@@ -1,13 +1,13 @@
 package net.poopyfeed.pf
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         return@post
       }
       try {
-        navController.navigate(Uri.parse(uriString))
+        navController.navigate(uriString.toUri())
         viewModel.refreshUnreadCount()
       } catch (e: IllegalArgumentException) {
         // Unrecognized URI — ignore silently

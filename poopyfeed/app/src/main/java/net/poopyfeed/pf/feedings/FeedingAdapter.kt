@@ -56,7 +56,13 @@ class FeedingAdapter(
         "bottle" -> {
           if (feeding.amount_oz != null) {
             binding.textAmount.visibility = View.VISIBLE
-            binding.textAmount.text = "${feeding.amount_oz} oz"
+            val amountText =
+                if (feeding.amount_oz % 1.0 == 0.0) {
+                  ctx.getString(R.string.quick_log_bottle_oz_int, feeding.amount_oz.toInt())
+                } else {
+                  ctx.getString(R.string.quick_log_bottle_oz_float, feeding.amount_oz)
+                }
+            binding.textAmount.text = amountText
           } else {
             binding.textAmount.visibility = View.GONE
           }

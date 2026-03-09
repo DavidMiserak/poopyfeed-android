@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -230,10 +231,22 @@ constructor(
       0 -> "Today"
       1 -> "Yesterday"
       else -> {
-        val dayOfWeek = targetDate.dayOfWeek.name.take(3).capitalize()
+        val dayOfWeek = getDayOfWeekAbbreviation(targetDate.dayOfWeek)
         val monthName = getMonthName(targetDate.monthNumber)
         "${dayOfWeek}, ${monthName} ${targetDate.dayOfMonth}"
       }
+    }
+  }
+
+  private fun getDayOfWeekAbbreviation(dayOfWeek: DayOfWeek): String {
+    return when (dayOfWeek) {
+      DayOfWeek.MONDAY -> "Mon"
+      DayOfWeek.TUESDAY -> "Tue"
+      DayOfWeek.WEDNESDAY -> "Wed"
+      DayOfWeek.THURSDAY -> "Thu"
+      DayOfWeek.FRIDAY -> "Fri"
+      DayOfWeek.SATURDAY -> "Sat"
+      DayOfWeek.SUNDAY -> "Sun"
     }
   }
 

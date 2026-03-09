@@ -46,7 +46,8 @@ class ChildAdapter(private val onChildClick: (Child) -> Unit) :
             "O" -> ctx.getString(R.string.create_child_gender_other)
             else -> ctx.getString(R.string.create_child_gender_male)
           }
-      binding.textAgeGender.text = "$ageFormatted • $genderFormatted"
+      binding.textAgeGender.text =
+          ctx.getString(R.string.children_list_age_gender, ageFormatted, genderFormatted)
 
       // Activity times on right column: short format ("1m", "1h", "1d")
       binding.textLastFeeding.text = formatRelativeTimeShort(ctx, child.last_feeding)

@@ -2,6 +2,7 @@ package net.poopyfeed.pf.data.session
 
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -45,13 +46,11 @@ constructor(
     }
 
     // Clear cached quiet hours to prevent cross-account data leak
-    context
-        .getSharedPreferences(PoopyFeedMessagingService.PREFS_NAME, Context.MODE_PRIVATE)
-        .edit()
-        .remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED)
-        .remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_START)
-        .remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_END)
-        .apply()
+    context.getSharedPreferences(PoopyFeedMessagingService.PREFS_NAME, Context.MODE_PRIVATE).edit {
+      remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED)
+      remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_START)
+      remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_END)
+    }
 
     syncScheduler.cancel()
     pendingSyncDao.clearAll()

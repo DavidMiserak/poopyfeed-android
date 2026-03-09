@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.NumberFormat
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildDetailBinding
@@ -222,9 +223,10 @@ class ChildDetailFragment : Fragment() {
       binding.todayContent.visibility = View.VISIBLE
 
       val today = summary.today
-      binding.textTodayFeedingsCount.text = today.feedings.count.toString()
-      binding.textTodayDiapersCount.text = today.diapers.count.toString()
-      binding.textTodayNapsCount.text = today.sleep.naps.toString()
+      val numberFormatter = NumberFormat.getIntegerInstance()
+      binding.textTodayFeedingsCount.text = numberFormatter.format(today.feedings.count)
+      binding.textTodayDiapersCount.text = numberFormatter.format(today.diapers.count)
+      binding.textTodayNapsCount.text = numberFormatter.format(today.sleep.naps)
 
       // Feedings detail: total oz (hide if zero)
       if (today.feedings.totalOz > 0) {
