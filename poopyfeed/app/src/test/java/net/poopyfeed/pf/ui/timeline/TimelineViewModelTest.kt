@@ -193,4 +193,32 @@ class TimelineViewModelTest {
     assertIs<TimelineUiState.Ready>(state)
     assertEquals(emptyList<TimelineItem>(), state.items)
   }
+
+  @Test
+  fun `API returning zero events shows Ready not Loading`() = runTest {
+    createViewModel(events = emptyList())
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    assertEquals(emptyList<TimelineItem>(), state.items)
+  }
+
+  @Test
+  fun `API error shows Error state`() = runTest {
+    val savedStateHandle = SavedStateHandle().apply { set("childId", 123) }
+    coEvery { mockAnalyticsRepository.getTimeline(123) } returns
+        ApiResult.Error(net.poopyfeed.pf.data.models.ApiError.NetworkError("offline"))
+    coEvery { mockContext.getString(any<Int>()) } returns "Network error"
+    viewModel =
+        TimelineViewModel(
+            savedStateHandle,
+            mockAnalyticsRepository,
+            mockNapsRepository,
+            mockSyncScheduler,
+            mockContext)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Error>(state)
+  }
 }

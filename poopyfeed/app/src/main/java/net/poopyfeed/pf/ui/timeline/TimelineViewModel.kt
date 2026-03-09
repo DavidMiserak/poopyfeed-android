@@ -78,10 +78,13 @@ constructor(
   /** Day offset: 0 = today, 1 = yesterday, ..., 6 = oldest allowed day. */
   private val _dayOffset: MutableStateFlow<Int> = MutableStateFlow(0)
 
+  /** Tracks fetch lifecycle: null = loading, empty = loaded OK, non-empty = error message. */
+  private val _fetchStatus: MutableStateFlow<String?> = MutableStateFlow(null)
+
   /** Combined UI state: filters allEvents by dayOffset, formats day header, checks boundaries. */
   val uiState: Flow<TimelineUiState> =
-      combine(_allEvents, _dayOffset) { allEvents, dayOffset ->
-        computeUiState(allEvents, dayOffset)
+      combine(_allEvents, _dayOffset, _fetchStatus) { allEvents, dayOffset, fetchStatus ->
+        computeUiState(allEvents, dayOffset, fetchStatus)
       }
 
   init {
@@ -90,15 +93,16 @@ constructor(
 
   /** Loads all timeline events from API and updates [_allEvents]. */
   private fun loadTimeline() {
+    _fetchStatus.value = null // loading
     viewModelScope.launch {
       when (val result = analyticsRepository.getTimeline(childId)) {
         is ApiResult.Success -> {
-          val events = result.data.results
-          _allEvents.value = events
+          _allEvents.value = result.data.results
+          _fetchStatus.value = "" // loaded OK
         }
         is ApiResult.Error -> {
-          // Error is handled in computeUiState
           _allEvents.value = emptyList()
+          _fetchStatus.value = result.error.getUserMessage(context)
         }
         is ApiResult.Loading -> {
           // no-op; we manage Loading locally
@@ -107,10 +111,19 @@ constructor(
     }
   }
 
-  /** Computes UI state from all events and current day offset. */
-  private fun computeUiState(allEvents: List<TimelineEvent>, dayOffset: Int): TimelineUiState {
-    if (allEvents.isEmpty()) {
+  /** Computes UI state from all events, current day offset, and fetch status. */
+  private fun computeUiState(
+      allEvents: List<TimelineEvent>,
+      dayOffset: Int,
+      fetchStatus: String?,
+  ): TimelineUiState {
+    // null = still loading
+    if (fetchStatus == null) {
       return TimelineUiState.Loading
+    }
+    // non-empty = error message from API
+    if (fetchStatus.isNotEmpty()) {
+      return TimelineUiState.Error(fetchStatus)
     }
 
     // Filter events for the requested day (today - dayOffset)
