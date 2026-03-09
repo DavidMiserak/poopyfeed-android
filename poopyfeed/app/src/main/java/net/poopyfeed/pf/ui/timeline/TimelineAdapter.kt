@@ -6,37 +6,76 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.R as MaterialR
+import com.google.android.material.color.MaterialColors
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.databinding.ItemTimelineEventBinding
+import net.poopyfeed.pf.databinding.ItemTimelineGapBinding
+import net.poopyfeed.pf.util.formatTimeForDisplay
 
 /**
- * RecyclerView adapter for timeline events. Displays feeding, diaper, and nap events with emoji
- * icon, summary, and local time.
+ * RecyclerView adapter for timeline items. Renders events with emoji, summary, local time, and
+ * color-coded accent stripe, plus gap indicators between events with significant time gaps.
  */
-class TimelineAdapter : ListAdapter<TimelineEvent, TimelineAdapter.ViewHolder>(DiffCallback()) {
+class TimelineAdapter :
+    ListAdapter<TimelineItem, RecyclerView.ViewHolder>(TimelineItemDiffCallback()) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val binding =
-        ItemTimelineEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-    return ViewHolder(binding)
+  companion object {
+    private const val VIEW_TYPE_EVENT = 0
+    private const val VIEW_TYPE_GAP = 1
   }
 
-  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    holder.bind(getItem(position))
+  override fun getItemViewType(position: Int): Int {
+    return when (getItem(position)) {
+      is TimelineItem.Event -> VIEW_TYPE_EVENT
+      is TimelineItem.Gap -> VIEW_TYPE_GAP
+    }
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    val inflater = LayoutInflater.from(parent.context)
+    return when (viewType) {
+      VIEW_TYPE_GAP -> {
+        val binding = ItemTimelineGapBinding.inflate(inflater, parent, false)
+        GapViewHolder(binding)
+      }
+      else -> {
+        val binding = ItemTimelineEventBinding.inflate(inflater, parent, false)
+        EventViewHolder(binding)
+      }
+    }
+  }
+
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    when (val item = getItem(position)) {
+      is TimelineItem.Event -> (holder as EventViewHolder).bind(item.event)
+      is TimelineItem.Gap -> (holder as GapViewHolder).bind(item.durationMinutes)
+    }
   }
 
   /** ViewHolder for a single timeline event. */
-  class ViewHolder(private val binding: ItemTimelineEventBinding) :
+  class EventViewHolder(private val binding: ItemTimelineEventBinding) :
       RecyclerView.ViewHolder(binding.root) {
 
     fun bind(event: TimelineEvent) {
       val context = binding.root.context
       val (emoji, summary) = formatEvent(context, event)
-      val timeStr = extractTime(event.at)
 
       binding.eventEmoji.text = emoji
       binding.eventSummary.text = summary
-      binding.eventTime.text = timeStr
+      binding.eventTime.text = formatTimeForDisplay(context, event.at)
+
+      // Set accent stripe color based on event type
+      val stripeColor =
+          when {
+            event.feeding != null ->
+                MaterialColors.getColor(binding.root, MaterialR.attr.colorPrimary)
+            event.diaper != null ->
+                MaterialColors.getColor(binding.root, MaterialR.attr.colorSecondary)
+            event.nap != null -> MaterialColors.getColor(binding.root, MaterialR.attr.colorTertiary)
+            else -> MaterialColors.getColor(binding.root, MaterialR.attr.colorOutline)
+          }
+      binding.accentStripe.setBackgroundColor(stripeColor)
     }
 
     private fun formatEvent(context: Context, event: TimelineEvent): Pair<String, String> {
@@ -106,24 +145,37 @@ class TimelineAdapter : ListAdapter<TimelineEvent, TimelineAdapter.ViewHolder>(D
         else -> "❓" to "Unknown event"
       }
     }
+  }
 
-    private fun extractTime(isoString: String): String {
-      return try {
-        // isoString format: "2026-03-09T14:30:00Z"
-        val timePart = isoString.substringAfter("T").substringBefore("Z")
-        timePart.substringBeforeLast(":") // "14:30"
-      } catch (e: Exception) {
-        "—"
-      }
+  /** ViewHolder for a time gap indicator. */
+  class GapViewHolder(private val binding: ItemTimelineGapBinding) :
+      RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(durationMinutes: Long) {
+      val hours = durationMinutes / 60
+      val mins = durationMinutes % 60
+      val label =
+          when {
+            hours > 0 && mins > 0 -> "${hours}h ${mins}m gap"
+            hours > 0 -> "${hours}h gap"
+            else -> "${mins}m gap"
+          }
+      binding.textGapDuration.text = label
     }
   }
 
-  private class DiffCallback : DiffUtil.ItemCallback<TimelineEvent>() {
-    override fun areItemsTheSame(oldItem: TimelineEvent, newItem: TimelineEvent): Boolean {
-      return oldItem.at == newItem.at && oldItem.type == newItem.type
+  private class TimelineItemDiffCallback : DiffUtil.ItemCallback<TimelineItem>() {
+    override fun areItemsTheSame(oldItem: TimelineItem, newItem: TimelineItem): Boolean {
+      return when {
+        oldItem is TimelineItem.Event && newItem is TimelineItem.Event ->
+            oldItem.event.at == newItem.event.at && oldItem.event.type == newItem.event.type
+        oldItem is TimelineItem.Gap && newItem is TimelineItem.Gap ->
+            oldItem.durationMinutes == newItem.durationMinutes
+        else -> false
+      }
     }
 
-    override fun areContentsTheSame(oldItem: TimelineEvent, newItem: TimelineEvent): Boolean {
+    override fun areContentsTheSame(oldItem: TimelineItem, newItem: TimelineItem): Boolean {
       return oldItem == newItem
     }
   }

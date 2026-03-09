@@ -19,14 +19,21 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
 
+/** An item in the timeline list — either a real event or a gap marker between events. */
+sealed interface TimelineItem {
+  data class Event(val event: TimelineEvent) : TimelineItem
+
+  data class Gap(val durationMinutes: Long) : TimelineItem
+}
+
 /** UI state for the timeline screen. */
 sealed interface TimelineUiState {
   /** Events are loading. */
   data object Loading : TimelineUiState
 
-  /** Events loaded; [eventsForDay] is filtered for current day, [dayHeader] is formatted label. */
+  /** Events loaded; [items] contains events interleaved with gap markers. */
   data class Ready(
-      val eventsForDay: List<TimelineEvent>,
+      val items: List<TimelineItem>,
       val dayHeader: String,
       val canGoPrevious: Boolean,
       val canGoNext: Boolean,
@@ -48,6 +55,11 @@ constructor(
     private val analyticsRepository: AnalyticsRepository,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
+
+  companion object {
+    /** Minimum gap between events (in minutes) before showing a gap indicator. */
+    const val GAP_THRESHOLD_MINUTES = 60L
+  }
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
 
@@ -94,16 +106,49 @@ constructor(
 
     // Filter events for the requested day (today - dayOffset)
     val eventsForDay = filterEventsByDay(allEvents, dayOffset)
+    val items = interleaveGaps(eventsForDay)
     val dayHeader = formatDayHeader(dayOffset)
     val canGoPrevious = dayOffset < 6
     val canGoNext = dayOffset > 0
 
     return TimelineUiState.Ready(
-        eventsForDay = eventsForDay,
+        items = items,
         dayHeader = dayHeader,
         canGoPrevious = canGoPrevious,
         canGoNext = canGoNext,
     )
+  }
+
+  /**
+   * Interleaves [TimelineItem.Gap] markers between consecutive events when the time difference
+   * exceeds [GAP_THRESHOLD_MINUTES]. Events are newest-first, so each gap represents the quiet
+   * period between the newer event and the older one below it.
+   */
+  private fun interleaveGaps(events: List<TimelineEvent>): List<TimelineItem> {
+    if (events.isEmpty()) return emptyList()
+    val items = mutableListOf<TimelineItem>()
+    for (i in events.indices) {
+      items.add(TimelineItem.Event(events[i]))
+      if (i < events.lastIndex) {
+        val newerMs = parseEpochMs(events[i].at)
+        val olderMs = parseEpochMs(events[i + 1].at)
+        if (newerMs != null && olderMs != null) {
+          val gapMinutes = (newerMs - olderMs) / 60_000
+          if (gapMinutes >= GAP_THRESHOLD_MINUTES) {
+            items.add(TimelineItem.Gap(gapMinutes))
+          }
+        }
+      }
+    }
+    return items
+  }
+
+  private fun parseEpochMs(isoString: String): Long? {
+    return try {
+      Instant.parse(isoString).toEpochMilliseconds()
+    } catch (_: Exception) {
+      null
+    }
   }
 
   /**
@@ -118,8 +163,8 @@ constructor(
 
     val targetDatePrefix = targetDate.toString() // "YYYY-MM-DD"
 
-    // Filter events that fall on targetDate and sort oldest-first (reverse server order)
-    return events.filter { event -> event.at.startsWith(targetDatePrefix) }.reversed()
+    // Filter events that fall on targetDate (newest-first, matching server order)
+    return events.filter { event -> event.at.startsWith(targetDatePrefix) }
   }
 
   /** Formats day header label based on offset: "Today", "Yesterday", or "Mon, Mar 4". */

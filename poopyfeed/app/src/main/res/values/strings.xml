@@ -252,6 +252,13 @@
 
     <!-- Timeline -->
     <string name="timeline_title">Timeline</string>
+    <string name="timeline_previous_day">Previous day</string>
+    <string name="timeline_next_day">Next day</string>
+    <string name="timeline_loading">Loading timeline…</string>
+    <string name="timeline_empty_title">Nothing recorded</string>
+    <string name="timeline_empty_subtitle">No feedings, diapers, or naps logged for this day</string>
+    <string name="timeline_error_title">Failed to load timeline</string>
+    <string name="timeline_retry">Retry</string>
 
     <!-- Create Feeding -->
     <string name="create_feeding_title">Log Feeding</string>

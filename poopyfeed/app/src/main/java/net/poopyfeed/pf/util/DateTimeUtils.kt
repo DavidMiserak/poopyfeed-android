@@ -151,6 +151,19 @@ fun formatNapDuration(context: Context, startIso: String, endIso: String): Strin
 }
 
 /**
+ * Formats an ISO 8601 datetime string as time-only for display (e.g. "2:30 PM") in the device's
+ * local timezone.
+ */
+fun formatTimeForDisplay(context: Context, isoString: String): String {
+  return try {
+    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    DateUtils.formatDateTime(context, millis, DateUtils.FORMAT_SHOW_TIME)
+  } catch (e: Exception) {
+    "—"
+  }
+}
+
+/**
  * Formats an ISO 8601 datetime string for display (e.g. "Mar 6, 2025 2:30 PM") in the device's
  * local timezone.
  */

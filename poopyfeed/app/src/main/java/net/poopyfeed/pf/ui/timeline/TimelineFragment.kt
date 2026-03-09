@@ -62,14 +62,17 @@ class TimelineFragment : Fragment() {
     when (state) {
       is TimelineUiState.Loading -> {
         binding.recyclerTimeline.visibility = View.GONE
+        binding.layoutLoadingState.visibility = View.VISIBLE
         binding.layoutEmptyState.visibility = View.GONE
         binding.layoutErrorState.visibility = View.GONE
       }
       is TimelineUiState.Ready -> {
-        binding.recyclerTimeline.visibility = View.VISIBLE
-        binding.layoutEmptyState.visibility =
-            if (state.eventsForDay.isEmpty()) View.VISIBLE else View.GONE
+        binding.layoutLoadingState.visibility = View.GONE
         binding.layoutErrorState.visibility = View.GONE
+
+        val hasEvents = state.items.any { it is TimelineItem.Event }
+        binding.recyclerTimeline.visibility = if (hasEvents) View.VISIBLE else View.GONE
+        binding.layoutEmptyState.visibility = if (hasEvents) View.GONE else View.VISIBLE
 
         // Update day header
         binding.textDayHeader.text = state.dayHeader
@@ -78,11 +81,12 @@ class TimelineFragment : Fragment() {
         binding.btnPrevious.isEnabled = state.canGoPrevious
         binding.btnNext.isEnabled = state.canGoNext
 
-        // Submit events to adapter
-        adapter.submitList(state.eventsForDay)
+        // Submit items (events + gap markers) to adapter
+        adapter.submitList(state.items)
       }
       is TimelineUiState.Error -> {
         binding.recyclerTimeline.visibility = View.GONE
+        binding.layoutLoadingState.visibility = View.GONE
         binding.layoutEmptyState.visibility = View.GONE
         binding.layoutErrorState.visibility = View.VISIBLE
         binding.textErrorMessage.text = state.message

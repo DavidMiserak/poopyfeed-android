@@ -183,6 +183,6 @@ class TimelineViewModelTest {
     // Today has no events
     val state = viewModel.uiState.first()
     assertIs<TimelineUiState.Ready>(state)
-    assertEquals(emptyList(), state.eventsForDay)
+    assertEquals(emptyList<TimelineItem>(), state.items)
   }
 }

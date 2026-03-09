@@ -5,33 +5,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface"
+    android:background="@drawable/bg_gradient_page"
     tools:context="net.poopyfeed.pf.ui.timeline.TimelineFragment">
 
     <!-- Day header with navigation -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/spacing_12"
-        android:paddingVertical="@dimen/spacing_12">
+        android:paddingHorizontal="@dimen/spacing_8"
+        android:paddingVertical="@dimen/spacing_8">
 
         <!-- Previous button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_previous"
-            style="?attr/borderlessButtonStyle"
+            style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="←"
-            android:textSize="20sp"
-            android:minHeight="48dp"
-            android:minWidth="48dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
+            android:contentDescription="@string/timeline_previous_day"
+            app:icon="@drawable/ic_chevron_left"
+            app:iconTint="?attr/colorOnSurface"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Day header -->
         <TextView
@@ -39,33 +34,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/fredoka"
-            android:textSize="@dimen/text_headline_medium"
-            android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold"
             android:gravity="center"
-            app:layout_constraintStart_toEndOf="@id/btn_previous"
-            app:layout_constraintEnd_toStartOf="@id/btn_next"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_headline_medium"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_next"
+            app:layout_constraintStart_toEndOf="@id/btn_previous"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Today" />
 
         <!-- Next button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_next"
-            style="?attr/borderlessButtonStyle"
+            style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="→"
-            android:textSize="20sp"
-            android:minHeight="48dp"
-            android:minWidth="48dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
+            android:contentDescription="@string/timeline_next_day"
+            app:icon="@drawable/ic_chevron_right"
+            app:iconTint="?attr/colorOnSurface"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -73,8 +63,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?attr/colorOutline"
-        android:alpha="0.12" />
+        android:layout_marginHorizontal="@dimen/spacing_12"
+        android:alpha="0.12"
+        android:background="?attr/colorOutline" />
 
     <!-- Timeline events RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -82,43 +73,79 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingStart="@dimen/spacing_6"
-        android:paddingEnd="@dimen/spacing_6"
-        android:paddingTop="@dimen/spacing_12"
-        android:paddingBottom="@dimen/spacing_24"
         android:clipToPadding="false"
         android:overScrollMode="never"
+        android:paddingStart="@dimen/spacing_6"
+        android:paddingEnd="@dimen/spacing_6"
+        android:paddingTop="@dimen/spacing_8"
+        android:paddingBottom="@dimen/spacing_24"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_timeline_event" />
 
-    <!-- Empty state (no events for this day) -->
+    <!-- Loading state -->
+    <LinearLayout
+        android:id="@+id/layout_loading_state"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorColor="?attr/colorPrimary"
+            app:indicatorSize="40dp"
+            app:trackThickness="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/timeline_loading"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="@dimen/text_body_medium" />
+
+    </LinearLayout>
+
+    <!-- Empty state -->
     <LinearLayout
         android:id="@+id/layout_empty_state"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/spacing_16"
         android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No events recorded"
-            android:fontFamily="@font/fredoka"
-            android:textSize="@dimen/text_headline_small"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="@dimen/spacing_8" />
+            android:text="😴"
+            android:textSize="48sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No feedings, diapers, or naps logged for this day"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
+            android:layout_marginTop="@dimen/spacing_8"
+            android:fontFamily="@font/fredoka"
+            android:text="@string/timeline_empty_title"
             android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="@dimen/text_headline_small" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_4"
+            android:fontFamily="@font/dm_sans"
             android:gravity="center"
-            android:paddingHorizontal="@dimen/spacing_12" />
+            android:text="@string/timeline_empty_subtitle"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="@dimen/text_body_medium" />
 
     </LinearLayout>
 
@@ -128,29 +155,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:paddingHorizontal="@dimen/spacing_12"
         android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Failed to load timeline"
+            android:layout_marginBottom="@dimen/spacing_8"
             android:fontFamily="@font/fredoka"
-            android:textSize="@dimen/text_headline_small"
+            android:text="@string/timeline_error_title"
             android:textColor="?attr/colorError"
-            android:layout_marginBottom="@dimen/spacing_8" />
+            android:textSize="@dimen/text_headline_small" />
 
         <TextView
             android:id="@+id/text_error_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:gravity="center"
             android:layout_marginBottom="@dimen/spacing_16"
+            android:fontFamily="@font/dm_sans"
+            android:gravity="center"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="@dimen/text_body_medium"
             tools:text="Network error" />
 
         <com.google.android.material.button.MaterialButton
@@ -158,7 +185,7 @@
             style="@style/Widget.Pf.Button.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Retry" />
+            android:text="@string/timeline_retry" />
 
     </LinearLayout>
 
