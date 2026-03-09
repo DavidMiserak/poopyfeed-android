@@ -119,24 +119,39 @@ class NotificationsFragment : Fragment() {
           binding.swipeRefresh.isRefreshing =
               loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
 
-          // Show/hide empty state
-          val isEmptyAfterRefresh =
-              loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
-          binding.layoutEmptyState.visibility = if (isEmptyAfterRefresh) View.VISIBLE else View.GONE
-          binding.recyclerNotifications.visibility =
-              if (isEmptyAfterRefresh) View.GONE else View.VISIBLE
-
-          // Show/hide error state
-          val refreshError = loadStates.refresh as? LoadState.Error
-          if (refreshError != null) {
-            binding.layoutErrorState.visibility = View.VISIBLE
-            binding.recyclerNotifications.visibility = View.GONE
-            binding.layoutEmptyState.visibility = View.GONE
-            binding.layoutErrorState
-                .findViewById<android.widget.TextView>(R.id.text_error_message)
-                .text = refreshError.error.message ?: "Unknown error"
-          } else {
-            binding.layoutErrorState.visibility = View.GONE
+          // Manage center loading spinner and state overlays
+          when {
+            // Initial load - show center spinner
+            loadStates.refresh is LoadState.Loading && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.VISIBLE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.recyclerNotifications.visibility = View.GONE
+            }
+            // Error during initial load - show error
+            loadStates.refresh is LoadState.Error && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.VISIBLE
+              binding.recyclerNotifications.visibility = View.GONE
+              binding.layoutErrorState
+                  .findViewById<android.widget.TextView>(R.id.text_error_message)
+                  .text = (loadStates.refresh as? LoadState.Error)?.error?.message ?: "Unknown error"
+            }
+            // Data loaded - show list
+            loadStates.refresh is LoadState.NotLoading && adapter.itemCount > 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.recyclerNotifications.visibility = View.VISIBLE
+            }
+            // Empty result - show empty state
+            loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.VISIBLE
+              binding.layoutErrorState.visibility = View.GONE
+              binding.recyclerNotifications.visibility = View.GONE
+            }
           }
 
           requireActivity().invalidateOptionsMenu()

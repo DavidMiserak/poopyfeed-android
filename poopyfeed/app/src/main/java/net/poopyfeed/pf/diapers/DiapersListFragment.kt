@@ -65,13 +65,44 @@ class DiapersListFragment : Fragment() {
       }
     }
 
-    // Handle load states (loading spinner)
+    // Handle load states (loading spinner and state overlays)
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         adapter.loadStateFlow.collect { loadStates ->
           // Show/hide refresh spinner on initial load
           binding.swipeRefresh.isRefreshing =
               loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+
+          // Manage center loading spinner and state overlays
+          when {
+            // Initial load - show center spinner
+            loadStates.refresh is LoadState.Loading && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.VISIBLE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+            }
+            // Error during initial load - show error
+            loadStates.refresh is LoadState.Error && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.VISIBLE
+              (loadStates.refresh as? LoadState.Error)?.error?.localizedMessage?.let {
+                binding.textErrorMessage.text = it
+              }
+            }
+            // Data loaded - show list
+            loadStates.refresh is LoadState.NotLoading && adapter.itemCount > 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.GONE
+              binding.layoutErrorState.visibility = View.GONE
+            }
+            // Empty result - show empty state
+            loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0 -> {
+              binding.progressLoading.visibility = View.GONE
+              binding.layoutEmptyState.visibility = View.VISIBLE
+              binding.layoutErrorState.visibility = View.GONE
+            }
+          }
         }
       }
     }
