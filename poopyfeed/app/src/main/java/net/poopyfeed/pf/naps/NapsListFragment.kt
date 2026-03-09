@@ -101,6 +101,7 @@ class NapsListFragment : Fragment() {
             ?.collect { created ->
               if (created) {
                 adapter.refresh()
+                binding.recyclerNaps.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
@@ -120,6 +121,7 @@ class NapsListFragment : Fragment() {
             ?.collect { updated ->
               if (updated) {
                 adapter.refresh()
+                binding.recyclerNaps.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle

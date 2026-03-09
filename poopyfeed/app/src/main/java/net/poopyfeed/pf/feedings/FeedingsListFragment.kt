@@ -100,6 +100,7 @@ class FeedingsListFragment : Fragment() {
             ?.collect { created ->
               if (created) {
                 adapter.refresh()
+                binding.recyclerFeedings.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
@@ -119,6 +120,7 @@ class FeedingsListFragment : Fragment() {
             ?.collect { updated ->
               if (updated) {
                 adapter.refresh()
+                binding.recyclerFeedings.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle

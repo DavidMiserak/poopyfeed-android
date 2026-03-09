@@ -100,6 +100,7 @@ class DiapersListFragment : Fragment() {
             ?.collect { created ->
               if (created) {
                 adapter.refresh()
+                binding.recyclerDiapers.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
@@ -119,6 +120,7 @@ class DiapersListFragment : Fragment() {
             ?.collect { updated ->
               if (updated) {
                 adapter.refresh()
+                binding.recyclerDiapers.scrollToPosition(0)
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
