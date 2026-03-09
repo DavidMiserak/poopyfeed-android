@@ -17,7 +17,7 @@ import net.poopyfeed.pf.util.formatTimeForDisplay
  * RecyclerView adapter for timeline items. Renders events with emoji, summary, local time, and
  * color-coded accent stripe, plus gap indicators between events with significant time gaps.
  */
-class TimelineAdapter :
+class TimelineAdapter(private val onAddNapClick: (gap: TimelineItem.Gap) -> Unit) :
     ListAdapter<TimelineItem, RecyclerView.ViewHolder>(TimelineItemDiffCallback()) {
 
   companion object {
@@ -49,7 +49,7 @@ class TimelineAdapter :
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     when (val item = getItem(position)) {
       is TimelineItem.Event -> (holder as EventViewHolder).bind(item.event)
-      is TimelineItem.Gap -> (holder as GapViewHolder).bind(item.durationMinutes)
+      is TimelineItem.Gap -> (holder as GapViewHolder).bind(item, onAddNapClick)
     }
   }
 
@@ -151,16 +151,23 @@ class TimelineAdapter :
   class GapViewHolder(private val binding: ItemTimelineGapBinding) :
       RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(durationMinutes: Long) {
-      val hours = durationMinutes / 60
-      val mins = durationMinutes % 60
-      val label =
+    fun bind(gap: TimelineItem.Gap, onAddNapClick: (TimelineItem.Gap) -> Unit) {
+      val context = binding.root.context
+      val hours = gap.durationMinutes / 60
+      val mins = gap.durationMinutes % 60
+      val durationLabel =
           when {
-            hours > 0 && mins > 0 -> "${hours}h ${mins}m gap"
-            hours > 0 -> "${hours}h gap"
-            else -> "${mins}m gap"
+            hours > 0 && mins > 0 -> "${hours}h ${mins}m"
+            hours > 0 -> "${hours}h"
+            else -> "${mins}m"
           }
-      binding.textGapDuration.text = label
+      binding.textGapDuration.text = "💤 $durationLabel quiet"
+
+      // Format button with time range (nap boundaries: +1min / -1min from events)
+      val startTime = formatTimeForDisplay(context, gap.olderEventAt)
+      val endTime = formatTimeForDisplay(context, gap.newerEventAt)
+      binding.btnAddNap.text = "😴 Add nap · $startTime – $endTime"
+      binding.btnAddNap.setOnClickListener { onAddNapClick(gap) }
     }
   }
 
@@ -170,7 +177,8 @@ class TimelineAdapter :
         oldItem is TimelineItem.Event && newItem is TimelineItem.Event ->
             oldItem.event.at == newItem.event.at && oldItem.event.type == newItem.event.type
         oldItem is TimelineItem.Gap && newItem is TimelineItem.Gap ->
-            oldItem.durationMinutes == newItem.durationMinutes
+            oldItem.newerEventAt == newItem.newerEventAt &&
+                oldItem.olderEventAt == newItem.olderEventAt
         else -> false
       }
     }

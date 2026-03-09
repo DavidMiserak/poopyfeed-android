@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentTimelineBinding
@@ -40,8 +41,10 @@ class TimelineFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    // Setup adapter
-    adapter = TimelineAdapter()
+    // Setup adapter with gap nap callback
+    adapter = TimelineAdapter { gap ->
+      viewModel.createNapFromGap(gap.newerEventAt, gap.olderEventAt)
+    }
     binding.recyclerTimeline.layoutManager = LinearLayoutManager(requireContext())
     binding.recyclerTimeline.adapter = adapter
 
@@ -50,10 +53,18 @@ class TimelineFragment : Fragment() {
     binding.btnNext.setOnClickListener { viewModel.nextDay() }
     binding.btnRetry.setOnClickListener { viewModel.refresh() }
 
-    // Collect UI state
+    // Collect UI state and nap creation results
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state -> updateUI(state) }
+        launch { viewModel.uiState.collect { state -> updateUI(state) } }
+        launch {
+          viewModel.napCreationResult.collect { message ->
+            if (message != null) {
+              Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+              viewModel.clearNapCreationResult()
+            }
+          }
+        }
       }
     }
   }

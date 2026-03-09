@@ -32,6 +32,8 @@ class TimelineViewModelTest {
 
   private val testDispatcher = StandardTestDispatcher()
   private val mockAnalyticsRepository: AnalyticsRepository = mockk()
+  private val mockNapsRepository: net.poopyfeed.pf.data.repository.CachedNapsRepository = mockk()
+  private val mockSyncScheduler: net.poopyfeed.pf.sync.SyncScheduler = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
   private lateinit var viewModel: TimelineViewModel
 
@@ -51,7 +53,13 @@ class TimelineViewModelTest {
     val savedStateHandle = SavedStateHandle().apply { set("childId", 123) }
     coEvery { mockAnalyticsRepository.getTimeline(123) } returns
         ApiResult.Success(PaginatedResponse(count = events.size, results = events))
-    viewModel = TimelineViewModel(savedStateHandle, mockAnalyticsRepository, mockContext)
+    viewModel =
+        TimelineViewModel(
+            savedStateHandle,
+            mockAnalyticsRepository,
+            mockNapsRepository,
+            mockSyncScheduler,
+            mockContext)
     testDispatcher.scheduler.advanceUntilIdle()
   }
 

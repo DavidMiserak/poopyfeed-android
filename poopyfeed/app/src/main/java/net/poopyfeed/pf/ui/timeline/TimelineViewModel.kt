@@ -16,14 +16,21 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.models.TimelineEvent
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
+import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.sync.SyncScheduler
 
 /** An item in the timeline list — either a real event or a gap marker between events. */
 sealed interface TimelineItem {
   data class Event(val event: TimelineEvent) : TimelineItem
 
-  data class Gap(val durationMinutes: Long) : TimelineItem
+  data class Gap(
+      val durationMinutes: Long,
+      val newerEventAt: String,
+      val olderEventAt: String,
+  ) : TimelineItem
 }
 
 /** UI state for the timeline screen. */
@@ -53,6 +60,8 @@ class TimelineViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val analyticsRepository: AnalyticsRepository,
+    private val napsRepository: CachedNapsRepository,
+    private val syncScheduler: SyncScheduler,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -135,7 +144,12 @@ constructor(
         if (newerMs != null && olderMs != null) {
           val gapMinutes = (newerMs - olderMs) / 60_000
           if (gapMinutes >= GAP_THRESHOLD_MINUTES) {
-            items.add(TimelineItem.Gap(gapMinutes))
+            items.add(
+                TimelineItem.Gap(
+                    durationMinutes = gapMinutes,
+                    newerEventAt = events[i].at,
+                    olderEventAt = events[i + 1].at,
+                ))
           }
         }
       }
@@ -209,6 +223,52 @@ constructor(
             Instant.parse("${this}T00:00:00Z").toEpochMilliseconds() - (days * 86_400_000L))
         .toLocalDateTime(TimeZone.currentSystemDefault())
         .date
+  }
+
+  /** One-shot event for nap creation result. Null = idle, non-null = show message then clear. */
+  private val _napCreationResult: MutableStateFlow<String?> = MutableStateFlow(null)
+  val napCreationResult: Flow<String?> = _napCreationResult
+
+  /** Clears the nap creation result after it has been consumed by the UI. */
+  fun clearNapCreationResult() {
+    _napCreationResult.value = null
+  }
+
+  /**
+   * Creates a completed nap covering a time gap. Start is [newerEventAt] minus 1 minute (the older
+   * boundary of the gap), end is [olderEventAt] plus 1 minute (the newer boundary), with 1-minute
+   * offsets to avoid timestamp conflicts with adjacent events.
+   */
+  fun createNapFromGap(newerEventAt: String, olderEventAt: String) {
+    viewModelScope.launch {
+      val newerMs = parseEpochMs(newerEventAt) ?: return@launch
+      val olderMs = parseEpochMs(olderEventAt) ?: return@launch
+
+      // Nap starts 1 min after the older event, ends 1 min before the newer event
+      val napStartMs = olderMs + 60_000
+      val napEndMs = newerMs - 60_000
+
+      if (napEndMs <= napStartMs) {
+        _napCreationResult.value = "Gap too small to add a nap"
+        return@launch
+      }
+
+      val napStart = Instant.fromEpochMilliseconds(napStartMs).toString()
+      val napEnd = Instant.fromEpochMilliseconds(napEndMs).toString()
+
+      val request = CreateNapRequest(start_time = napStart, end_time = napEnd)
+      when (val result = napsRepository.createNap(childId, request)) {
+        is ApiResult.Success -> {
+          syncScheduler.enqueueIfPending()
+          _napCreationResult.value = "Nap added"
+          refresh()
+        }
+        is ApiResult.Error -> {
+          _napCreationResult.value = result.error.getUserMessage(context)
+        }
+        is ApiResult.Loading -> {}
+      }
+    }
   }
 
   /** Moves to the previous day (increases dayOffset). */
