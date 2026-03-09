@@ -172,7 +172,8 @@ interface PoopyFeedApiService {
   @GET("children/{childId}/naps/")
   suspend fun listNaps(
       @Path("childId") childId: Int,
-      @Query("page") page: Int = 1
+      @Query("page") page: Int = 1,
+      @Query("page_size") pageSize: Int = 20
   ): PaginatedResponse<NapListResponse>
 
   /** Create a new nap record. POST /api/v1/children/{childId}/naps/ */
