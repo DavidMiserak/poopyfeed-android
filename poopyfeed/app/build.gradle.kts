@@ -33,7 +33,7 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             buildConfigField("String", "API_BASE_URL", "\"https://poopyfeed.net/api/v1/\"")
             buildConfigField("String", "WEB_BASE_URL", "\"https://poopyfeed.net/\"")

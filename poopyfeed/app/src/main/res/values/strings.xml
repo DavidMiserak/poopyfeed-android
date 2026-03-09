@@ -147,7 +147,20 @@
     <string name="child_detail_today_oz">%1$.1f oz</string>
     <string name="child_detail_today_nap_minutes">%1$dh %2$dm total</string>
     <string name="child_detail_today_nap_minutes_short">%1$dm total</string>
-    <string name="child_detail_today_diapers_detail">%1$d wet, %2$d dirty, %3$d both</string>
+    <!-- Composed from plurals in code for i18n -->
+    <string name="child_detail_today_diapers_detail_format">%1$s, %2$s, %3$s</string>
+    <plurals name="child_detail_today_diapers_wet">
+        <item quantity="one">%d wet</item>
+        <item quantity="other">%d wet</item>
+    </plurals>
+    <plurals name="child_detail_today_diapers_dirty">
+        <item quantity="one">%d dirty</item>
+        <item quantity="other">%d dirty</item>
+    </plurals>
+    <plurals name="child_detail_today_diapers_both">
+        <item quantity="one">%d both</item>
+        <item quantity="other">%d both</item>
+    </plurals>
     <string name="child_detail_edit_button">Edit</string>
     <string name="child_detail_share_button">Share</string>
     <string name="child_detail_delete_button">Delete Child</string>

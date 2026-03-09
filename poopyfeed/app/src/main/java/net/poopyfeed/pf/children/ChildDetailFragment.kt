@@ -240,12 +240,30 @@ class ChildDetailFragment : Fragment() {
       // Diapers detail: wet, dirty, and both (hide if zero)
       if (today.diapers.count > 0) {
         binding.textTodayDiapersDetail.visibility = View.VISIBLE
+        val wetStr =
+            resources.getQuantityString(
+                R.plurals.child_detail_today_diapers_wet,
+                today.diapers.wet,
+                today.diapers.wet,
+            )
+        val dirtyStr =
+            resources.getQuantityString(
+                R.plurals.child_detail_today_diapers_dirty,
+                today.diapers.dirty,
+                today.diapers.dirty,
+            )
+        val bothStr =
+            resources.getQuantityString(
+                R.plurals.child_detail_today_diapers_both,
+                today.diapers.both,
+                today.diapers.both,
+            )
         binding.textTodayDiapersDetail.text =
             getString(
-                R.string.child_detail_today_diapers_detail,
-                today.diapers.wet,
-                today.diapers.dirty,
-                today.diapers.both,
+                R.string.child_detail_today_diapers_detail_format,
+                wetStr,
+                dirtyStr,
+                bothStr,
             )
       } else {
         binding.textTodayDiapersDetail.visibility = View.GONE
