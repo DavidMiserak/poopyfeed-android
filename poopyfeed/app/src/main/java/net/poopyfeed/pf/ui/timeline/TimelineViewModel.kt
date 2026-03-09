@@ -182,12 +182,15 @@ constructor(
         if (nextEvent.gapAfterMinutes != null &&
             nextEvent.gapAfterStart != null &&
             nextEvent.gapAfterEnd != null) {
-          items.add(
-              TimelineItem.Gap(
-                  durationMinutes = nextEvent.gapAfterMinutes,
-                  newerEventAt = nextEvent.gapAfterStart,
-                  olderEventAt = nextEvent.gapAfterEnd,
-              ))
+          val (newer, older) = orderGapBoundaries(nextEvent.gapAfterStart, nextEvent.gapAfterEnd)
+          if (newer != null && older != null) {
+            items.add(
+                TimelineItem.Gap(
+                    durationMinutes = nextEvent.gapAfterMinutes,
+                    newerEventAt = newer,
+                    olderEventAt = older,
+                ))
+          }
         }
       }
     }
@@ -199,6 +202,24 @@ constructor(
       Instant.parse(isoString).toEpochMilliseconds()
     } catch (_: Exception) {
       null
+    }
+  }
+
+  /**
+   * Returns (newerEventAt, olderEventAt) so that createNapFromGap and the UI always get the correct
+   * order regardless of whether the backend sends gap_after_start/end in chronological order or as
+   * (newer, older).
+   */
+  private fun orderGapBoundaries(
+      gapAfterStart: String,
+      gapAfterEnd: String,
+  ): Pair<String?, String?> {
+    val startMs = parseEpochMs(gapAfterStart) ?: return Pair(null, null)
+    val endMs = parseEpochMs(gapAfterEnd) ?: return Pair(null, null)
+    return if (startMs >= endMs) {
+      Pair(gapAfterStart, gapAfterEnd)
+    } else {
+      Pair(gapAfterEnd, gapAfterStart)
     }
   }
 

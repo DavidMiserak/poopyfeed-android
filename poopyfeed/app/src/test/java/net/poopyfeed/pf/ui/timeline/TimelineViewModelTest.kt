@@ -555,6 +555,36 @@ class TimelineViewModelTest {
   }
 
   @Test
+  fun `gap with backend sending start before end still yields correct newer and older for Add nap`() =
+      runTest {
+        val today = getTodayDateString()
+        // Backend sends gap in chronological order: gap_after_start = older, gap_after_end = newer
+        val events =
+            listOf(
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T14:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = null),
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T10:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = 240L,
+                    gapAfterStart = "${today}T10:00:00Z",
+                    gapAfterEnd = "${today}T14:00:00Z"),
+            )
+        createViewModel(events = events)
+        val state = viewModel.uiState.first()
+        assertIs<TimelineUiState.Ready>(state)
+        val gaps = state.items.filterIsInstance<TimelineItem.Gap>()
+        assertEquals(1, gaps.size)
+        assertEquals("${today}T14:00:00Z", gaps[0].newerEventAt)
+        assertEquals("${today}T10:00:00Z", gaps[0].olderEventAt)
+        assertTrue(gaps[0].showAddNapButton)
+      }
+
+  @Test
   fun `createNapFromGap with valid gap calls repository with 1 min buffers and emits Nap added`() =
       runTest {
         createViewModel(events = emptyList())
