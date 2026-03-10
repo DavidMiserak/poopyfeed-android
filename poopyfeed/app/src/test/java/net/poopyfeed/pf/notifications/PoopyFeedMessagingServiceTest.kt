@@ -61,6 +61,14 @@ class PoopyFeedMessagingServiceTest {
   }
 
   @Test
+  fun `getChannelIdForEventType routes activity_alert to activity_alerts channel`() {
+    // Verify correct channel for activity alerts (most common event type)
+    val channelId = PoopyFeedMessagingService.getChannelIdForEventType("activity_alert")
+    assertEquals(PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS, channelId)
+    assertEquals("activity_alerts", channelId)
+  }
+
+  @Test
   fun `onMessageReceived returns early when title is missing`() {
     // Arrange: Message without title
     every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
