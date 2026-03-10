@@ -18,6 +18,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.MainActivity
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.QuietHours
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
@@ -37,6 +38,7 @@ class PoopyFeedMessagingService : FirebaseMessagingService() {
 
   @Inject lateinit var notificationsRepository: NotificationsRepository
   @Inject lateinit var tokenManager: TokenManager
+  @Inject lateinit var analyticsTracker: AnalyticsTracker
 
   private val serviceJob = SupervisorJob()
   private val serviceScope = CoroutineScope(serviceJob + Dispatchers.IO)
@@ -86,6 +88,7 @@ class PoopyFeedMessagingService : FirebaseMessagingService() {
   }
 
   private fun showNotification(title: String, body: String, eventType: String, childId: String?) {
+    analyticsTracker.logNotificationOpened(eventType, childId)
     val channelId = getChannelId(eventType)
 
     // Build deep link URI from child_id (if present)

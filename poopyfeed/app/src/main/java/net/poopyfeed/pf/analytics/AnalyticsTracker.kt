@@ -130,13 +130,13 @@ class AnalyticsTracker @Inject constructor(private val firebaseAnalytics: Fireba
    * Logs when a push notification is opened.
    *
    * @param eventType The type of event the notification was about (e.g., "feeding", "nap").
-   * @param childId The ID of the child the event is related to.
+   * @param childId The ID of the child the event is related to (optional).
    */
-  fun logNotificationOpened(eventType: String, childId: String) {
+  fun logNotificationOpened(eventType: String, childId: String?) {
     val bundle =
         Bundle().apply {
           putString("event_type", eventType)
-          putString("item_id", childId)
+          if (childId != null) putString("item_id", childId)
         }
     firebaseAnalytics.logEvent("notification_opened", bundle)
   }
