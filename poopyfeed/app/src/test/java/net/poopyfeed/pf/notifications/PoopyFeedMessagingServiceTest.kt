@@ -64,4 +64,29 @@ class PoopyFeedMessagingServiceTest {
     service.onMessageReceived(remoteMessage) // Should not throw
     assertTrue(true, "Message was processed without error")
   }
+
+  @Test
+  fun `onMessageReceived with pattern_alert processes message with child_id`() {
+    // Arrange
+    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
+    every { mockTokenManager.getToken() } returns "fake_token"
+
+    service =
+        PoopyFeedMessagingService().apply {
+          notificationsRepository = mockNotificationsRepository
+          tokenManager = mockTokenManager
+        }
+
+    val messageData =
+        mapOf(
+            "title" to "Feeding Pattern Alert",
+            "body" to "Feeding intervals are getting longer",
+            "event_type" to "pattern_alert",
+            "child_id" to "child-456")
+    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
+
+    // Act & Assert - verify no exception thrown
+    service.onMessageReceived(remoteMessage) // Should not throw
+    assertTrue(true, "Pattern alert message was processed without error")
+  }
 }
