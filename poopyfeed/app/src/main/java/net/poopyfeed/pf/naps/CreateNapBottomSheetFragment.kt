@@ -50,6 +50,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     updateTimestampDisplay()
     updateEndTimeDisplay()
     updateEndTimeButtonLabel()
+    validateForm() // Initial validation
     binding.buttonChangeTime.setOnClickListener { showStartDateTimePickers() }
     binding.buttonChangeEndTime.setOnClickListener { showEndDateTimePickers() }
     binding.buttonStartNap.setOnClickListener { startNap() }
@@ -59,13 +60,17 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
         viewModel.uiState.collect { state ->
           when (state) {
             is CreateNapUiState.Idle -> {
-              binding.buttonStartNap.isEnabled = true
+              binding.buttonStartNap.isEnabled = isFormValid()
+              binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
               binding.buttonStartNap.visibility = View.VISIBLE
               binding.progressSaving.visibility = View.GONE
+              validateForm() // Re-validate on return to idle
             }
             is CreateNapUiState.Saving -> {
               binding.buttonStartNap.isEnabled = false
-              binding.buttonStartNap.visibility = View.GONE
+              binding.buttonStartNap.text =
+                  getString(R.string.create_nap_start_button) // Keep text, add progress
+              binding.buttonStartNap.visibility = View.VISIBLE
               binding.progressSaving.visibility = View.VISIBLE
             }
             is CreateNapUiState.Success -> {
@@ -74,6 +79,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
             }
             is CreateNapUiState.Error -> {
               binding.buttonStartNap.isEnabled = true
+              binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
               binding.buttonStartNap.visibility = View.VISIBLE
               binding.progressSaving.visibility = View.GONE
               Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
@@ -116,6 +122,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     showDateTimePickers(selectedTimestamp) {
       selectedTimestamp = it
       updateTimestampDisplay()
+      validateForm() // Validate after time change for real-time feedback
     }
   }
 
@@ -125,6 +132,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
       selectedEndTimestamp = it
       updateEndTimeDisplay()
       updateEndTimeButtonLabel()
+      validateForm() // Validate after time change for real-time feedback
     }
   }
 
@@ -160,22 +168,41 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun startNap() {
-    val endTime = selectedEndTimestamp
-    if (endTime != null) {
-      try {
-        val startMs = kotlinx.datetime.Instant.parse(selectedTimestamp).toEpochMilliseconds()
-        val endMs = kotlinx.datetime.Instant.parse(endTime).toEpochMilliseconds()
-        if (endMs <= startMs) {
-          Snackbar.make(
-                  binding.root,
-                  getString(R.string.create_nap_end_must_be_after_start),
-                  Snackbar.LENGTH_LONG)
-              .show()
-          return
-        }
-      } catch (_: Exception) {}
+    // Validate form before submitting
+    if (!isFormValid()) {
+      Snackbar.make(
+              binding.root,
+              getString(R.string.create_nap_end_must_be_after_start),
+              Snackbar.LENGTH_LONG)
+          .show()
+      return
     }
     viewModel.createNap(selectedTimestamp, selectedEndTimestamp)
+  }
+
+  /** Check if form is valid (end_time after start_time if end_time is set). */
+  private fun isFormValid(): Boolean {
+    val endTime = selectedEndTimestamp ?: return true // No end time = valid
+    return try {
+      val startMs = kotlinx.datetime.Instant.parse(selectedTimestamp).toEpochMilliseconds()
+      val endMs = kotlinx.datetime.Instant.parse(endTime).toEpochMilliseconds()
+      endMs > startMs
+    } catch (_: Exception) {
+      false // Invalid timestamp format
+    }
+  }
+
+  /** Validate form and update button state accordingly. */
+  private fun validateForm() {
+    val isValid = isFormValid()
+    binding.buttonStartNap.isEnabled = isValid
+    // Add visual feedback: you could add a red border to end_time field if invalid
+    if (!isValid && selectedEndTimestamp != null) {
+      binding.textEndTime.setTextColor(binding.root.context.getColor(android.R.color.holo_red_dark))
+    } else {
+      binding.textEndTime.setTextColor(
+          binding.root.context.getColorStateList(android.R.color.darker_gray))
+    }
   }
 
   override fun onDestroyView() {

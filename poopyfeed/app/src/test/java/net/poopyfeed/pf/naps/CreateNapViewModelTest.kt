@@ -129,7 +129,7 @@ class CreateNapViewModelTest {
       }
 
   @Test
-  fun `createNap does not log analytics when end_time is null`() =
+  fun `createNap logs analytics with -1 duration when end_time is null (open-ended nap)`() =
       runTest(testDispatcher) {
         val mockNap = TestFixtures.mockNap(end_time = null)
         coEvery { mockRepository.createNap(1, any()) } returns ApiResult.Success(mockNap)
@@ -137,6 +137,39 @@ class CreateNapViewModelTest {
         viewModel.createNap("2024-01-15T12:00:00Z")
         advanceUntilIdle()
 
-        verify(exactly = 0) { mockAnalyticsTracker.logNapLogged(any()) }
+        // Open-ended naps log with -1 duration
+        verify { mockAnalyticsTracker.logNapLogged(-1) }
+      }
+
+  @Test
+  fun `createNap logs error analytics when API fails`() =
+      runTest(testDispatcher) {
+        coEvery { mockRepository.createNap(1, any()) } returns
+            ApiResult.Error(ApiError.NetworkError("Network failed"))
+
+        viewModel.createNap("2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        // Verify error is logged to analytics
+        verify { mockAnalyticsTracker.logError(any(), any()) }
+        assertIs<CreateNapUiState.Error>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createNap logs error analytics when duration calculation fails`() =
+      runTest(testDispatcher) {
+        // Create a nap with invalid timestamp to trigger parsing error
+        val mockNap =
+            TestFixtures.mockNap(start_time = "invalid", end_time = "2024-01-15T14:00:00Z")
+        coEvery { mockRepository.createNap(1, any()) } returns ApiResult.Success(mockNap)
+
+        viewModel.createNap("2024-01-15T12:00:00Z", "2024-01-15T14:00:00Z")
+        advanceUntilIdle()
+
+        // Verify error is logged for duration calculation failure
+        verify { mockAnalyticsTracker.logError("NapDurationCalculationError", any()) }
+        // But nap is still logged with 0 duration
+        verify { mockAnalyticsTracker.logNapLogged(0) }
+        assertIs<CreateNapUiState.Success>(viewModel.uiState.value)
       }
 }

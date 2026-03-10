@@ -126,43 +126,35 @@ class NapsListFragment : Fragment() {
       }
     }
 
-    // Handle post-creation refresh
+    // Handle post-creation refresh (one-shot: clear flag after consuming)
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.getStateFlow("nap_created", false)
-            ?.collect { created ->
-              if (created) {
-                adapter.refresh()
-                binding.recyclerNaps.scrollToPosition(0)
-                findNavController()
-                    .currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("nap_created", false)
-              }
-            }
+        val backStackEntry = findNavController().currentBackStackEntry ?: return@repeatOnLifecycle
+        val savedStateHandle = backStackEntry.savedStateHandle
+        savedStateHandle.getStateFlow("nap_created", false).collect { created ->
+          if (created) {
+            adapter.refresh()
+            binding.recyclerNaps.scrollToPosition(0)
+            // Clear flag immediately to prevent duplicate refreshes on config change
+            savedStateHandle.set("nap_created", false)
+          }
+        }
       }
     }
 
-    // Handle post-update refresh
+    // Handle post-update refresh (one-shot: clear flag after consuming)
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.getStateFlow("nap_updated", false)
-            ?.collect { updated ->
-              if (updated) {
-                adapter.refresh()
-                binding.recyclerNaps.scrollToPosition(0)
-                findNavController()
-                    .currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("nap_updated", false)
-              }
-            }
+        val backStackEntry = findNavController().currentBackStackEntry ?: return@repeatOnLifecycle
+        val savedStateHandle = backStackEntry.savedStateHandle
+        savedStateHandle.getStateFlow("nap_updated", false).collect { updated ->
+          if (updated) {
+            adapter.refresh()
+            binding.recyclerNaps.scrollToPosition(0)
+            // Clear flag immediately to prevent duplicate refreshes on config change
+            savedStateHandle.set("nap_updated", false)
+          }
+        }
       }
     }
   }

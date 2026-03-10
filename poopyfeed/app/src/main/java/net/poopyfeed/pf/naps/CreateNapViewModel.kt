@@ -17,6 +17,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.util.handleAndLogError
 
 /** UI state for the create nap bottom sheet. */
 sealed interface CreateNapUiState {
@@ -44,7 +45,9 @@ constructor(
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
-  private val childId: Int = checkNotNull(savedStateHandle["childId"])
+  private val childId: Int =
+      savedStateHandle.get<Int>("childId")
+          ?: throw IllegalArgumentException("CreateNapViewModel requires childId argument")
 
   private val _uiState: MutableStateFlow<CreateNapUiState> = MutableStateFlow(CreateNapUiState.Idle)
   val uiState: StateFlow<CreateNapUiState> = _uiState.asStateFlow()
@@ -58,21 +61,29 @@ constructor(
           when (result) {
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
-              // Calculate duration if end_time is present
               val nap = result.data
-              if (nap.end_time != null) {
-                try {
-                  val startMs = Instant.parse(nap.start_time).toEpochMilliseconds()
-                  val endMs = Instant.parse(nap.end_time).toEpochMilliseconds()
-                  val durationMinutes = ((endMs - startMs) / (60 * 1000)).toInt()
-                  analyticsTracker.logNapLogged(durationMinutes)
-                } catch (e: Exception) {
-                  // Silent fail - don't block UI on analytics error
-                }
-              }
+              // Calculate and log duration; use -1 for open-ended naps
+              val durationMinutes =
+                  if (nap.end_time != null) {
+                    try {
+                      val startMs = Instant.parse(nap.start_time).toEpochMilliseconds()
+                      val endMs = Instant.parse(nap.end_time).toEpochMilliseconds()
+                      ((endMs - startMs) / (60 * 1000)).toInt()
+                    } catch (e: Exception) {
+                      analyticsTracker.logError(
+                          "NapDurationCalculationError", e.message ?: "Unknown exception")
+                      0 // Log with 0 duration if calculation fails
+                    }
+                  } else {
+                    -1 // Open-ended nap (no end_time set)
+                  }
+              analyticsTracker.logNapLogged(durationMinutes)
               CreateNapUiState.Success
             }
-            is ApiResult.Error -> CreateNapUiState.Error(result.error.getUserMessage(context))
+            is ApiResult.Error -> {
+              handleAndLogError(analyticsTracker, result.error, "createNap")
+              CreateNapUiState.Error(result.error.getUserMessage(context))
+            }
             is ApiResult.Loading -> CreateNapUiState.Saving
           }
     }
