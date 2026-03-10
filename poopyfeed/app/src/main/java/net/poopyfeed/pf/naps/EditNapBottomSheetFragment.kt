@@ -14,11 +14,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Calendar
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.databinding.FragmentEditNapBottomSheetBinding
+import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.util.DatePickerUtils
 import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
@@ -33,6 +35,7 @@ class EditNapBottomSheetFragment : BottomSheetDialogFragment() {
     get() = _binding!!
 
   private val viewModel: EditNapViewModel by viewModels()
+  @Inject lateinit var tokenManager: TokenManager
   private var selectedStartTime: String = ""
   private var selectedEndTime: String? = null
   private var formPrefilled: Boolean = false
@@ -142,30 +145,26 @@ class EditNapBottomSheetFragment : BottomSheetDialogFragment() {
       initialIso: String,
       onSelected: (String) -> Unit,
   ) {
-    val cal = Calendar.getInstance()
-    try {
-      val instant = kotlinx.datetime.Instant.parse(initialIso)
-      cal.timeInMillis = instant.toEpochMilliseconds()
-    } catch (_: Exception) {}
+    val tzId = tokenManager.getProfileTimezone()
+    val initMillis = DatePickerUtils.datePickerSelectionMillis(initialIso, tzId)
+    val (pickerHour, pickerMinute) = DatePickerUtils.timePickerHourMinute(initialIso, tzId)
+
     val datePicker =
         com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
-            .setSelection(cal.timeInMillis)
+            .setSelection(initMillis)
             .build()
     datePicker.addOnPositiveButtonClickListener { millis ->
-      cal.timeInMillis = millis
+      val (year, month, day) = DatePickerUtils.extractSelectedDate(millis)
       val timePicker =
           MaterialTimePicker.Builder()
               .setTimeFormat(TimeFormat.CLOCK_12H)
-              .setHour(cal.get(Calendar.HOUR_OF_DAY))
-              .setMinute(cal.get(Calendar.MINUTE))
+              .setHour(pickerHour)
+              .setMinute(pickerMinute)
               .build()
       timePicker.addOnPositiveButtonClickListener {
-        cal.set(Calendar.HOUR_OF_DAY, timePicker.hour)
-        cal.set(Calendar.MINUTE, timePicker.minute)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        val iso = kotlinx.datetime.Instant.fromEpochMilliseconds(cal.timeInMillis).toString()
-        onSelected(iso)
+        val utcIso =
+            DatePickerUtils.toUtcIso(year, month, day, timePicker.hour, timePicker.minute, tzId)
+        onSelected(utcIso)
       }
       timePicker.show(parentFragmentManager, "${tagPrefix}_time")
     }

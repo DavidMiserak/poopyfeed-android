@@ -288,24 +288,23 @@ class CreateNapViewModelTest {
       }
 
   @Test
-  fun `getDatePickerSelectionMillisForProfileTz returns correct date for midnight boundary`() =
+  fun `getDatePickerSelectionMillisForProfileTz returns midnight UTC of profile date for boundary`() =
       runTest(testDispatcher) {
         // UTC: 2024-03-10 02:00:00Z
         // Profile TZ: America/Los_Angeles (UTC-8)
         // Expected profile date: 2024-03-09
+        // MaterialDatePicker expects midnight UTC, so should return 2024-03-09T00:00:00Z
         val utcTime = "2024-03-10T02:00:00Z"
         val selectionMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
 
-        // Verify the returned millis represents March 9 in profile timezone
-        // by converting back to date
+        // MaterialDatePicker uses UTC internally, so verify date in UTC
         val instant = kotlinx.datetime.Instant.fromEpochMilliseconds(selectionMillis)
-        val localDateTime =
-            instant.toLocalDateTime(kotlinx.datetime.TimeZone.of("America/Los_Angeles"))
+        val utcDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
 
-        assert(localDateTime.dayOfMonth == 9) { "Expected day 9, got ${localDateTime.dayOfMonth}" }
-        assert(localDateTime.monthNumber == 3) {
-          "Expected month 3, got ${localDateTime.monthNumber}"
-        }
+        assert(utcDateTime.dayOfMonth == 9) { "Expected day 9, got ${utcDateTime.dayOfMonth}" }
+        assert(utcDateTime.monthNumber == 3) { "Expected month 3, got ${utcDateTime.monthNumber}" }
+        // Should be midnight UTC
+        assert(utcDateTime.hour == 0) { "Expected hour 0 (midnight UTC), got ${utcDateTime.hour}" }
       }
 
   @Test
@@ -317,12 +316,136 @@ class CreateNapViewModelTest {
         val utcTime = "2024-03-15T12:00:00Z"
         val selectionMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
 
+        // Verify date in UTC (matching MaterialDatePicker's internal representation)
         val instant = kotlinx.datetime.Instant.fromEpochMilliseconds(selectionMillis)
-        val localDateTime =
-            instant.toLocalDateTime(kotlinx.datetime.TimeZone.of("America/Los_Angeles"))
+        val utcDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
 
-        assert(localDateTime.dayOfMonth == 15) {
-          "Expected day 15, got ${localDateTime.dayOfMonth}"
+        assert(utcDateTime.dayOfMonth == 15) { "Expected day 15, got ${utcDateTime.dayOfMonth}" }
+      }
+
+  @Test
+  fun `convertProfileTimezoneToUtc converts date and time in profile timezone to UTC correctly`() =
+      runTest(testDispatcher) {
+        // User is in Los Angeles (UTC-8)
+        // They pick March 9 at 15:00 in the profile timezone picker
+        // March 9 15:00 LA time = March 9 23:00 UTC
+        val profileLocalDateTime = "2024-03-09T15:00:00"
+        val resultUtc = viewModel.convertLocalTimeToUtc(profileLocalDateTime)
+
+        // Verify it converts correctly to UTC
+        val instant = kotlinx.datetime.Instant.parse(resultUtc)
+        val utcLocalDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+
+        assert(utcLocalDateTime.dayOfMonth == 9) {
+          "Expected UTC day 9, got ${utcLocalDateTime.dayOfMonth}"
         }
+        assert(utcLocalDateTime.hour == 23) { "Expected UTC hour 23, got ${utcLocalDateTime.hour}" }
+      }
+
+  @Test
+  fun `date picker e2e flow simulates MaterialDatePicker UTC behavior`() =
+      runTest(testDispatcher) {
+        // Scenario: Current UTC is 2024-03-10T02:00:00Z
+        // Profile TZ: America/Los_Angeles (UTC-8) → local date is March 9
+        // User wants to log nap for March 9 at 20:00 (8 PM) LA time
+        // Expected UTC result: 2024-03-10T04:00:00Z
+
+        val utcTime = "2024-03-10T02:00:00Z"
+
+        // Step 1: Get millis to initialize MaterialDatePicker
+        val pickerInitMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
+
+        // Verify picker will show March 9 (read back in UTC, matching picker's behavior)
+        val pickerInitDate =
+            kotlinx.datetime.Instant.fromEpochMilliseconds(pickerInitMillis)
+                .toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+        assert(pickerInitDate.dayOfMonth == 9) {
+          "Picker should show March 9, got ${pickerInitDate.dayOfMonth}"
+        }
+
+        // Step 2: User selects March 9 → MaterialDatePicker returns midnight UTC of March 9
+        val pickerReturnedMillis = pickerInitMillis // User keeps same date
+
+        // Step 3: Fragment extracts date from returned millis in UTC
+        // (This is what the fixed fragment code does)
+        val selectedDate =
+            kotlinx.datetime.Instant.fromEpochMilliseconds(pickerReturnedMillis)
+                .toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+        assert(selectedDate.dayOfMonth == 9) {
+          "Selected date should be March 9, got ${selectedDate.dayOfMonth}"
+        }
+
+        // Step 4: User picks 20:00 in time picker (profile TZ time)
+        // Fragment builds: date from UTC extraction + time from picker
+        val selectedProfileDateTime =
+            "${selectedDate.year}-${String.format("%02d", selectedDate.monthNumber)}-${String.format("%02d", selectedDate.dayOfMonth)}T20:00:00"
+
+        // Step 5: Convert profile TZ datetime to UTC
+        val resultUtc = viewModel.convertLocalTimeToUtc(selectedProfileDateTime)
+
+        // Verify: March 9 20:00 LA (UTC-8) = March 10 04:00 UTC
+        val resultInstant = kotlinx.datetime.Instant.parse(resultUtc)
+        val resultUtcTime = resultInstant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+
+        assert(resultUtcTime.dayOfMonth == 10) {
+          "Expected UTC day 10, got ${resultUtcTime.dayOfMonth}"
+        }
+        assert(resultUtcTime.hour == 4) { "Expected UTC hour 4, got ${resultUtcTime.hour}" }
+      }
+
+  @Test
+  fun `date picker e2e flow with US Eastern timezone at 4am`() =
+      runTest(testDispatcher) {
+        // Reproduces exact user bug: US/Eastern, select March 9 at 4 AM
+        // Previously showed March 8 at 4 AM
+
+        // Setup with US/Eastern timezone
+        every { mockTokenManager.getProfileTimezone() } returns "US/Eastern"
+        val easternViewModel =
+            CreateNapViewModel(
+                savedStateHandle,
+                mockRepository,
+                mockSyncScheduler,
+                mockAnalyticsTracker,
+                mockContext,
+                mockTokenManager)
+
+        // Current time doesn't matter much, but let's say it's March 9 noon ET
+        // March 9 12:00 ET = March 9 17:00 UTC
+        val utcTime = "2024-03-09T17:00:00Z"
+
+        // Step 1: Get millis for date picker (should show March 9)
+        val pickerInitMillis = easternViewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
+        val pickerDate =
+            kotlinx.datetime.Instant.fromEpochMilliseconds(pickerInitMillis)
+                .toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+        assert(pickerDate.dayOfMonth == 9) {
+          "Picker should show March 9, got ${pickerDate.dayOfMonth}"
+        }
+
+        // Step 2: User selects March 9 → picker returns midnight UTC March 9
+        val pickerReturnedMillis = pickerInitMillis
+
+        // Step 3: Extract date in UTC (what the fixed fragment does)
+        val selectedDate =
+            kotlinx.datetime.Instant.fromEpochMilliseconds(pickerReturnedMillis)
+                .toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+
+        // Step 4: User selects 4:00 AM in time picker
+        val selectedProfileDateTime =
+            "${selectedDate.year}-${String.format("%02d", selectedDate.monthNumber)}-${String.format("%02d", selectedDate.dayOfMonth)}T04:00:00"
+
+        // Step 5: Convert to UTC
+        val resultUtc = easternViewModel.convertLocalTimeToUtc(selectedProfileDateTime)
+
+        // March 9 04:00 ET (UTC-5) = March 9 09:00 UTC
+        val resultInstant = kotlinx.datetime.Instant.parse(resultUtc)
+        val resultUtcTime = resultInstant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC)
+
+        // THE BUG: previously this showed March 8 instead of March 9
+        assert(resultUtcTime.dayOfMonth == 9) {
+          "Expected UTC day 9 (March 9 4AM ET -> March 9 9AM UTC), got ${resultUtcTime.dayOfMonth}"
+        }
+        assert(resultUtcTime.hour == 9) { "Expected UTC hour 9, got ${resultUtcTime.hour}" }
       }
 }

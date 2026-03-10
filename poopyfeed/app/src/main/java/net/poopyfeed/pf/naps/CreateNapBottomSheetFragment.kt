@@ -14,11 +14,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Calendar
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateNapBottomSheetBinding
+import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.util.DatePickerUtils
 import net.poopyfeed.pf.util.formatTimestampForDisplay
 
 /**
@@ -33,6 +35,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     get() = _binding!!
 
   private val viewModel: CreateNapViewModel by viewModels()
+  @Inject lateinit var tokenManager: TokenManager
   private var selectedTimestamp: String = Clock.System.now().toString()
   private var selectedEndTimestamp: String? = null
 
@@ -158,45 +161,25 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun showDateTimePickers(initialIso: String, onSelected: (String) -> Unit) {
-    val cal = Calendar.getInstance()
-    try {
-      val instant = kotlinx.datetime.Instant.parse(initialIso)
-      cal.timeInMillis = instant.toEpochMilliseconds()
-    } catch (_: Exception) {}
-
-    // Convert UTC time to profile timezone for time picker display (only time, not date)
-    val (pickerHour, pickerMinute) = viewModel.getCalendarHourMinuteForPicker(initialIso)
+    val tzId = tokenManager.getProfileTimezone()
+    val initMillis = DatePickerUtils.datePickerSelectionMillis(initialIso, tzId)
+    val (pickerHour, pickerMinute) = DatePickerUtils.timePickerHourMinute(initialIso, tzId)
 
     val datePicker =
         com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
-            .setSelection(cal.timeInMillis) // Use device timezone date
+            .setSelection(initMillis)
             .build()
     datePicker.addOnPositiveButtonClickListener { millis ->
-      cal.timeInMillis = millis
+      val (year, month, day) = DatePickerUtils.extractSelectedDate(millis)
       val timePicker =
           MaterialTimePicker.Builder()
               .setTimeFormat(TimeFormat.CLOCK_12H)
-              .setHour(pickerHour) // Use profile timezone hour
-              .setMinute(pickerMinute) // Use profile timezone minute
+              .setHour(pickerHour)
+              .setMinute(pickerMinute)
               .build()
       timePicker.addOnPositiveButtonClickListener {
-        // User picked time is in profile timezone
-        cal.set(Calendar.HOUR_OF_DAY, timePicker.hour)
-        cal.set(Calendar.MINUTE, timePicker.minute)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        // Convert from profile timezone back to UTC
-        val profileLocalDateTime =
-            "${
-                String.format(
-                    "%04d-%02d-%02d",
-                    cal.get(Calendar.YEAR),
-                    cal.get(Calendar.MONTH) + 1,
-                    cal.get(Calendar.DAY_OF_MONTH)
-                )
-            }T${String.format("%02d:%02d:%02d", timePicker.hour, timePicker.minute, 0)}"
-        val utcIso = viewModel.convertLocalTimeToUtc(profileLocalDateTime)
+        val utcIso =
+            DatePickerUtils.toUtcIso(year, month, day, timePicker.hour, timePicker.minute, tzId)
         onSelected(utcIso)
       }
       timePicker.show(parentFragmentManager, "time")

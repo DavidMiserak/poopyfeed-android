@@ -153,8 +153,11 @@ constructor(
   }
 
   /**
-   * Gets the epoch milliseconds for midnight (00:00) of the date in profile timezone. Used to set
-   * MaterialDatePicker selection to the correct profile timezone date, not UTC date.
+   * Gets the epoch milliseconds for midnight UTC of the date in profile timezone. Used to set
+   * MaterialDatePicker selection to the correct profile timezone date.
+   *
+   * MaterialDatePicker uses UTC internally: setSelection() expects midnight UTC of the desired
+   * date, and the returned millis from onPositiveButtonClick is midnight UTC of the selected date.
    *
    * @param utcTime UTC ISO 8601 string
    * @return Epoch milliseconds representing midnight UTC of the profile timezone date
@@ -166,13 +169,12 @@ constructor(
       val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
       val localDate = localDateTime.date
 
-      // Create a Java LocalDateTime for midnight of the profile TZ date
+      // MaterialDatePicker expects midnight UTC for the desired date.
+      // Convert profile timezone date to midnight UTC (not midnight profile TZ).
       val javaLocalDateTime =
           JavaLocalDateTime.of(localDate.year, localDate.monthNumber, localDate.dayOfMonth, 0, 0, 0)
-      val zoneId = ZoneId.of(tzId)
-      val zonedDateTime = javaLocalDateTime.atZone(zoneId)
-      val midnightInstant = zonedDateTime.toInstant()
-      midnightInstant.toEpochMilli()
+      val zonedDateTime = javaLocalDateTime.atZone(ZoneId.of("UTC"))
+      zonedDateTime.toInstant().toEpochMilli()
     } catch (e: Exception) {
       System.currentTimeMillis() // Fallback to today
     }
