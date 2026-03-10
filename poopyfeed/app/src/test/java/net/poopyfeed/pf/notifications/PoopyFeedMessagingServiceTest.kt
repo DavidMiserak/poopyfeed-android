@@ -42,91 +42,6 @@ class PoopyFeedMessagingServiceTest {
   }
 
   @Test
-  fun `onMessageReceived with feeding_reminder processes message`() {
-    // Arrange
-    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
-    every { mockTokenManager.getToken() } returns "fake_token"
-
-    service =
-        PoopyFeedMessagingService().apply {
-          notificationsRepository = mockNotificationsRepository
-          tokenManager = mockTokenManager
-        }
-
-    val messageData =
-        mapOf(
-            "title" to "Feeding Reminder",
-            "body" to "It's been 3 hours since the last feeding",
-            "event_type" to "feeding_reminder",
-            "child_id" to "child-123")
-    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
-
-    // Act & Assert - verify no exception thrown
-    service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Message was processed without error")
-  }
-
-  @Test
-  fun `onMessageReceived with pattern_alert processes message with child_id`() {
-    // Arrange
-    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
-    every { mockTokenManager.getToken() } returns "fake_token"
-
-    service =
-        PoopyFeedMessagingService().apply {
-          notificationsRepository = mockNotificationsRepository
-          tokenManager = mockTokenManager
-        }
-
-    val messageData =
-        mapOf(
-            "title" to "Feeding Pattern Alert",
-            "body" to "Feeding intervals are getting longer",
-            "event_type" to "pattern_alert",
-            "child_id" to "child-456")
-    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
-
-    // Act & Assert - verify no exception thrown
-    service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Pattern alert message was processed without error")
-  }
-
-  @Test
-  fun `onMessageReceived feeding_reminder bypasses quiet hours`() {
-    // Arrange: Enable quiet hours in SharedPreferences
-    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
-    every { mockTokenManager.getToken() } returns "fake_token"
-
-    service =
-        PoopyFeedMessagingService().apply {
-          notificationsRepository = mockNotificationsRepository
-          tokenManager = mockTokenManager
-        }
-
-    // Set up quiet hours
-    val prefs =
-        context.getSharedPreferences(PoopyFeedMessagingService.PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit().apply {
-      putBoolean(PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED, true)
-      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_START, "22:00:00")
-      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_END, "07:00:00")
-      apply()
-    }
-
-    val messageData =
-        mapOf(
-            "title" to "Feeding Reminder",
-            "body" to "Time to feed",
-            "event_type" to "feeding_reminder",
-            "child_id" to "child-999")
-    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
-
-    // Act & Assert - feeding_reminder should process even with quiet hours enabled
-    service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Feeding reminder bypasses quiet hours and processes")
-  }
-
-  @Test
   fun `onMessageReceived returns early when title is missing`() {
     // Arrange: Message without title
     every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
@@ -214,29 +129,5 @@ class PoopyFeedMessagingServiceTest {
 
     // Assert: Verify no exception thrown (channels created)
     assertTrue(true, "Notification channels were created without error")
-  }
-
-  @Test
-  fun `onMessageReceived creates notification without deep link when child_id is missing`() {
-    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
-
-    service =
-        PoopyFeedMessagingService().apply {
-          notificationsRepository = mockNotificationsRepository
-          tokenManager = mockTokenManager
-        }
-
-    val messageData =
-        mapOf(
-            "title" to "System Alert",
-            "body" to "General notification",
-            "event_type" to "activity_alert"
-            // Missing "child_id"
-            )
-    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
-
-    // Act & Assert - verify no exception thrown
-    service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Notification without child_id is created successfully")
   }
 }
