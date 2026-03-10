@@ -10,6 +10,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import net.poopyfeed.pf.analytics.AnalyticsTracker
@@ -51,6 +53,38 @@ constructor(
 
   private val _uiState: MutableStateFlow<CreateNapUiState> = MutableStateFlow(CreateNapUiState.Idle)
   val uiState: StateFlow<CreateNapUiState> = _uiState.asStateFlow()
+
+  private val _startTime: MutableStateFlow<String> = MutableStateFlow("")
+  private val _endTime: MutableStateFlow<String?> = MutableStateFlow(null)
+
+  val proposedDuration: StateFlow<String> =
+      combine(_startTime, _endTime) { start, end ->
+            if (start.isEmpty() || end == null) {
+              return@combine ""
+            }
+            try {
+              val startMs = Instant.parse(start).toEpochMilliseconds()
+              val endMs = Instant.parse(end).toEpochMilliseconds()
+              val diffMs = endMs - startMs
+              val totalMinutes = (diffMs / (60 * 1000)).toInt()
+              when {
+                totalMinutes < 60 -> "${totalMinutes}m"
+                totalMinutes % 60 == 0 -> "${totalMinutes / 60}h"
+                else -> "${totalMinutes / 60}h ${totalMinutes % 60}m"
+              }
+            } catch (_: Exception) {
+              ""
+            }
+          }
+          .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.Eagerly, "")
+
+  fun setStartTime(startTime: String) {
+    _startTime.value = startTime
+  }
+
+  fun setEndTime(endTime: String?) {
+    _endTime.value = endTime
+  }
 
   fun createNap(startTime: String, endTime: String? = null) {
     viewModelScope.launch {

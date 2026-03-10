@@ -172,4 +172,42 @@ class CreateNapViewModelTest {
         verify { mockAnalyticsTracker.logNapLogged(0) }
         assertIs<CreateNapUiState.Success>(viewModel.uiState.value)
       }
+
+  @Test
+  fun `proposedDuration emits formatted duration when both start and end times are set`() =
+      runTest(testDispatcher) {
+        val startTime = "2024-01-15T12:00:00Z"
+        val endTime = "2024-01-15T13:45:00Z" // 1 hour 45 minutes
+        viewModel.setStartTime(startTime)
+        viewModel.setEndTime(endTime)
+        advanceUntilIdle()
+
+        val duration = viewModel.proposedDuration.value
+        assert(duration == "1h 45m") { "Expected '1h 45m', got '$duration'" }
+      }
+
+  @Test
+  fun `proposedDuration emits empty string when end time is null`() =
+      runTest(testDispatcher) {
+        val startTime = "2024-01-15T12:00:00Z"
+        viewModel.setStartTime(startTime)
+        viewModel.setEndTime(null)
+        advanceUntilIdle()
+
+        val duration = viewModel.proposedDuration.value
+        assert(duration == "") { "Expected empty string, got '$duration'" }
+      }
+
+  @Test
+  fun `proposedDuration emits only minutes when duration is less than 1 hour`() =
+      runTest(testDispatcher) {
+        val startTime = "2024-01-15T12:00:00Z"
+        val endTime = "2024-01-15T12:30:00Z" // 30 minutes
+        viewModel.setStartTime(startTime)
+        viewModel.setEndTime(endTime)
+        advanceUntilIdle()
+
+        val duration = viewModel.proposedDuration.value
+        assert(duration == "30m") { "Expected '30m', got '$duration'" }
+      }
 }

@@ -296,6 +296,7 @@
     <string name="create_nap_start_button">Start Nap</string>
     <string name="create_nap_end_not_set">Not set</string>
     <string name="create_nap_end_must_be_after_start">End time must be after start time</string>
+    <string name="create_nap_duration">Duration: %s</string>
     <string name="edit_nap_title">Edit nap</string>
     <string name="edit_nap_end_label">End time</string>
     <string name="edit_nap_set_end_time">Set end time</string>

@@ -76,15 +76,33 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/text_end_time"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/dm_sans"
-            android:textSize="@dimen/text_body_medium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="Not set" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Not set" />
+
+            <TextView
+                android:id="@+id/text_proposed_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_2"
+                android:fontFamily="@font/dm_sans"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="?attr/colorOnTertiary"
+                android:visibility="gone"
+                tools:text="Duration: 1h 45m"
+                tools:visibility="visible" />
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_change_end_time"

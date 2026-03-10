@@ -57,34 +57,42 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.uiState.collect { state ->
-          when (state) {
-            is CreateNapUiState.Idle -> {
-              binding.buttonStartNap.isEnabled = isFormValid()
-              binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
-              binding.buttonStartNap.visibility = View.VISIBLE
-              binding.progressSaving.visibility = View.GONE
-              validateForm() // Re-validate on return to idle
-            }
-            is CreateNapUiState.Saving -> {
-              binding.buttonStartNap.isEnabled = false
-              binding.buttonStartNap.text =
-                  getString(R.string.create_nap_start_button) // Keep text, add progress
-              binding.buttonStartNap.visibility = View.VISIBLE
-              binding.progressSaving.visibility = View.VISIBLE
-            }
-            is CreateNapUiState.Success -> {
-              findNavController().previousBackStackEntry?.savedStateHandle?.set("nap_created", true)
-              dismiss()
-            }
-            is CreateNapUiState.Error -> {
-              binding.buttonStartNap.isEnabled = true
-              binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
-              binding.buttonStartNap.visibility = View.VISIBLE
-              binding.progressSaving.visibility = View.GONE
-              Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+        launch {
+          viewModel.uiState.collect { state ->
+            when (state) {
+              is CreateNapUiState.Idle -> {
+                binding.buttonStartNap.isEnabled = isFormValid()
+                binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
+                binding.buttonStartNap.visibility = View.VISIBLE
+                binding.progressSaving.visibility = View.GONE
+                validateForm() // Re-validate on return to idle
+              }
+              is CreateNapUiState.Saving -> {
+                binding.buttonStartNap.isEnabled = false
+                binding.buttonStartNap.text =
+                    getString(R.string.create_nap_start_button) // Keep text, add progress
+                binding.buttonStartNap.visibility = View.VISIBLE
+                binding.progressSaving.visibility = View.VISIBLE
+              }
+              is CreateNapUiState.Success -> {
+                findNavController()
+                    .previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("nap_created", true)
+                dismiss()
+              }
+              is CreateNapUiState.Error -> {
+                binding.buttonStartNap.isEnabled = true
+                binding.buttonStartNap.text = getString(R.string.create_nap_start_button)
+                binding.buttonStartNap.visibility = View.VISIBLE
+                binding.progressSaving.visibility = View.GONE
+                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+              }
             }
           }
+        }
+        launch {
+          viewModel.proposedDuration.collect { duration -> updateDurationDisplay(duration) }
         }
       }
     }
@@ -94,12 +102,25 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     binding.textStartTime.text =
         if (isNow(selectedTimestamp)) getString(R.string.create_nap_now)
         else formatTimestampForDisplay(requireContext(), selectedTimestamp)
+    // Update ViewModel state for duration calculation
+    viewModel.setStartTime(selectedTimestamp)
   }
 
   private fun updateEndTimeDisplay() {
     binding.textEndTime.text =
         selectedEndTimestamp?.let { formatTimestampForDisplay(requireContext(), it) }
             ?: getString(R.string.create_nap_end_not_set)
+    // Update ViewModel state for duration calculation
+    viewModel.setEndTime(selectedEndTimestamp)
+  }
+
+  private fun updateDurationDisplay(duration: String) {
+    if (duration.isEmpty()) {
+      binding.textProposedDuration.visibility = View.GONE
+    } else {
+      binding.textProposedDuration.text = getString(R.string.create_nap_duration, duration)
+      binding.textProposedDuration.visibility = View.VISIBLE
+    }
   }
 
   private fun updateEndTimeButtonLabel() {
