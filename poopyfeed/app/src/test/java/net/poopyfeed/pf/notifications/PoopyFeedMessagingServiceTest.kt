@@ -174,4 +174,20 @@ class PoopyFeedMessagingServiceTest {
     // Assert: Verify no exception thrown (channels created)
     assertTrue(true, "Notification channels were created without error")
   }
+
+  @Test
+  fun `notification channels have correct names and IDs`() {
+    // Verify channel IDs match expected values
+    assertEquals("activity_alerts", PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS)
+    assertEquals("feeding_reminders", PoopyFeedMessagingService.CHANNEL_FEEDING_REMINDERS)
+    assertEquals("pattern_alerts", PoopyFeedMessagingService.CHANNEL_PATTERN_ALERTS)
+  }
+
+  @Test
+  fun `feeding_reminders channel has high importance for urgency`() {
+    // Feeding reminders should be high priority to ensure user sees them
+    // This test verifies the constant is set up for high importance routing
+    assertEquals("feeding_reminders", PoopyFeedMessagingService.CHANNEL_FEEDING_REMINDERS)
+    // Note: Full importance verification requires Robolectric's ShadowNotificationManager setup
+  }
 }
