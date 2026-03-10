@@ -14,6 +14,7 @@ import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.db.PoopyFeedDatabase
+import net.poopyfeed.pf.data.db.RemoteKeyDao
 
 /** Hilt module for Room database and DAOs. */
 @Module
@@ -36,6 +37,10 @@ object DatabaseModule {
   @Provides
   @Singleton
   fun providePendingSyncDao(db: PoopyFeedDatabase): PendingSyncDao = db.pendingSyncDao()
+
+  @Provides
+  @Singleton
+  fun provideRemoteKeyDao(db: PoopyFeedDatabase): RemoteKeyDao = db.remoteKeyDao()
 
   @Provides
   @Singleton

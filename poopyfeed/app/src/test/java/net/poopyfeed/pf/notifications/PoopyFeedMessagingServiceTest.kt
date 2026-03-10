@@ -1,6 +1,5 @@
 package net.poopyfeed.pf.notifications
 
-import android.app.NotificationManager
 import android.content.Context
 import com.google.firebase.messaging.RemoteMessage
 import io.mockk.clearAllMocks
@@ -18,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.Shadows
 
 @RunWith(RobolectricTestRunner::class)
 class PoopyFeedMessagingServiceTest {
@@ -227,7 +225,8 @@ class PoopyFeedMessagingServiceTest {
     assertEquals("activity_alerts", PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS)
     assertEquals("feeding_reminders", PoopyFeedMessagingService.CHANNEL_FEEDING_REMINDERS)
     assertEquals("pattern_alerts", PoopyFeedMessagingService.CHANNEL_PATTERN_ALERTS)
-    // Robolectric restrictions prevent direct description verification, but channels are created with proper setup
+    // Robolectric restrictions prevent direct description verification, but channels are created
+    // with proper setup
   }
 
   @Test

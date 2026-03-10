@@ -18,6 +18,7 @@ import net.poopyfeed.pf.data.db.FeedingEntity
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
 import net.poopyfeed.pf.data.db.PendingSyncDao
+import net.poopyfeed.pf.data.db.RemoteKeyDao
 import net.poopyfeed.pf.data.models.*
 import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.Test
@@ -27,6 +28,7 @@ class CachedTrackingRepositoriesTest {
 
   private val testDispatcher = UnconfinedTestDispatcher()
   private val pendingSyncDao = io.mockk.mockk<PendingSyncDao>(relaxed = true)
+  private val remoteKeyDao = io.mockk.mockk<RemoteKeyDao>(relaxed = true)
   private val syncScheduler = io.mockk.mockk<SyncScheduler>(relaxed = true)
   private val json = Json { ignoreUnknownKeys = true }
 
@@ -43,6 +45,7 @@ class CachedTrackingRepositoriesTest {
                 apiService,
                 feedingDao,
                 pendingSyncDao,
+                remoteKeyDao,
                 syncScheduler,
                 json,
                 ioDispatcher = testDispatcher)
@@ -72,6 +75,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             feedingDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -96,6 +100,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             feedingDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -132,6 +137,7 @@ class CachedTrackingRepositoriesTest {
                 apiService,
                 feedingDao,
                 pendingSyncDao,
+                remoteKeyDao,
                 syncScheduler,
                 json,
                 ioDispatcher = testDispatcher)
@@ -168,6 +174,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             feedingDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -189,6 +196,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             feedingDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -223,6 +231,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             diaperDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -251,6 +260,7 @@ class CachedTrackingRepositoriesTest {
             apiService,
             diaperDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)
@@ -282,7 +292,13 @@ class CachedTrackingRepositoriesTest {
         PaginatedResponse(1, results = listOf(listItem))
     val repo =
         CachedNapsRepository(
-            apiService, napDao, pendingSyncDao, syncScheduler, json, ioDispatcher = testDispatcher)
+            apiService,
+            napDao,
+            pendingSyncDao,
+            remoteKeyDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     val listResults = repo.listNapsCached(1).toList()
     assertIs<ApiResult.Success<List<Nap>>>(listResults[0])
@@ -304,7 +320,13 @@ class CachedTrackingRepositoriesTest {
     io.mockk.coEvery { apiService.deleteNap(1, 1) } returns Unit
     val repo =
         CachedNapsRepository(
-            apiService, napDao, pendingSyncDao, syncScheduler, json, ioDispatcher = testDispatcher)
+            apiService,
+            napDao,
+            pendingSyncDao,
+            remoteKeyDao,
+            syncScheduler,
+            json,
+            ioDispatcher = testDispatcher)
 
     assertIs<ApiResult.Success<Nap>>(repo.createNap(1, createRequest))
     assertIs<ApiResult.Success<Nap>>(repo.updateNap(1, 1, updateRequest))

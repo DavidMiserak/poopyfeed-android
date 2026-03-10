@@ -16,6 +16,7 @@ import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.DiaperEntity
 import net.poopyfeed.pf.data.db.PendingSyncDao
+import net.poopyfeed.pf.data.db.RemoteKeyDao
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
@@ -32,6 +33,7 @@ class CachedDiapersRepositoryTest {
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var diaperDao: DiaperDao
   private lateinit var pendingSyncDao: PendingSyncDao
+  private lateinit var remoteKeyDao: RemoteKeyDao
   private lateinit var syncScheduler: SyncScheduler
   private lateinit var repository: CachedDiapersRepository
   private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,12 +44,14 @@ class CachedDiapersRepositoryTest {
     apiService = io.mockk.mockk()
     diaperDao = io.mockk.mockk()
     pendingSyncDao = io.mockk.mockk(relaxed = true)
+    remoteKeyDao = io.mockk.mockk(relaxed = true)
     syncScheduler = io.mockk.mockk(relaxed = true)
     repository =
         CachedDiapersRepository(
             apiService,
             diaperDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)

@@ -16,6 +16,8 @@ import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
+import net.poopyfeed.pf.data.db.RemoteKeyDao
+import net.poopyfeed.pf.data.db.RemoteKeyEntity
 import net.poopyfeed.pf.data.models.NapListResponse
 import net.poopyfeed.pf.data.models.PaginatedResponse
 import org.junit.Before
@@ -39,12 +41,13 @@ class NapsRemoteMediatorTest {
 
   private val mockApiService = mockk<PoopyFeedApiService>()
   private val mockDao = mockk<NapDao>(relaxed = true)
+  private val mockRemoteKeyDao = mockk<RemoteKeyDao>(relaxed = true)
   private val childId = 1
   private lateinit var mediator: NapsRemoteMediator
 
   @Before
   fun setup() {
-    mediator = NapsRemoteMediator(childId, mockApiService, mockDao)
+    mediator = NapsRemoteMediator(childId, mockApiService, mockDao, mockRemoteKeyDao)
   }
 
   @Test
@@ -62,6 +65,8 @@ class NapsRemoteMediatorTest {
     coEvery { mockApiService.listNaps(childId, 1, 20) } returns mockResponse
     coEvery { mockDao.clearChildNaps(childId) } returns Unit
     coEvery { mockDao.upsertNaps(any()) } returns Unit
+    coEvery { mockRemoteKeyDao.clearKey(childId, "naps") } returns Unit
+    coEvery { mockRemoteKeyDao.upsert(any()) } returns Unit
 
     // Create empty paging state
     val state: PagingState<Int, NapEntity> = createPagingState()
@@ -81,6 +86,10 @@ class NapsRemoteMediatorTest {
 
     // Verify entities were upserted
     coVerify { mockDao.upsertNaps(any()) }
+
+    // Verify RemoteKey was cleared and next page was saved
+    coVerify { mockRemoteKeyDao.clearKey(childId, "naps") }
+    coVerify { mockRemoteKeyDao.upsert(RemoteKeyEntity(childId, "naps", 2)) }
   }
 
   @Test
@@ -106,8 +115,55 @@ class NapsRemoteMediatorTest {
   }
 
   @Test
+  fun testAppendLoadsPageFromRemoteKey() = runTest {
+    val mockNap = TestFixtures.mockNapListResponse(id = 5)
+    val mockResponse =
+        TestFixtures.mockPaginatedResponse(
+            results = listOf(mockNap),
+            count = 40,
+            next = "http://api.example.com/naps/?page=3",
+            previous = "http://api.example.com/naps/?page=1")
+
+    coEvery { mockApiService.listNaps(childId, 2, 20) } returns mockResponse
+    coEvery { mockDao.upsertNaps(any()) } returns Unit
+    coEvery { mockRemoteKeyDao.getKey(childId, "naps") } returns RemoteKeyEntity(childId, "naps", 2)
+    coEvery { mockRemoteKeyDao.upsert(any()) } returns Unit
+
+    val state = createPagingState(anchorPosition = 19, itemCount = 20)
+
+    val result = mediator.load(LoadType.APPEND, state)
+
+    assertTrue(result is MediatorResult.Success)
+    assertFalse(result.endOfPaginationReached)
+
+    // Verify API was called with page 2 from RemoteKey
+    coVerify { mockApiService.listNaps(childId, 2, 20) }
+
+    // Verify next page was saved (2 + 1 = 3)
+    coVerify { mockRemoteKeyDao.upsert(RemoteKeyEntity(childId, "naps", 3)) }
+  }
+
+  @Test
+  fun testAppendWithNullNextPageReturnsEndOfPagination() = runTest {
+    coEvery { mockRemoteKeyDao.getKey(childId, "naps") } returns
+        RemoteKeyEntity(childId, "naps", null)
+
+    val state = createPagingState(anchorPosition = 39, itemCount = 40)
+
+    val result = mediator.load(LoadType.APPEND, state)
+
+    assertTrue(result is MediatorResult.Success)
+    assertTrue(result.endOfPaginationReached)
+
+    // Verify no API call was made
+    coVerify(exactly = 0) { mockApiService.listNaps(any(), any(), any()) }
+  }
+
+  @Test
   fun testAppendLoadHandlesResponseCorrectly() = runTest {
-    // When AppendLoad encounters empty state (no lastItem), it should return success immediately
+    // When AppendLoad encounters no RemoteKey, it should return success immediately
+    coEvery { mockRemoteKeyDao.getKey(childId, "naps") } returns null
+
     val state: PagingState<Int, NapEntity> = createPagingState(itemCount = 0)
 
     val result = mediator.load(LoadType.APPEND, state)
@@ -158,6 +214,7 @@ class NapsRemoteMediatorTest {
     // Empty state (no items yet) during APPEND
     val state: PagingState<Int, NapEntity> = createPagingState(itemCount = 0)
 
+    coEvery { mockRemoteKeyDao.getKey(childId, "naps") } returns null
     coEvery { mockDao.upsertNaps(any()) } returns Unit
 
     val result = mediator.load(LoadType.APPEND, state)

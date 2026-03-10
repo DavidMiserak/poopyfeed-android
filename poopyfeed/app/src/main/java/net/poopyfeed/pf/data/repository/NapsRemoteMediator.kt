@@ -8,10 +8,13 @@ import java.io.IOException
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
+import net.poopyfeed.pf.data.db.RemoteKeyDao
+import net.poopyfeed.pf.data.db.RemoteKeyEntity
 import retrofit2.HttpException
 
 private const val NAPS_PAGE_SIZE = 20
 private const val NAPS_STARTING_PAGE = 1
+private const val ENTITY_TYPE = "naps"
 
 /**
  * RemoteMediator for paginated naps list with Paging 3.
@@ -24,12 +27,14 @@ private const val NAPS_STARTING_PAGE = 1
  * @param childId The child ID to fetch naps for
  * @param apiService Retrofit service for API calls
  * @param dao NapDao for Room database access
+ * @param remoteKeyDao RemoteKeyDao for tracking pagination state
  */
 @OptIn(ExperimentalPagingApi::class)
 class NapsRemoteMediator(
     private val childId: Int,
     private val apiService: PoopyFeedApiService,
     private val dao: NapDao,
+    private val remoteKeyDao: RemoteKeyDao,
 ) : RemoteMediator<Int, NapEntity>() {
 
   override suspend fun load(
@@ -40,19 +45,19 @@ class NapsRemoteMediator(
       // Determine the page to load
       val loadKey =
           when (loadType) {
-            LoadType.REFRESH -> NAPS_STARTING_PAGE
+            LoadType.REFRESH -> {
+              // Clear remote key on REFRESH to reset pagination
+              remoteKeyDao.clearKey(childId, ENTITY_TYPE)
+              NAPS_STARTING_PAGE
+            }
             LoadType.PREPEND -> {
               // Naps are reverse-chronological (newest first), so we don't prepend new items
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-              // Get the last item or return end of pagination
-              val lastItem =
-                  state.lastItemOrNull()
-                      ?: return MediatorResult.Success(endOfPaginationReached = true)
-              // Calculate next page based on loaded items count
-              // Total pages loaded = ceil(itemCount / pageSize), next page = current + 1
-              (state.pages.sumOf { it.data.size } / NAPS_PAGE_SIZE) + 2
+              // Get next page from RemoteKey, or end pagination if not found
+              val key = remoteKeyDao.getKey(childId, ENTITY_TYPE)
+              key?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
           }
 
@@ -70,6 +75,10 @@ class NapsRemoteMediator(
 
       // Upsert into Room
       dao.upsertNaps(entities)
+
+      // Save next page to RemoteKey (null if no more pages)
+      val nextPage = if (response.next == null) null else loadKey + 1
+      remoteKeyDao.upsert(RemoteKeyEntity(childId, ENTITY_TYPE, nextPage))
 
       // Return success with endOfPaginationReached flag
       MediatorResult.Success(endOfPaginationReached = response.next == null)

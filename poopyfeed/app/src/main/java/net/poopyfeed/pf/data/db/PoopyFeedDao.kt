@@ -157,3 +157,20 @@ interface NapDao {
   /** Clear all naps for a child. */
   @Query("DELETE FROM naps WHERE child = :childId") suspend fun clearChildNaps(childId: Int)
 }
+
+/** DAO for Remote Keys (Paging 3 pagination state). */
+@Dao
+interface RemoteKeyDao {
+
+  /** Insert or update a remote key. */
+  @Upsert suspend fun upsert(key: RemoteKeyEntity)
+
+  /** Get the remote key for a child and entity type. */
+  @Query(
+      "SELECT * FROM remote_keys WHERE child_id = :childId AND entity_type = :entityType LIMIT 1")
+  suspend fun getKey(childId: Int, entityType: String): RemoteKeyEntity?
+
+  /** Clear the remote key for a child and entity type. */
+  @Query("DELETE FROM remote_keys WHERE child_id = :childId AND entity_type = :entityType")
+  suspend fun clearKey(childId: Int, entityType: String)
+}

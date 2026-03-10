@@ -203,3 +203,11 @@ data class NapEntity(
             updated_at = nap.updated_at)
   }
 }
+
+/** Remote keys for Paging 3 RemoteMediator. Tracks next page per (childId, entityType). */
+@Entity(tableName = "remote_keys", primaryKeys = ["child_id", "entity_type"])
+data class RemoteKeyEntity(
+    @ColumnInfo(name = "child_id") val childId: Int,
+    @ColumnInfo(name = "entity_type") val entityType: String,
+    @ColumnInfo(name = "next_page") val nextPage: Int?, // null = end of pagination
+)

@@ -16,6 +16,7 @@ import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
 import net.poopyfeed.pf.data.db.PendingSyncDao
+import net.poopyfeed.pf.data.db.RemoteKeyDao
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
@@ -32,6 +33,7 @@ class CachedFeedingsRepositoryTest {
   private lateinit var apiService: PoopyFeedApiService
   private lateinit var feedingDao: FeedingDao
   private lateinit var pendingSyncDao: PendingSyncDao
+  private lateinit var remoteKeyDao: RemoteKeyDao
   private lateinit var syncScheduler: SyncScheduler
   private lateinit var repository: CachedFeedingsRepository
   private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,12 +44,14 @@ class CachedFeedingsRepositoryTest {
     apiService = io.mockk.mockk()
     feedingDao = io.mockk.mockk()
     pendingSyncDao = io.mockk.mockk(relaxed = true)
+    remoteKeyDao = io.mockk.mockk(relaxed = true)
     syncScheduler = io.mockk.mockk(relaxed = true)
     repository =
         CachedFeedingsRepository(
             apiService,
             feedingDao,
             pendingSyncDao,
+            remoteKeyDao,
             syncScheduler,
             json,
             ioDispatcher = testDispatcher)

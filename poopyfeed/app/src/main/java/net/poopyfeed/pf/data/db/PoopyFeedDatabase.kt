@@ -13,7 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * Schema version 1: children, feedings, diapers, naps. Version 2: children can_edit,
  * feeding_reminder_interval. Version 3: feedings duration_minutes, side. Version 4: children
  * custom_bottle_low_oz, custom_bottle_mid_oz, custom_bottle_high_oz. Version 5: pending_sync table
- * for offline-first background sync.
+ * for offline-first background sync. Version 6: remote_keys table for Paging 3 pagination state.
  */
 @Database(
     entities =
@@ -22,8 +22,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
             FeedingEntity::class,
             DiaperEntity::class,
             NapEntity::class,
-            PendingSyncEntity::class],
-    version = 5,
+            PendingSyncEntity::class,
+            RemoteKeyEntity::class],
+    version = 6,
     exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
@@ -36,6 +37,8 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
   abstract fun napDao(): NapDao
 
   abstract fun pendingSyncDao(): PendingSyncDao
+
+  abstract fun remoteKeyDao(): RemoteKeyDao
 
   companion object {
     private const val DATABASE_NAME = "poopyfeed_db"
@@ -83,6 +86,19 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
           }
         }
 
+    private val MIGRATION_5_6 =
+        object : Migration(5, 6) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS remote_keys (
+                  child_id INTEGER NOT NULL,
+                  entity_type TEXT NOT NULL,
+                  next_page INTEGER,
+                  PRIMARY KEY(child_id, entity_type)
+                )""")
+          }
+        }
+
     @Volatile private var instance: PoopyFeedDatabase? = null
 
     fun getInstance(context: Context): PoopyFeedDatabase {
@@ -91,7 +107,8 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
             instance
                 ?: Room.databaseBuilder(
                         context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(
+                        MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build()
                     .also { instance = it }
           }

@@ -30,6 +30,7 @@ import net.poopyfeed.pf.data.db.NapDao
 import net.poopyfeed.pf.data.db.NapEntity
 import net.poopyfeed.pf.data.db.PendingSyncDao
 import net.poopyfeed.pf.data.db.PendingSyncEntity
+import net.poopyfeed.pf.data.db.RemoteKeyDao
 import net.poopyfeed.pf.data.models.*
 import net.poopyfeed.pf.data.models.toApiError
 import net.poopyfeed.pf.di.IoDispatcher
@@ -195,6 +196,7 @@ constructor(
     private val apiService: PoopyFeedApiService,
     private val feedingDao: FeedingDao,
     private val pendingSyncDao: PendingSyncDao,
+    private val remoteKeyDao: RemoteKeyDao,
     private val syncScheduler: SyncScheduler,
     private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -368,7 +370,8 @@ constructor(
   fun pagedFeedings(childId: Int): Flow<PagingData<Feeding>> =
       Pager(
               config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-              remoteMediator = FeedingsRemoteMediator(childId, apiService, feedingDao)) {
+              remoteMediator =
+                  FeedingsRemoteMediator(childId, apiService, feedingDao, remoteKeyDao)) {
                 feedingDao.pagingSourceFeedings(childId)
               }
           .flow
@@ -382,6 +385,7 @@ constructor(
     private val apiService: PoopyFeedApiService,
     private val diaperDao: DiaperDao,
     private val pendingSyncDao: PendingSyncDao,
+    private val remoteKeyDao: RemoteKeyDao,
     private val syncScheduler: SyncScheduler,
     private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -547,7 +551,8 @@ constructor(
   fun pagedDiapers(childId: Int): Flow<PagingData<Diaper>> =
       Pager(
               config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-              remoteMediator = DiapersRemoteMediator(childId, apiService, diaperDao)) {
+              remoteMediator =
+                  DiapersRemoteMediator(childId, apiService, diaperDao, remoteKeyDao)) {
                 diaperDao.pagingSourceDiapers(childId)
               }
           .flow
@@ -561,6 +566,7 @@ constructor(
     private val apiService: PoopyFeedApiService,
     private val napDao: NapDao,
     private val pendingSyncDao: PendingSyncDao,
+    private val remoteKeyDao: RemoteKeyDao,
     private val syncScheduler: SyncScheduler,
     private val json: Json,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -717,7 +723,7 @@ constructor(
   fun pagedNaps(childId: Int): Flow<PagingData<Nap>> =
       Pager(
               config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-              remoteMediator = NapsRemoteMediator(childId, apiService, napDao)) {
+              remoteMediator = NapsRemoteMediator(childId, apiService, napDao, remoteKeyDao)) {
                 napDao.pagingSourceNaps(childId)
               }
           .flow

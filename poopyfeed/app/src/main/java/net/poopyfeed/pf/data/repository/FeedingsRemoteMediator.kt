@@ -8,10 +8,13 @@ import java.io.IOException
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.FeedingDao
 import net.poopyfeed.pf.data.db.FeedingEntity
+import net.poopyfeed.pf.data.db.RemoteKeyDao
+import net.poopyfeed.pf.data.db.RemoteKeyEntity
 import retrofit2.HttpException
 
 private const val FEEDINGS_PAGE_SIZE = 20
 private const val FEEDINGS_STARTING_PAGE = 1
+private const val ENTITY_TYPE = "feedings"
 
 /**
  * RemoteMediator for paginated feedings list with Paging 3.
@@ -24,12 +27,14 @@ private const val FEEDINGS_STARTING_PAGE = 1
  * @param childId The child ID to fetch feedings for
  * @param apiService Retrofit service for API calls
  * @param dao FeedingDao for Room database access
+ * @param remoteKeyDao RemoteKeyDao for tracking pagination state
  */
 @OptIn(ExperimentalPagingApi::class)
 class FeedingsRemoteMediator(
     private val childId: Int,
     private val apiService: PoopyFeedApiService,
     private val dao: FeedingDao,
+    private val remoteKeyDao: RemoteKeyDao,
 ) : RemoteMediator<Int, FeedingEntity>() {
 
   override suspend fun load(
@@ -40,19 +45,19 @@ class FeedingsRemoteMediator(
       // Determine the page to load
       val loadKey =
           when (loadType) {
-            LoadType.REFRESH -> FEEDINGS_STARTING_PAGE
+            LoadType.REFRESH -> {
+              // Clear remote key on REFRESH to reset pagination
+              remoteKeyDao.clearKey(childId, ENTITY_TYPE)
+              FEEDINGS_STARTING_PAGE
+            }
             LoadType.PREPEND -> {
               // Feedings are reverse-chronological (newest first), so we don't prepend new items
               return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-              // Get the last item or return end of pagination
-              val lastItem =
-                  state.lastItemOrNull()
-                      ?: return MediatorResult.Success(endOfPaginationReached = true)
-              // Calculate next page based on loaded items count
-              // Total pages loaded = ceil(itemCount / pageSize), next page = current + 1
-              (state.pages.sumOf { it.data.size } / FEEDINGS_PAGE_SIZE) + 2
+              // Get next page from RemoteKey, or end pagination if not found
+              val key = remoteKeyDao.getKey(childId, ENTITY_TYPE)
+              key?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
           }
 
@@ -71,6 +76,10 @@ class FeedingsRemoteMediator(
 
       // Upsert into Room
       dao.upsertFeedings(entities)
+
+      // Save next page to RemoteKey (null if no more pages)
+      val nextPage = if (response.next == null) null else loadKey + 1
+      remoteKeyDao.upsert(RemoteKeyEntity(childId, ENTITY_TYPE, nextPage))
 
       // Return success with endOfPaginationReached flag
       MediatorResult.Success(endOfPaginationReached = response.next == null)
