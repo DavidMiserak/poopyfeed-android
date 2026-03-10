@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -22,6 +23,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.UserProfile
@@ -40,6 +42,7 @@ class LoginViewModelTest {
   private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
+  private val mockAnalyticsTracker: AnalyticsTracker = mockk(relaxed = true)
 
   @Before
   fun setup() {
@@ -74,7 +77,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
 
     assertTrue(viewModel.checkExistingToken())
   }
@@ -85,7 +88,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
 
     assertFalse(viewModel.checkExistingToken())
   }
@@ -96,7 +99,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
   }
@@ -121,7 +124,7 @@ class LoginViewModelTest {
 
         val viewModel =
             LoginViewModel(
-                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
         viewModel.login("user@example.com", "password123")
 
         advanceUntilIdle()
@@ -138,7 +141,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
     viewModel.login("user@example.com", "wrong")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -156,7 +159,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
     viewModel.login("a@b.com", "p")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -173,7 +176,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
     viewModel.clearError()
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
@@ -186,7 +189,7 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
     viewModel.login("user@example.com", "pass")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -208,11 +211,38 @@ class LoginViewModelTest {
 
         val viewModel =
             LoginViewModel(
-                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
         viewModel.login("user@example.com", "password123")
 
         advanceUntilIdle()
 
         assertIs<LoginUiState.Success>(viewModel.uiState.value)
       }
+
+  @Test
+  fun `login success logs analytics event`() = runTest(testDispatcher) {
+    every { mockTokenManager.getToken() } returns null
+    every { mockTokenManager.saveToken(any()) } returns Unit
+    every { mockTokenManager.saveProfileTimezone(any()) } returns Unit
+    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
+    coEvery { mockAuthRepository.getProfile() } returns
+        ApiResult.Success(
+            UserProfile(
+                id = 1,
+                email = "user@example.com",
+                first_name = "Test",
+                last_name = "User",
+                timezone = "UTC"))
+    coEvery { mockNotificationsRepository.registerDeviceToken(any()) } returns
+        ApiResult.Success(Unit)
+
+    val viewModel =
+        LoginViewModel(
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+    viewModel.login("user@example.com", "password123")
+
+    advanceUntilIdle()
+
+    coVerify { mockAnalyticsTracker.logLoginSuccess() }
+  }
 }

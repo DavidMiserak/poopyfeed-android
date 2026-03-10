@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -19,8 +20,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
+import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
@@ -36,6 +39,7 @@ class SignupViewModelTest {
   private val mockNotificationsRepository: NotificationsRepository = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
+  private val mockAnalyticsTracker: AnalyticsTracker = mockk(relaxed = true)
   private lateinit var viewModel: SignupViewModel
 
   @Before
@@ -59,7 +63,7 @@ class SignupViewModelTest {
 
     viewModel =
         SignupViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext)
+            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
   }
 
   @After
@@ -141,5 +145,25 @@ class SignupViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<SignupUiState.Success>(viewModel.uiState.value)
+  }
+
+  @Test
+  fun `signUp success logs analytics event`() = runTest {
+    coEvery { mockAuthRepository.signup(any(), any()) } returns ApiResult.Success("token-123")
+    coEvery { mockAuthRepository.getProfile() } returns
+        ApiResult.Success(
+            UserProfile(
+                id = 1,
+                email = "test@example.com",
+                first_name = "Test",
+                last_name = "User",
+                timezone = "UTC"))
+    coEvery { mockNotificationsRepository.registerDeviceToken(any()) } returns
+        ApiResult.Success(Unit)
+
+    viewModel.signUp("test@example.com", "password123")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    coVerify { mockAnalyticsTracker.logSignupSuccess() }
   }
 }

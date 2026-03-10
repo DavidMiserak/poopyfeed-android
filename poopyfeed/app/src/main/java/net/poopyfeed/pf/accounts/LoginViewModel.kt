@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AuthRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
@@ -45,6 +46,7 @@ constructor(
     private val notificationsRepository: NotificationsRepository,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
@@ -75,6 +77,7 @@ constructor(
           }
           // Register FCM token for push notifications (inline to complete before navigation)
           registerFcmToken()
+          analyticsTracker.logLoginSuccess()
           _uiState.value = LoginUiState.Success
         }
         is ApiResult.Error -> {
