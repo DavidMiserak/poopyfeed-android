@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.LocalDateTime as JavaLocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,10 +16,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
 import net.poopyfeed.pf.util.handleAndLogError
 
@@ -45,6 +50,7 @@ constructor(
     private val syncScheduler: SyncScheduler,
     private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
 
   private val childId: Int =
@@ -84,6 +90,47 @@ constructor(
 
   fun setEndTime(endTime: String?) {
     _endTime.value = endTime
+  }
+
+  /**
+   * Converts a local time string (in the profile timezone) to UTC ISO 8601 format. Used when user
+   * picks a time in their profile timezone via the date picker. For example, if the profile is in
+   * Los Angeles (UTC-8) and the user picks "09:00:00", this converts to "17:00:00Z" (UTC).
+   *
+   * @param profileLocalTime Local datetime string without timezone (e.g. "2024-01-15T09:00:00")
+   * @return UTC ISO 8601 string with Z suffix (e.g. "2024-01-15T17:00:00Z")
+   */
+  fun convertLocalTimeToUtc(profileLocalTime: String): String {
+    return try {
+      val tzId = tokenManager.getProfileTimezone() ?: "UTC"
+      val javaLocalDateTime = JavaLocalDateTime.parse(profileLocalTime)
+      val zoneId = ZoneId.of(tzId)
+      val zonedDateTime = javaLocalDateTime.atZone(zoneId)
+      val instant = zonedDateTime.toInstant()
+      // Convert to ISO 8601 UTC format (with Z suffix)
+      Instant.fromEpochMilliseconds(instant.toEpochMilli()).toString()
+    } catch (e: Exception) {
+      profileLocalTime + "Z" // Fallback to treating as UTC if parsing fails
+    }
+  }
+
+  /**
+   * Converts a UTC ISO 8601 timestamp to a local time string in the profile timezone. Used for
+   * displaying times to the user. For example, if the profile is in Los Angeles (UTC-8) and the UTC
+   * time is "17:00:00Z", this returns "09:00:00" (local time).
+   *
+   * @param utcTime UTC ISO 8601 string (e.g. "2024-01-15T17:00:00Z")
+   * @return Local datetime string without timezone (e.g. "2024-01-15T09:00:00")
+   */
+  fun convertUtcTimeToLocal(utcTime: String): String {
+    return try {
+      val tzId = tokenManager.getProfileTimezone() ?: "UTC"
+      val instant = Instant.parse(utcTime)
+      val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
+      localDateTime.toString()
+    } catch (e: Exception) {
+      utcTime // Fallback to UTC time if parsing fails
+    }
   }
 
   fun createNap(startTime: String, endTime: String? = null) {

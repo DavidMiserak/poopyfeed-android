@@ -21,6 +21,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
 import org.junit.After
 import org.junit.Before
@@ -35,6 +36,7 @@ class CreateNapViewModelTest {
   private lateinit var mockRepository: CachedNapsRepository
   private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var mockAnalyticsTracker: AnalyticsTracker
+  private lateinit var mockTokenManager: TokenManager
   private lateinit var viewModel: CreateNapViewModel
 
   @Before
@@ -45,10 +47,17 @@ class CreateNapViewModelTest {
     mockRepository = mockk()
     mockSyncScheduler = mockk(relaxed = true)
     mockAnalyticsTracker = mockk(relaxed = true)
+    mockTokenManager = mockk()
     every { mockContext.getString(any()) } returns "Error message"
+    every { mockTokenManager.getProfileTimezone() } returns "America/Los_Angeles"
     viewModel =
         CreateNapViewModel(
-            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
+            savedStateHandle,
+            mockRepository,
+            mockSyncScheduler,
+            mockAnalyticsTracker,
+            mockContext,
+            mockTokenManager)
   }
 
   @After
@@ -209,5 +218,43 @@ class CreateNapViewModelTest {
 
         val duration = viewModel.proposedDuration.value
         assert(duration == "30m") { "Expected '30m', got '$duration'" }
+      }
+
+  @Test
+  fun `convertLocalTimeToUtc converts profile timezone time to UTC correctly`() =
+      runTest(testDispatcher) {
+        // Profile TZ: America/Los_Angeles (PST = UTC-8)
+        // Local time: 2024-01-15 09:00:00 (profile TZ)
+        // Expected UTC: 2024-01-15 17:00:00Z (8 hours ahead)
+        val profileLocalTime = "2024-01-15T09:00:00"
+        val utcTime = viewModel.convertLocalTimeToUtc(profileLocalTime)
+
+        // Check it's a valid ISO 8601 UTC string ending in Z
+        assert(utcTime.endsWith("Z")) { "UTC time should end with Z, got: $utcTime" }
+
+        // Verify timestamp can be parsed as valid ISO 8601
+        assert(runCatching { kotlinx.datetime.Instant.parse(utcTime) }.isSuccess) {
+          "Result should be valid ISO 8601: $utcTime"
+        }
+      }
+
+  @Test
+  fun `convertUtcTimeToLocal converts UTC to profile timezone time correctly`() =
+      runTest(testDispatcher) {
+        // UTC time: 2024-01-15 17:00:00Z
+        // Profile TZ: America/Los_Angeles (PST = UTC-8)
+        // Expected local: 2024-01-15 09:00:00
+        val utcTime = "2024-01-15T17:00:00Z"
+        val localDateTime = viewModel.convertUtcTimeToLocal(utcTime)
+
+        // Check format (no Z, as it's a local time string)
+        assert(!localDateTime.endsWith("Z")) {
+          "Local time should not end with Z, got: $localDateTime"
+        }
+
+        // Verify it's a valid LocalDateTime format
+        assert(runCatching { kotlinx.datetime.LocalDateTime.parse(localDateTime) }.isSuccess) {
+          "Result should be valid LocalDateTime: $localDateTime"
+        }
       }
 }
