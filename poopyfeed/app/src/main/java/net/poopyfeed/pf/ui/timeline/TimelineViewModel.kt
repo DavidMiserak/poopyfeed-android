@@ -19,6 +19,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.models.TimelineEvent
@@ -79,6 +80,7 @@ constructor(
     private val syncScheduler: SyncScheduler,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])

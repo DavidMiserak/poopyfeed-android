@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.UpdateNapRequest
@@ -23,6 +24,7 @@ class NapsListViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedNapsRepository,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])

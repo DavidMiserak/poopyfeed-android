@@ -22,6 +22,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.QuietHours
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.databinding.FragmentAccountSettingsBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Account settings screen. Displays and edits user profile (name, email, timezone) via
@@ -53,6 +54,8 @@ class AccountSettingsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "AccountSettings")
 
     // SECTION 1: Profile - Save button
     binding.buttonAccountSave.setOnClickListener {

@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,7 @@ class EditChildViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedChildrenRepository
   private lateinit var mockApiService: PoopyFeedApiService
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: EditChildViewModel
 
   @Before
@@ -43,6 +45,7 @@ class EditChildViewModelTest {
     mockContext = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk()
     mockApiService = mockk()
     every { mockContext.getString(any()) } returns "Error message"
     coEvery { mockApiService.getNotificationPreferences() } returns emptyList()
@@ -54,7 +57,8 @@ class EditChildViewModelTest {
   }
 
   private fun createViewModel() =
-      EditChildViewModel(savedStateHandle, mockRepository, mockApiService, mockContext)
+      EditChildViewModel(
+          savedStateHandle, mockRepository, mockApiService, mockContext, mockAnalyticsTracker)
 
   @Test
   fun `init loads child from repo and emits Ready with canEditReminder`() =
@@ -242,6 +246,8 @@ class EditChildViewModelTest {
         val child = TestFixtures.mockChild(id = 1)
         coEvery { mockRepository.getChildCached(1) } returns flowOf(child)
         coEvery { mockRepository.deleteChild(1) } returns ApiResult.Success(Unit)
+        every { mockRepository.listChildrenCached() } returns flowOf(ApiResult.Success(emptyList()))
+        every { mockAnalyticsTracker.logChildDeleted(any()) } returns Unit
 
         viewModel = createViewModel()
         advanceUntilIdle()
@@ -251,6 +257,7 @@ class EditChildViewModelTest {
         advanceUntilIdle()
 
         coVerify { mockRepository.deleteChild(1) }
+        verify { mockAnalyticsTracker.logChildDeleted(0) }
         assertEquals(1, emitted.size)
         job.cancel()
       }

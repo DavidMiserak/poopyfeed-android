@@ -40,7 +40,7 @@ class CreateChildViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
-    mockAnalyticsTracker = mockk(relaxed = true)
+    mockAnalyticsTracker = mockk()
     every { mockContext.getString(any()) } returns "Error message"
     viewModel = CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext)
   }
@@ -63,11 +63,13 @@ class CreateChildViewModelTest {
         coEvery { mockRepository.createChild(any()) } returns ApiResult.Success(mockChild)
         every { mockRepository.listChildrenCached() } returns
             flowOf(ApiResult.Success(listOf(mockChild)))
+        every { mockAnalyticsTracker.logChildCreated(any()) } returns Unit
 
         viewModel.createChild("Alice", "2024-01-15", "F")
         advanceUntilIdle()
 
         coVerify { mockRepository.createChild(any()) }
+        verify { mockAnalyticsTracker.logChildCreated(1) }
         assertIs<CreateChildUiState.Success>(viewModel.uiState.value)
       }
 
@@ -145,6 +147,7 @@ class CreateChildViewModelTest {
         coEvery { mockRepository.createChild(any()) } returns ApiResult.Success(child1)
         every { mockRepository.listChildrenCached() } returns
             flowOf(ApiResult.Success(listOf(child1, child2)))
+        every { mockAnalyticsTracker.logChildCreated(any()) } returns Unit
 
         viewModel.createChild("Alice", "2024-01-15", "F")
         advanceUntilIdle()

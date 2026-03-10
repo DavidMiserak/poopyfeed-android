@@ -33,6 +33,7 @@ class PendingInvitesViewModelTest {
   private lateinit var mockSharingRepository: SharingRepository
   private lateinit var mockChildrenRepository: ChildrenRepository
   private lateinit var mockCachedChildrenRepository: CachedChildrenRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: PendingInvitesViewModel
 
   @Before
@@ -42,6 +43,7 @@ class PendingInvitesViewModelTest {
     mockSharingRepository = mockk()
     mockChildrenRepository = mockk()
     mockCachedChildrenRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
   }
 
@@ -65,7 +67,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<PendingInvitesUiState.Ready>(viewModel.uiState.value)
@@ -86,7 +88,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<PendingInvitesUiState.Empty>(viewModel.uiState.value)
@@ -104,7 +106,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<PendingInvitesUiState.Error>(viewModel.uiState.value)
@@ -125,7 +127,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val collected = mutableListOf<Int>()
@@ -152,7 +154,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val messages = mutableListOf<String>()
@@ -176,7 +178,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<PendingInvitesUiState.Loading>(viewModel.uiState.value)
@@ -197,7 +199,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<PendingInvitesUiState.Ready>(viewModel.uiState.value)
@@ -218,7 +220,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
         val ids = mutableListOf<Int>()
         val job = launch { viewModel.navigateToChild.collect { ids.add(it) } }
@@ -239,7 +241,7 @@ class PendingInvitesViewModelTest {
                 mockChildrenRepository,
                 mockCachedChildrenRepository,
                 mockContext,
-            )
+                mockAnalyticsTracker)
         advanceUntilIdle()
         assertIs<PendingInvitesUiState.Empty>(viewModel.uiState.value)
 

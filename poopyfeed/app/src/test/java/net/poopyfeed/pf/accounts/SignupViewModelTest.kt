@@ -63,7 +63,11 @@ class SignupViewModelTest {
 
     viewModel =
         SignupViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
   }
 
   @After

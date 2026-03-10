@@ -32,6 +32,7 @@ class NapsListViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedNapsRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: NapsListViewModel
 
   @Before
@@ -39,6 +40,7 @@ class NapsListViewModelTest {
     Dispatchers.setMain(testDispatcher)
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
   }
 
   @After
@@ -51,7 +53,7 @@ class NapsListViewModelTest {
     val pagingData: Flow<PagingData<Nap>> = flowOf()
     every { mockRepository.pagedNaps(1) } returns pagingData
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -60,7 +62,7 @@ class NapsListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedNaps(1) } returns flowOf()
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.deleteError.value == null)
   }
@@ -70,7 +72,7 @@ class NapsListViewModelTest {
     every { mockRepository.pagedNaps(1) } returns flowOf()
     coEvery { mockRepository.deleteNap(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteError.value // access to initialize
 
     viewModel.deleteNap(10)
@@ -86,7 +88,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.deleteNap(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteNap(10)
     advanceUntilIdle()
 
@@ -101,7 +103,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.updateNap(1, 10, capture(requestSlot)) } returns
         ApiResult.Success(mockNap)
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.endNap(10)
     advanceUntilIdle()
 
@@ -117,7 +119,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.updateNap(1, 10, any()) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.endNap(10)
     advanceUntilIdle()
 

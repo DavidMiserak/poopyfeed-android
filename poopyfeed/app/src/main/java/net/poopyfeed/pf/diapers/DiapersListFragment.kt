@@ -21,6 +21,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentDiapersListBinding
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Displays a list of diaper changes for a child with pull-to-refresh. FAB opens create diaper
@@ -48,6 +49,8 @@ class DiapersListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "DiapersList")
 
     val childId = requireArguments().getInt("childId")
     adapter =

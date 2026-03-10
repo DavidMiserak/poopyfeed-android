@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.QuietHours
@@ -82,6 +83,7 @@ constructor(
     private val clearSessionUseCase: ClearSessionUseCase,
     private val tokenManager: TokenManager,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<AccountSettingsUiState> =
@@ -321,6 +323,7 @@ constructor(
         is ApiResult.Success -> {
           // Token rotation: store new token (user remains logged in)
           tokenManager.saveToken(result.data)
+          analyticsTracker.logPasswordChanged()
           _uiState.value = AccountSettingsUiState.PasswordChanged
         }
         is ApiResult.Error -> {
@@ -359,6 +362,7 @@ constructor(
 
       when (val result = authRepository.deleteAccount(password)) {
         is ApiResult.Success -> {
+          analyticsTracker.logAccountDeleted()
           clearSessionUseCase()
           _uiState.value = AccountSettingsUiState.AccountDeleted
         }

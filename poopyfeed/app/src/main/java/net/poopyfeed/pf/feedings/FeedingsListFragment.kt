@@ -21,6 +21,7 @@ import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentFeedingsListBinding
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Displays a list of feedings for a child with pull-to-refresh. FAB opens create feeding bottom
@@ -48,6 +49,8 @@ class FeedingsListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "FeedingsList")
 
     val childId = requireArguments().getInt("childId")
     adapter =

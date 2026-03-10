@@ -31,6 +31,7 @@ class NotificationsViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockContext: Context
   private lateinit var mockRepository: NotificationsRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: NotificationsViewModel
 
   @Before
@@ -38,6 +39,7 @@ class NotificationsViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk(relaxed = true)
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     // Mock pagingData flow
     coEvery { mockRepository.pagedNotifications() } returns
@@ -59,7 +61,7 @@ class NotificationsViewModelTest {
   @Test
   fun `init exposes pagingData flow from repository`() =
       runTest(testDispatcher) {
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         coVerify { mockRepository.pagedNotifications() }
@@ -70,7 +72,7 @@ class NotificationsViewModelTest {
       runTest(testDispatcher) {
         coEvery { mockRepository.markAllRead() } returns ApiResult.Success(5)
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val invalidations = mutableListOf<Unit>()
@@ -90,7 +92,7 @@ class NotificationsViewModelTest {
         coEvery { mockRepository.markAllRead() } returns
             ApiResult.Error(ApiError.NetworkError("Failed"))
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val errors = mutableListOf<String>()
@@ -109,7 +111,7 @@ class NotificationsViewModelTest {
         val notif = TestFixtures.mockNotification(id = 10, childId = 42)
         coEvery { mockRepository.markAsRead(10) } returns ApiResult.Success(notif)
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val navIds = mutableListOf<Int>()
@@ -135,7 +137,7 @@ class NotificationsViewModelTest {
         coEvery { mockRepository.markAsRead(10) } returns
             ApiResult.Error(ApiError.NetworkError("fail"))
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val errors = mutableListOf<String>()
@@ -153,7 +155,7 @@ class NotificationsViewModelTest {
       runTest(testDispatcher) {
         coEvery { mockRepository.markAllRead() } returns ApiResult.Loading()
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val errors = mutableListOf<String>()
@@ -175,7 +177,7 @@ class NotificationsViewModelTest {
                 ),
             )
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertTrue(viewModel.hasUnread)
@@ -191,7 +193,7 @@ class NotificationsViewModelTest {
                 ),
             )
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertFalse(viewModel.hasUnread)
@@ -202,7 +204,7 @@ class NotificationsViewModelTest {
       runTest(testDispatcher) {
         coEvery { mockRepository.markAsRead(10) } returns ApiResult.Loading()
 
-        viewModel = NotificationsViewModel(mockRepository, mockContext)
+        viewModel = NotificationsViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val navIds = mutableListOf<Int>()

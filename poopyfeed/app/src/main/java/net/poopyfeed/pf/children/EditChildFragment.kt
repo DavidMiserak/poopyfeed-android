@@ -22,6 +22,7 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentEditChildBottomSheetBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Full-screen fragment for editing a child: name, DOB, gender, custom bottle amounts, feeding
@@ -55,6 +56,8 @@ class EditChildFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "EditChild")
 
     binding.dragHandle.visibility = View.GONE
 

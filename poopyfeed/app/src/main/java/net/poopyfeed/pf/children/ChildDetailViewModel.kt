@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.DashboardSummaryResponse
@@ -57,6 +58,7 @@ constructor(
     private val repo: CachedChildrenRepository,
     private val analyticsRepo: AnalyticsRepository,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   val childId: Int = checkNotNull(savedStateHandle["childId"])

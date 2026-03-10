@@ -77,7 +77,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
 
     assertTrue(viewModel.checkExistingToken())
   }
@@ -88,7 +92,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
 
     assertFalse(viewModel.checkExistingToken())
   }
@@ -99,7 +107,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
   }
@@ -124,7 +136,11 @@ class LoginViewModelTest {
 
         val viewModel =
             LoginViewModel(
-                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+                mockAuthRepository,
+                mockNotificationsRepository,
+                mockTokenManager,
+                mockContext,
+                mockAnalyticsTracker)
         viewModel.login("user@example.com", "password123")
 
         advanceUntilIdle()
@@ -141,7 +157,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
     viewModel.login("user@example.com", "wrong")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -159,7 +179,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
     viewModel.login("a@b.com", "p")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -176,7 +200,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
     viewModel.clearError()
 
     assertIs<LoginUiState.Idle>(viewModel.uiState.value)
@@ -189,7 +217,11 @@ class LoginViewModelTest {
 
     val viewModel =
         LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+            mockAuthRepository,
+            mockNotificationsRepository,
+            mockTokenManager,
+            mockContext,
+            mockAnalyticsTracker)
     viewModel.login("user@example.com", "pass")
 
     testDispatcher.scheduler.advanceUntilIdle()
@@ -211,7 +243,11 @@ class LoginViewModelTest {
 
         val viewModel =
             LoginViewModel(
-                mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
+                mockAuthRepository,
+                mockNotificationsRepository,
+                mockTokenManager,
+                mockContext,
+                mockAnalyticsTracker)
         viewModel.login("user@example.com", "password123")
 
         advanceUntilIdle()
@@ -220,29 +256,34 @@ class LoginViewModelTest {
       }
 
   @Test
-  fun `login success logs analytics event`() = runTest(testDispatcher) {
-    every { mockTokenManager.getToken() } returns null
-    every { mockTokenManager.saveToken(any()) } returns Unit
-    every { mockTokenManager.saveProfileTimezone(any()) } returns Unit
-    coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
-    coEvery { mockAuthRepository.getProfile() } returns
-        ApiResult.Success(
-            UserProfile(
-                id = 1,
-                email = "user@example.com",
-                first_name = "Test",
-                last_name = "User",
-                timezone = "UTC"))
-    coEvery { mockNotificationsRepository.registerDeviceToken(any()) } returns
-        ApiResult.Success(Unit)
+  fun `login success logs analytics event`() =
+      runTest(testDispatcher) {
+        every { mockTokenManager.getToken() } returns null
+        every { mockTokenManager.saveToken(any()) } returns Unit
+        every { mockTokenManager.saveProfileTimezone(any()) } returns Unit
+        coEvery { mockAuthRepository.login(any(), any()) } returns ApiResult.Success("token-123")
+        coEvery { mockAuthRepository.getProfile() } returns
+            ApiResult.Success(
+                UserProfile(
+                    id = 1,
+                    email = "user@example.com",
+                    first_name = "Test",
+                    last_name = "User",
+                    timezone = "UTC"))
+        coEvery { mockNotificationsRepository.registerDeviceToken(any()) } returns
+            ApiResult.Success(Unit)
 
-    val viewModel =
-        LoginViewModel(
-            mockAuthRepository, mockNotificationsRepository, mockTokenManager, mockContext, mockAnalyticsTracker)
-    viewModel.login("user@example.com", "password123")
+        val viewModel =
+            LoginViewModel(
+                mockAuthRepository,
+                mockNotificationsRepository,
+                mockTokenManager,
+                mockContext,
+                mockAnalyticsTracker)
+        viewModel.login("user@example.com", "password123")
 
-    advanceUntilIdle()
+        advanceUntilIdle()
 
-    coVerify { mockAnalyticsTracker.logLoginSuccess() }
-  }
+        coVerify { mockAnalyticsTracker.logLoginSuccess() }
+      }
 }

@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
@@ -42,6 +44,7 @@ class ChildrenListViewModel
 constructor(
     private val repo: CachedChildrenRepository,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<ChildrenListUiState> =
@@ -109,8 +112,19 @@ constructor(
   fun deleteChild(childId: Int) {
     viewModelScope.launch {
       val result = repo.deleteChild(childId)
-      if (result is ApiResult.Error) {
-        _deleteError.emit(result.error.getUserMessage(context))
+      when (result) {
+        is ApiResult.Success -> {
+          // Get remaining child count for analytics
+          val allChildren = repo.listChildrenCached().first()
+          val remainingCount = if (allChildren is ApiResult.Success) allChildren.data.size else 0
+          analyticsTracker.logChildDeleted(remainingCount)
+        }
+        is ApiResult.Error -> {
+          _deleteError.emit(result.error.getUserMessage(context))
+        }
+        is ApiResult.Loading -> {
+          /* no-op */
+        }
       }
     }
   }

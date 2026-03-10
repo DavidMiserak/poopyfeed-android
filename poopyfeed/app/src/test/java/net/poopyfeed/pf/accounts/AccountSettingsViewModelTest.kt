@@ -45,6 +45,8 @@ class AccountSettingsViewModelTest {
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
+  private val mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker =
+      mockk()
 
   private val defaultQuietHours =
       QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
@@ -52,14 +54,8 @@ class AccountSettingsViewModelTest {
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
-    every { mockContext.getString(R.string.error_network) } returns
-        "Network error. Please check your connection."
-    every { mockContext.getString(R.string.error_serialization) } returns
-        "Data format error. Please try again."
-    every { mockContext.getString(R.string.error_unknown) } returns
-        "Something went wrong. Please try again."
-    coEvery { mockNotificationsRepository.getQuietHours() } returns
-        ApiResult.Success(defaultQuietHours)
+    every { mockAnalyticsTracker.logPasswordChanged() } returns Unit
+    every { mockAnalyticsTracker.logAccountDeleted() } returns Unit
   }
 
   @After
@@ -81,7 +77,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -102,7 +99,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -124,7 +122,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -146,7 +145,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -174,7 +174,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -203,7 +204,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -226,6 +228,8 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.changePassword(VALID_PASSWORD, NEW_PASSWORD) } returns
         ApiResult.Success(NEW_TOKEN)
     every { mockTokenManager.saveToken(NEW_TOKEN) } returns Unit
+    coEvery { mockNotificationsRepository.getQuietHours() } returns
+        ApiResult.Success(defaultQuietHours)
 
     val viewModel =
         AccountSettingsViewModel(
@@ -233,7 +237,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -242,6 +247,7 @@ class AccountSettingsViewModelTest {
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.PasswordChanged>(state)
     verify(exactly = 1) { mockTokenManager.saveToken(NEW_TOKEN) }
+    verify(exactly = 1) { mockAnalyticsTracker.logPasswordChanged() }
   }
 
   @Test
@@ -258,7 +264,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, "different-password")
@@ -283,7 +290,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, "short", "short")
@@ -308,7 +316,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword("", NEW_PASSWORD, NEW_PASSWORD)
@@ -336,7 +345,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -356,6 +366,8 @@ class AccountSettingsViewModelTest {
     coEvery { mockAuthRepository.getProfile() } returns ApiResult.Success(initialProfile)
     coEvery { mockAuthRepository.deleteAccount(VALID_PASSWORD) } returns ApiResult.Success(Unit)
     coEvery { mockClearSessionUseCase() } returns Unit
+    coEvery { mockNotificationsRepository.getQuietHours() } returns
+        ApiResult.Success(defaultQuietHours)
 
     val viewModel =
         AccountSettingsViewModel(
@@ -363,7 +375,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -371,6 +384,7 @@ class AccountSettingsViewModelTest {
 
     val state = viewModel.uiState.value
     assertIs<AccountSettingsUiState.AccountDeleted>(state)
+    verify(exactly = 1) { mockAnalyticsTracker.logAccountDeleted() }
     coVerify(exactly = 1) { mockClearSessionUseCase() }
   }
 
@@ -388,7 +402,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("")
@@ -417,7 +432,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount("wrong-password")
@@ -443,7 +459,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -471,7 +488,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Transition to PasswordChanged state
@@ -495,7 +513,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -515,7 +534,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -544,7 +564,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -567,7 +588,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Unauthorized>(viewModel.uiState.value)
@@ -590,7 +612,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertIs<AccountSettingsUiState.Ready>(viewModel.uiState.value)
@@ -619,7 +642,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -643,7 +667,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
 
     testDispatcher.scheduler.advanceUntilIdle()
 
@@ -663,7 +688,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.saveProfile("New", "Name", "Europe/Berlin")
@@ -682,7 +708,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.saveProfile("New", "Name", "UTC")
@@ -706,7 +733,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, NEW_PASSWORD, NEW_PASSWORD)
@@ -728,7 +756,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.changePassword(VALID_PASSWORD, "", "")
@@ -751,7 +780,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     viewModel.deleteAccount(VALID_PASSWORD)
@@ -774,7 +804,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     val errors = mutableListOf<String>()
@@ -803,7 +834,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     val successes = mutableListOf<Unit>()
@@ -831,7 +863,8 @@ class AccountSettingsViewModelTest {
             mockNotificationsRepository,
             mockClearSessionUseCase,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     val errors = mutableListOf<String>()

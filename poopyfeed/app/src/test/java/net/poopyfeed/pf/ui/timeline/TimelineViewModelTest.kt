@@ -44,11 +44,13 @@ class TimelineViewModelTest {
   private val mockSyncScheduler: net.poopyfeed.pf.sync.SyncScheduler = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: TimelineViewModel
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
+    mockAnalyticsTracker = mockk(relaxed = true)
   }
 
   @After
@@ -70,7 +72,8 @@ class TimelineViewModelTest {
             mockNapsRepository,
             mockSyncScheduler,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
   }
 
@@ -674,7 +677,8 @@ class TimelineViewModelTest {
             mockNapsRepository,
             mockSyncScheduler,
             mockTokenManager,
-            mockContext)
+            mockContext,
+            mockAnalyticsTracker)
     testDispatcher.scheduler.advanceUntilIdle()
 
     val state = viewModel.uiState.first()

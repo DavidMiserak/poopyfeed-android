@@ -33,6 +33,7 @@ class ChildDetailViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
   private lateinit var mockAnalyticsRepository: AnalyticsRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var savedStateHandle: SavedStateHandle
 
   @Before
@@ -40,6 +41,7 @@ class ChildDetailViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
     mockAnalyticsRepository = mockk()
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     every { mockContext.getString(any()) } returns "formatted_time"
@@ -64,7 +66,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -85,7 +91,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -109,7 +119,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -134,7 +148,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -160,7 +178,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -191,7 +213,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -217,7 +243,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -241,7 +271,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -265,7 +299,11 @@ class ChildDetailViewModelTest {
 
         val viewModel =
             ChildDetailViewModel(
-                savedStateHandle, mockRepository, mockAnalyticsRepository, mockContext)
+                savedStateHandle,
+                mockRepository,
+                mockAnalyticsRepository,
+                mockContext,
+                mockAnalyticsTracker)
         advanceUntilIdle()
 
         val initialAlerts = (viewModel.uiState.value as? ChildDetailUiState.Ready)?.patternAlerts

@@ -29,6 +29,7 @@ class DiapersListViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedDiapersRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: DiapersListViewModel
 
   @Before
@@ -36,6 +37,7 @@ class DiapersListViewModelTest {
     Dispatchers.setMain(testDispatcher)
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
   }
 
   @After
@@ -48,7 +50,7 @@ class DiapersListViewModelTest {
     val pagingData: Flow<PagingData<Diaper>> = flowOf()
     every { mockRepository.pagedDiapers(1) } returns pagingData
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -57,7 +59,7 @@ class DiapersListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedDiapers(1) } returns flowOf()
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.deleteError.value == null)
   }
@@ -67,7 +69,7 @@ class DiapersListViewModelTest {
     every { mockRepository.pagedDiapers(1) } returns flowOf()
     coEvery { mockRepository.deleteDiaper(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteDiaper(10)
     advanceUntilIdle()
 
@@ -81,7 +83,7 @@ class DiapersListViewModelTest {
     coEvery { mockRepository.deleteDiaper(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteDiaper(10)
     advanceUntilIdle()
 

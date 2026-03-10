@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.ShareInvite
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
@@ -52,6 +53,7 @@ constructor(
     private val childrenRepository: ChildrenRepository,
     private val cachedChildrenRepository: CachedChildrenRepository,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<PendingInvitesUiState> =

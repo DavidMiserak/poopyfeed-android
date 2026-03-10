@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildrenListBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Displays a list of children with pull-to-refresh support. Allows tapping a child to view details.
@@ -42,6 +43,8 @@ class ChildrenListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "ChildrenList")
 
     // Setup adapter
     adapter = ChildAdapter { child -> navigateToChildDetail(child.id) }

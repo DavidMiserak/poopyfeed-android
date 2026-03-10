@@ -17,6 +17,7 @@ import java.text.NumberFormat
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildDetailBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Displays details of a single child including name, age, gender, and last activities. Shows edit
@@ -42,6 +43,8 @@ class ChildDetailFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "ChildDetail")
 
     binding.buttonEdit.setOnClickListener { openEditChild() }
 

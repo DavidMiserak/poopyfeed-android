@@ -29,6 +29,7 @@ class FeedingsListViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedFeedingsRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: FeedingsListViewModel
 
   @Before
@@ -36,6 +37,7 @@ class FeedingsListViewModelTest {
     Dispatchers.setMain(testDispatcher)
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
   }
 
   @After
@@ -48,7 +50,7 @@ class FeedingsListViewModelTest {
     val pagingData: Flow<PagingData<Feeding>> = flowOf()
     every { mockRepository.pagedFeedings(1) } returns pagingData
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -57,7 +59,7 @@ class FeedingsListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
 
     assert(viewModel.deleteError.value == null)
   }
@@ -67,7 +69,7 @@ class FeedingsListViewModelTest {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
     coEvery { mockRepository.deleteFeeding(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 
@@ -81,7 +83,7 @@ class FeedingsListViewModelTest {
     coEvery { mockRepository.deleteFeeding(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 

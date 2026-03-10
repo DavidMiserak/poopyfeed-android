@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentPendingInvitesBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Lists pending share invites. User can accept an invite; on success they are taken to that child's
@@ -43,6 +44,8 @@ class PendingInvitesFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "PendingInvites")
 
     adapter = PendingInviteAdapter { _, _ ->
       // Accept is by token only (backend has no pending list); use "I have an invite link" flow

@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.databinding.FragmentSharingBinding
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Manage sharing for a child: invite links (copy/pause/delete) and people with access; create
@@ -46,6 +47,8 @@ class SharingFragment : Fragment(), SharingInviteCallbacks {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "Sharing")
 
     adapter = SharingAdapter(this)
     binding.recyclerSharing.adapter = adapter

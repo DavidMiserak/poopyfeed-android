@@ -29,6 +29,7 @@ class SharingViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var mockSharingRepository: SharingRepository
   private lateinit var savedStateHandle: SavedStateHandle
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: SharingViewModel
 
   @Before
@@ -37,6 +38,7 @@ class SharingViewModelTest {
     mockContext = mockk()
     mockSharingRepository = mockk()
     savedStateHandle = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     every { savedStateHandle.get<Int>("childId") } returns 7
   }
@@ -56,10 +58,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Ready>(viewModel.uiState.value)
@@ -88,10 +87,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Ready>(viewModel.uiState.value)
@@ -110,10 +106,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Error>(viewModel.uiState.value)
@@ -128,10 +121,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Error>(viewModel.uiState.value)
@@ -145,10 +135,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         viewModel.refresh()
         advanceUntilIdle()
@@ -176,10 +163,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val messages = mutableListOf<String>()
@@ -211,10 +195,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         val messages = mutableListOf<String>()
@@ -245,10 +226,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         val messages = mutableListOf<String>()
         val job = launch { viewModel.errorMessage.collect { messages.add(it) } }
@@ -266,10 +244,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Loading>(viewModel.uiState.value)
@@ -283,10 +258,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<SharingUiState.Loading>(viewModel.uiState.value)
@@ -310,10 +282,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         viewModel.toggleInvite(invite)
         advanceUntilIdle()
@@ -340,10 +309,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         viewModel.deleteInvite(invite)
         advanceUntilIdle()
@@ -370,10 +336,7 @@ class SharingViewModelTest {
 
         viewModel =
             SharingViewModel(
-                savedStateHandle,
-                mockSharingRepository,
-                mockContext,
-            )
+                savedStateHandle, mockSharingRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         val messages = mutableListOf<String>()
         val job = launch { viewModel.errorMessage.collect { messages.add(it) } }

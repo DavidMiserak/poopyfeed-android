@@ -4,7 +4,6 @@ import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.mockk.mockk
 import io.mockk.verify
-import io.mockk.verifyOrder
 import kotlin.test.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -40,9 +39,11 @@ class AnalyticsTrackerTest {
   fun `logScreenView includes screen_name parameter`() {
     tracker.logScreenView(screenName = "TestScreen", screenClass = "TestClass")
 
-    verify { firebaseAnalytics.logEvent("screen_view", match<Bundle> { bundle ->
-      bundle.getString("screen_name") == "TestScreen"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "screen_view",
+          match<Bundle> { bundle -> bundle.getString("screen_name") == "TestScreen" })
+    }
   }
 
   @Test
@@ -56,9 +57,10 @@ class AnalyticsTrackerTest {
   fun `logLoginSuccess includes method parameter`() {
     tracker.logLoginSuccess()
 
-    verify { firebaseAnalytics.logEvent("login", match<Bundle> { bundle ->
-      bundle.getString("method") == "email"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "login", match<Bundle> { bundle -> bundle.getString("method") == "email" })
+    }
   }
 
   @Test
@@ -72,9 +74,10 @@ class AnalyticsTrackerTest {
   fun `logSignupSuccess includes method parameter`() {
     tracker.logSignupSuccess()
 
-    verify { firebaseAnalytics.logEvent("sign_up", match<Bundle> { bundle ->
-      bundle.getString("method") == "email"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "sign_up", match<Bundle> { bundle -> bundle.getString("method") == "email" })
+    }
   }
 
   @Test
@@ -95,9 +98,10 @@ class AnalyticsTrackerTest {
   fun `logChildCreated includes child_count parameter`() {
     tracker.logChildCreated(childCount = 2)
 
-    verify { firebaseAnalytics.logEvent("child_created", match<Bundle> { bundle ->
-      bundle.getInt("child_count") == 2
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "child_created", match<Bundle> { bundle -> bundle.getInt("child_count") == 2 })
+    }
   }
 
   @Test
@@ -111,9 +115,10 @@ class AnalyticsTrackerTest {
   fun `logChildDeleted includes child_count parameter`() {
     tracker.logChildDeleted(childCount = 1)
 
-    verify { firebaseAnalytics.logEvent("child_deleted", match<Bundle> { bundle ->
-      bundle.getInt("child_count") == 1
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "child_deleted", match<Bundle> { bundle -> bundle.getInt("child_count") == 1 })
+    }
   }
 
   @Test
@@ -127,9 +132,11 @@ class AnalyticsTrackerTest {
   fun `logFeedingLogged includes feeding_type parameter`() {
     tracker.logFeedingLogged(feedingType = "breast")
 
-    verify { firebaseAnalytics.logEvent("feeding_logged", match<Bundle> { bundle ->
-      bundle.getString("feeding_type") == "breast"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "feeding_logged",
+          match<Bundle> { bundle -> bundle.getString("feeding_type") == "breast" })
+    }
   }
 
   @Test
@@ -143,9 +150,10 @@ class AnalyticsTrackerTest {
   fun `logDiaperLogged includes change_type parameter`() {
     tracker.logDiaperLogged(changeType = "wet")
 
-    verify { firebaseAnalytics.logEvent("diaper_logged", match<Bundle> { bundle ->
-      bundle.getString("change_type") == "wet"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "diaper_logged", match<Bundle> { bundle -> bundle.getString("change_type") == "wet" })
+    }
   }
 
   @Test
@@ -159,9 +167,10 @@ class AnalyticsTrackerTest {
   fun `logNapLogged includes duration_minutes parameter`() {
     tracker.logNapLogged(durationMinutes = 60)
 
-    verify { firebaseAnalytics.logEvent("nap_logged", match<Bundle> { bundle ->
-      bundle.getInt("duration_minutes") == 60
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "nap_logged", match<Bundle> { bundle -> bundle.getInt("duration_minutes") == 60 })
+    }
   }
 
   @Test
@@ -189,9 +198,13 @@ class AnalyticsTrackerTest {
   fun `logDeepLinkOpened includes uri_path parameter`() {
     tracker.logDeepLinkOpened(uriPath = "poopyfeed://app/children/123")
 
-    verify { firebaseAnalytics.logEvent("deep_link_opened", match<Bundle> { bundle ->
-      bundle.getString("uri_path") == "poopyfeed://app/children/123"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "deep_link_opened",
+          match<Bundle> { bundle ->
+            bundle.getString("uri_path") == "poopyfeed://app/children/123"
+          })
+    }
   }
 
   @Test
@@ -205,9 +218,10 @@ class AnalyticsTrackerTest {
   fun `logOfflineSyncCompleted includes items_synced parameter`() {
     tracker.logOfflineSyncCompleted(itemsSynced = 5)
 
-    verify { firebaseAnalytics.logEvent("offline_sync_completed", match<Bundle> { bundle ->
-      bundle.getInt("items_synced") == 5
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "offline_sync_completed", match<Bundle> { bundle -> bundle.getInt("items_synced") == 5 })
+    }
   }
 
   @Test
@@ -221,20 +235,27 @@ class AnalyticsTrackerTest {
   fun `logNotificationOpened includes event_type and item_id parameters`() {
     tracker.logNotificationOpened(eventType = "feeding", childId = "child-123")
 
-    verify { firebaseAnalytics.logEvent("notification_opened", match<Bundle> { bundle ->
-      bundle.getString("event_type") == "feeding" &&
-      bundle.getString("item_id") == "child-123"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "notification_opened",
+          match<Bundle> { bundle ->
+            bundle.getString("event_type") == "feeding" &&
+                bundle.getString("item_id") == "child-123"
+          })
+    }
   }
 
   @Test
   fun `logNotificationOpened handles different event types correctly`() {
     tracker.logNotificationOpened(eventType = "nap", childId = "child-456")
 
-    verify { firebaseAnalytics.logEvent("notification_opened", match<Bundle> { bundle ->
-      bundle.getString("event_type") == "nap" &&
-      bundle.getString("item_id") == "child-456"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "notification_opened",
+          match<Bundle> { bundle ->
+            bundle.getString("event_type") == "nap" && bundle.getString("item_id") == "child-456"
+          })
+    }
   }
 
   @Test
@@ -248,27 +269,34 @@ class AnalyticsTrackerTest {
   fun `logError includes error_type and error_message parameters`() {
     tracker.logError(errorType = "NetworkError", errorMessage = "Connection timeout")
 
-    verify { firebaseAnalytics.logEvent("app_error", match<Bundle> { bundle ->
-      bundle.getString("error_type") == "NetworkError" &&
-      bundle.getString("error_message") == "Connection timeout"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "app_error",
+          match<Bundle> { bundle ->
+            bundle.getString("error_type") == "NetworkError" &&
+                bundle.getString("error_message") == "Connection timeout"
+          })
+    }
   }
 
   @Test
   fun `logFeedingLogged with different feeding types`() {
     tracker.logFeedingLogged(feedingType = "bottle")
 
-    verify { firebaseAnalytics.logEvent("feeding_logged", match<Bundle> { bundle ->
-      bundle.getString("feeding_type") == "bottle"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "feeding_logged",
+          match<Bundle> { bundle -> bundle.getString("feeding_type") == "bottle" })
+    }
   }
 
   @Test
   fun `logDiaperLogged with different change types`() {
     tracker.logDiaperLogged(changeType = "poop")
 
-    verify { firebaseAnalytics.logEvent("diaper_logged", match<Bundle> { bundle ->
-      bundle.getString("change_type") == "poop"
-    }) }
+    verify {
+      firebaseAnalytics.logEvent(
+          "diaper_logged", match<Bundle> { bundle -> bundle.getString("change_type") == "poop" })
+    }
   }
 }

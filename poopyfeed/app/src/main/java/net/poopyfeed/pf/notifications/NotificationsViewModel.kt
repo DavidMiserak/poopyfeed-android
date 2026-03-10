@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Notification
 import net.poopyfeed.pf.data.repository.NotificationsRepository
@@ -44,6 +45,7 @@ class NotificationsViewModel
 constructor(
     private val repo: NotificationsRepository,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<NotificationsListUiState> =

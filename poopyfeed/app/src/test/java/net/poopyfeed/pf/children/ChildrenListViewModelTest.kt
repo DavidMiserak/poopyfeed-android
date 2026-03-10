@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
@@ -31,6 +33,7 @@ class ChildrenListViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
+  private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
   private lateinit var viewModel: ChildrenListViewModel
 
   @Before
@@ -38,6 +41,7 @@ class ChildrenListViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk()
     every { mockContext.getString(any()) } returns "Error message"
   }
 
@@ -54,7 +58,7 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         coVerify { mockRepository.refreshChildren() }
@@ -68,7 +72,7 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         viewModel.refresh()
         advanceUntilIdle()
@@ -86,7 +90,7 @@ class ChildrenListViewModelTest {
       coEvery { mockRepository.refreshChildren() } returns
           ApiResult.Error(ApiError.NetworkError("down"))
 
-      viewModel = ChildrenListViewModel(mockRepository, mockContext)
+      viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
       advanceUntilIdle()
 
       assertIs<ChildrenListUiState.Error>(viewModel.uiState.value)
@@ -102,7 +106,7 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
 
         assertIs<ChildrenListUiState.Loading>(viewModel.uiState.value)
@@ -118,7 +122,7 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.deleteChild(1) } returns
             ApiResult.Error(ApiError.NetworkError("fail"))
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         val emissions = mutableListOf<String>()
         val job = launch { viewModel.deleteError.collect { emissions.add(it) } }
@@ -127,6 +131,8 @@ class ChildrenListViewModelTest {
         job.cancel()
 
         assert(emissions.size == 1)
+        // No analytics call on error
+        verify(exactly = 0) { mockAnalyticsTracker.logChildDeleted(any()) }
       }
 
   @Test
@@ -137,12 +143,14 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.deleteChild(1) } returns ApiResult.Success(Unit)
+        every { mockAnalyticsTracker.logChildDeleted(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
         advanceUntilIdle()
         viewModel.deleteChild(1)
         advanceUntilIdle()
 
         coVerify { mockRepository.deleteChild(1) }
+        verify { mockAnalyticsTracker.logChildDeleted(0) }
       }
 }

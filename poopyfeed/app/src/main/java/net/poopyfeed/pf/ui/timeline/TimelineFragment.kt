@@ -16,6 +16,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.databinding.FragmentTimelineBinding
 import net.poopyfeed.pf.di.TokenManager
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * Displays a 7-day timeline of feedings, diapers, and naps for a child with day navigation. All
@@ -43,6 +44,8 @@ class TimelineFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "Timeline")
 
     // Determine profile timezone (falls back to device when not set)
     val profileTimezoneId = tokenManager.getProfileTimezone()

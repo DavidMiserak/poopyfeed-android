@@ -27,6 +27,7 @@ import net.poopyfeed.pf.MainActivityViewModel
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentNotificationsBinding
 import net.poopyfeed.pf.ui.common.PagingLoadStateAdapter
+import net.poopyfeed.pf.util.logScreenView
 
 /**
  * In-app notifications center. Lists notifications with pull-to-refresh, "Load more" for
@@ -66,6 +67,8 @@ class NotificationsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    logScreenView(viewModel.analyticsTracker, "Notifications")
 
     requireActivity()
         .addMenuProvider(

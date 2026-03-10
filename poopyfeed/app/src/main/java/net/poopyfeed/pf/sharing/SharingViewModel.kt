@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.data.repository.SharingRepository
@@ -39,6 +40,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val sharingRepository: SharingRepository,
     @param:ApplicationContext private val context: Context,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
   val childId: Int = checkNotNull(savedStateHandle["childId"])
