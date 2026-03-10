@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
@@ -32,6 +34,7 @@ class CreateNapViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedNapsRepository
   private lateinit var mockSyncScheduler: SyncScheduler
+  private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var viewModel: CreateNapViewModel
 
   @Before
@@ -41,8 +44,9 @@ class CreateNapViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockSyncScheduler = mockk(relaxed = true)
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateNapViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockContext)
+    viewModel = CreateNapViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After
@@ -104,5 +108,33 @@ class CreateNapViewModelTest {
         advanceUntilIdle()
 
         assertIs<CreateNapUiState.Saving>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createNap logs analytics with duration in minutes when end_time is present`() =
+      runTest(testDispatcher) {
+        // Create a nap with 2-hour duration
+        val startTime = "2024-01-15T12:00:00Z"
+        val endTime = "2024-01-15T14:00:00Z"
+        val mockNap = TestFixtures.mockNap(start_time = startTime, end_time = endTime)
+        coEvery { mockRepository.createNap(1, any()) } returns ApiResult.Success(mockNap)
+
+        viewModel.createNap(startTime, endTime)
+        advanceUntilIdle()
+
+        // 2 hours = 120 minutes
+        verify { mockAnalyticsTracker.logNapLogged(120) }
+      }
+
+  @Test
+  fun `createNap does not log analytics when end_time is null`() =
+      runTest(testDispatcher) {
+        val mockNap = TestFixtures.mockNap(end_time = null)
+        coEvery { mockRepository.createNap(1, any()) } returns ApiResult.Success(mockNap)
+
+        viewModel.createNap("2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        verify(exactly = 0) { mockAnalyticsTracker.logNapLogged(any()) }
       }
 }

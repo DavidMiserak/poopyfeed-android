@@ -9,7 +9,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateChildRequest
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
@@ -42,6 +44,7 @@ class CreateChildViewModel
 @Inject
 constructor(
     private val repo: CachedChildrenRepository,
+    private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -82,7 +85,14 @@ constructor(
       val result = repo.createChild(request)
       _uiState.value =
           when (result) {
-            is ApiResult.Success -> CreateChildUiState.Success
+            is ApiResult.Success -> {
+              // Query child count from result flow (Room data is already updated by repo.createChild)
+              val allChildren = repo.listChildrenCached().first()
+              if (allChildren is ApiResult.Success) {
+                analyticsTracker.logChildCreated(allChildren.data.size)
+              }
+              CreateChildUiState.Success
+            }
             is ApiResult.Error -> CreateChildUiState.Error(result.error.getUserMessage(context))
             is ApiResult.Loading -> CreateChildUiState.Saving
           }

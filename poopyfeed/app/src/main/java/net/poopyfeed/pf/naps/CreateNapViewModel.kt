@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
@@ -38,6 +40,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedNapsRepository,
     private val syncScheduler: SyncScheduler,
+    private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -55,6 +58,18 @@ constructor(
           when (result) {
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
+              // Calculate duration if end_time is present
+              val nap = result.data
+              if (nap.end_time != null) {
+                try {
+                  val startMs = Instant.parse(nap.start_time).toEpochMilliseconds()
+                  val endMs = Instant.parse(nap.end_time).toEpochMilliseconds()
+                  val durationMinutes = ((endMs - startMs) / (60 * 1000)).toInt()
+                  analyticsTracker.logNapLogged(durationMinutes)
+                } catch (e: Exception) {
+                  // Silent fail - don't block UI on analytics error
+                }
+              }
               CreateNapUiState.Success
             }
             is ApiResult.Error -> CreateNapUiState.Error(result.error.getUserMessage(context))

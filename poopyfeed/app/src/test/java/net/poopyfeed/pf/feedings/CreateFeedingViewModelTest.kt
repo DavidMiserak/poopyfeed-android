@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
@@ -31,6 +33,7 @@ class CreateFeedingViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedFeedingsRepository
   private lateinit var mockSyncScheduler: SyncScheduler
+  private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var viewModel: CreateFeedingViewModel
 
   @Before
@@ -40,9 +43,10 @@ class CreateFeedingViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockSyncScheduler = mockk(relaxed = true)
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
-        CreateFeedingViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockContext)
+        CreateFeedingViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After
@@ -109,5 +113,17 @@ class CreateFeedingViewModelTest {
         advanceUntilIdle()
 
         assertIs<CreateFeedingUiState.Saving>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createFeeding logs analytics with feeding type on success`() =
+      runTest(testDispatcher) {
+        val mockFeeding = TestFixtures.mockFeeding().copy(feeding_type = "breast")
+        coEvery { mockRepository.createFeeding(1, any()) } returns ApiResult.Success(mockFeeding)
+
+        viewModel.createFeeding("breast", null, 15, "left", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        verify { mockAnalyticsTracker.logFeedingLogged("breast") }
       }
 }

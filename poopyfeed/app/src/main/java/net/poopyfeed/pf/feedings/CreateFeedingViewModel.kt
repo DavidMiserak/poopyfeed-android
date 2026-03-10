@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
@@ -42,6 +43,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedFeedingsRepository,
     private val syncScheduler: SyncScheduler,
+    private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -102,6 +104,7 @@ constructor(
           when (result) {
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
+              analyticsTracker.logFeedingLogged(result.data.feeding_type)
               CreateFeedingUiState.Success
             }
             is ApiResult.Error -> CreateFeedingUiState.Error(result.error.getUserMessage(context))

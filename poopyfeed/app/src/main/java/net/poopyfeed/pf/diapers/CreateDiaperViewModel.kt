@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
@@ -37,6 +38,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedDiapersRepository,
     private val syncScheduler: SyncScheduler,
+    private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -61,6 +63,7 @@ constructor(
           when (result) {
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
+              analyticsTracker.logDiaperLogged(result.data.change_type)
               CreateDiaperUiState.Success
             }
             is ApiResult.Error -> CreateDiaperUiState.Error(result.error.getUserMessage(context))

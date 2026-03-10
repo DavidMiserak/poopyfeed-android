@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
@@ -31,6 +33,7 @@ class CreateDiaperViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedDiapersRepository
   private lateinit var mockSyncScheduler: SyncScheduler
+  private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var viewModel: CreateDiaperViewModel
 
   @Before
@@ -40,9 +43,10 @@ class CreateDiaperViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockSyncScheduler = mockk(relaxed = true)
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
-        CreateDiaperViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockContext)
+        CreateDiaperViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After
@@ -93,5 +97,17 @@ class CreateDiaperViewModelTest {
         advanceUntilIdle()
 
         assertIs<CreateDiaperUiState.Saving>(viewModel.uiState.value)
+      }
+
+  @Test
+  fun `createDiaper logs analytics with change type on success`() =
+      runTest(testDispatcher) {
+        val mockDiaper = TestFixtures.mockDiaper().copy(change_type = "both")
+        coEvery { mockRepository.createDiaper(1, any()) } returns ApiResult.Success(mockDiaper)
+
+        viewModel.createDiaper("both", "2024-01-15T12:00:00Z")
+        advanceUntilIdle()
+
+        verify { mockAnalyticsTracker.logDiaperLogged("both") }
       }
 }

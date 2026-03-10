@@ -5,16 +5,19 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
@@ -29,6 +32,7 @@ class CreateChildViewModelTest {
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
+  private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var viewModel: CreateChildViewModel
 
   @Before
@@ -36,8 +40,9 @@ class CreateChildViewModelTest {
     Dispatchers.setMain(testDispatcher)
     mockContext = mockk()
     mockRepository = mockk()
+    mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateChildViewModel(mockRepository, mockContext)
+    viewModel = CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext)
   }
 
   @After
@@ -54,8 +59,10 @@ class CreateChildViewModelTest {
   @Test
   fun `createChild with valid inputs calls repository`() =
       runTest(testDispatcher) {
-        coEvery { mockRepository.createChild(any()) } returns
-            ApiResult.Success(TestFixtures.mockChild())
+        val mockChild = TestFixtures.mockChild()
+        coEvery { mockRepository.createChild(any()) } returns ApiResult.Success(mockChild)
+        every { mockRepository.listChildrenCached() } returns
+            flowOf(ApiResult.Success(listOf(mockChild)))
 
         viewModel.createChild("Alice", "2024-01-15", "F")
         advanceUntilIdle()
@@ -128,5 +135,20 @@ class CreateChildViewModelTest {
         val state = viewModel.uiState.value
         assertIs<CreateChildUiState.ValidationError>(state)
         coVerify(exactly = 0) { mockRepository.createChild(any()) }
+      }
+
+  @Test
+  fun `createChild logs analytics with child count on success`() =
+      runTest(testDispatcher) {
+        val child1 = TestFixtures.mockChild()
+        val child2 = TestFixtures.mockChild().copy(id = 2, name = "Bob")
+        coEvery { mockRepository.createChild(any()) } returns ApiResult.Success(child1)
+        every { mockRepository.listChildrenCached() } returns
+            flowOf(ApiResult.Success(listOf(child1, child2)))
+
+        viewModel.createChild("Alice", "2024-01-15", "F")
+        advanceUntilIdle()
+
+        verify { mockAnalyticsTracker.logChildCreated(2) }
       }
 }
