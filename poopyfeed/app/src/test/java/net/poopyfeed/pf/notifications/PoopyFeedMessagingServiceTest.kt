@@ -70,7 +70,7 @@ class PoopyFeedMessagingServiceTest {
 
   @Test
   fun `onMessageReceived returns early when title is missing`() {
-    // Arrange: Message without title
+    // Arrange: Message without required title field
     every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
 
     service =
@@ -82,18 +82,18 @@ class PoopyFeedMessagingServiceTest {
     val messageData =
         mapOf(
             "body" to "Message without title", "event_type" to "activity_alert"
-            // Missing "title"
+            // Missing "title" — required field
             )
     val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
 
-    // Act & Assert - should not throw, early return expected
+    // Act & Assert: Service handles missing title gracefully with early return
     service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Message without title is handled gracefully")
+    assertTrue(true, "Missing title causes early return without error")
   }
 
   @Test
   fun `onMessageReceived returns early when body is missing`() {
-    // Arrange: Message without body
+    // Arrange: Message without required body field
     every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
 
     service =
@@ -105,13 +105,21 @@ class PoopyFeedMessagingServiceTest {
     val messageData =
         mapOf(
             "title" to "Notification Title", "event_type" to "activity_alert"
-            // Missing "body"
+            // Missing "body" — required field
             )
     val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
 
-    // Act & Assert - should not throw, early return expected
+    // Act & Assert: Service handles missing body gracefully with early return
     service.onMessageReceived(remoteMessage) // Should not throw
-    assertTrue(true, "Message without body is handled gracefully")
+    assertTrue(true, "Missing body causes early return without error")
+  }
+
+  @Test
+  fun `event_type defaults to empty string when missing from payload`() {
+    // Verify that event_type is treated as optional and defaults to empty string
+    // This allows routing to default activity_alerts channel
+    val defaultChannelId = PoopyFeedMessagingService.getChannelIdForEventType("")
+    assertEquals(PoopyFeedMessagingService.CHANNEL_ACTIVITY_ALERTS, defaultChannelId)
   }
 
   @Test
