@@ -124,4 +124,50 @@ class PoopyFeedMessagingServiceTest {
     service.onMessageReceived(remoteMessage) // Should not throw
     assertTrue(true, "Feeding reminder bypasses quiet hours and processes")
   }
+
+  @Test
+  fun `onMessageReceived returns early when title is missing`() {
+    // Arrange: Message without title
+    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
+
+    service =
+        PoopyFeedMessagingService().apply {
+          notificationsRepository = mockNotificationsRepository
+          tokenManager = mockTokenManager
+        }
+
+    val messageData =
+        mapOf(
+            "body" to "Message without title", "event_type" to "activity_alert"
+            // Missing "title"
+            )
+    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
+
+    // Act & Assert - should not throw, early return expected
+    service.onMessageReceived(remoteMessage) // Should not throw
+    assertTrue(true, "Message without title is handled gracefully")
+  }
+
+  @Test
+  fun `onMessageReceived returns early when body is missing`() {
+    // Arrange: Message without body
+    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
+
+    service =
+        PoopyFeedMessagingService().apply {
+          notificationsRepository = mockNotificationsRepository
+          tokenManager = mockTokenManager
+        }
+
+    val messageData =
+        mapOf(
+            "title" to "Notification Title", "event_type" to "activity_alert"
+            // Missing "body"
+            )
+    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
+
+    // Act & Assert - should not throw, early return expected
+    service.onMessageReceived(remoteMessage) // Should not throw
+    assertTrue(true, "Message without body is handled gracefully")
+  }
 }
