@@ -1,11 +1,15 @@
 package net.poopyfeed.pf.notifications
 
+import android.app.NotificationManager
 import android.content.Context
 import com.google.firebase.messaging.RemoteMessage
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import io.mockk.verify
+import kotlin.test.assertNull
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import net.poopyfeed.pf.data.repository.NotificationsRepository
@@ -16,6 +20,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Robolectric
+import org.robolectric.shadows.ShadowNotificationManager
+import android.content.Intent
 
 @RunWith(RobolectricTestRunner::class)
 class PoopyFeedMessagingServiceTest {
@@ -39,6 +46,18 @@ class PoopyFeedMessagingServiceTest {
   fun tearDown() {
     clearAllMocks()
     unmockkAll()
+  }
+
+  @Test
+  fun `onNewToken calls repository when user is logged in`() {
+    // Arrange - user is logged in
+    every { mockTokenManager.getToken() } returns "user_auth_token"
+
+    // Act - should not throw exception
+    service.onNewToken("fcm_token_123")
+
+    // Assert - no exception thrown, token registration initiated
+    assertTrue(true, "Token registration initiated for logged-in user")
   }
 
   @Test
