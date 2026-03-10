@@ -24,6 +24,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.databinding.ActivityMainBinding
 import net.poopyfeed.pf.di.TokenManager
 
@@ -36,6 +37,7 @@ import net.poopyfeed.pf.di.TokenManager
 class MainActivity : AppCompatActivity() {
 
   @Inject lateinit var tokenManager: TokenManager
+  @Inject lateinit var analyticsTracker: AnalyticsTracker
 
   private lateinit var binding: ActivityMainBinding
   private lateinit var appBarConfiguration: AppBarConfiguration
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun navigateToDeepLink(uriString: String) {
+    analyticsTracker.logDeepLinkOpened(uriString)
     binding.root.post { // post to ensure NavController is initialized
       val navController = findNavController(R.id.nav_host_fragment_content_main)
       val currentDest = navController.currentDestination?.id
