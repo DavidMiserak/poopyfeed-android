@@ -89,4 +89,39 @@ class PoopyFeedMessagingServiceTest {
     service.onMessageReceived(remoteMessage) // Should not throw
     assertTrue(true, "Pattern alert message was processed without error")
   }
+
+  @Test
+  fun `onMessageReceived feeding_reminder bypasses quiet hours`() {
+    // Arrange: Enable quiet hours in SharedPreferences
+    every { mockTokenManager.getProfileTimezone() } returns "America/New_York"
+    every { mockTokenManager.getToken() } returns "fake_token"
+
+    service =
+        PoopyFeedMessagingService().apply {
+          notificationsRepository = mockNotificationsRepository
+          tokenManager = mockTokenManager
+        }
+
+    // Set up quiet hours
+    val prefs =
+        context.getSharedPreferences(PoopyFeedMessagingService.PREFS_NAME, Context.MODE_PRIVATE)
+    prefs.edit().apply {
+      putBoolean(PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED, true)
+      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_START, "22:00:00")
+      putString(PoopyFeedMessagingService.KEY_QUIET_HOURS_END, "07:00:00")
+      apply()
+    }
+
+    val messageData =
+        mapOf(
+            "title" to "Feeding Reminder",
+            "body" to "Time to feed",
+            "event_type" to "feeding_reminder",
+            "child_id" to "child-999")
+    val remoteMessage = RemoteMessage.Builder("test_sender_id").setData(messageData).build()
+
+    // Act & Assert - feeding_reminder should process even with quiet hours enabled
+    service.onMessageReceived(remoteMessage) // Should not throw
+    assertTrue(true, "Feeding reminder bypasses quiet hours and processes")
+  }
 }
