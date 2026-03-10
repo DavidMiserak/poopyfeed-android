@@ -257,4 +257,31 @@ class CreateNapViewModelTest {
           "Result should be valid LocalDateTime: $localDateTime"
         }
       }
+
+  @Test
+  fun `getCalendarHourMinuteForPicker returns profile timezone time components`() =
+      runTest(testDispatcher) {
+        // UTC: 2024-01-15 17:00:00Z
+        // Profile TZ: America/Los_Angeles (UTC-8)
+        // Expected local: 09:00 (9 AM)
+        val utcTime = "2024-01-15T17:00:00Z"
+        val (hour, minute) = viewModel.getCalendarHourMinuteForPicker(utcTime)
+
+        // Should return 9 (from 09:00)
+        assert(hour == 9) { "Expected hour 9, got $hour" }
+        assert(minute == 0) { "Expected minute 0, got $minute" }
+      }
+
+  @Test
+  fun `getCalendarHourMinuteForPicker handles fractional minutes correctly`() =
+      runTest(testDispatcher) {
+        // UTC: 2024-01-15 17:45:30Z
+        // Profile TZ: America/Los_Angeles (UTC-8)
+        // Expected local: 09:45
+        val utcTime = "2024-01-15T17:45:30Z"
+        val (hour, minute) = viewModel.getCalendarHourMinuteForPicker(utcTime)
+
+        assert(hour == 9) { "Expected hour 9, got $hour" }
+        assert(minute == 45) { "Expected minute 45, got $minute" }
+      }
 }

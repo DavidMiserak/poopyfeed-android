@@ -163,6 +163,10 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
       val instant = kotlinx.datetime.Instant.parse(initialIso)
       cal.timeInMillis = instant.toEpochMilliseconds()
     } catch (_: Exception) {}
+
+    // Convert UTC time to profile timezone for date picker display
+    val (pickerHour, pickerMinute) = viewModel.getCalendarHourMinuteForPicker(initialIso)
+
     val datePicker =
         com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
             .setSelection(cal.timeInMillis)
@@ -172,16 +176,28 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
       val timePicker =
           MaterialTimePicker.Builder()
               .setTimeFormat(TimeFormat.CLOCK_12H)
-              .setHour(cal.get(Calendar.HOUR_OF_DAY))
-              .setMinute(cal.get(Calendar.MINUTE))
+              .setHour(pickerHour) // Use profile timezone hour
+              .setMinute(pickerMinute) // Use profile timezone minute
               .build()
       timePicker.addOnPositiveButtonClickListener {
+        // User picked time is in profile timezone
         cal.set(Calendar.HOUR_OF_DAY, timePicker.hour)
         cal.set(Calendar.MINUTE, timePicker.minute)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MILLISECOND, 0)
-        val iso = kotlinx.datetime.Instant.fromEpochMilliseconds(cal.timeInMillis).toString()
-        onSelected(iso)
+
+        // Convert from profile timezone back to UTC
+        val profileLocalDateTime =
+            "${
+                String.format(
+                    "%04d-%02d-%02d",
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.DAY_OF_MONTH)
+                )
+            }T${String.format("%02d:%02d:%02d", timePicker.hour, timePicker.minute, 0)}"
+        val utcIso = viewModel.convertLocalTimeToUtc(profileLocalDateTime)
+        onSelected(utcIso)
       }
       timePicker.show(parentFragmentManager, "time")
     }

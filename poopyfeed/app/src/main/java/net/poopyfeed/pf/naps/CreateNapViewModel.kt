@@ -133,6 +133,25 @@ constructor(
     }
   }
 
+  /**
+   * Extracts hour and minute components from a UTC ISO 8601 timestamp, converted to the profile
+   * timezone. Used for initializing MaterialTimePicker with the correct local time.
+   *
+   * @param utcTime UTC ISO 8601 string (e.g., "2024-01-15T17:00:00Z")
+   * @return Pair of (hour, minute) in profile timezone (e.g., Pair(9, 0) for Los Angeles when UTC
+   *   is 17:00)
+   */
+  fun getCalendarHourMinuteForPicker(utcTime: String): Pair<Int, Int> {
+    return try {
+      val tzId = tokenManager.getProfileTimezone() ?: "UTC"
+      val instant = Instant.parse(utcTime)
+      val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
+      Pair(localDateTime.hour, localDateTime.minute)
+    } catch (e: Exception) {
+      Pair(0, 0) // Fallback to midnight
+    }
+  }
+
   fun createNap(startTime: String, endTime: String? = null) {
     viewModelScope.launch {
       _uiState.value = CreateNapUiState.Saving
