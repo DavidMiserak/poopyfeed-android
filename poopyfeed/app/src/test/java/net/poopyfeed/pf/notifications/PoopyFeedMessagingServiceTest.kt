@@ -150,6 +150,15 @@ class PoopyFeedMessagingServiceTest {
   }
 
   @Test
+  fun `quiet hours preferences constants are correctly defined`() {
+    // Verify quiet hours preference keys are consistent
+    assertEquals("poopyfeed_prefs", PoopyFeedMessagingService.PREFS_NAME)
+    assertEquals("quiet_hours_enabled", PoopyFeedMessagingService.KEY_QUIET_HOURS_ENABLED)
+    assertEquals("quiet_hours_start", PoopyFeedMessagingService.KEY_QUIET_HOURS_START)
+    assertEquals("quiet_hours_end", PoopyFeedMessagingService.KEY_QUIET_HOURS_END)
+  }
+
+  @Test
   fun `createNotificationChannels creates all three required channels`() {
     // Act
     PoopyFeedMessagingService.createNotificationChannels(context)
