@@ -2,11 +2,15 @@ package net.poopyfeed.pf.analytics
 
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
-import io.mockk.spyk
+import io.mockk.mockk
+import io.mockk.verify
 import kotlin.test.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class AnalyticsTrackerTest {
 
   private lateinit var firebaseAnalytics: FirebaseAnalytics
@@ -14,9 +18,7 @@ class AnalyticsTrackerTest {
 
   @Before
   fun setup() {
-    // Use spyk with delegated object instead of relaxed mock
-    val firebaseAnalyticsReal = io.mockk.mockk<FirebaseAnalytics>()
-    firebaseAnalytics = firebaseAnalyticsReal
+    firebaseAnalytics = mockk(relaxed = true)
     tracker = AnalyticsTracker(firebaseAnalytics)
     assertNotNull(tracker)
   }
@@ -27,160 +29,128 @@ class AnalyticsTrackerTest {
   }
 
   @Test
-  fun `logScreenView executes without throwing`() {
-    try {
-      tracker.logScreenView("HomeFragment", "HomeFragment")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logScreenView calls logEvent with correct event name`() {
+    tracker.logScreenView(screenName = "HomeFragment", screenClass = "HomeFragment")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("screen_view", any()) }
   }
 
   @Test
-  fun `logLoginSuccess executes without throwing`() {
-    try {
-      tracker.logLoginSuccess()
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logLoginSuccess calls logEvent with correct event name`() {
+    tracker.logLoginSuccess()
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("login", any()) }
   }
 
   @Test
-  fun `logSignupSuccess executes without throwing`() {
-    try {
-      tracker.logSignupSuccess()
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logSignupSuccess calls logEvent with correct event name`() {
+    tracker.logSignupSuccess()
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("sign_up", any()) }
   }
 
   @Test
-  fun `logLogout executes without throwing`() {
-    try {
-      tracker.logLogout()
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logLogout calls logEvent with correct event name`() {
+    tracker.logLogout()
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("logout", any()) }
   }
 
   @Test
-  fun `logChildCreated executes without throwing`() {
-    try {
-      tracker.logChildCreated(childCount = 2)
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logChildCreated calls logEvent with correct event name`() {
+    tracker.logChildCreated(childCount = 2)
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("child_created", any()) }
   }
 
   @Test
-  fun `logChildDeleted executes without throwing`() {
-    try {
-      tracker.logChildDeleted(childCount = 1)
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logChildDeleted calls logEvent with correct event name`() {
+    tracker.logChildDeleted(childCount = 1)
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("child_deleted", any()) }
   }
 
   @Test
-  fun `logFeedingLogged executes without throwing`() {
-    try {
-      tracker.logFeedingLogged(feedingType = "breast")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logFeedingLogged calls logEvent with correct event name`() {
+    tracker.logFeedingLogged(feedingType = "breast")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("feeding_logged", any()) }
   }
 
   @Test
-  fun `logDiaperLogged executes without throwing`() {
-    try {
-      tracker.logDiaperLogged(changeType = "wet")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logDiaperLogged calls logEvent with correct event name`() {
+    tracker.logDiaperLogged(changeType = "wet")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("diaper_logged", any()) }
   }
 
   @Test
-  fun `logNapLogged executes without throwing`() {
-    try {
-      tracker.logNapLogged(durationMinutes = 60)
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logNapLogged calls logEvent with correct event name`() {
+    tracker.logNapLogged(durationMinutes = 60)
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("nap_logged", any()) }
   }
 
   @Test
-  fun `logPasswordChanged executes without throwing`() {
-    try {
-      tracker.logPasswordChanged()
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logPasswordChanged calls logEvent with correct event name`() {
+    tracker.logPasswordChanged()
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("password_changed", any()) }
   }
 
   @Test
-  fun `logAccountDeleted executes without throwing`() {
-    try {
-      tracker.logAccountDeleted()
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logAccountDeleted calls logEvent with correct event name`() {
+    tracker.logAccountDeleted()
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("account_deleted", any()) }
   }
 
   @Test
-  fun `logDeepLinkOpened executes without throwing`() {
-    try {
-      tracker.logDeepLinkOpened(uriPath = "poopyfeed://app/children/123")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logDeepLinkOpened calls logEvent with correct event name`() {
+    tracker.logDeepLinkOpened(uriPath = "poopyfeed://app/children/123")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("deep_link_opened", any()) }
   }
 
   @Test
-  fun `logOfflineSyncCompleted executes without throwing`() {
-    try {
-      tracker.logOfflineSyncCompleted(itemsSynced = 5)
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logOfflineSyncCompleted calls logEvent with correct event name`() {
+    tracker.logOfflineSyncCompleted(itemsSynced = 5)
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("offline_sync_completed", any()) }
   }
 
   @Test
-  fun `logNotificationOpened executes without throwing`() {
-    try {
-      tracker.logNotificationOpened(eventType = "feeding", childId = "child-123")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logNotificationOpened calls logEvent with correct event name`() {
+    tracker.logNotificationOpened(eventType = "feeding", childId = "child-123")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("notification_opened", any()) }
   }
 
   @Test
-  fun `logError executes without throwing`() {
-    try {
-      tracker.logError(errorType = "NetworkError", errorMessage = "Connection timeout")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logNotificationOpened handles different event types correctly`() {
+    tracker.logNotificationOpened(eventType = "nap", childId = "child-456")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("notification_opened", any()) }
   }
 
   @Test
-  fun `all methods can execute`() {
-    try {
-      tracker.logScreenView("TestScreen", "TestScreen")
-      tracker.logLoginSuccess()
-      tracker.logSignupSuccess()
-      tracker.logLogout()
-      tracker.logChildCreated(1)
-      tracker.logChildDeleted(0)
-      tracker.logFeedingLogged("bottle")
-      tracker.logDiaperLogged("poop")
-      tracker.logNapLogged(30)
-      tracker.logPasswordChanged()
-      tracker.logAccountDeleted()
-      tracker.logDeepLinkOpened("poopyfeed://app/children")
-      tracker.logOfflineSyncCompleted(3)
-      tracker.logNotificationOpened("nap", "child-456")
-      tracker.logError("UnknownError", "Something went wrong")
-    } catch (e: Exception) {
-      // Ignore exceptions from mocking Firebase SDK
-    }
+  fun `logError calls logEvent with correct event name`() {
+    tracker.logError(errorType = "NetworkError", errorMessage = "Connection timeout")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("app_error", any()) }
+  }
+
+  @Test
+  fun `logFeedingLogged with different feeding types`() {
+    tracker.logFeedingLogged(feedingType = "bottle")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("feeding_logged", any()) }
+  }
+
+  @Test
+  fun `logDiaperLogged with different change types`() {
+    tracker.logDiaperLogged(changeType = "poop")
+
+    verify(exactly = 1) { firebaseAnalytics.logEvent("diaper_logged", any()) }
   }
 }
