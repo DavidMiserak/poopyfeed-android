@@ -46,7 +46,8 @@ class CreateDiaperViewModelTest {
     mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
-        CreateDiaperViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
+        CreateDiaperViewModel(
+            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After

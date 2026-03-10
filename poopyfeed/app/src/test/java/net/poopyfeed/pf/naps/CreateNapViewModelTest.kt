@@ -46,7 +46,9 @@ class CreateNapViewModelTest {
     mockSyncScheduler = mockk(relaxed = true)
     mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateNapViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
+    viewModel =
+        CreateNapViewModel(
+            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After

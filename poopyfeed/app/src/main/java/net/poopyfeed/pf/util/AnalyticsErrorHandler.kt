@@ -20,14 +20,10 @@ fun handleAndLogError(
 ): String {
   val (errorType, errorMessage) =
       when (error) {
-        is ApiError.HttpError ->
-            "HttpError_${error.statusCode}" to error.errorMessage
-        is ApiError.NetworkError ->
-            "NetworkError" to error.errorMessage
-        is ApiError.SerializationError ->
-            "SerializationError" to error.errorMessage
-        is ApiError.UnknownError ->
-            "UnknownError" to error.errorMessage
+        is ApiError.HttpError -> "HttpError_${error.statusCode}" to error.errorMessage
+        is ApiError.NetworkError -> "NetworkError" to error.errorMessage
+        is ApiError.SerializationError -> "SerializationError" to error.errorMessage
+        is ApiError.UnknownError -> "UnknownError" to error.errorMessage
       }
 
   analyticsTracker.logError(errorType, "$context: $errorMessage")

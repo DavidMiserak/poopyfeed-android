@@ -46,7 +46,8 @@ class CreateFeedingViewModelTest {
     mockAnalyticsTracker = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
-        CreateFeedingViewModel(savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
+        CreateFeedingViewModel(
+            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
   }
 
   @After

@@ -86,7 +86,8 @@ constructor(
       _uiState.value =
           when (result) {
             is ApiResult.Success -> {
-              // Query child count from result flow (Room data is already updated by repo.createChild)
+              // Query child count from result flow (Room data is already updated by
+              // repo.createChild)
               val allChildren = repo.listChildrenCached().first()
               if (allChildren is ApiResult.Success) {
                 analyticsTracker.logChildCreated(allChildren.data.size)

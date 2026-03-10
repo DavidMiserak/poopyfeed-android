@@ -45,8 +45,7 @@ class AccountSettingsViewModelTest {
   private val mockClearSessionUseCase: ClearSessionUseCase = mockk(relaxed = true)
   private val mockTokenManager: TokenManager = mockk(relaxed = true)
   private val mockContext: Context = mockk(relaxed = true)
-  private val mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker =
-      mockk()
+  private val mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker = mockk()
 
   private val defaultQuietHours =
       QuietHours(enabled = false, startTime = "22:00:00", endTime = "07:00:00")
