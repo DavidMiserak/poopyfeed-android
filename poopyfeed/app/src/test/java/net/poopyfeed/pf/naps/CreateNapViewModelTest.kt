@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.TestFixtures
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
@@ -283,5 +285,44 @@ class CreateNapViewModelTest {
 
         assert(hour == 9) { "Expected hour 9, got $hour" }
         assert(minute == 45) { "Expected minute 45, got $minute" }
+      }
+
+  @Test
+  fun `getDatePickerSelectionMillisForProfileTz returns correct date for midnight boundary`() =
+      runTest(testDispatcher) {
+        // UTC: 2024-03-10 02:00:00Z
+        // Profile TZ: America/Los_Angeles (UTC-8)
+        // Expected profile date: 2024-03-09
+        val utcTime = "2024-03-10T02:00:00Z"
+        val selectionMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
+
+        // Verify the returned millis represents March 9 in profile timezone
+        // by converting back to date
+        val instant = kotlinx.datetime.Instant.fromEpochMilliseconds(selectionMillis)
+        val localDateTime =
+            instant.toLocalDateTime(kotlinx.datetime.TimeZone.of("America/Los_Angeles"))
+
+        assert(localDateTime.dayOfMonth == 9) { "Expected day 9, got ${localDateTime.dayOfMonth}" }
+        assert(localDateTime.monthNumber == 3) {
+          "Expected month 3, got ${localDateTime.monthNumber}"
+        }
+      }
+
+  @Test
+  fun `getDatePickerSelectionMillisForProfileTz keeps same date when no boundary crossing`() =
+      runTest(testDispatcher) {
+        // UTC: 2024-03-15 12:00:00Z
+        // Profile TZ: America/Los_Angeles (UTC-8)
+        // Expected profile date: 2024-03-15 (no boundary crossing)
+        val utcTime = "2024-03-15T12:00:00Z"
+        val selectionMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
+
+        val instant = kotlinx.datetime.Instant.fromEpochMilliseconds(selectionMillis)
+        val localDateTime =
+            instant.toLocalDateTime(kotlinx.datetime.TimeZone.of("America/Los_Angeles"))
+
+        assert(localDateTime.dayOfMonth == 15) {
+          "Expected day 15, got ${localDateTime.dayOfMonth}"
+        }
       }
 }

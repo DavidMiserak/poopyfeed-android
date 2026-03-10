@@ -167,9 +167,12 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
     // Convert UTC time to profile timezone for date picker display
     val (pickerHour, pickerMinute) = viewModel.getCalendarHourMinuteForPicker(initialIso)
 
+    // Get profile timezone date for date picker (fixes midnight boundary issues)
+    val profileTzDateMillis = viewModel.getDatePickerSelectionMillisForProfileTz(initialIso)
+
     val datePicker =
         com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
-            .setSelection(cal.timeInMillis)
+            .setSelection(profileTzDateMillis) // Use profile TZ date, not UTC date
             .build()
     datePicker.addOnPositiveButtonClickListener { millis ->
       cal.timeInMillis = millis
