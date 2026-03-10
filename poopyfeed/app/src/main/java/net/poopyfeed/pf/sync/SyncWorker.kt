@@ -9,6 +9,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.IOException
 import kotlinx.serialization.json.Json
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.DiaperEntity
@@ -39,6 +40,7 @@ constructor(
     private val diaperDao: DiaperDao,
     private val napDao: NapDao,
     private val json: Json,
+    private val analyticsTracker: AnalyticsTracker,
 ) : CoroutineWorker(appContext, workerParams) {
 
   override suspend fun doWork(): Result {
@@ -46,11 +48,13 @@ constructor(
     if (pendingItems.isEmpty()) return Result.success()
 
     var hasNetworkFailure = false
+    var itemsSynced = 0
 
     for (item in pendingItems) {
       try {
         syncItem(item)
         pendingSyncDao.delete(item.id)
+        itemsSynced++
       } catch (e: IOException) {
         // Network still down — retry the whole batch later
         hasNetworkFailure = true
@@ -64,6 +68,10 @@ constructor(
                 retryCount = item.retryCount + 1,
             ))
       }
+    }
+
+    if (itemsSynced > 0) {
+      analyticsTracker.logOfflineSyncCompleted(itemsSynced)
     }
 
     return if (hasNetworkFailure) Result.retry() else Result.success()

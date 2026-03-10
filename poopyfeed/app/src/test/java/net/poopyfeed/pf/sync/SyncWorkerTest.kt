@@ -15,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import net.poopyfeed.pf.TestFixtures
+import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.api.PoopyFeedApiService
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.FeedingDao
@@ -40,6 +41,7 @@ class SyncWorkerTest {
   private val diaperDao: DiaperDao = mockk(relaxed = true)
   private val napDao: NapDao = mockk(relaxed = true)
   private val json = Json { ignoreUnknownKeys = true }
+  private val analyticsTracker: AnalyticsTracker = mockk(relaxed = true)
 
   private lateinit var context: Context
 
@@ -58,7 +60,7 @@ class SyncWorkerTest {
   private fun buildWorker(): SyncWorker {
     return TestListenableWorkerBuilder<SyncWorker>(context)
         .setWorkerFactory(
-            TestSyncWorkerFactory(pendingSyncDao, apiService, feedingDao, diaperDao, napDao, json))
+            TestSyncWorkerFactory(pendingSyncDao, apiService, feedingDao, diaperDao, napDao, json, analyticsTracker))
         .build()
   }
 
@@ -193,6 +195,7 @@ private class TestSyncWorkerFactory(
     private val diaperDao: DiaperDao,
     private val napDao: NapDao,
     private val json: Json,
+    private val analyticsTracker: AnalyticsTracker,
 ) : androidx.work.WorkerFactory() {
   override fun createWorker(
       appContext: Context,
@@ -207,6 +210,7 @@ private class TestSyncWorkerFactory(
         feedingDao,
         diaperDao,
         napDao,
-        json)
+        json,
+        analyticsTracker)
   }
 }
