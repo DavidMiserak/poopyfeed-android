@@ -363,4 +363,50 @@
     <string name="a11y_go_to_diapers">Diapers. Double tap to open.</string>
     <string name="a11y_go_to_naps">Naps. Double tap to open.</string>
     <string name="a11y_go_to_timeline">Timeline. Double tap to open.</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Reports</string>
+    <string name="reports_export_csv_title">Export CSV</string>
+    <string name="reports_export_csv_subtitle">Download activity data as spreadsheet</string>
+    <string name="reports_export_pdf_title">Export PDF</string>
+    <string name="reports_export_pdf_subtitle">Download formatted report with charts</string>
+    <string name="reports_pediatrician_title">Pediatrician Summary</string>
+    <string name="reports_pediatrician_subtitle">Last 7 days at a glance for your doctor</string>
+    <string name="reports_date_range_label">Date range</string>
+    <string name="reports_days_7">7 days</string>
+    <string name="reports_days_30">30 days</string>
+    <string name="reports_days_60">60 days</string>
+    <string name="reports_days_90">90 days</string>
+    <string name="reports_export_button">Export</string>
+    <string name="reports_exporting">Exporting…</string>
+    <string name="reports_export_success">Export ready</string>
+    <string name="reports_export_error">Export failed</string>
+    <string name="reports_share">Share</string>
+    <string name="child_detail_reports">Reports</string>
+    <string name="child_detail_reports_subtitle">Export data and summaries</string>
+    <string name="a11y_go_to_reports">Reports. Double tap to view export options.</string>
+    <string name="icon_reports">📊</string>
+
+    <!-- Export PDF Bottom Sheet -->
+    <string name="export_pdf_title">Generating PDF</string>
+    <string name="export_pdf_preparing">Preparing…</string>
+    <string name="export_pdf_generating">Generating report…</string>
+    <string name="export_pdf_ready">Report ready!</string>
+    <string name="export_pdf_failed">Generation failed</string>
+    <string name="export_pdf_cancel">Cancel</string>
+    <string name="export_pdf_retry">Retry</string>
+    <string name="export_pdf_share">Share PDF</string>
+
+    <!-- Pediatrician Summary -->
+    <string name="pediatrician_title">Pediatrician Summary</string>
+    <string name="pediatrician_period">Last 7 days</string>
+    <string name="pediatrician_feedings_label">Feedings</string>
+    <string name="pediatrician_feedings_per_day">%s/day</string>
+    <string name="pediatrician_oz_per_day">%.1f oz/day</string>
+    <string name="pediatrician_diapers_label">Diapers</string>
+    <string name="pediatrician_diapers_per_day">%s/day</string>
+    <string name="pediatrician_naps_label">Naps</string>
+    <string name="pediatrician_naps_per_day">%s/day</string>
+    <string name="pediatrician_sleep_per_day">%s total sleep/day</string>
+    <string name="pediatrician_empty">No activity data for the last 7 days</string>
 </resources>
