@@ -109,4 +109,79 @@ class AnalyticsRepositoryTest {
     assertTrue(result is ApiResult.Error)
     assertTrue(result.error is ApiError.NetworkError)
   }
+
+  @Test
+  fun `exportCsv success returns ApiResult Success with ResponseBody`() = runTest {
+    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+    coEvery { mockApiService.exportCsv(1, 30) } returns mockBody
+
+    val result = repository.exportCsv(1, 30)
+
+    assertTrue(result is ApiResult.Success)
+    assertEquals(mockBody, result.data)
+  }
+
+  @Test
+  fun `exportCsv network error returns ApiResult Error`() = runTest {
+    coEvery { mockApiService.exportCsv(1, 30) } throws java.io.IOException("Network error")
+
+    val result = repository.exportCsv(1, 30)
+
+    assertTrue(result is ApiResult.Error)
+    assertTrue(result.error is ApiError.NetworkError)
+  }
+
+  @Test
+  fun `exportPdf success returns ApiResult Success with ExportJobResponse`() = runTest {
+    val mockResponse = TestFixtures.mockExportJobResponse()
+    coEvery { mockApiService.exportPdf(1, any()) } returns mockResponse
+
+    val result = repository.exportPdf(1, 30)
+
+    assertTrue(result is ApiResult.Success)
+    assertEquals(mockResponse, result.data)
+  }
+
+  @Test
+  fun `getExportStatus success returns ApiResult Success`() = runTest {
+    val mockStatus = TestFixtures.mockJobStatusResponse(status = "completed", progress = 100)
+    coEvery { mockApiService.getExportStatus(1, "task-123") } returns mockStatus
+
+    val result = repository.getExportStatus(1, "task-123")
+
+    assertTrue(result is ApiResult.Success)
+    assertEquals("completed", result.data.status)
+    assertEquals(100, result.data.progress)
+  }
+
+  @Test
+  fun `downloadPdf success returns ApiResult Success with ResponseBody`() = runTest {
+    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+    coEvery { mockApiService.downloadPdf("report.pdf") } returns mockBody
+
+    val result = repository.downloadPdf("report.pdf")
+
+    assertTrue(result is ApiResult.Success)
+  }
+
+  @Test
+  fun `getWeeklySummary success returns ApiResult Success`() = runTest {
+    val mockSummary = TestFixtures.mockWeeklySummary()
+    coEvery { mockApiService.getWeeklySummary(1) } returns mockSummary
+
+    val result = repository.getWeeklySummary(1)
+
+    assertTrue(result is ApiResult.Success)
+    assertEquals(mockSummary, result.data)
+  }
+
+  @Test
+  fun `getWeeklySummary network error returns ApiResult Error`() = runTest {
+    coEvery { mockApiService.getWeeklySummary(1) } throws java.io.IOException("fail")
+
+    val result = repository.getWeeklySummary(1)
+
+    assertTrue(result is ApiResult.Error)
+    assertTrue(result.error is ApiError.NetworkError)
+  }
 }

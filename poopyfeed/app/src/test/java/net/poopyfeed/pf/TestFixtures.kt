@@ -4,6 +4,8 @@ import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.data.models.ChildShare
 import net.poopyfeed.pf.data.models.DashboardSummaryResponse
+import net.poopyfeed.pf.data.models.ExportJobResponse
+import net.poopyfeed.pf.data.models.JobStatusResponse
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.models.DiaperListResponse
 import net.poopyfeed.pf.data.models.Feeding
@@ -410,4 +412,30 @@ object TestFixtures {
           gapAfterEnd = gapAfterEnd,
           isNapEligible = isNapEligible,
       )
+
+  fun mockExportJobResponse(
+      taskId: String = "task-123",
+      status: String = "pending",
+      message: String = "Export started",
+  ): ExportJobResponse = ExportJobResponse(taskId = taskId, status = status, message = message)
+
+  fun mockJobStatusResponse(
+      taskId: String = "task-123",
+      status: String = "processing",
+      progress: Int = 50,
+      result: net.poopyfeed.pf.data.models.JobResult? = null,
+      error: String? = null,
+  ): JobStatusResponse =
+      JobStatusResponse(
+          taskId = taskId,
+          status = status,
+          progress = progress,
+          result = result,
+          error = error,
+      )
+
+  fun mockWeeklySummary(
+      childId: Int = 1,
+      period: String = "2026-03-04 to 2026-03-11",
+  ): WeeklySummary = WeeklySummary(childId = childId, period = period)
 }
