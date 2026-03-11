@@ -1,7 +1,9 @@
 package net.poopyfeed.pf.reports
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlin.test.assertEquals
@@ -19,22 +21,30 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
+import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReportsViewModelTest {
 
+  @get:Rule val tempFolder = TemporaryFolder()
+
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockRepo: AnalyticsRepository
   private lateinit var mockTracker: AnalyticsTracker
+  private lateinit var mockContext: Context
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
     mockRepo = mockk(relaxed = true)
     mockTracker = mockk(relaxed = true)
+    mockContext = mockk(relaxed = true)
+    every { mockContext.cacheDir } returns tempFolder.root
   }
 
   @After
@@ -44,12 +54,13 @@ class ReportsViewModelTest {
 
   private fun createViewModel(childId: Int = 1): ReportsViewModel {
     val handle = SavedStateHandle(mapOf("childId" to childId))
-    return ReportsViewModel(handle, mockRepo, mockTracker)
+    return ReportsViewModel(handle, mockRepo, mockTracker, mockContext, testDispatcher)
   }
 
   @Test
-  fun `exportCsv success emits CsvReady with response body`() = runTest {
-    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+  fun `exportCsv success emits CsvReady with file`() = runTest {
+    val mockBody = mockk<ResponseBody>(relaxed = true)
+    every { mockBody.byteStream() } returns "csv-data".byteInputStream()
     coEvery { mockRepo.exportCsv(1, 30) } returns ApiResult.Success(mockBody)
 
     val vm = createViewModel()
@@ -60,12 +71,13 @@ class ReportsViewModelTest {
 
     val state = vm.exportState.first()
     assertTrue(state is ExportState.CsvReady)
-    assertEquals(mockBody, (state as ExportState.CsvReady).body)
+    assertTrue((state as ExportState.CsvReady).file.exists())
   }
 
   @Test
   fun `exportCsv success logs analytics event`() = runTest {
-    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+    val mockBody = mockk<ResponseBody>(relaxed = true)
+    every { mockBody.byteStream() } returns "csv-data".byteInputStream()
     coEvery { mockRepo.exportCsv(1, 30) } returns ApiResult.Success(mockBody)
 
     val vm = createViewModel()
@@ -138,7 +150,8 @@ class ReportsViewModelTest {
 
   @Test
   fun `clearExportState resets to Idle`() = runTest {
-    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+    val mockBody = mockk<ResponseBody>(relaxed = true)
+    every { mockBody.byteStream() } returns "csv-data".byteInputStream()
     coEvery { mockRepo.exportCsv(1, 30) } returns ApiResult.Success(mockBody)
 
     val vm = createViewModel()

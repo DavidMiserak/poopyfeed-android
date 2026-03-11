@@ -75,7 +75,7 @@ class ReportsFragment : Fragment() {
                 binding.buttonExportPdf.isEnabled = false
               }
               is ExportState.CsvReady -> {
-                saveCsvAndShare(state.body)
+                shareFile(state.file, "text/csv")
                 viewModel.clearExportState()
               }
               is ExportState.PdfStarted -> {
@@ -99,24 +99,19 @@ class ReportsFragment : Fragment() {
     }
   }
 
-  private fun saveCsvAndShare(body: okhttp3.ResponseBody) {
+  private fun shareFile(file: File, mimeType: String) {
     try {
-      val dir = File(requireContext().cacheDir, "exports")
-      if (!dir.exists()) dir.mkdirs()
-      val file = File(dir, "poopyfeed_export_${System.currentTimeMillis()}.csv")
-      file.outputStream().use { output -> body.byteStream().use { input -> input.copyTo(output) } }
-
       val uri =
           FileProvider.getUriForFile(
               requireContext(), "${requireContext().packageName}.fileprovider", file)
       val shareIntent =
           Intent(Intent.ACTION_SEND).apply {
-            type = "text/csv"
+            type = mimeType
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
           }
       startActivity(Intent.createChooser(shareIntent, getString(R.string.reports_share)))
-    } catch (e: Exception) {
+    } catch (_: Exception) {
       Snackbar.make(binding.root, getString(R.string.reports_export_error), Snackbar.LENGTH_LONG)
           .show()
     }

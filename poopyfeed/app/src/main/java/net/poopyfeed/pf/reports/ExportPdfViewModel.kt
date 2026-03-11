@@ -1,17 +1,23 @@
 package net.poopyfeed.pf.reports
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
+import net.poopyfeed.pf.di.IoDispatcher
 
 /** UI state for async PDF export progress bottom sheet. */
 sealed interface PdfExportUiState {
@@ -20,7 +26,7 @@ sealed interface PdfExportUiState {
 
   data class Completed(val filename: String, val downloadUrl: String) : PdfExportUiState
 
-  data class Downloaded(val body: okhttp3.ResponseBody) : PdfExportUiState
+  data class Downloaded(val file: File) : PdfExportUiState
 
   data class Failed(val message: String) : PdfExportUiState
 }
@@ -31,6 +37,8 @@ class ExportPdfViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val analyticsRepo: AnalyticsRepository,
+    @ApplicationContext private val appContext: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
   val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -72,12 +80,17 @@ constructor(
     }
   }
 
-  /** Download the completed PDF file. */
+  /** Download the completed PDF file and save to cache. */
   fun downloadFile(filename: String) {
     viewModelScope.launch {
       when (val result = analyticsRepo.downloadPdf(filename)) {
         is ApiResult.Success -> {
-          _uiState.value = PdfExportUiState.Downloaded(result.data)
+          val file = saveToFile(result.data, "poopyfeed_report_${System.currentTimeMillis()}.pdf")
+          if (file != null) {
+            _uiState.value = PdfExportUiState.Downloaded(file)
+          } else {
+            _uiState.value = PdfExportUiState.Failed("Failed to save PDF")
+          }
         }
         is ApiResult.Error -> {
           _uiState.value = PdfExportUiState.Failed(extractErrorMessage(result.error))
@@ -86,6 +99,21 @@ constructor(
       }
     }
   }
+
+  private suspend fun saveToFile(body: okhttp3.ResponseBody, filename: String): File? =
+      withContext(ioDispatcher) {
+        try {
+          val dir = File(appContext.cacheDir, "exports")
+          if (!dir.exists()) dir.mkdirs()
+          val file = File(dir, filename)
+          file.outputStream().use { output ->
+            body.byteStream().use { input -> input.copyTo(output) }
+          }
+          file
+        } catch (_: Exception) {
+          null
+        }
+      }
 
   private fun extractErrorMessage(error: ApiError): String =
       when (error) {

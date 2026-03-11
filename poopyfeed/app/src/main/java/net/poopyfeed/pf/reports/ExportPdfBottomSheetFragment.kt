@@ -90,7 +90,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.buttonShare.setOnClickListener { viewModel.downloadFile(state.filename) }
               }
               is PdfExportUiState.Downloaded -> {
-                savePdfAndShare(state.body)
+                sharePdf(state.file)
                 dismiss()
               }
               is PdfExportUiState.Failed -> {
@@ -109,13 +109,8 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-  private fun savePdfAndShare(body: okhttp3.ResponseBody) {
+  private fun sharePdf(file: File) {
     try {
-      val dir = File(requireContext().cacheDir, "exports")
-      if (!dir.exists()) dir.mkdirs()
-      val file = File(dir, "poopyfeed_report_${System.currentTimeMillis()}.pdf")
-      file.outputStream().use { output -> body.byteStream().use { input -> input.copyTo(output) } }
-
       val uri =
           FileProvider.getUriForFile(
               requireContext(), "${requireContext().packageName}.fileprovider", file)

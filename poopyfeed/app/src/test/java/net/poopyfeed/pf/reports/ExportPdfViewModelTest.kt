@@ -1,7 +1,9 @@
 package net.poopyfeed.pf.reports
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,20 +20,28 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.JobResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
+import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExportPdfViewModelTest {
 
+  @get:Rule val tempFolder = TemporaryFolder()
+
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockRepo: AnalyticsRepository
+  private lateinit var mockContext: Context
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
     mockRepo = mockk(relaxed = true)
+    mockContext = mockk(relaxed = true)
+    every { mockContext.cacheDir } returns tempFolder.root
   }
 
   @After
@@ -44,7 +54,7 @@ class ExportPdfViewModelTest {
       taskId: String = "task-123",
   ): ExportPdfViewModel {
     val handle = SavedStateHandle(mapOf("childId" to childId, "taskId" to taskId))
-    return ExportPdfViewModel(handle, mockRepo)
+    return ExportPdfViewModel(handle, mockRepo, mockContext, testDispatcher)
   }
 
   @Test
@@ -149,8 +159,9 @@ class ExportPdfViewModelTest {
   }
 
   @Test
-  fun `downloadFile success emits Downloaded`() = runTest {
-    val mockBody = mockk<okhttp3.ResponseBody>(relaxed = true)
+  fun `downloadFile success emits Downloaded with file`() = runTest {
+    val mockBody = mockk<ResponseBody>(relaxed = true)
+    every { mockBody.byteStream() } returns "pdf-data".byteInputStream()
     coEvery { mockRepo.downloadPdf("report.pdf") } returns ApiResult.Success(mockBody)
 
     val vm = createViewModel()
@@ -159,6 +170,7 @@ class ExportPdfViewModelTest {
 
     val state = vm.uiState.first()
     assertTrue(state is PdfExportUiState.Downloaded)
+    assertTrue((state as PdfExportUiState.Downloaded).file.exists())
   }
 
   @Test
