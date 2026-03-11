@@ -305,4 +305,39 @@ interface PoopyFeedApiService {
       @Query("page") page: Int = 1,
       @Query("page_size") pageSize: Int = 100,
   ): PaginatedResponse<TimelineEvent>
+
+  // ========================
+  // Export Endpoints
+  // ========================
+
+  /** Export CSV for a child. POST /api/v1/analytics/children/{childId}/export-csv/?days=30 */
+  @Streaming
+  @POST("analytics/children/{childId}/export-csv/")
+  suspend fun exportCsv(
+      @Path("childId") childId: Int,
+      @Query("days") days: Int = 30,
+  ): okhttp3.ResponseBody
+
+  /** Start async PDF export. POST /api/v1/analytics/children/{childId}/export-pdf/ */
+  @POST("analytics/children/{childId}/export-pdf/")
+  suspend fun exportPdf(
+      @Path("childId") childId: Int,
+      @Body request: ExportPdfRequest,
+  ): ExportJobResponse
+
+  /** Poll PDF export status. GET /api/v1/analytics/children/{childId}/export-status/{taskId}/ */
+  @GET("analytics/children/{childId}/export-status/{taskId}/")
+  suspend fun getExportStatus(
+      @Path("childId") childId: Int,
+      @Path("taskId") taskId: String,
+  ): JobStatusResponse
+
+  /** Download generated PDF. GET /api/v1/analytics/download/{filename}/ */
+  @Streaming
+  @GET("analytics/download/{filename}/")
+  suspend fun downloadPdf(@Path("filename") filename: String): okhttp3.ResponseBody
+
+  /** Get weekly summary for a child. GET /api/v1/analytics/children/{childId}/weekly-summary/ */
+  @GET("analytics/children/{childId}/weekly-summary/")
+  suspend fun getWeeklySummary(@Path("childId") childId: Int): WeeklySummary
 }
