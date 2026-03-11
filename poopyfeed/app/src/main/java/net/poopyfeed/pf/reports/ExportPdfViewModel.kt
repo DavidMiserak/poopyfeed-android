@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.di.IoDispatcher
@@ -73,7 +72,7 @@ constructor(
           }
         }
         is ApiResult.Error -> {
-          _uiState.value = PdfExportUiState.Failed(extractErrorMessage(result.error))
+          _uiState.value = PdfExportUiState.Failed(result.error.displayMessage)
         }
         is ApiResult.Loading -> Unit
       }
@@ -93,7 +92,7 @@ constructor(
           }
         }
         is ApiResult.Error -> {
-          _uiState.value = PdfExportUiState.Failed(extractErrorMessage(result.error))
+          _uiState.value = PdfExportUiState.Failed(result.error.displayMessage)
         }
         is ApiResult.Loading -> Unit
       }
@@ -113,13 +112,5 @@ constructor(
         } catch (_: Exception) {
           null
         }
-      }
-
-  private fun extractErrorMessage(error: ApiError): String =
-      when (error) {
-        is ApiError.HttpError -> error.detail ?: error.errorMessage
-        is ApiError.NetworkError -> error.errorMessage
-        is ApiError.SerializationError -> error.errorMessage
-        is ApiError.UnknownError -> error.errorMessage
       }
 }

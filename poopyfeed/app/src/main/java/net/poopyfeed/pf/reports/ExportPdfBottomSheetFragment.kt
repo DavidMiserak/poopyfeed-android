@@ -2,8 +2,6 @@ package net.poopyfeed.pf.reports
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +13,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentExportPdfBottomSheetBinding
@@ -27,14 +27,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     get() = _binding!!
 
   private val viewModel: ExportPdfViewModel by viewModels()
-  private val pollHandler = Handler(Looper.getMainLooper())
-  private val pollRunnable =
-      object : Runnable {
-        override fun run() {
-          viewModel.pollOnce()
-          pollHandler.postDelayed(this, 2000L)
-        }
-      }
+  private var pollingJob: Job? = null
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -61,11 +54,21 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun startPolling() {
-    pollHandler.post(pollRunnable)
+    pollingJob?.cancel()
+    pollingJob =
+        viewLifecycleOwner.lifecycleScope.launch {
+          viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+              viewModel.pollOnce()
+              delay(2000L)
+            }
+          }
+        }
   }
 
   private fun stopPolling() {
-    pollHandler.removeCallbacks(pollRunnable)
+    pollingJob?.cancel()
+    pollingJob = null
   }
 
   private fun collectFlows() {

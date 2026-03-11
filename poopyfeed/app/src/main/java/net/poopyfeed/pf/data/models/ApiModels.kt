@@ -487,6 +487,16 @@ sealed class ApiError : Exception() {
         is SerializationError -> context.getString(R.string.error_serialization)
         is UnknownError -> context.getString(R.string.error_unknown)
       }
+
+  /** Raw error message without localization. Use in ViewModels that lack a Context. */
+  val displayMessage: String
+    get() =
+        when (this) {
+          is HttpError -> detail ?: errorMessage
+          is NetworkError -> errorMessage
+          is SerializationError -> errorMessage
+          is UnknownError -> errorMessage
+        }
 }
 
 /**

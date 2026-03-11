@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.poopyfeed.pf.analytics.AnalyticsTracker
-import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.di.IoDispatcher
@@ -63,7 +62,7 @@ constructor(
           }
         }
         is ApiResult.Error -> {
-          _exportState.value = ExportState.Error(result.error.errorMessage())
+          _exportState.value = ExportState.Error(result.error.displayMessage)
         }
         else -> Unit
       }
@@ -79,7 +78,7 @@ constructor(
           analyticsTracker.logEvent("export_pdf")
         }
         is ApiResult.Error -> {
-          _exportState.value = ExportState.Error(result.error.errorMessage())
+          _exportState.value = ExportState.Error(result.error.displayMessage)
         }
         else -> Unit
       }
@@ -103,13 +102,5 @@ constructor(
         } catch (_: Exception) {
           null
         }
-      }
-
-  private fun ApiError.errorMessage(): String =
-      when (this) {
-        is ApiError.HttpError -> detail ?: errorMessage
-        is ApiError.NetworkError -> errorMessage
-        is ApiError.SerializationError -> errorMessage
-        is ApiError.UnknownError -> errorMessage
       }
 }

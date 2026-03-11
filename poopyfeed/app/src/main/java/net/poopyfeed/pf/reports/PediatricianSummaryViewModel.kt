@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.analytics.AnalyticsTracker
-import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.WeeklySummary
 import net.poopyfeed.pf.data.repository.AnalyticsRepository
@@ -81,19 +80,11 @@ constructor(
           }
         }
         is ApiResult.Error -> {
-          _uiState.value = PediatricianSummaryUiState.Error(result.error.errorMessage())
+          _uiState.value = PediatricianSummaryUiState.Error(result.error.displayMessage)
         }
         else -> Unit
       }
       _isRefreshing.value = false
     }
   }
-
-  private fun ApiError.errorMessage(): String =
-      when (this) {
-        is ApiError.HttpError -> detail ?: errorMessage
-        is ApiError.NetworkError -> errorMessage
-        is ApiError.SerializationError -> errorMessage
-        is ApiError.UnknownError -> errorMessage
-      }
 }
