@@ -142,6 +142,15 @@ class AnalyticsTracker @Inject constructor(private val firebaseAnalytics: Fireba
   }
 
   /**
+   * Logs a simple named event with no parameters.
+   *
+   * @param name The event name.
+   */
+  fun logEvent(name: String) {
+    firebaseAnalytics.logEvent(name, Bundle())
+  }
+
+  /**
    * Logs an error event.
    *
    * @param errorType The type of error that occurred.
