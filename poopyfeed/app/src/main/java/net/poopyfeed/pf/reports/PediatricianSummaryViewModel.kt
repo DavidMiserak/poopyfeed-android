@@ -29,6 +29,7 @@ sealed interface PediatricianSummaryUiState {
   ) : PediatricianSummaryUiState
 
   data object Empty : PediatricianSummaryUiState
+
   data class Error(val message: String) : PediatricianSummaryUiState
 }
 
@@ -80,8 +81,7 @@ constructor(
           }
         }
         is ApiResult.Error -> {
-          _uiState.value =
-              PediatricianSummaryUiState.Error(result.error.errorMessage())
+          _uiState.value = PediatricianSummaryUiState.Error(result.error.errorMessage())
         }
         else -> Unit
       }

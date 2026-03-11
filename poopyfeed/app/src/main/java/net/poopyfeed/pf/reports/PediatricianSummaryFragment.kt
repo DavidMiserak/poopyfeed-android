@@ -78,8 +78,7 @@ class PediatricianSummaryFragment : Fragment() {
         val hours = state.sleepMinutesPerDay / 60
         val mins = state.sleepMinutesPerDay % 60
         val sleepStr = if (hours > 0) "${hours}h ${mins}m" else "${mins}m"
-        binding.textSleepPerDay.text =
-            getString(R.string.pediatrician_sleep_per_day, sleepStr)
+        binding.textSleepPerDay.text = getString(R.string.pediatrician_sleep_per_day, sleepStr)
       }
       is PediatricianSummaryUiState.Empty -> {
         binding.textEmpty.visibility = View.VISIBLE

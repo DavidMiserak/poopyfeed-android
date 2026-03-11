@@ -19,7 +19,9 @@ sealed interface PdfExportUiState {
       PdfExportUiState
 
   data class Completed(val filename: String, val downloadUrl: String) : PdfExportUiState
+
   data class Downloaded(val body: okhttp3.ResponseBody) : PdfExportUiState
+
   data class Failed(val message: String) : PdfExportUiState
 }
 
@@ -57,8 +59,7 @@ constructor(
               _uiState.value = PdfExportUiState.Failed(status.error ?: "Export failed")
             }
             else -> {
-              val statusText =
-                  if (status.progress > 10) "Generating report…" else "Preparing…"
+              val statusText = if (status.progress > 10) "Generating report…" else "Preparing…"
               _uiState.value = PdfExportUiState.Polling(status.progress, statusText)
             }
           }

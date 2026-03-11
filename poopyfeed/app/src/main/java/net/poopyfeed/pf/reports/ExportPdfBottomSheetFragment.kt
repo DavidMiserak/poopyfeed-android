@@ -87,9 +87,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.textStatus.text = getString(R.string.export_pdf_ready)
                 binding.progressBar.setProgressCompat(100, true)
                 binding.buttonShare.visibility = View.VISIBLE
-                binding.buttonShare.setOnClickListener {
-                  viewModel.downloadFile(state.filename)
-                }
+                binding.buttonShare.setOnClickListener { viewModel.downloadFile(state.filename) }
               }
               is PdfExportUiState.Downloaded -> {
                 savePdfAndShare(state.body)

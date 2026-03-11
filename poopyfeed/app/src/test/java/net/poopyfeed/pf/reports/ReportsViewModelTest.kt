@@ -79,8 +79,7 @@ class ReportsViewModelTest {
 
   @Test
   fun `exportCsv error emits ExportError`() = runTest {
-    coEvery { mockRepo.exportCsv(1, 30) } returns
-        ApiResult.Error(ApiError.NetworkError("fail"))
+    coEvery { mockRepo.exportCsv(1, 30) } returns ApiResult.Error(ApiError.NetworkError("fail"))
 
     val vm = createViewModel()
     advanceUntilIdle()
@@ -125,8 +124,7 @@ class ReportsViewModelTest {
 
   @Test
   fun `startPdfExport error emits ExportError`() = runTest {
-    coEvery { mockRepo.exportPdf(1, 30) } returns
-        ApiResult.Error(ApiError.NetworkError("fail"))
+    coEvery { mockRepo.exportPdf(1, 30) } returns ApiResult.Error(ApiError.NetworkError("fail"))
 
     val vm = createViewModel()
     advanceUntilIdle()
