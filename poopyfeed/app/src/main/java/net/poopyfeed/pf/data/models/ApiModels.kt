@@ -372,6 +372,36 @@ data class DashboardSummaryResponse(
     @SerialName("unread_count") val unreadCount: Int = 0,
 )
 
+/** Request body for POST /api/v1/analytics/children/{childId}/export-pdf/ */
+@Serializable data class ExportPdfRequest(val days: Int = 30)
+
+/** Response from POST export-pdf/ (async job created). */
+@Serializable
+data class ExportJobResponse(
+    @SerialName("task_id") val taskId: String,
+    val status: String,
+    val message: String = "",
+)
+
+/** Response from GET export-status/{taskId}/ (poll for progress). */
+@Serializable
+data class JobStatusResponse(
+    @SerialName("task_id") val taskId: String,
+    val status: String,
+    val progress: Int = 0,
+    val result: JobResult? = null,
+    val error: String? = null,
+)
+
+/** Nested result inside JobStatusResponse when status == "completed". */
+@Serializable
+data class JobResult(
+    val filename: String,
+    @SerialName("download_url") val downloadUrl: String,
+    @SerialName("created_at") val createdAt: String = "",
+    @SerialName("expires_at") val expiresAt: String = "",
+)
+
 @Serializable data class MarkAllReadResponse(val updated: Int)
 
 /** Request body for PATCH notification (mark as read). */
