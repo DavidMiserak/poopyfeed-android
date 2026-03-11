@@ -1009,6 +1009,85 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Reports card (gradient hero style) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/button_reports"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_8"
+            android:contentDescription="@string/a11y_go_to_reports"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/corner_radius_lg"
+            app:cardElevation="@dimen/elevation_2"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_timeline">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_gradient_hero"
+                android:paddingStart="@dimen/spacing_12"
+                android:paddingEnd="@dimen/spacing_12"
+                android:paddingTop="@dimen/spacing_8"
+                android:paddingBottom="@dimen/spacing_8">
+
+                <TextView
+                    android:id="@+id/reports_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/icon_reports"
+                    android:textSize="24sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <TextView
+                    android:id="@+id/reports_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_8"
+                    android:fontFamily="@font/fredoka"
+                    android:text="@string/child_detail_reports"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/reports_emoji"
+                    app:layout_constraintEnd_toStartOf="@id/reports_chevron"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/reports_subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_8"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:fontFamily="@font/dm_sans"
+                    android:text="@string/child_detail_reports_subtitle"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.85"
+                    android:textSize="@dimen/text_body_small"
+                    app:layout_constraintStart_toEndOf="@id/reports_emoji"
+                    app:layout_constraintEnd_toStartOf="@id/reports_chevron"
+                    app:layout_constraintTop_toBottomOf="@id/reports_title" />
+
+                <ImageView
+                    android:id="@+id/reports_chevron"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    app:tint="@android:color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

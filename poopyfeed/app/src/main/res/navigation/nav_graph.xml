@@ -95,6 +95,10 @@
         <action
             android:id="@+id/action_childDetail_to_timeline"
             app:destination="@id/TimelineFragment" />
+
+        <action
+            android:id="@+id/action_childDetail_to_reports"
+            app:destination="@id/ReportsFragment" />
     </fragment>
 
     <dialog
@@ -309,6 +313,55 @@
 
         <argument
             android:name="childId"
+            app:argType="integer" />
+    </dialog>
+
+    <fragment
+        android:id="@+id/ReportsFragment"
+        android:name="net.poopyfeed.pf.reports.ReportsFragment"
+        android:label="@string/reports_title"
+        tools:layout="@layout/fragment_reports">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_reports_to_pediatricianSummary"
+            app:destination="@id/PediatricianSummaryFragment" />
+
+        <action
+            android:id="@+id/action_reports_to_exportPdfSheet"
+            app:destination="@id/exportPdfBottomSheet" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/PediatricianSummaryFragment"
+        android:name="net.poopyfeed.pf.reports.PediatricianSummaryFragment"
+        android:label="@string/pediatrician_title"
+        tools:layout="@layout/fragment_pediatrician_summary">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/exportPdfBottomSheet"
+        android:name="net.poopyfeed.pf.reports.ExportPdfBottomSheetFragment"
+        android:label="@string/export_pdf_title"
+        tools:layout="@layout/fragment_export_pdf_bottom_sheet">
+
+        <argument
+            android:name="childId"
+            app:argType="integer" />
+
+        <argument
+            android:name="taskId"
+            app:argType="string" />
+
+        <argument
+            android:name="days"
             app:argType="integer" />
     </dialog>
 
