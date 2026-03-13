@@ -2,11 +2,13 @@ package net.poopyfeed.pf.reports
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,27 +26,25 @@ import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReportsViewModelTest {
-
-  @get:Rule val tempFolder = TemporaryFolder()
 
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockRepo: AnalyticsRepository
   private lateinit var mockTracker: AnalyticsTracker
-  private lateinit var mockContext: Context
+  private lateinit var appContext: Context
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
     mockRepo = mockk(relaxed = true)
     mockTracker = mockk(relaxed = true)
-    mockContext = mockk(relaxed = true)
-    every { mockContext.cacheDir } returns tempFolder.root
+    appContext = ApplicationProvider.getApplicationContext()
   }
 
   @After
@@ -54,11 +54,11 @@ class ReportsViewModelTest {
 
   private fun createViewModel(childId: Int = 1): ReportsViewModel {
     val handle = SavedStateHandle(mapOf("childId" to childId))
-    return ReportsViewModel(handle, mockRepo, mockTracker, mockContext, testDispatcher)
+    return ReportsViewModel(handle, mockRepo, mockTracker, appContext, testDispatcher)
   }
 
   @Test
-  fun `exportCsv success emits CsvReady with file`() = runTest {
+  fun `exportCsv success emits CsvReady with uri`() = runTest {
     val mockBody = mockk<ResponseBody>(relaxed = true)
     every { mockBody.byteStream() } returns "csv-data".byteInputStream()
     coEvery { mockRepo.exportCsv(1, 30) } returns ApiResult.Success(mockBody)
@@ -71,7 +71,7 @@ class ReportsViewModelTest {
 
     val state = vm.exportState.first()
     assertTrue(state is ExportState.CsvReady)
-    assertTrue((state as ExportState.CsvReady).file.exists())
+    assertNotNull((state as ExportState.CsvReady).uri)
   }
 
   @Test

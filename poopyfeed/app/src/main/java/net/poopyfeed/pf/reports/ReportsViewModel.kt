@@ -1,12 +1,16 @@
 package net.poopyfeed.pf.reports
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +29,7 @@ sealed interface ExportState {
 
   data object Exporting : ExportState
 
-  data class CsvReady(val file: File) : ExportState
+  data class CsvReady(val uri: Uri) : ExportState
 
   data class PdfStarted(val taskId: String, val days: Int) : ExportState
 
@@ -53,12 +57,13 @@ constructor(
       _exportState.value = ExportState.Exporting
       when (val result = analyticsRepo.exportCsv(childId, days)) {
         is ApiResult.Success -> {
-          val file = saveToFile(result.data, "poopyfeed_export_${System.currentTimeMillis()}.csv")
-          if (file != null) {
-            _exportState.value = ExportState.CsvReady(file)
+          val filename = "poopyfeed_export_${System.currentTimeMillis()}.csv"
+          val uri = saveToDownloads(result.data, filename, "text/csv")
+          if (uri != null) {
+            _exportState.value = ExportState.CsvReady(uri)
             analyticsTracker.logEvent("export_csv")
           } else {
-            _exportState.value = ExportState.Error("Failed to save file")
+            _exportState.value = ExportState.Error("Failed to save CSV file to storage")
           }
         }
         is ApiResult.Error -> {
@@ -89,17 +94,28 @@ constructor(
     _exportState.value = ExportState.Idle
   }
 
-  private suspend fun saveToFile(body: okhttp3.ResponseBody, filename: String): File? =
+  private suspend fun saveToDownloads(
+      body: okhttp3.ResponseBody,
+      filename: String,
+      mimeType: String,
+  ): Uri? =
       withContext(ioDispatcher) {
         try {
-          val dir = File(appContext.cacheDir, "exports")
-          if (!dir.exists()) dir.mkdirs()
-          val file = File(dir, filename)
-          file.outputStream().use { output ->
+          val values =
+              ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, filename)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType)
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+              }
+          val uri =
+              appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                  ?: throw IllegalStateException("MediaStore insert returned null")
+          appContext.contentResolver.openOutputStream(uri)?.use { output ->
             body.byteStream().use { input -> input.copyTo(output) }
-          }
-          file
-        } catch (_: Exception) {
+          } ?: throw IllegalStateException("Could not open output stream")
+          uri
+        } catch (e: Exception) {
+          Log.e("ReportsViewModel", "CSV save error: ${e.message}", e)
           null
         }
       }

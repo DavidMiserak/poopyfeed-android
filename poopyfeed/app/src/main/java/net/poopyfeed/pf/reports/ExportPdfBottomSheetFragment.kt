@@ -1,18 +1,18 @@
 package net.poopyfeed.pf.reports
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,8 +57,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     pollingJob?.cancel()
     pollingJob =
         viewLifecycleOwner.lifecycleScope.launch {
-          while (viewLifecycleOwner.lifecycle.currentState.isAtLeast(
-              Lifecycle.State.STARTED)) {
+          while (viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             viewModel.pollOnce()
             delay(2000L)
           }
@@ -92,7 +91,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.buttonShare.setOnClickListener { viewModel.downloadFile(state.filename) }
               }
               is PdfExportUiState.Downloaded -> {
-                sharePdf(state.file)
+                showPdfSuccess(state.uri)
                 dismiss()
               }
               is PdfExportUiState.Failed -> {
@@ -111,21 +110,19 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-  private fun sharePdf(file: File) {
-    try {
-      val uri =
-          FileProvider.getUriForFile(
-              requireContext(), "${requireContext().packageName}.fileprovider", file)
-      val shareIntent =
-          Intent(Intent.ACTION_SEND).apply {
-            type = "application/pdf"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          }
-      startActivity(Intent.createChooser(shareIntent, getString(R.string.reports_share)))
-    } catch (_: Exception) {
-      // File share failed — dismissed already
-    }
+  private fun showPdfSuccess(uri: Uri) {
+    val parentView = requireActivity().findViewById<View>(android.R.id.content)
+    Snackbar.make(parentView, getString(R.string.reports_pdf_saved), Snackbar.LENGTH_LONG)
+        .setAction(getString(R.string.reports_share)) {
+          val shareIntent =
+              Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+              }
+          startActivity(Intent.createChooser(shareIntent, getString(R.string.reports_share)))
+        }
+        .show()
   }
 
   override fun onDestroyView() {

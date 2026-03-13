@@ -1,12 +1,16 @@
 package net.poopyfeed.pf.reports
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +29,7 @@ sealed interface PdfExportUiState {
 
   data class Completed(val filename: String, val downloadUrl: String) : PdfExportUiState
 
-  data class Downloaded(val file: File) : PdfExportUiState
+  data class Downloaded(val uri: Uri) : PdfExportUiState
 
   data class Failed(val message: String) : PdfExportUiState
 }
@@ -79,14 +83,18 @@ constructor(
     }
   }
 
-  /** Download the completed PDF file and save to cache. */
+  /** Download the completed PDF file and save to Downloads. */
   fun downloadFile(filename: String) {
     viewModelScope.launch {
       when (val result = analyticsRepo.downloadPdf(filename)) {
         is ApiResult.Success -> {
-          val file = saveToFile(result.data, "poopyfeed_report_${System.currentTimeMillis()}.pdf")
-          if (file != null) {
-            _uiState.value = PdfExportUiState.Downloaded(file)
+          val uri =
+              saveToDownloads(
+                  result.data,
+                  "poopyfeed_report_${System.currentTimeMillis()}.pdf",
+                  "application/pdf")
+          if (uri != null) {
+            _uiState.value = PdfExportUiState.Downloaded(uri)
           } else {
             _uiState.value = PdfExportUiState.Failed("Failed to save PDF")
           }
@@ -99,17 +107,28 @@ constructor(
     }
   }
 
-  private suspend fun saveToFile(body: okhttp3.ResponseBody, filename: String): File? =
+  private suspend fun saveToDownloads(
+      body: okhttp3.ResponseBody,
+      filename: String,
+      mimeType: String,
+  ): Uri? =
       withContext(ioDispatcher) {
         try {
-          val dir = File(appContext.cacheDir, "exports")
-          if (!dir.exists()) dir.mkdirs()
-          val file = File(dir, filename)
-          file.outputStream().use { output ->
+          val values =
+              ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, filename)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType)
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+              }
+          val uri =
+              appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                  ?: throw IllegalStateException("MediaStore insert returned null")
+          appContext.contentResolver.openOutputStream(uri)?.use { output ->
             body.byteStream().use { input -> input.copyTo(output) }
-          }
-          file
-        } catch (_: Exception) {
+          } ?: throw IllegalStateException("Could not open output stream")
+          uri
+        } catch (e: Exception) {
+          Log.e("ExportPdfViewModel", "PDF save error: ${e.message}", e)
           null
         }
       }

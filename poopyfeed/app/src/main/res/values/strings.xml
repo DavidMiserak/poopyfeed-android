@@ -382,6 +382,8 @@
     <string name="reports_exporting">Exporting…</string>
     <string name="reports_export_success">Export ready</string>
     <string name="reports_export_error">Export failed</string>
+    <string name="reports_csv_saved">CSV saved to Downloads</string>
+    <string name="reports_pdf_saved">PDF saved to Downloads</string>
     <string name="reports_share">Share</string>
     <string name="child_detail_reports">Reports</string>
     <string name="child_detail_reports_subtitle">Export data and summaries</string>

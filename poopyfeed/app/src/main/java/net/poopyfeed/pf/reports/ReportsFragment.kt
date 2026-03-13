@@ -1,11 +1,11 @@
 package net.poopyfeed.pf.reports
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentReportsBinding
@@ -79,7 +78,7 @@ class ReportsFragment : Fragment() {
                 binding.buttonExportPdf.isEnabled = false
               }
               is ExportState.CsvReady -> {
-                shareFile(state.file, "text/csv")
+                showCsvSuccess(state.uri)
                 viewModel.clearExportState()
               }
               is ExportState.PdfStarted -> {
@@ -103,22 +102,18 @@ class ReportsFragment : Fragment() {
     }
   }
 
-  private fun shareFile(file: File, mimeType: String) {
-    try {
-      val uri =
-          FileProvider.getUriForFile(
-              requireContext(), "${requireContext().packageName}.fileprovider", file)
-      val shareIntent =
-          Intent(Intent.ACTION_SEND).apply {
-            type = mimeType
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          }
-      startActivity(Intent.createChooser(shareIntent, getString(R.string.reports_share)))
-    } catch (_: Exception) {
-      Snackbar.make(binding.root, getString(R.string.reports_export_error), Snackbar.LENGTH_LONG)
-          .show()
-    }
+  private fun showCsvSuccess(uri: Uri) {
+    Snackbar.make(binding.root, getString(R.string.reports_csv_saved), Snackbar.LENGTH_LONG)
+        .setAction(getString(R.string.reports_share)) {
+          val shareIntent =
+              Intent(Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+              }
+          startActivity(Intent.createChooser(shareIntent, getString(R.string.reports_share)))
+        }
+        .show()
   }
 
   override fun onDestroyView() {

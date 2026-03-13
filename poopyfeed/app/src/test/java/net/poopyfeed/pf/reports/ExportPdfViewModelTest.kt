@@ -2,10 +2,12 @@ package net.poopyfeed.pf.reports
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,25 +25,23 @@ import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExportPdfViewModelTest {
 
-  @get:Rule val tempFolder = TemporaryFolder()
-
   private val testDispatcher = StandardTestDispatcher()
   private lateinit var mockRepo: AnalyticsRepository
-  private lateinit var mockContext: Context
+  private lateinit var appContext: Context
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
     mockRepo = mockk(relaxed = true)
-    mockContext = mockk(relaxed = true)
-    every { mockContext.cacheDir } returns tempFolder.root
+    appContext = ApplicationProvider.getApplicationContext()
   }
 
   @After
@@ -54,7 +54,7 @@ class ExportPdfViewModelTest {
       taskId: String = "task-123",
   ): ExportPdfViewModel {
     val handle = SavedStateHandle(mapOf("childId" to childId, "taskId" to taskId))
-    return ExportPdfViewModel(handle, mockRepo, mockContext, testDispatcher)
+    return ExportPdfViewModel(handle, mockRepo, appContext, testDispatcher)
   }
 
   @Test
@@ -159,7 +159,7 @@ class ExportPdfViewModelTest {
   }
 
   @Test
-  fun `downloadFile success emits Downloaded with file`() = runTest {
+  fun `downloadFile success emits Downloaded with uri`() = runTest {
     val mockBody = mockk<ResponseBody>(relaxed = true)
     every { mockBody.byteStream() } returns "pdf-data".byteInputStream()
     coEvery { mockRepo.downloadPdf("report.pdf") } returns ApiResult.Success(mockBody)
@@ -170,7 +170,7 @@ class ExportPdfViewModelTest {
 
     val state = vm.uiState.first()
     assertTrue(state is PdfExportUiState.Downloaded)
-    assertTrue((state as PdfExportUiState.Downloaded).file.exists())
+    assertNotNull((state as PdfExportUiState.Downloaded).uri)
   }
 
   @Test
