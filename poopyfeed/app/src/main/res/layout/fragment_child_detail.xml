@@ -915,106 +915,13 @@
 
         </LinearLayout>
 
-        <!-- Section: Insights -->
-        <TextView
-            android:id="@+id/label_insights"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_16"
-            android:layout_marginBottom="@dimen/spacing_4"
-            android:fontFamily="@font/fredoka"
-            android:text="@string/child_detail_section_insights"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="@dimen/text_body_medium"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_tracking" />
-
-        <!-- Timeline card (visually distinct — gradient hero style) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/button_timeline"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_4"
-            android:contentDescription="@string/a11y_go_to_timeline"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="@dimen/corner_radius_lg"
-            app:cardElevation="@dimen/elevation_2"
-            app:strokeWidth="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_insights">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_gradient_hero"
-                android:paddingStart="@dimen/spacing_12"
-                android:paddingEnd="@dimen/spacing_12"
-                android:paddingTop="@dimen/spacing_8"
-                android:paddingBottom="@dimen/spacing_8">
-
-                <TextView
-                    android:id="@+id/timeline_emoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/icon_timeline"
-                    android:textSize="24sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <TextView
-                    android:id="@+id/timeline_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_8"
-                    android:fontFamily="@font/fredoka"
-                    android:text="@string/child_detail_timeline"
-                    android:textColor="@android:color/white"
-                    android:textSize="@dimen/text_body_large"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@id/timeline_emoji"
-                    app:layout_constraintEnd_toStartOf="@id/timeline_chevron"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/timeline_subtitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_8"
-                    android:layout_marginTop="@dimen/spacing_2"
-                    android:fontFamily="@font/dm_sans"
-                    android:text="@string/child_detail_timeline_subtitle"
-                    android:textColor="@android:color/white"
-                    android:alpha="0.85"
-                    android:textSize="@dimen/text_body_small"
-                    app:layout_constraintStart_toEndOf="@id/timeline_emoji"
-                    app:layout_constraintEnd_toStartOf="@id/timeline_chevron"
-                    app:layout_constraintTop_toBottomOf="@id/timeline_title" />
-
-                <ImageView
-                    android:id="@+id/timeline_chevron"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="@null"
-                    android:importantForAccessibility="no"
-                    app:tint="@android:color/white"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </com.google.android.material.card.MaterialCardView>
 
         <!-- Reports card (gradient hero style) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/button_reports"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_8"
+            android:layout_marginTop="@dimen/spacing_16"
             android:contentDescription="@string/a11y_go_to_reports"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/corner_radius_lg"
@@ -1022,7 +929,7 @@
             app:strokeWidth="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_timeline">
+            app:layout_constraintTop_toBottomOf="@id/card_tracking">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

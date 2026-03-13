@@ -74,10 +74,6 @@ class ChildDetailFragment : Fragment() {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
       findNavController().navigate(R.id.action_childDetail_to_napsList, bundle)
     }
-    binding.buttonTimeline.setOnClickListener {
-      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
-      findNavController().navigate(R.id.action_childDetail_to_reports, bundle)
-    }
     binding.buttonShare.setOnClickListener {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
       findNavController().navigate(R.id.action_childDetail_to_sharingFragment, bundle)
@@ -174,8 +170,6 @@ class ChildDetailFragment : Fragment() {
         binding.cardToday.visibility = View.GONE
         binding.labelTrack.visibility = View.GONE
         binding.cardTracking.visibility = View.GONE
-        binding.labelInsights.visibility = View.GONE
-        binding.buttonTimeline.visibility = View.GONE
         binding.buttonReports.visibility = View.GONE
       }
       is ChildDetailUiState.Ready -> {
@@ -188,8 +182,6 @@ class ChildDetailFragment : Fragment() {
         binding.cardToday.visibility = View.VISIBLE
         binding.labelTrack.visibility = View.VISIBLE
         binding.cardTracking.visibility = View.VISIBLE
-        binding.labelInsights.visibility = View.VISIBLE
-        binding.buttonTimeline.visibility = View.VISIBLE
         binding.buttonReports.visibility = View.VISIBLE
         bindReadyState(state)
       }
