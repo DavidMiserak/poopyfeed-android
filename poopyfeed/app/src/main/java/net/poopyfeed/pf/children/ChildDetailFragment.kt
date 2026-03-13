@@ -76,7 +76,7 @@ class ChildDetailFragment : Fragment() {
     }
     binding.buttonTimeline.setOnClickListener {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
-      findNavController().navigate(R.id.action_childDetail_to_timeline, bundle)
+      findNavController().navigate(R.id.action_childDetail_to_reports, bundle)
     }
     binding.buttonShare.setOnClickListener {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }

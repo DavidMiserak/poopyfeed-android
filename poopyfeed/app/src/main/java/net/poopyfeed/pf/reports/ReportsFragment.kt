@@ -44,6 +44,10 @@ class ReportsFragment : Fragment() {
 
     binding.buttonExportCsv.setOnClickListener { viewModel.exportCsv(getSelectedDays()) }
     binding.buttonExportPdf.setOnClickListener { viewModel.startPdfExport(getSelectedDays()) }
+    binding.cardTimeline.setOnClickListener {
+      val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
+      findNavController().navigate(R.id.action_reports_to_timeline, bundle)
+    }
     binding.cardPediatrician.setOnClickListener {
       val bundle = Bundle().apply { putInt("childId", viewModel.childId) }
       findNavController().navigate(R.id.action_reports_to_pediatricianSummary, bundle)

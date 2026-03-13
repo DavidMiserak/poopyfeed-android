@@ -370,6 +370,7 @@
     <string name="reports_export_csv_subtitle">Download activity data as spreadsheet</string>
     <string name="reports_export_pdf_title">Export PDF</string>
     <string name="reports_export_pdf_subtitle">Download formatted report with charts</string>
+    <string name="reports_timeline_subtitle">View all activities in chronological order</string>
     <string name="reports_pediatrician_title">Pediatrician Summary</string>
     <string name="reports_pediatrician_subtitle">Last 7 days at a glance for your doctor</string>
     <string name="reports_date_range_label">Date range</string>

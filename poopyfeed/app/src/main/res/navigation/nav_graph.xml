@@ -93,10 +93,6 @@
             app:destination="@id/EditChildFragment" />
 
         <action
-            android:id="@+id/action_childDetail_to_timeline"
-            app:destination="@id/TimelineFragment" />
-
-        <action
             android:id="@+id/action_childDetail_to_reports"
             app:destination="@id/ReportsFragment" />
     </fragment>
@@ -333,6 +329,10 @@
         <action
             android:id="@+id/action_reports_to_exportPdfSheet"
             app:destination="@id/exportPdfBottomSheet" />
+
+        <action
+            android:id="@+id/action_reports_to_timeline"
+            app:destination="@id/TimelineFragment" />
     </fragment>
 
     <fragment

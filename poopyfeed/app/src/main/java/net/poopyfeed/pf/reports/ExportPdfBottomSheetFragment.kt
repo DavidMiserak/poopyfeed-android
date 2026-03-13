@@ -57,11 +57,10 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     pollingJob?.cancel()
     pollingJob =
         viewLifecycleOwner.lifecycleScope.launch {
-          viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            while (true) {
-              viewModel.pollOnce()
-              delay(2000L)
-            }
+          while (viewLifecycleOwner.lifecycle.currentState.isAtLeast(
+              Lifecycle.State.STARTED)) {
+            viewModel.pollOnce()
+            delay(2000L)
           }
         }
   }
