@@ -18,6 +18,7 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 /** UI state for the children list screen. */
 sealed interface ChildrenListUiState {
@@ -45,6 +46,7 @@ constructor(
     private val repo: CachedChildrenRepository,
     @param:ApplicationContext private val context: Context,
     val analyticsTracker: AnalyticsTracker,
+    val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<ChildrenListUiState> =
@@ -99,7 +101,9 @@ constructor(
       _isRefreshing.value = true
       try {
         val result = repo.refreshChildren()
-        if (result is ApiResult.Error && _uiState.value is ChildrenListUiState.Loading) {
+        if (result is ApiResult.Success) {
+          toastManager.showSuccess("✓ Synced")
+        } else if (result is ApiResult.Error && _uiState.value is ChildrenListUiState.Loading) {
           _uiState.value = ChildrenListUiState.Error(result.error.getUserMessage(context))
         }
       } finally {

@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.setMain
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +34,7 @@ class ChildrenListViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
   private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: ChildrenListViewModel
 
   @Before
@@ -41,6 +43,7 @@ class ChildrenListViewModelTest {
     mockContext = mockk()
     mockRepository = mockk()
     mockAnalyticsTracker = mockk()
+    mockToastManager = mockk()
     every { mockContext.getString(any()) } returns "Error message"
   }
 
@@ -56,8 +59,9 @@ class ChildrenListViewModelTest {
             flowOf(ApiResult.Success(emptyList()))
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
 
         coVerify { mockRepository.refreshChildren() }
@@ -70,8 +74,9 @@ class ChildrenListViewModelTest {
             flowOf(ApiResult.Success(emptyList()))
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         viewModel.refresh()
         advanceUntilIdle()
@@ -89,7 +94,7 @@ class ChildrenListViewModelTest {
       coEvery { mockRepository.refreshChildren() } returns
           ApiResult.Error(ApiError.NetworkError("down"))
 
-      viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+      viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
       advanceUntilIdle()
 
       assertIs<ChildrenListUiState.Error>(viewModel.uiState.value)
@@ -104,8 +109,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.listChildrenCached() } returns flowOf(ApiResult.Loading())
         coEvery { mockRepository.hasSyncedFlow } returns flowOf(true)
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
+        every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
 
         assertIs<ChildrenListUiState.Loading>(viewModel.uiState.value)
@@ -120,8 +126,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.deleteChild(1) } returns
             ApiResult.Error(ApiError.NetworkError("fail"))
+        every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         val emissions = mutableListOf<String>()
         val job = launch { viewModel.deleteError.collect { emissions.add(it) } }
@@ -143,8 +150,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         coEvery { mockRepository.deleteChild(1) } returns ApiResult.Success(Unit)
         every { mockAnalyticsTracker.logChildDeleted(any()) } returns Unit
+        every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker)
+        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         viewModel.deleteChild(1)
         advanceUntilIdle()

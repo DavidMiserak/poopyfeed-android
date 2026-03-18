@@ -1,6 +1,8 @@
 package net.poopyfeed.pf.ui.toast
 
-class TestToastManager : ToastManager {
+import javax.inject.Inject
+
+class TestToastManager @Inject constructor() : ToastManager {
     private val _messages = mutableListOf<Pair<String, MessageType>>()
 
     val messages: List<Pair<String, MessageType>> get() = _messages.toList()
