@@ -21,6 +21,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -34,6 +35,7 @@ class CreateDiaperViewModelTest {
   private lateinit var mockRepository: CachedDiapersRepository
   private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var mockAnalyticsTracker: AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: CreateDiaperViewModel
 
   @Before
@@ -44,10 +46,11 @@ class CreateDiaperViewModelTest {
     mockRepository = mockk()
     mockSyncScheduler = mockk(relaxed = true)
     mockAnalyticsTracker = mockk(relaxed = true)
+    mockToastManager = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
         CreateDiaperViewModel(
-            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext)
+            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext, mockToastManager)
   }
 
   @After

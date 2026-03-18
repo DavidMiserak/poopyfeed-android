@@ -14,8 +14,10 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
+import net.poopyfeed.pf.data.models.toToastMessage
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 /** UI state for the create diaper bottom sheet. */
 sealed interface CreateDiaperUiState {
@@ -40,6 +42,7 @@ constructor(
     private val syncScheduler: SyncScheduler,
     private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
+    private val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -64,9 +67,13 @@ constructor(
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
               analyticsTracker.logDiaperLogged(result.data.change_type)
+              toastManager.showSuccess("✓ Diaper change saved")
               CreateDiaperUiState.Success
             }
-            is ApiResult.Error -> CreateDiaperUiState.Error(result.error.getUserMessage(context))
+            is ApiResult.Error -> {
+              toastManager.showError(result.error.toToastMessage())
+              CreateDiaperUiState.Error(result.error.getUserMessage(context))
+            }
             is ApiResult.Loading -> CreateDiaperUiState.Saving
           }
     }
