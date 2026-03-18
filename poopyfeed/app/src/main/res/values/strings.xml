@@ -120,7 +120,7 @@
     <string name="badge_icon_nap">😴</string>
     <string name="icon_baby">👶</string>
     <string name="icon_warning">⚠️</string>
-    <string name="icon_timeline">📊</string>
+
 
     <!-- Child Detail -->
     <string name="child_detail_last_feeding">%1$s</string>
@@ -134,11 +134,8 @@
     <string name="child_detail_feedings">Feedings</string>
     <string name="child_detail_diapers">Diapers</string>
     <string name="child_detail_naps">Naps</string>
-    <string name="child_detail_timeline">Timeline</string>
-    <string name="child_detail_timeline_subtitle">View 7-day activity history</string>
     <string name="child_detail_section_recent_activity">Recent Activity</string>
     <string name="child_detail_section_track">Track</string>
-    <string name="child_detail_section_insights">Insights</string>
     <string name="child_detail_today_loading">Loading today summary</string>
     <string name="child_detail_today_label">Today</string>
     <string name="child_detail_today_feedings">feedings</string>
@@ -362,7 +359,7 @@
     <string name="a11y_go_to_feedings">Feedings. Double tap to open.</string>
     <string name="a11y_go_to_diapers">Diapers. Double tap to open.</string>
     <string name="a11y_go_to_naps">Naps. Double tap to open.</string>
-    <string name="a11y_go_to_timeline">Timeline. Double tap to open.</string>
+
 
     <!-- Reports -->
     <string name="reports_title">Reports</string>
@@ -379,9 +376,6 @@
     <string name="reports_days_60">60 days</string>
     <string name="reports_days_90">90 days</string>
     <string name="reports_export_button">Export</string>
-    <string name="reports_exporting">Exporting…</string>
-    <string name="reports_export_success">Export ready</string>
-    <string name="reports_export_error">Export failed</string>
     <string name="reports_csv_saved">CSV saved to Downloads</string>
     <string name="reports_pdf_saved">PDF saved to Downloads</string>
     <string name="reports_share">Share</string>
@@ -393,7 +387,6 @@
     <!-- Export PDF Bottom Sheet -->
     <string name="export_pdf_title">Generating PDF</string>
     <string name="export_pdf_preparing">Preparing…</string>
-    <string name="export_pdf_generating">Generating report…</string>
     <string name="export_pdf_ready">Report ready!</string>
     <string name="export_pdf_failed">Generation failed</string>
     <string name="export_pdf_cancel">Cancel</string>

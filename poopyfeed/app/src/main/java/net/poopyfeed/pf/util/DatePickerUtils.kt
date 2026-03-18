@@ -2,6 +2,7 @@ package net.poopyfeed.pf.util
 
 import java.time.LocalDateTime as JavaLocalDateTime
 import java.time.ZoneId
+import java.util.Locale
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -103,7 +104,7 @@ object DatePickerUtils {
       val zonedDt = javaLdt.atZone(ZoneId.of(tzId))
       Instant.fromEpochMilliseconds(zonedDt.toInstant().toEpochMilli()).toString()
     } catch (_: Exception) {
-      "${String.format("%04d-%02d-%02dT%02d:%02d:00", year, month, day, hour, minute)}Z"
+      "${String.format(Locale.US, "%04d-%02d-%02dT%02d:%02d:00", year, month, day, hour, minute)}Z"
     }
   }
 }

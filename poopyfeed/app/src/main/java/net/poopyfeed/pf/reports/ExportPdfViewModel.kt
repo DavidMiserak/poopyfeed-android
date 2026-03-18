@@ -3,9 +3,11 @@ package net.poopyfeed.pf.reports
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -114,22 +116,36 @@ constructor(
   ): Uri? =
       withContext(ioDispatcher) {
         try {
-          val values =
-              ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, filename)
-                put(MediaStore.Downloads.MIME_TYPE, mimeType)
-                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-              }
-          val uri =
-              appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-                  ?: throw IllegalStateException("MediaStore insert returned null")
-          appContext.contentResolver.openOutputStream(uri)?.use { output ->
-            body.byteStream().use { input -> input.copyTo(output) }
-          } ?: throw IllegalStateException("Could not open output stream")
-          uri
+          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            throw UnsupportedOperationException(
+                "Saving to Downloads requires Android 10 (API 29) or higher"
+            )
+          }
+          saveToMediaStore(body, filename, mimeType)
         } catch (e: Exception) {
           Log.e("ExportPdfViewModel", "PDF save error: ${e.message}", e)
           null
         }
       }
+
+  @RequiresApi(Build.VERSION_CODES.Q)
+  private fun saveToMediaStore(
+      body: okhttp3.ResponseBody,
+      filename: String,
+      mimeType: String,
+  ): Uri {
+    val values =
+        ContentValues().apply {
+          put(MediaStore.Downloads.DISPLAY_NAME, filename)
+          put(MediaStore.Downloads.MIME_TYPE, mimeType)
+          put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+    val uri =
+        appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            ?: throw IllegalStateException("MediaStore insert returned null")
+    appContext.contentResolver.openOutputStream(uri)?.use { output ->
+      body.byteStream().use { input -> input.copyTo(output) }
+    } ?: throw IllegalStateException("Could not open output stream")
+    return uri
+  }
 }
