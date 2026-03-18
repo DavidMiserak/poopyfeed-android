@@ -684,4 +684,81 @@ class TimelineViewModelTest {
     val state = viewModel.uiState.first()
     assertIs<TimelineUiState.Error>(state)
   }
+
+  @Test
+  fun `refresh failure after successful load keeps existing data and shows transient error`() =
+      runTest {
+        val today = getTodayDateString()
+        val events =
+            listOf(
+                TestFixtures.mockTimelineEvent(at = "${today}T14:00:00Z"),
+                TestFixtures.mockTimelineEvent(at = "${today}T10:00:00Z"),
+            )
+        createViewModel(events = events)
+
+        // Verify initial load succeeded
+        val initialState = viewModel.uiState.first()
+        assertIs<TimelineUiState.Ready>(initialState)
+        val initialEventCount = initialState.items.filterIsInstance<TimelineItem.Event>().size
+        assertTrue(initialEventCount > 0, "Should have events after initial load")
+
+        // Now make the API return an error on refresh
+        coEvery { mockAnalyticsRepository.getTimeline(123) } returns
+            ApiResult.Error(ApiError.NetworkError("offline"))
+        coEvery { mockContext.getString(any<Int>()) } returns "Network error"
+
+        viewModel.refresh()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Timeline should still show existing data (Ready), NOT Error state
+        val stateAfterRefresh = viewModel.uiState.first()
+        assertIs<TimelineUiState.Ready>(stateAfterRefresh)
+        val eventCountAfterRefresh =
+            stateAfterRefresh.items.filterIsInstance<TimelineItem.Event>().size
+        assertEquals(
+            initialEventCount,
+            eventCountAfterRefresh,
+            "Existing events should be preserved after refresh failure")
+
+        // Error should be surfaced as a transient message (napCreationResult)
+        assertEquals("Network error", viewModel.napCreationResult.first())
+      }
+
+  @Test
+  fun `createNapFromGap offline keeps timeline visible and shows error toast`() = runTest {
+    val today = getTodayDateString()
+    val events =
+        listOf(
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T14:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = null),
+            TestFixtures.mockTimelineEvent(
+                type = "feeding",
+                at = "${today}T10:00:00Z",
+                feeding = TestFixtures.mockTimelineFeedingPayload(),
+                gapAfterMinutes = 240L,
+                gapAfterStart = "${today}T14:00:00Z",
+                gapAfterEnd = "${today}T10:00:00Z"),
+        )
+    createViewModel(events = events)
+
+    // Nap creation succeeds (offline mode), but timeline refresh fails
+    coEvery { mockNapsRepository.createNap(123, any()) } returns
+        ApiResult.Success(TestFixtures.mockNap(id = 1))
+    coEvery { mockAnalyticsRepository.getTimeline(123) } returns
+        ApiResult.Error(ApiError.NetworkError("offline"))
+    coEvery { mockContext.getString(any<Int>()) } returns "Network error"
+
+    viewModel.createNapFromGap("${today}T14:00:00Z", "${today}T10:00:00Z")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Timeline should still show Ready state with existing data
+    val state = viewModel.uiState.first()
+    assertIs<TimelineUiState.Ready>(state)
+    assertTrue(
+        state.items.filterIsInstance<TimelineItem.Event>().isNotEmpty(),
+        "Timeline should still show events after offline nap creation")
+  }
 }

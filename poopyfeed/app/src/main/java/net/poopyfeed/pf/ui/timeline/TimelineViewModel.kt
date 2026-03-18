@@ -94,6 +94,10 @@ constructor(
   /** Tracks fetch lifecycle: null = loading, empty = loaded OK, non-empty = error message. */
   private val _fetchStatus: MutableStateFlow<String?> = MutableStateFlow(null)
 
+  /** Whether a refresh is in progress (for pull-to-refresh spinner). */
+  private val _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val isRefreshing: Flow<Boolean> = _isRefreshing
+
   /**
    * Timezone used for timeline day boundaries and headers. Prefers the user's profile timezone when
    * available; falls back to the device timezone.
@@ -113,23 +117,38 @@ constructor(
     loadTimeline()
   }
 
+  /** Whether [loadTimeline] has completed at least once. */
+  private var hasLoadedOnce = false
+
   /** Loads all timeline events from API and updates [_allEvents]. */
   private fun loadTimeline() {
-    _fetchStatus.value = null // loading
+    // Only show full loading state on initial load; refreshes keep existing data visible
+    if (!hasLoadedOnce) {
+      _fetchStatus.value = null // loading
+    }
+    _isRefreshing.value = true
     viewModelScope.launch {
       when (val result = analyticsRepository.getTimeline(childId)) {
         is ApiResult.Success -> {
           _allEvents.value = result.data.results
           _fetchStatus.value = "" // loaded OK
+          hasLoadedOnce = true
         }
         is ApiResult.Error -> {
-          _allEvents.value = emptyList()
-          _fetchStatus.value = result.error.getUserMessage(context)
+          if (hasLoadedOnce) {
+            // Refresh failed — keep existing data, show transient error via napCreationResult
+            _napCreationResult.value = result.error.getUserMessage(context)
+          } else {
+            // Initial load failed — show error state
+            _allEvents.value = emptyList()
+            _fetchStatus.value = result.error.getUserMessage(context)
+          }
         }
         is ApiResult.Loading -> {
           // no-op; we manage Loading locally
         }
       }
+      _isRefreshing.value = false
     }
   }
 
