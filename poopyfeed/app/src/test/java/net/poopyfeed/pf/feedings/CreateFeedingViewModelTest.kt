@@ -50,7 +50,12 @@ class CreateFeedingViewModelTest {
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
         CreateFeedingViewModel(
-            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext, mockToastManager)
+            savedStateHandle,
+            mockRepository,
+            mockSyncScheduler,
+            mockAnalyticsTracker,
+            mockContext,
+            mockToastManager)
   }
 
   @After

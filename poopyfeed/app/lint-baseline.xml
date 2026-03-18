@@ -2,6 +2,39 @@
 <issues format="6" by="lint 9.1.0" type="baseline" client="gradle" dependencies="false" name="AGP (9.1.0)" variant="all" version="9.1.0">
 
     <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="      &quot;${String.format(&quot;%04d-%02d-%02dT%02d:%02d:00&quot;, year, month, day, hour, minute)}Z&quot;"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/util/DatePickerUtils.kt"
+            line="106"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level 29 (current min is 26): `android.provider.MediaStore.Downloads#EXTERNAL_CONTENT_URI`"
+        errorLine1="              appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/reports/ExportPdfViewModel.kt"
+            line="124"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Field requires API level 29 (current min is 26): `android.provider.MediaStore.Downloads#EXTERNAL_CONTENT_URI`"
+        errorLine1="              appContext.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/net/poopyfeed/pf/reports/ReportsViewModel.kt"
+            line="111"
+            column="49"/>
+    </issue>
+
+    <issue
         id="AndroidGradlePluginVersion"
         message="A newer version of Gradle than 9.3.1 is available: 9.4.0"
         errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip"
@@ -10,6 +43,61 @@
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/wrapper/gradle-wrapper.properties"
             line="5"
             column="17"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.18.0"
+        errorLine1="coreKtx = &quot;1.17.0&quot;"
+        errorLine2="          ~~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="5"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.activity:activity-ktx than 1.12.4 is available: 1.13.0"
+        errorLine1="activity = &quot;1.12.4&quot;"
+        errorLine2="           ~~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="27"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.paging:paging-common-ktx than 3.4.1 is available: 3.4.2"
+        errorLine1="paging = &quot;3.4.1&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="37"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.paging:paging-runtime-ktx than 3.4.1 is available: 3.4.2"
+        errorLine1="paging = &quot;3.4.1&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="37"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 2.3.10 is available: 2.3.20"
+        errorLine1="kotlin = &quot;2.3.10&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
     </issue>
 
     <issue
@@ -87,6 +175,105 @@
             file="$HOME/projects/poopyfeed/android/poopyfeed/gradle/libs.versions.toml"
             line="30"
             column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.icon_timeline` appears to be unused"
+        errorLine1="    &lt;string name=&quot;icon_timeline&quot;>📊&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="123"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_timeline` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_timeline&quot;>Timeline&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="137"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_timeline_subtitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_timeline_subtitle&quot;>View 7-day activity history&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="138"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.child_detail_section_insights` appears to be unused"
+        errorLine1="    &lt;string name=&quot;child_detail_section_insights&quot;>Insights&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="141"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.a11y_go_to_timeline` appears to be unused"
+        errorLine1="    &lt;string name=&quot;a11y_go_to_timeline&quot;>Timeline. Double tap to open.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="365"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.reports_exporting` appears to be unused"
+        errorLine1="    &lt;string name=&quot;reports_exporting&quot;>Exporting…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="382"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.reports_export_success` appears to be unused"
+        errorLine1="    &lt;string name=&quot;reports_export_success&quot;>Export ready&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="383"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.reports_export_error` appears to be unused"
+        errorLine1="    &lt;string name=&quot;reports_export_error&quot;>Export failed&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="384"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.export_pdf_generating` appears to be unused"
+        errorLine1="    &lt;string name=&quot;export_pdf_generating&quot;>Generating report…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="396"
+            column="13"/>
     </issue>
 
 </issues>

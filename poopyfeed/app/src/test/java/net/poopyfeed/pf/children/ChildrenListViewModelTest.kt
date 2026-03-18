@@ -61,7 +61,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+        viewModel =
+            ChildrenListViewModel(
+                mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
 
         coVerify { mockRepository.refreshChildren() }
@@ -76,7 +78,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+        viewModel =
+            ChildrenListViewModel(
+                mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         viewModel.refresh()
         advanceUntilIdle()
@@ -94,7 +98,8 @@ class ChildrenListViewModelTest {
       coEvery { mockRepository.refreshChildren() } returns
           ApiResult.Error(ApiError.NetworkError("down"))
 
-      viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+      viewModel =
+          ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
       advanceUntilIdle()
 
       assertIs<ChildrenListUiState.Error>(viewModel.uiState.value)
@@ -111,7 +116,9 @@ class ChildrenListViewModelTest {
         coEvery { mockRepository.refreshChildren() } returns ApiResult.Success(emptyList())
         every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+        viewModel =
+            ChildrenListViewModel(
+                mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
 
         assertIs<ChildrenListUiState.Loading>(viewModel.uiState.value)
@@ -128,7 +135,9 @@ class ChildrenListViewModelTest {
             ApiResult.Error(ApiError.NetworkError("fail"))
         every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+        viewModel =
+            ChildrenListViewModel(
+                mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         val emissions = mutableListOf<String>()
         val job = launch { viewModel.deleteError.collect { emissions.add(it) } }
@@ -152,7 +161,9 @@ class ChildrenListViewModelTest {
         every { mockAnalyticsTracker.logChildDeleted(any()) } returns Unit
         every { mockToastManager.showSuccess(any()) } returns Unit
 
-        viewModel = ChildrenListViewModel(mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
+        viewModel =
+            ChildrenListViewModel(
+                mockRepository, mockContext, mockAnalyticsTracker, mockToastManager)
         advanceUntilIdle()
         viewModel.deleteChild(1)
         advanceUntilIdle()

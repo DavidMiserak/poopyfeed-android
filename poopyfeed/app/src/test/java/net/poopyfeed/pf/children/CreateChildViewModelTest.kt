@@ -45,7 +45,8 @@ class CreateChildViewModelTest {
     mockAnalyticsTracker = mockk()
     mockToastManager = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext, mockToastManager)
+    viewModel =
+        CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext, mockToastManager)
   }
 
   @After

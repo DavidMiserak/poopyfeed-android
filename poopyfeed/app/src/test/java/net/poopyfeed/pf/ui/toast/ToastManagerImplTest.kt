@@ -11,49 +11,49 @@ import org.junit.Test
 
 class ToastManagerImplTest {
 
-    private lateinit var context: Context
-    private lateinit var toastManager: ToastManagerImpl
-    private lateinit var mockToast: Toast
+  private lateinit var context: Context
+  private lateinit var toastManager: ToastManagerImpl
+  private lateinit var mockToast: Toast
 
-    @Before
-    fun setup() {
-        context = mockk(relaxed = true)
-        mockToast = mockk(relaxed = true)
+  @Before
+  fun setup() {
+    context = mockk(relaxed = true)
+    mockToast = mockk(relaxed = true)
 
-        // Mock the static Toast.makeText() method
-        mockkStatic(Toast::class)
-        every { Toast.makeText(any(), any<String>(), any()) } returns mockToast
+    // Mock the static Toast.makeText() method
+    mockkStatic(Toast::class)
+    every { Toast.makeText(any(), any<String>(), any()) } returns mockToast
 
-        toastManager = ToastManagerImpl(context)
+    toastManager = ToastManagerImpl(context)
+  }
+
+  @Test
+  fun testShowSuccessCreatesToastWithShortDuration() {
+    toastManager.showSuccess("✓ Test message")
+
+    verify {
+      Toast.makeText(context, "✓ Test message", Toast.LENGTH_SHORT)
+      mockToast.show()
     }
+  }
 
-    @Test
-    fun testShowSuccessCreatesToastWithShortDuration() {
-        toastManager.showSuccess("✓ Test message")
+  @Test
+  fun testShowErrorCreatesToastWithLongDuration() {
+    toastManager.showError("✗ Error message")
 
-        verify {
-            Toast.makeText(context, "✓ Test message", Toast.LENGTH_SHORT)
-            mockToast.show()
-        }
+    verify {
+      Toast.makeText(context, "✗ Error message", Toast.LENGTH_LONG)
+      mockToast.show()
     }
+  }
 
-    @Test
-    fun testShowErrorCreatesToastWithLongDuration() {
-        toastManager.showError("✗ Error message")
+  @Test
+  fun testShowInfoCreatesToastWithShortDuration() {
+    toastManager.showInfo("📱 Info message")
 
-        verify {
-            Toast.makeText(context, "✗ Error message", Toast.LENGTH_LONG)
-            mockToast.show()
-        }
+    verify {
+      Toast.makeText(context, "📱 Info message", Toast.LENGTH_SHORT)
+      mockToast.show()
     }
-
-    @Test
-    fun testShowInfoCreatesToastWithShortDuration() {
-        toastManager.showInfo("📱 Info message")
-
-        verify {
-            Toast.makeText(context, "📱 Info message", Toast.LENGTH_SHORT)
-            mockToast.show()
-        }
-    }
+  }
 }

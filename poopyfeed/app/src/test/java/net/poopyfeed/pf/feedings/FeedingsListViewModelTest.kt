@@ -53,7 +53,9 @@ class FeedingsListViewModelTest {
     val pagingData: Flow<PagingData<Feeding>> = flowOf()
     every { mockRepository.pagedFeedings(1) } returns pagingData
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel =
+        FeedingsListViewModel(
+            savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -62,7 +64,9 @@ class FeedingsListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel =
+        FeedingsListViewModel(
+            savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.deleteError.value == null)
   }
@@ -73,7 +77,9 @@ class FeedingsListViewModelTest {
     coEvery { mockRepository.refreshFeedings(1) } returns ApiResult.Success(emptyList())
     every { mockToastManager.showSuccess(any()) } returns Unit
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel =
+        FeedingsListViewModel(
+            savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.refresh()
     advanceUntilIdle()
 
@@ -86,7 +92,9 @@ class FeedingsListViewModelTest {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
     coEvery { mockRepository.deleteFeeding(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel =
+        FeedingsListViewModel(
+            savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 
@@ -100,7 +108,9 @@ class FeedingsListViewModelTest {
     coEvery { mockRepository.deleteFeeding(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel =
+        FeedingsListViewModel(
+            savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 

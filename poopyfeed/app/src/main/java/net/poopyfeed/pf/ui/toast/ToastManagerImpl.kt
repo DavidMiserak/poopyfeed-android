@@ -7,21 +7,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ToastManagerImpl @Inject constructor(@ApplicationContext private val context: Context) : ToastManager {
+class ToastManagerImpl @Inject constructor(@ApplicationContext private val context: Context) :
+    ToastManager {
 
-    override fun showSuccess(message: String) {
-        showToast(message, Toast.LENGTH_SHORT)
-    }
+  override fun showSuccess(message: String) {
+    showToast(message, Toast.LENGTH_SHORT)
+  }
 
-    override fun showError(message: String) {
-        showToast(message, Toast.LENGTH_LONG)
-    }
+  override fun showError(message: String) {
+    showToast(message, Toast.LENGTH_LONG)
+  }
 
-    override fun showInfo(message: String) {
-        showToast(message, Toast.LENGTH_SHORT)
-    }
+  override fun showInfo(message: String) {
+    showToast(message, Toast.LENGTH_SHORT)
+  }
 
-    private fun showToast(message: String, duration: Int) {
-        Toast.makeText(context, message, duration).show()
-    }
+  private fun showToast(message: String, duration: Int) {
+    Toast.makeText(context, message, duration).show()
+  }
 }

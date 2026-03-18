@@ -50,7 +50,12 @@ class CreateDiaperViewModelTest {
     every { mockContext.getString(any()) } returns "Error message"
     viewModel =
         CreateDiaperViewModel(
-            savedStateHandle, mockRepository, mockSyncScheduler, mockAnalyticsTracker, mockContext, mockToastManager)
+            savedStateHandle,
+            mockRepository,
+            mockSyncScheduler,
+            mockAnalyticsTracker,
+            mockContext,
+            mockToastManager)
   }
 
   @After
