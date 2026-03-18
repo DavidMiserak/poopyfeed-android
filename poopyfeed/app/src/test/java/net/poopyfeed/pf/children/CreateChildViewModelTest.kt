@@ -21,6 +21,7 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +34,7 @@ class CreateChildViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var mockRepository: CachedChildrenRepository
   private lateinit var mockAnalyticsTracker: AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: CreateChildViewModel
 
   @Before
@@ -41,8 +43,9 @@ class CreateChildViewModelTest {
     mockContext = mockk()
     mockRepository = mockk()
     mockAnalyticsTracker = mockk()
+    mockToastManager = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
-    viewModel = CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext)
+    viewModel = CreateChildViewModel(mockRepository, mockAnalyticsTracker, mockContext, mockToastManager)
   }
 
   @After

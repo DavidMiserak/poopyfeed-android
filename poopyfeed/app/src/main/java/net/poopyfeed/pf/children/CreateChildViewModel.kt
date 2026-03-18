@@ -14,7 +14,9 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateChildRequest
+import net.poopyfeed.pf.data.models.toToastMessage
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 /** UI state for the create child bottom sheet. */
 sealed interface CreateChildUiState {
@@ -46,6 +48,7 @@ constructor(
     private val repo: CachedChildrenRepository,
     private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
+    private val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<CreateChildUiState> =
@@ -92,9 +95,13 @@ constructor(
               if (allChildren is ApiResult.Success) {
                 analyticsTracker.logChildCreated(allChildren.data.size)
               }
+              toastManager.showSuccess("✓ Child created")
               CreateChildUiState.Success
             }
-            is ApiResult.Error -> CreateChildUiState.Error(result.error.getUserMessage(context))
+            is ApiResult.Error -> {
+              toastManager.showError(result.error.toToastMessage())
+              CreateChildUiState.Error(result.error.getUserMessage(context))
+            }
             is ApiResult.Loading -> CreateChildUiState.Saving
           }
     }
