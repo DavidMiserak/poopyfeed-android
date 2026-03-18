@@ -8,8 +8,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -69,9 +69,8 @@ class ReportsViewModelTest {
     vm.exportCsv(30)
     advanceUntilIdle()
 
-    val state = vm.exportState.first()
-    assertTrue(state is ExportState.CsvReady)
-    assertNotNull((state as ExportState.CsvReady).uri)
+    val state = assertIs<ExportState.CsvReady>(vm.exportState.first())
+    assertNotNull(state.uri)
   }
 
   @Test
@@ -99,9 +98,8 @@ class ReportsViewModelTest {
     vm.exportCsv(30)
     advanceUntilIdle()
 
-    val state = vm.exportState.first()
-    assertTrue(state is ExportState.Error)
-    assertEquals("fail", (state as ExportState.Error).message)
+    val state = assertIs<ExportState.Error>(vm.exportState.first())
+    assertEquals("fail", state.message)
   }
 
   @Test
@@ -115,9 +113,8 @@ class ReportsViewModelTest {
     vm.startPdfExport(30)
     advanceUntilIdle()
 
-    val state = vm.exportState.first()
-    assertTrue(state is ExportState.PdfStarted)
-    assertEquals("task-123", (state as ExportState.PdfStarted).taskId)
+    val state = assertIs<ExportState.PdfStarted>(vm.exportState.first())
+    assertEquals("task-123", state.taskId)
   }
 
   @Test
@@ -144,8 +141,7 @@ class ReportsViewModelTest {
     vm.startPdfExport(30)
     advanceUntilIdle()
 
-    val state = vm.exportState.first()
-    assertTrue(state is ExportState.Error)
+    assertIs<ExportState.Error>(vm.exportState.first())
   }
 
   @Test
@@ -161,7 +157,6 @@ class ReportsViewModelTest {
     advanceUntilIdle()
     vm.clearExportState()
 
-    val state = vm.exportState.first()
-    assertTrue(state is ExportState.Idle)
+    assertIs<ExportState.Idle>(vm.exportState.first())
   }
 }

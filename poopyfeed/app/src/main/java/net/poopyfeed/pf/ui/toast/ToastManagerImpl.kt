@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ToastManagerImpl @Inject constructor(@ApplicationContext private val context: Context) :
+class ToastManagerImpl @Inject constructor(@param:ApplicationContext private val context: Context) :
     ToastManager {
 
   override fun showSuccess(message: String) {

@@ -40,8 +40,8 @@ class ExportPdfViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val analyticsRepo: AnalyticsRepository,
-    @ApplicationContext private val appContext: Context,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationContext private val appContext: Context,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
   val childId: Int = checkNotNull(savedStateHandle["childId"])

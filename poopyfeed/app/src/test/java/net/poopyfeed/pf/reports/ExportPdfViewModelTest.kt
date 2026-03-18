@@ -7,8 +7,8 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -60,8 +60,7 @@ class ExportPdfViewModelTest {
   @Test
   fun `initial state is Polling`() = runTest {
     val vm = createViewModel()
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Polling)
+    assertIs<PdfExportUiState.Polling>(vm.uiState.first())
   }
 
   @Test
@@ -83,9 +82,8 @@ class ExportPdfViewModelTest {
     vm.pollOnce()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Completed)
-    assertEquals("report.pdf", (state as PdfExportUiState.Completed).filename)
+    val state = assertIs<PdfExportUiState.Completed>(vm.uiState.first())
+    assertEquals("report.pdf", state.filename)
     assertEquals("/analytics/download/report.pdf/", state.downloadUrl)
   }
 
@@ -102,9 +100,8 @@ class ExportPdfViewModelTest {
     vm.pollOnce()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Polling)
-    assertEquals(60, (state as PdfExportUiState.Polling).progress)
+    val state = assertIs<PdfExportUiState.Polling>(vm.uiState.first())
+    assertEquals(60, state.progress)
     assertEquals("Generating report…", state.statusText)
   }
 
@@ -121,9 +118,8 @@ class ExportPdfViewModelTest {
     vm.pollOnce()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Polling)
-    assertEquals("Preparing…", (state as PdfExportUiState.Polling).statusText)
+    val state = assertIs<PdfExportUiState.Polling>(vm.uiState.first())
+    assertEquals("Preparing…", state.statusText)
   }
 
   @Test
@@ -139,9 +135,8 @@ class ExportPdfViewModelTest {
     vm.pollOnce()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Failed)
-    assertEquals("Server error", (state as PdfExportUiState.Failed).message)
+    val state = assertIs<PdfExportUiState.Failed>(vm.uiState.first())
+    assertEquals("Server error", state.message)
   }
 
   @Test
@@ -153,9 +148,8 @@ class ExportPdfViewModelTest {
     vm.pollOnce()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Failed)
-    assertEquals("No internet", (state as PdfExportUiState.Failed).message)
+    val state = assertIs<PdfExportUiState.Failed>(vm.uiState.first())
+    assertEquals("No internet", state.message)
   }
 
   @Test
@@ -168,9 +162,8 @@ class ExportPdfViewModelTest {
     vm.downloadFile("report.pdf")
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Downloaded)
-    assertNotNull((state as PdfExportUiState.Downloaded).uri)
+    val state = assertIs<PdfExportUiState.Downloaded>(vm.uiState.first())
+    assertNotNull(state.uri)
   }
 
   @Test
@@ -182,8 +175,7 @@ class ExportPdfViewModelTest {
     vm.downloadFile("report.pdf")
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PdfExportUiState.Failed)
-    assertEquals("Internal Server Error", (state as PdfExportUiState.Failed).message)
+    val state = assertIs<PdfExportUiState.Failed>(vm.uiState.first())
+    assertEquals("Internal Server Error", state.message)
   }
 }

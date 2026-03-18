@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -76,15 +77,13 @@ class PediatricianSummaryViewModelTest {
     val vm = createViewModel()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PediatricianSummaryUiState.Ready)
-    val ready = state as PediatricianSummaryUiState.Ready
-    assertEquals(summary, ready.summary)
-    assertEquals(5, ready.feedingsPerDay) // 35 / 7
-    assertEquals(12.5, ready.ozPerDay) // 87.5 / 7.0
-    assertEquals(4, ready.diapersPerDay) // 28 / 7
-    assertEquals(2, ready.napsPerDay) // 14 / 7
-    assertEquals(120, ready.sleepMinutesPerDay) // 840 / 7
+    val state = assertIs<PediatricianSummaryUiState.Ready>(vm.uiState.first())
+    assertEquals(summary, state.summary)
+    assertEquals(5, state.feedingsPerDay) // 35 / 7
+    assertEquals(12.5, state.ozPerDay) // 87.5 / 7.0
+    assertEquals(4, state.diapersPerDay) // 28 / 7
+    assertEquals(2, state.napsPerDay) // 14 / 7
+    assertEquals(120, state.sleepMinutesPerDay) // 840 / 7
   }
 
   @Test
@@ -95,8 +94,7 @@ class PediatricianSummaryViewModelTest {
     val vm = createViewModel()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PediatricianSummaryUiState.Empty)
+    assertIs<PediatricianSummaryUiState.Empty>(vm.uiState.first())
   }
 
   @Test
@@ -107,9 +105,8 @@ class PediatricianSummaryViewModelTest {
     val vm = createViewModel()
     advanceUntilIdle()
 
-    val state = vm.uiState.first()
-    assertTrue(state is PediatricianSummaryUiState.Error)
-    assertEquals("No internet", (state as PediatricianSummaryUiState.Error).message)
+    val state = assertIs<PediatricianSummaryUiState.Error>(vm.uiState.first())
+    assertEquals("No internet", state.message)
   }
 
   @Test
