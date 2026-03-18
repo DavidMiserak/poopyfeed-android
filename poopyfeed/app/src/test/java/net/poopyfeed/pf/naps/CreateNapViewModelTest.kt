@@ -25,6 +25,7 @@ import net.poopyfeed.pf.data.models.CreateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +40,7 @@ class CreateNapViewModelTest {
   private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var mockTokenManager: TokenManager
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: CreateNapViewModel
 
   @Before
@@ -50,6 +52,7 @@ class CreateNapViewModelTest {
     mockSyncScheduler = mockk(relaxed = true)
     mockAnalyticsTracker = mockk(relaxed = true)
     mockTokenManager = mockk()
+    mockToastManager = mockk(relaxed = true)
     every { mockContext.getString(any()) } returns "Error message"
     every { mockTokenManager.getProfileTimezone() } returns "America/Los_Angeles"
     viewModel =
@@ -59,7 +62,8 @@ class CreateNapViewModelTest {
             mockSyncScheduler,
             mockAnalyticsTracker,
             mockContext,
-            mockTokenManager)
+            mockTokenManager,
+            mockToastManager)
   }
 
   @After
@@ -408,7 +412,8 @@ class CreateNapViewModelTest {
                 mockSyncScheduler,
                 mockAnalyticsTracker,
                 mockContext,
-                mockTokenManager)
+                mockTokenManager,
+                mockToastManager)
 
         // Current time doesn't matter much, but let's say it's March 9 noon ET
         // March 9 12:00 ET = March 9 17:00 UTC

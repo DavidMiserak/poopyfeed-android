@@ -21,9 +21,11 @@ import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateNapRequest
+import net.poopyfeed.pf.data.models.toToastMessage
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 import net.poopyfeed.pf.util.handleAndLogError
 
 /** UI state for the create nap bottom sheet. */
@@ -51,6 +53,7 @@ constructor(
     private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
     private val tokenManager: TokenManager,
+    private val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int =
@@ -206,10 +209,12 @@ constructor(
                     -1 // Open-ended nap (no end_time set)
                   }
               analyticsTracker.logNapLogged(durationMinutes)
+              toastManager.showSuccess("✓ Nap recorded")
               CreateNapUiState.Success
             }
             is ApiResult.Error -> {
               handleAndLogError(analyticsTracker, result.error, "createNap")
+              toastManager.showError(result.error.toToastMessage())
               CreateNapUiState.Error(result.error.getUserMessage(context))
             }
             is ApiResult.Loading -> CreateNapUiState.Saving

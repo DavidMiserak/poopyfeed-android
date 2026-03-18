@@ -16,6 +16,7 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +36,7 @@ class CreateNapBottomSheetFragmentTest {
   private lateinit var mockSyncScheduler: SyncScheduler
   private lateinit var mockAnalyticsTracker: AnalyticsTracker
   private lateinit var mockTokenManager: TokenManager
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: CreateNapViewModel
   private val childId = 1
 
@@ -47,6 +49,7 @@ class CreateNapBottomSheetFragmentTest {
     mockSyncScheduler = mockk(relaxed = true)
     mockAnalyticsTracker = mockk(relaxed = true)
     mockTokenManager = mockk()
+    mockToastManager = mockk(relaxed = true)
 
     every { mockContext.getString(any()) } returns "Error message"
     every { mockTokenManager.getProfileTimezone() } returns "US/Eastern"
@@ -57,7 +60,8 @@ class CreateNapBottomSheetFragmentTest {
             mockSyncScheduler,
             mockAnalyticsTracker,
             mockContext,
-            mockTokenManager)
+            mockTokenManager,
+            mockToastManager)
   }
 
   @After
