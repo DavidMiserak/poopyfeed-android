@@ -9,14 +9,18 @@ import javax.inject.Singleton
 class ToastManagerImpl @Inject constructor(private val context: Context) : ToastManager {
 
     override fun showSuccess(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        showToast(message, Toast.LENGTH_SHORT)
     }
 
     override fun showError(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        showToast(message, Toast.LENGTH_LONG)
     }
 
     override fun showInfo(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        showToast(message, Toast.LENGTH_SHORT)
+    }
+
+    private fun showToast(message: String, duration: Int) {
+        Toast.makeText(context, message, duration).show()
     }
 }
