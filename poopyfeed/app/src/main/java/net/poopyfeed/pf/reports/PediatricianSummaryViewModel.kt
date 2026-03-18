@@ -55,12 +55,12 @@ constructor(
   }
 
   fun refresh() {
-    _isRefreshing.value = true
     load()
   }
 
   private fun load() {
     viewModelScope.launch {
+      _isRefreshing.value = true
       when (val result = analyticsRepo.getWeeklySummary(childId)) {
         is ApiResult.Success -> {
           val s = result.data

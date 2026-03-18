@@ -55,7 +55,11 @@ constructor(
   val errorMessage: SharedFlow<String> = _errorMessage.asSharedFlow()
 
   init {
-    viewModelScope.launch { load() }
+    viewModelScope.launch {
+      _isRefreshing.value = true
+      load()
+      _isRefreshing.value = false
+    }
   }
 
   fun refresh() {
