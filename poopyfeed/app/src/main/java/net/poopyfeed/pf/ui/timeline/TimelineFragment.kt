@@ -58,15 +58,21 @@ class TimelineFragment : Fragment() {
     binding.recyclerTimeline.layoutManager = LinearLayoutManager(requireContext())
     binding.recyclerTimeline.adapter = adapter
 
-    // Setup navigation buttons
+    // Setup navigation buttons and pull-to-refresh
     binding.btnPrevious.setOnClickListener { viewModel.previousDay() }
     binding.btnNext.setOnClickListener { viewModel.nextDay() }
     binding.btnRetry.setOnClickListener { viewModel.refresh() }
+    binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
 
-    // Collect UI state and nap creation results
+    // Collect UI state, refresh state, nap creation results, and refresh errors
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         launch { viewModel.uiState.collect { state -> updateUI(state) } }
+        launch {
+          viewModel.isRefreshing.collect { refreshing ->
+            _binding?.swipeRefresh?.isRefreshing = refreshing
+          }
+        }
         launch {
           viewModel.napCreationResult.collect { message ->
             if (message != null) {
@@ -74,6 +80,16 @@ class TimelineFragment : Fragment() {
                 Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show()
               }
               viewModel.clearNapCreationResult()
+            }
+          }
+        }
+        launch {
+          viewModel.refreshError.collect { message ->
+            if (message != null) {
+              _binding?.root?.let { root ->
+                Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show()
+              }
+              viewModel.clearRefreshError()
             }
           }
         }

@@ -67,20 +67,28 @@
         android:alpha="0.12"
         android:background="?attr/colorOutline" />
 
-    <!-- Timeline events RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_timeline"
+    <!-- Pull-to-refresh wrapper -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingStart="@dimen/spacing_6"
-        android:paddingEnd="@dimen/spacing_6"
-        android:paddingTop="@dimen/spacing_8"
-        android:paddingBottom="@dimen/spacing_24"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_timeline_event" />
+        android:layout_weight="1">
+
+        <!-- Timeline events RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_timeline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingStart="@dimen/spacing_6"
+            android:paddingEnd="@dimen/spacing_6"
+            android:paddingTop="@dimen/spacing_8"
+            android:paddingBottom="@dimen/spacing_24"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_timeline_event" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- Loading state -->
     <LinearLayout

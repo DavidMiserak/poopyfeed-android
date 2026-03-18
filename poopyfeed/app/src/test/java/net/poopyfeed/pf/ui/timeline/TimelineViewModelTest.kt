@@ -720,8 +720,8 @@ class TimelineViewModelTest {
             eventCountAfterRefresh,
             "Existing events should be preserved after refresh failure")
 
-        // Error should be surfaced as a transient message (napCreationResult)
-        assertEquals("Network error", viewModel.napCreationResult.first())
+        // Error should be surfaced as a transient message (refreshError, not napCreationResult)
+        assertEquals("Network error", viewModel.refreshError.first())
       }
 
   @Test

@@ -16,6 +16,8 @@ internal fun Exception.toApiError(): ApiError =
         }
       }
       is java.io.IOException -> ApiError.NetworkError(this.message ?: "Network error")
+      is kotlinx.serialization.SerializationException ->
+          ApiError.SerializationError(this.message ?: "Serialization error")
       else -> ApiError.UnknownError(this.message ?: "Unknown error")
     }
 

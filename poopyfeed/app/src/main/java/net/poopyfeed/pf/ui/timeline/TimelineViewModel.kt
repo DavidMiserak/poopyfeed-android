@@ -136,8 +136,8 @@ constructor(
         }
         is ApiResult.Error -> {
           if (hasLoadedOnce) {
-            // Refresh failed — keep existing data, show transient error via napCreationResult
-            _napCreationResult.value = result.error.getUserMessage(context)
+            // Refresh failed — keep existing data, show transient error via dedicated flow
+            _refreshError.value = result.error.getUserMessage(context)
           } else {
             // Initial load failed — show error state
             _allEvents.value = emptyList()
@@ -327,9 +327,18 @@ constructor(
   private val _napCreationResult: MutableStateFlow<String?> = MutableStateFlow(null)
   val napCreationResult: Flow<String?> = _napCreationResult
 
+  /** One-shot event for refresh errors (separate from nap creation). */
+  private val _refreshError: MutableStateFlow<String?> = MutableStateFlow(null)
+  val refreshError: Flow<String?> = _refreshError
+
   /** Clears the nap creation result after it has been consumed by the UI. */
   fun clearNapCreationResult() {
     _napCreationResult.value = null
+  }
+
+  /** Clears the refresh error after it has been consumed by the UI. */
+  fun clearRefreshError() {
+    _refreshError.value = null
   }
 
   /**
