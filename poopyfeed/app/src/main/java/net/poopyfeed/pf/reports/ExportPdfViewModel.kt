@@ -118,8 +118,7 @@ constructor(
         try {
           if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             throw UnsupportedOperationException(
-                "Saving to Downloads requires Android 10 (API 29) or higher"
-            )
+                "Saving to Downloads requires Android 10 (API 29) or higher")
           }
           saveToMediaStore(body, filename, mimeType)
         } catch (e: Exception) {
