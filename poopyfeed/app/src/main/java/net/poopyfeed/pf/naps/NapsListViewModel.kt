@@ -17,6 +17,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.UpdateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 @HiltViewModel
 class NapsListViewModel
@@ -25,6 +26,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedNapsRepository,
     val analyticsTracker: AnalyticsTracker,
+    val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -33,6 +35,15 @@ constructor(
 
   private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+  fun refresh() {
+    viewModelScope.launch {
+      val result = repo.refreshNaps(childId)
+      if (result is ApiResult.Success) {
+        toastManager.showSuccess("✓ Synced")
+      }
+    }
+  }
 
   fun deleteNap(napId: Int) {
     viewModelScope.launch {

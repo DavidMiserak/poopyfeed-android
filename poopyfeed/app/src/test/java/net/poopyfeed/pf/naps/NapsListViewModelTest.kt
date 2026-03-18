@@ -22,6 +22,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.UpdateNapRequest
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +34,7 @@ class NapsListViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedNapsRepository
   private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: NapsListViewModel
 
   @Before
@@ -41,6 +43,7 @@ class NapsListViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockAnalyticsTracker = mockk(relaxed = true)
+    mockToastManager = mockk()
   }
 
   @After
@@ -53,7 +56,7 @@ class NapsListViewModelTest {
     val pagingData: Flow<PagingData<Nap>> = flowOf()
     every { mockRepository.pagedNaps(1) } returns pagingData
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -62,9 +65,23 @@ class NapsListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedNaps(1) } returns flowOf()
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.deleteError.value == null)
+  }
+
+  @Test
+  fun `refresh calls repository refresh and shows toast on success`() = runTest {
+    every { mockRepository.pagedNaps(1) } returns flowOf()
+    coEvery { mockRepository.refreshNaps(1) } returns ApiResult.Success(emptyList())
+    every { mockToastManager.showSuccess(any()) } returns Unit
+
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel.refresh()
+    advanceUntilIdle()
+
+    coVerify { mockRepository.refreshNaps(1) }
+    every { mockToastManager.showSuccess("✓ Synced") }
   }
 
   @Test
@@ -72,7 +89,7 @@ class NapsListViewModelTest {
     every { mockRepository.pagedNaps(1) } returns flowOf()
     coEvery { mockRepository.deleteNap(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteError.value // access to initialize
 
     viewModel.deleteNap(10)
@@ -88,7 +105,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.deleteNap(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteNap(10)
     advanceUntilIdle()
 
@@ -103,7 +120,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.updateNap(1, 10, capture(requestSlot)) } returns
         ApiResult.Success(mockNap)
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.endNap(10)
     advanceUntilIdle()
 
@@ -119,7 +136,7 @@ class NapsListViewModelTest {
     coEvery { mockRepository.updateNap(1, 10, any()) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = NapsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.endNap(10)
     advanceUntilIdle()
 
