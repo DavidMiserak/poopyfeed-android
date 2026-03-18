@@ -14,8 +14,10 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
+import net.poopyfeed.pf.data.models.toToastMessage
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 /** UI state for the create feeding bottom sheet. */
 sealed interface CreateFeedingUiState {
@@ -45,6 +47,7 @@ constructor(
     private val syncScheduler: SyncScheduler,
     private val analyticsTracker: AnalyticsTracker,
     @param:ApplicationContext private val context: Context,
+    private val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -105,9 +108,13 @@ constructor(
             is ApiResult.Success -> {
               syncScheduler.enqueueIfPending()
               analyticsTracker.logFeedingLogged(result.data.feeding_type)
+              toastManager.showSuccess("✓ Feeding logged")
               CreateFeedingUiState.Success
             }
-            is ApiResult.Error -> CreateFeedingUiState.Error(result.error.getUserMessage(context))
+            is ApiResult.Error -> {
+              toastManager.showError(result.error.toToastMessage())
+              CreateFeedingUiState.Error(result.error.getUserMessage(context))
+            }
             is ApiResult.Loading -> CreateFeedingUiState.Saving
           }
     }
