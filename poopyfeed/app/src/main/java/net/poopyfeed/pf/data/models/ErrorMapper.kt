@@ -18,3 +18,17 @@ internal fun Exception.toApiError(): ApiError =
       is java.io.IOException -> ApiError.NetworkError(this.message ?: "Network error")
       else -> ApiError.UnknownError(this.message ?: "Unknown error")
     }
+
+/** Convert ApiError to user-friendly toast message. */
+fun ApiError.toToastMessage(): String =
+    when (this) {
+      is ApiError.NetworkError -> "✗ Failed to save - no internet"
+      is ApiError.HttpError ->
+          when {
+            this.statusCode == 401 -> "✗ Session expired - please login again"
+            this.statusCode in 500..599 -> "✗ Server error - please try again"
+            else -> "✗ Failed to save - error ${this.statusCode}"
+          }
+      is ApiError.SerializationError -> "✗ Failed to save - please try again"
+      is ApiError.UnknownError -> "✗ Failed to save - please try again"
+    }
