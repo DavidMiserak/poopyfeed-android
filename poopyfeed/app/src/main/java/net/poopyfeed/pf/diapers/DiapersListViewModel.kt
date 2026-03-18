@@ -15,6 +15,7 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 @HiltViewModel
 class DiapersListViewModel
@@ -23,6 +24,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedDiapersRepository,
     val analyticsTracker: AnalyticsTracker,
+    val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -31,6 +33,15 @@ constructor(
 
   private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+  fun refresh() {
+    viewModelScope.launch {
+      val result = repo.refreshDiapers(childId)
+      if (result is ApiResult.Success) {
+        toastManager.showSuccess("✓ Synced")
+      }
+    }
+  }
 
   fun deleteDiaper(diaperId: Int) {
     viewModelScope.launch {

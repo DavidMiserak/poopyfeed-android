@@ -19,6 +19,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.repository.CachedDiapersRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +31,7 @@ class DiapersListViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedDiapersRepository
   private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: DiapersListViewModel
 
   @Before
@@ -38,6 +40,7 @@ class DiapersListViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockAnalyticsTracker = mockk(relaxed = true)
+    mockToastManager = mockk()
   }
 
   @After
@@ -50,7 +53,7 @@ class DiapersListViewModelTest {
     val pagingData: Flow<PagingData<Diaper>> = flowOf()
     every { mockRepository.pagedDiapers(1) } returns pagingData
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -59,9 +62,23 @@ class DiapersListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedDiapers(1) } returns flowOf()
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.deleteError.value == null)
+  }
+
+  @Test
+  fun `refresh calls repository refresh and shows toast on success`() = runTest {
+    every { mockRepository.pagedDiapers(1) } returns flowOf()
+    coEvery { mockRepository.refreshDiapers(1) } returns ApiResult.Success(emptyList())
+    every { mockToastManager.showSuccess(any()) } returns Unit
+
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel.refresh()
+    advanceUntilIdle()
+
+    coVerify { mockRepository.refreshDiapers(1) }
+    every { mockToastManager.showSuccess("✓ Synced") }
   }
 
   @Test
@@ -69,7 +86,7 @@ class DiapersListViewModelTest {
     every { mockRepository.pagedDiapers(1) } returns flowOf()
     coEvery { mockRepository.deleteDiaper(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteDiaper(10)
     advanceUntilIdle()
 
@@ -83,7 +100,7 @@ class DiapersListViewModelTest {
     coEvery { mockRepository.deleteDiaper(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = DiapersListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteDiaper(10)
     advanceUntilIdle()
 
