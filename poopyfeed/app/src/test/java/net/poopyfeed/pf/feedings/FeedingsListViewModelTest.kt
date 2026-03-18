@@ -19,6 +19,7 @@ import net.poopyfeed.pf.data.models.ApiError
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +31,7 @@ class FeedingsListViewModelTest {
   private lateinit var savedStateHandle: SavedStateHandle
   private lateinit var mockRepository: CachedFeedingsRepository
   private lateinit var mockAnalyticsTracker: net.poopyfeed.pf.analytics.AnalyticsTracker
+  private lateinit var mockToastManager: ToastManager
   private lateinit var viewModel: FeedingsListViewModel
 
   @Before
@@ -38,6 +40,7 @@ class FeedingsListViewModelTest {
     savedStateHandle = SavedStateHandle(mapOf("childId" to 1))
     mockRepository = mockk()
     mockAnalyticsTracker = mockk(relaxed = true)
+    mockToastManager = mockk()
   }
 
   @After
@@ -50,7 +53,7 @@ class FeedingsListViewModelTest {
     val pagingData: Flow<PagingData<Feeding>> = flowOf()
     every { mockRepository.pagedFeedings(1) } returns pagingData
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.pagingData == pagingData)
   }
@@ -59,9 +62,23 @@ class FeedingsListViewModelTest {
   fun `deleteError flow is initialized`() {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
 
     assert(viewModel.deleteError.value == null)
+  }
+
+  @Test
+  fun `refresh calls repository refresh and shows toast on success`() = runTest {
+    every { mockRepository.pagedFeedings(1) } returns flowOf()
+    coEvery { mockRepository.refreshFeedings(1) } returns ApiResult.Success(emptyList())
+    every { mockToastManager.showSuccess(any()) } returns Unit
+
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
+    viewModel.refresh()
+    advanceUntilIdle()
+
+    coVerify { mockRepository.refreshFeedings(1) }
+    every { mockToastManager.showSuccess("✓ Synced") }
   }
 
   @Test
@@ -69,7 +86,7 @@ class FeedingsListViewModelTest {
     every { mockRepository.pagedFeedings(1) } returns flowOf()
     coEvery { mockRepository.deleteFeeding(1, 10) } returns ApiResult.Success(Unit)
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 
@@ -83,7 +100,7 @@ class FeedingsListViewModelTest {
     coEvery { mockRepository.deleteFeeding(1, 10) } returns
         ApiResult.Error(ApiError.NetworkError("offline"))
 
-    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker)
+    viewModel = FeedingsListViewModel(savedStateHandle, mockRepository, mockAnalyticsTracker, mockToastManager)
     viewModel.deleteFeeding(10)
     advanceUntilIdle()
 

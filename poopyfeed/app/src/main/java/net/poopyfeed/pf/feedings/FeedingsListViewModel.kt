@@ -15,6 +15,7 @@ import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.repository.CachedFeedingsRepository
+import net.poopyfeed.pf.ui.toast.ToastManager
 
 /**
  * ViewModel for [FeedingsListFragment]. Exposes paginated feedings for a child with delete support.
@@ -26,6 +27,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: CachedFeedingsRepository,
     val analyticsTracker: AnalyticsTracker,
+    val toastManager: ToastManager,
 ) : ViewModel() {
 
   private val childId: Int = checkNotNull(savedStateHandle["childId"])
@@ -34,6 +36,15 @@ constructor(
 
   private val _deleteError: MutableStateFlow<String?> = MutableStateFlow(null)
   val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+  fun refresh() {
+    viewModelScope.launch {
+      val result = repo.refreshFeedings(childId)
+      if (result is ApiResult.Success) {
+        toastManager.showSuccess("✓ Synced")
+      }
+    }
+  }
 
   fun deleteFeeding(feedingId: Int) {
     viewModelScope.launch {
