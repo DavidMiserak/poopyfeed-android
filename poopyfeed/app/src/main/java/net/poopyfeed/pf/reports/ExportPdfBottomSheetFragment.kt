@@ -57,9 +57,11 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
     pollingJob?.cancel()
     pollingJob =
         viewLifecycleOwner.lifecycleScope.launch {
-          while (viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            viewModel.pollOnce()
-            delay(2000L)
+          viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+              viewModel.pollOnce()
+              delay(2000L)
+            }
           }
         }
   }
@@ -80,6 +82,7 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.progressBar.setProgressCompat(state.progress, true)
                 binding.textStatus.text = state.statusText
                 binding.textError.visibility = View.GONE
+                binding.buttonCancel.visibility = View.VISIBLE
                 binding.buttonRetry.visibility = View.GONE
                 binding.buttonShare.visibility = View.GONE
               }
@@ -87,7 +90,9 @@ class ExportPdfBottomSheetFragment : BottomSheetDialogFragment() {
                 stopPolling()
                 binding.textStatus.text = getString(R.string.export_pdf_ready)
                 binding.progressBar.setProgressCompat(100, true)
+                binding.buttonCancel.visibility = View.GONE
                 binding.buttonShare.visibility = View.VISIBLE
+                binding.buttonShare.text = getString(R.string.export_pdf_download)
                 binding.buttonShare.setOnClickListener { viewModel.downloadFile(state.filename) }
               }
               is PdfExportUiState.Downloaded -> {

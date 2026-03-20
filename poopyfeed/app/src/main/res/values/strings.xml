@@ -392,6 +392,7 @@
     <string name="export_pdf_cancel">Cancel</string>
     <string name="export_pdf_retry">Retry</string>
     <string name="export_pdf_share">Share PDF</string>
+    <string name="export_pdf_download">Save PDF</string>
 
     <!-- Pediatrician Summary -->
     <string name="pediatrician_title">Pediatrician Summary</string>
