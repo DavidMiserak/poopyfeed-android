@@ -237,14 +237,15 @@ data class UpdateNapRequest(
 )
 
 /**
- * Backend list response for naps. API returns [napped_at] and [ended_at]; [child] is omitted. Map
- * to [Nap] in the repository with [childId].
+ * Backend list response for naps. API returns [napped_at], [ended_at], and [duration_minutes];
+ * [child] is omitted. Map to [Nap] in the repository with [childId].
  */
 @Serializable
 data class NapListResponse(
     val id: Int,
     @SerialName("napped_at") val napped_at: String,
     @SerialName("ended_at") val ended_at: String? = null,
+    val duration_minutes: Double? = null, // Computed from napped_at and ended_at
     val created_at: String,
     val updated_at: String
 ) {
