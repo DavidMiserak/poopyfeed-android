@@ -761,4 +761,86 @@ class TimelineViewModelTest {
         state.items.filterIsInstance<TimelineItem.Event>().isNotEmpty(),
         "Timeline should still show events after offline nap creation")
   }
+
+  @Test
+  fun `createNapFromGap replaces gap with nap when timeline is refreshed with fresh data`() =
+      runTest {
+        val today = getTodayDateString()
+        // Initial timeline: two feedings with a gap
+        val initialEvents =
+            listOf(
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T14:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = null),
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T10:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = 240L,
+                    gapAfterStart = "${today}T14:00:00Z",
+                    gapAfterEnd = "${today}T10:00:00Z"),
+            )
+        createViewModel(events = initialEvents)
+
+        // Initial state should show the gap
+        val initialState = viewModel.uiState.first()
+        assertIs<TimelineUiState.Ready>(initialState)
+        val initialGaps = initialState.items.filterIsInstance<TimelineItem.Gap>()
+        assertEquals(1, initialGaps.size, "Should have one gap initially")
+        assertTrue(initialGaps[0].showAddNapButton, "Gap should show Add nap button")
+
+        // User clicks "Add nap" button — create nap from gap
+        val createdNap = TestFixtures.mockNap(id = 1)
+        coEvery { mockNapsRepository.createNap(123, any()) } returns
+            ApiResult.Success(createdNap)
+
+        // After nap creation, refresh returns updated timeline with nap (gap removed)
+        val updatedEvents =
+            listOf(
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T14:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = null),
+                TestFixtures.mockTimelineEvent(
+                    type = "nap",
+                    at = "${today}T12:30:00Z",
+                    nap =
+                        TestFixtures.mockTimelineNapPayload(
+                            nappedAt = "${today}T10:01:00Z",
+                            endedAt = "${today}T13:59:00Z",
+                            durationMinutes = 238),
+                    gapAfterMinutes = null),
+                TestFixtures.mockTimelineEvent(
+                    type = "feeding",
+                    at = "${today}T10:00:00Z",
+                    feeding = TestFixtures.mockTimelineFeedingPayload(),
+                    gapAfterMinutes = null),
+            )
+        coEvery { mockAnalyticsRepository.getTimeline(123) } returns
+            ApiResult.Success(PaginatedResponse(count = updatedEvents.size, results = updatedEvents))
+
+        // Trigger nap creation
+        viewModel.createNapFromGap("${today}T14:00:00Z", "${today}T10:00:00Z")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify nap creation succeeded
+        assertEquals("Nap added", viewModel.napCreationResult.first())
+
+        // After refresh, timeline should show the nap, not the gap
+        val updatedState = viewModel.uiState.first()
+        assertIs<TimelineUiState.Ready>(updatedState)
+        val updatedGaps = updatedState.items.filterIsInstance<TimelineItem.Gap>()
+        val updatedNaps = updatedState.items.filterIsInstance<TimelineItem.Event>().filter {
+          it.event.nap != null
+        }
+        assertEquals(0, updatedGaps.size, "Gap should be replaced with nap")
+        assertEquals(1, updatedNaps.size, "Should have one nap event")
+        assertEquals(
+            "${today}T12:30:00Z",
+            updatedNaps[0].event.at,
+            "Nap event time should match created nap")
+      }
 }
