@@ -145,4 +145,48 @@ class ChartsViewModelTest {
     val state = vm.feedingTrendsState.first()
     assertIs<ChartUiState.Ready<List<FeedingTrendDayEntity>>>(state)
   }
+
+  @Test
+  fun `loadCharts emits Ready with empty list when API succeeds and cache is empty`() = runTest {
+    val feedingResponse = TestFixtures.mockFeedingTrendsResponse(dailyData = emptyList())
+    val sleepResponse = TestFixtures.mockSleepSummaryResponse(dailyData = emptyList())
+    coEvery { mockRepo.refreshFeedingTrends(1, 30) } returns ApiResult.Success(feedingResponse)
+    coEvery { mockRepo.refreshSleepSummary(1, 30) } returns ApiResult.Success(sleepResponse)
+
+    val vm = createViewModel()
+    vm.loadCharts(30)
+    advanceUntilIdle()
+
+    val feedingState = vm.feedingTrendsState.value
+    val sleepState = vm.sleepSummaryState.value
+    assertIs<ChartUiState.Ready<List<FeedingTrendDayEntity>>>(feedingState)
+    assertIs<ChartUiState.Ready<List<SleepSummaryDayEntity>>>(sleepState)
+    assertEquals(0, feedingState.data.size)
+    assertEquals(0, sleepState.data.size)
+  }
+
+  @Test
+  fun `loadCharts updates Ready state to empty when cache transitions to empty`() = runTest {
+    val feedingResponse = TestFixtures.mockFeedingTrendsResponse()
+    val sleepResponse = TestFixtures.mockSleepSummaryResponse()
+    coEvery { mockRepo.refreshFeedingTrends(1, 30) } returns ApiResult.Success(feedingResponse)
+    coEvery { mockRepo.refreshSleepSummary(1, 30) } returns ApiResult.Success(sleepResponse)
+
+    val vm = createViewModel()
+    vm.loadCharts(30)
+    feedingFlow.value = TestFixtures.mockFeedingTrendDayEntities()
+    sleepFlow.value = TestFixtures.mockSleepSummaryDayEntities()
+    advanceUntilIdle()
+
+    feedingFlow.value = emptyList()
+    sleepFlow.value = emptyList()
+    advanceUntilIdle()
+
+    val feedingState = vm.feedingTrendsState.value
+    val sleepState = vm.sleepSummaryState.value
+    assertIs<ChartUiState.Ready<List<FeedingTrendDayEntity>>>(feedingState)
+    assertIs<ChartUiState.Ready<List<SleepSummaryDayEntity>>>(sleepState)
+    assertEquals(0, feedingState.data.size)
+    assertEquals(0, sleepState.data.size)
+  }
 }

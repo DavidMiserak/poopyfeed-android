@@ -65,7 +65,8 @@ constructor(
     feedingCollectJob =
         viewModelScope.launch {
           chartsRepository.getFeedingTrends(childId, days).collect { entities ->
-            if (entities.isNotEmpty()) {
+            val current = _feedingTrendsState.value
+            if (entities.isNotEmpty() || current is ChartUiState.Ready) {
               _feedingTrendsState.value = ChartUiState.Ready(entities, lastFeedingSummary)
             }
           }
@@ -74,7 +75,8 @@ constructor(
     sleepCollectJob =
         viewModelScope.launch {
           chartsRepository.getSleepSummary(childId, days).collect { entities ->
-            if (entities.isNotEmpty()) {
+            val current = _sleepSummaryState.value
+            if (entities.isNotEmpty() || current is ChartUiState.Ready) {
               _sleepSummaryState.value = ChartUiState.Ready(entities, lastSleepSummary)
             }
           }
@@ -102,6 +104,8 @@ constructor(
         val current = _feedingTrendsState.value
         if (current is ChartUiState.Ready) {
           _feedingTrendsState.value = current.copy(weeklySummary = result.data.weeklySummary)
+        } else {
+          _feedingTrendsState.value = ChartUiState.Ready(emptyList(), result.data.weeklySummary)
         }
       }
       is ApiResult.Error -> {
@@ -120,6 +124,8 @@ constructor(
         val current = _sleepSummaryState.value
         if (current is ChartUiState.Ready) {
           _sleepSummaryState.value = current.copy(weeklySummary = result.data.weeklySummary)
+        } else {
+          _sleepSummaryState.value = ChartUiState.Ready(emptyList(), result.data.weeklySummary)
         }
       }
       is ApiResult.Error -> {

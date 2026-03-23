@@ -25,6 +25,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -222,6 +223,14 @@ class ReportsFragment : Fragment() {
   }
 
   private val brandOrange by lazy { Color.parseColor("#FF6B35") }
+  private val axisTextColor by lazy {
+    MaterialColors.getColor(
+        requireContext(), com.google.android.material.R.attr.colorOnSurfaceVariant, Color.DKGRAY)
+  }
+  private val axisLineColor by lazy {
+    MaterialColors.getColor(
+        requireContext(), com.google.android.material.R.attr.colorOutlineVariant, Color.LTGRAY)
+  }
 
   private fun getFredokaTypeface(): Typeface? =
       ResourcesCompat.getFont(requireContext(), R.font.fredoka)
@@ -252,12 +261,18 @@ class ReportsFragment : Fragment() {
         granularity = 1f
         valueFormatter = IndexAxisValueFormatter(labels)
         typeface = getFredokaTypeface()
+        textColor = axisTextColor
+        axisLineColor = this@ReportsFragment.axisLineColor
+        gridColor = this@ReportsFragment.axisLineColor
         setLabelCount(minOf(data.size, 7), true)
       }
       axisLeft.apply {
         granularity = 1f
         axisMinimum = 0f
         typeface = getFredokaTypeface()
+        textColor = axisTextColor
+        axisLineColor = this@ReportsFragment.axisLineColor
+        gridColor = this@ReportsFragment.axisLineColor
       }
       axisRight.isEnabled = false
       animateX(300)
@@ -285,12 +300,18 @@ class ReportsFragment : Fragment() {
         granularity = 1f
         valueFormatter = IndexAxisValueFormatter(labels)
         typeface = getFredokaTypeface()
+        textColor = axisTextColor
+        axisLineColor = this@ReportsFragment.axisLineColor
+        gridColor = this@ReportsFragment.axisLineColor
         setLabelCount(minOf(data.size, 7), true)
       }
       axisLeft.apply {
         granularity = 1f
         axisMinimum = 0f
         typeface = getFredokaTypeface()
+        textColor = axisTextColor
+        axisLineColor = this@ReportsFragment.axisLineColor
+        gridColor = this@ReportsFragment.axisLineColor
       }
       axisRight.isEnabled = false
       animateY(300)
