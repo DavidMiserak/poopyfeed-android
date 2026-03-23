@@ -306,6 +306,20 @@ interface PoopyFeedApiService {
       @Query("page_size") pageSize: Int = 100,
   ): PaginatedResponse<TimelineEvent>
 
+  /** Get feeding trends. GET /api/v1/analytics/children/{childId}/feeding-trends/?days=N */
+  @GET("analytics/children/{childId}/feeding-trends/")
+  suspend fun getFeedingTrends(
+      @Path("childId") childId: Int,
+      @Query("days") days: Int = 30,
+  ): FeedingTrendsResponse
+
+  /** Get sleep summary. GET /api/v1/analytics/children/{childId}/sleep-summary/?days=N */
+  @GET("analytics/children/{childId}/sleep-summary/")
+  suspend fun getSleepSummary(
+      @Path("childId") childId: Int,
+      @Query("days") days: Int = 30,
+  ): SleepSummaryResponse
+
   // ========================
   // Export Endpoints
   // ========================

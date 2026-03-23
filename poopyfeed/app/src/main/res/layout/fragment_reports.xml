@@ -65,6 +65,18 @@
 
         </com.google.android.material.chip.ChipGroup>
 
+        <include
+            android:id="@+id/card_feeding_trends"
+            layout="@layout/include_chart_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            android:id="@+id/card_sleep_summary"
+            layout="@layout/include_chart_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_export_csv"
             style="@style/Widget.Pf.CardView"

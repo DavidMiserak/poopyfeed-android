@@ -379,6 +379,16 @@
     <string name="reports_csv_saved">CSV saved to Downloads</string>
     <string name="reports_pdf_saved">PDF saved to Downloads</string>
     <string name="reports_share">Share</string>
+    <string name="reports_feeding_trends_title">Feeding Trends</string>
+    <string name="reports_sleep_summary_title">Sleep Summary</string>
+    <string name="reports_chart_error">Couldn\'t load chart</string>
+    <string name="reports_chart_retry">Retry</string>
+    <string name="reports_chart_no_data">No data for this period</string>
+    <string name="reports_avg_per_day">Avg %.1f/day</string>
+    <string name="reports_trend_increasing">Increasing</string>
+    <string name="reports_trend_decreasing">Decreasing</string>
+    <string name="reports_trend_stable">Stable</string>
+    <string name="reports_sleep_avg_format">Avg %.1f naps/day · %.1f hrs/day</string>
     <string name="child_detail_reports">Reports</string>
     <string name="child_detail_reports_subtitle">Export data and summaries</string>
     <string name="a11y_go_to_reports">Reports. Double tap to view export options.</string>

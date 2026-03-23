@@ -365,6 +365,44 @@ data class WeeklySummary(
     @SerialName("last_updated") val lastUpdated: String = "",
 )
 
+/** Single day's aggregated data from feeding-trends or sleep-summary endpoint. */
+@Serializable
+data class DailyData(
+    val date: String,
+    val count: Int,
+    @SerialName("average_duration") val averageDuration: Int? = null,
+    @SerialName("total_oz") val totalOz: Double? = null,
+    @SerialName("total_minutes") val totalMinutes: Int? = null,
+)
+
+/** Weekly trend summary (direction + magnitude). */
+@Serializable
+data class WeeklySummaryData(
+    @SerialName("avg_per_day") val avgPerDay: Double,
+    val trend: String,
+    val variance: Double,
+)
+
+/** Response from GET /analytics/children/{childId}/feeding-trends/?days=N */
+@Serializable
+data class FeedingTrendsResponse(
+    val period: String,
+    @SerialName("child_id") val childId: Int,
+    @SerialName("daily_data") val dailyData: List<DailyData>,
+    @SerialName("weekly_summary") val weeklySummary: WeeklySummaryData,
+    @SerialName("last_updated") val lastUpdated: String,
+)
+
+/** Response from GET /analytics/children/{childId}/sleep-summary/?days=N */
+@Serializable
+data class SleepSummaryResponse(
+    val period: String,
+    @SerialName("child_id") val childId: Int,
+    @SerialName("daily_data") val dailyData: List<DailyData>,
+    @SerialName("weekly_summary") val weeklySummary: WeeklySummaryData,
+    @SerialName("last_updated") val lastUpdated: String,
+)
+
 /** Batch response from GET /api/v1/children/{childId}/dashboard-summary/ */
 @Serializable
 data class DashboardSummaryResponse(

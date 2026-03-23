@@ -211,3 +211,67 @@ data class RemoteKeyEntity(
     @ColumnInfo(name = "entity_type") val entityType: String,
     @ColumnInfo(name = "next_page") val nextPage: Int?, // null = end of pagination
 )
+
+/** Cached daily feeding trend data from the feeding-trends API. */
+@Entity(
+    tableName = "feeding_trend_days",
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = ChildEntity::class,
+                parentColumns = ["id"],
+                childColumns = ["child_id"],
+                onDelete = ForeignKey.CASCADE)],
+    indices = [Index("child_id")])
+data class FeedingTrendDayEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "child_id") val childId: Int,
+    val date: String,
+    val count: Int,
+    val average_duration: Int? = null,
+    val total_oz: Double? = null,
+    val period: Int,
+) {
+  companion object {
+    fun fromDailyData(childId: Int, period: Int, data: DailyData): FeedingTrendDayEntity =
+        FeedingTrendDayEntity(
+            childId = childId,
+            date = data.date,
+            count = data.count,
+            average_duration = data.averageDuration,
+            total_oz = data.totalOz,
+            period = period,
+        )
+  }
+}
+
+/** Cached daily sleep summary data from the sleep-summary API. */
+@Entity(
+    tableName = "sleep_summary_days",
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = ChildEntity::class,
+                parentColumns = ["id"],
+                childColumns = ["child_id"],
+                onDelete = ForeignKey.CASCADE)],
+    indices = [Index("child_id")])
+data class SleepSummaryDayEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "child_id") val childId: Int,
+    val date: String,
+    val count: Int,
+    val total_minutes: Int? = null,
+    val period: Int,
+) {
+  companion object {
+    fun fromDailyData(childId: Int, period: Int, data: DailyData): SleepSummaryDayEntity =
+        SleepSummaryDayEntity(
+            childId = childId,
+            date = data.date,
+            count = data.count,
+            total_minutes = data.totalMinutes,
+            period = period,
+        )
+  }
+}

@@ -1,14 +1,18 @@
 package net.poopyfeed.pf
 
+import net.poopyfeed.pf.data.db.FeedingTrendDayEntity
+import net.poopyfeed.pf.data.db.SleepSummaryDayEntity
 import net.poopyfeed.pf.data.models.Child
 import net.poopyfeed.pf.data.models.ChildInvite
 import net.poopyfeed.pf.data.models.ChildShare
+import net.poopyfeed.pf.data.models.DailyData
 import net.poopyfeed.pf.data.models.DashboardSummaryResponse
 import net.poopyfeed.pf.data.models.Diaper
 import net.poopyfeed.pf.data.models.DiaperListResponse
 import net.poopyfeed.pf.data.models.ExportJobResponse
 import net.poopyfeed.pf.data.models.Feeding
 import net.poopyfeed.pf.data.models.FeedingListResponse
+import net.poopyfeed.pf.data.models.FeedingTrendsResponse
 import net.poopyfeed.pf.data.models.JobStatusResponse
 import net.poopyfeed.pf.data.models.Nap
 import net.poopyfeed.pf.data.models.NapListResponse
@@ -17,6 +21,7 @@ import net.poopyfeed.pf.data.models.PaginatedResponse
 import net.poopyfeed.pf.data.models.PatternAlert
 import net.poopyfeed.pf.data.models.PatternAlertsResponse
 import net.poopyfeed.pf.data.models.ShareInvite
+import net.poopyfeed.pf.data.models.SleepSummaryResponse
 import net.poopyfeed.pf.data.models.SummaryDiapers
 import net.poopyfeed.pf.data.models.SummaryFeedings
 import net.poopyfeed.pf.data.models.SummarySleep
@@ -27,6 +32,7 @@ import net.poopyfeed.pf.data.models.TimelineNapPayload
 import net.poopyfeed.pf.data.models.TodaySummary
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.data.models.WeeklySummary
+import net.poopyfeed.pf.data.models.WeeklySummaryData
 
 /**
  * Shared test fixtures for API models. Use in unit tests to avoid duplicating mock construction and
@@ -438,4 +444,84 @@ object TestFixtures {
       childId: Int = 1,
       period: String = "2026-03-04 to 2026-03-11",
   ): WeeklySummary = WeeklySummary(childId = childId, period = period)
+
+  fun mockFeedingTrendsResponse(
+      childId: Int = 1,
+      period: String = "30",
+      dailyData: List<DailyData> =
+          listOf(
+              DailyData(date = "2026-03-01", count = 5, averageDuration = 12, totalOz = 18.5),
+              DailyData(date = "2026-03-02", count = 4, averageDuration = 15, totalOz = 16.0)),
+      weeklySummary: WeeklySummaryData =
+          WeeklySummaryData(avgPerDay = 4.5, trend = "stable", variance = 0.5),
+  ): FeedingTrendsResponse =
+      FeedingTrendsResponse(
+          period = period,
+          childId = childId,
+          dailyData = dailyData,
+          weeklySummary = weeklySummary,
+          lastUpdated = "2026-03-23T10:30:00Z",
+      )
+
+  fun mockSleepSummaryResponse(
+      childId: Int = 1,
+      period: String = "30",
+      dailyData: List<DailyData> =
+          listOf(
+              DailyData(date = "2026-03-01", count = 2, totalMinutes = 120),
+              DailyData(date = "2026-03-02", count = 3, totalMinutes = 180)),
+      weeklySummary: WeeklySummaryData =
+          WeeklySummaryData(avgPerDay = 2.5, trend = "increasing", variance = 0.3),
+  ): SleepSummaryResponse =
+      SleepSummaryResponse(
+          period = period,
+          childId = childId,
+          dailyData = dailyData,
+          weeklySummary = weeklySummary,
+          lastUpdated = "2026-03-23T10:30:00Z",
+      )
+
+  fun mockFeedingTrendDayEntities(
+      childId: Int = 1,
+      period: Int = 30,
+  ): List<FeedingTrendDayEntity> =
+      listOf(
+          FeedingTrendDayEntity(
+              id = 1,
+              childId = childId,
+              date = "2026-03-01",
+              count = 5,
+              average_duration = 12,
+              total_oz = 18.5,
+              period = period),
+          FeedingTrendDayEntity(
+              id = 2,
+              childId = childId,
+              date = "2026-03-02",
+              count = 4,
+              average_duration = 15,
+              total_oz = 16.0,
+              period = period),
+      )
+
+  fun mockSleepSummaryDayEntities(
+      childId: Int = 1,
+      period: Int = 30,
+  ): List<SleepSummaryDayEntity> =
+      listOf(
+          SleepSummaryDayEntity(
+              id = 1,
+              childId = childId,
+              date = "2026-03-01",
+              count = 2,
+              total_minutes = 120,
+              period = period),
+          SleepSummaryDayEntity(
+              id = 2,
+              childId = childId,
+              date = "2026-03-02",
+              count = 3,
+              total_minutes = 180,
+              period = period),
+      )
 }

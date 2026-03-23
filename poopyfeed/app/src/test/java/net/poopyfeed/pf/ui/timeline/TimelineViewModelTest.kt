@@ -793,8 +793,7 @@ class TimelineViewModelTest {
 
         // User clicks "Add nap" button — create nap from gap
         val createdNap = TestFixtures.mockNap(id = 1)
-        coEvery { mockNapsRepository.createNap(123, any()) } returns
-            ApiResult.Success(createdNap)
+        coEvery { mockNapsRepository.createNap(123, any()) } returns ApiResult.Success(createdNap)
 
         // After nap creation, refresh returns updated timeline with nap (gap removed)
         val updatedEvents =
@@ -820,7 +819,8 @@ class TimelineViewModelTest {
                     gapAfterMinutes = null),
             )
         coEvery { mockAnalyticsRepository.getTimeline(123) } returns
-            ApiResult.Success(PaginatedResponse(count = updatedEvents.size, results = updatedEvents))
+            ApiResult.Success(
+                PaginatedResponse(count = updatedEvents.size, results = updatedEvents))
 
         // Trigger nap creation
         viewModel.createNapFromGap("${today}T14:00:00Z", "${today}T10:00:00Z")
@@ -833,9 +833,10 @@ class TimelineViewModelTest {
         val updatedState = viewModel.uiState.first()
         assertIs<TimelineUiState.Ready>(updatedState)
         val updatedGaps = updatedState.items.filterIsInstance<TimelineItem.Gap>()
-        val updatedNaps = updatedState.items.filterIsInstance<TimelineItem.Event>().filter {
-          it.event.nap != null
-        }
+        val updatedNaps =
+            updatedState.items.filterIsInstance<TimelineItem.Event>().filter {
+              it.event.nap != null
+            }
         assertEquals(0, updatedGaps.size, "Gap should be replaced with nap")
         assertEquals(1, updatedNaps.size, "Should have one nap event")
         assertEquals(

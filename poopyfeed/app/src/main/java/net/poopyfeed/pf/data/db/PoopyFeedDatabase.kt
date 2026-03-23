@@ -14,6 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * feeding_reminder_interval. Version 3: feedings duration_minutes, side. Version 4: children
  * custom_bottle_low_oz, custom_bottle_mid_oz, custom_bottle_high_oz. Version 5: pending_sync table
  * for offline-first background sync. Version 6: remote_keys table for Paging 3 pagination state.
+ * Version 7: feeding_trend_days and sleep_summary_days tables for cached charts.
  */
 @Database(
     entities =
@@ -23,8 +24,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
             DiaperEntity::class,
             NapEntity::class,
             PendingSyncEntity::class,
-            RemoteKeyEntity::class],
-    version = 6,
+            RemoteKeyEntity::class,
+            FeedingTrendDayEntity::class,
+            SleepSummaryDayEntity::class],
+    version = 7,
     exportSchema = true)
 abstract class PoopyFeedDatabase : RoomDatabase() {
 
@@ -39,6 +42,8 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
   abstract fun pendingSyncDao(): PendingSyncDao
 
   abstract fun remoteKeyDao(): RemoteKeyDao
+
+  abstract fun chartDao(): ChartDao
 
   companion object {
     private const val DATABASE_NAME = "poopyfeed_db"
@@ -99,6 +104,37 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
           }
         }
 
+    private val MIGRATION_6_7 =
+        object : Migration(6, 7) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS feeding_trend_days (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  child_id INTEGER NOT NULL,
+                  date TEXT NOT NULL,
+                  count INTEGER NOT NULL,
+                  average_duration INTEGER,
+                  total_oz REAL,
+                  period INTEGER NOT NULL,
+                  FOREIGN KEY(child_id) REFERENCES children(id) ON DELETE CASCADE
+                )""")
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_feeding_trend_days_child_id ON feeding_trend_days(child_id)")
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS sleep_summary_days (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  child_id INTEGER NOT NULL,
+                  date TEXT NOT NULL,
+                  count INTEGER NOT NULL,
+                  total_minutes INTEGER,
+                  period INTEGER NOT NULL,
+                  FOREIGN KEY(child_id) REFERENCES children(id) ON DELETE CASCADE
+                )""")
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS index_sleep_summary_days_child_id ON sleep_summary_days(child_id)")
+          }
+        }
+
     @Volatile private var instance: PoopyFeedDatabase? = null
 
     fun getInstance(context: Context): PoopyFeedDatabase {
@@ -108,7 +144,12 @@ abstract class PoopyFeedDatabase : RoomDatabase() {
                 ?: Room.databaseBuilder(
                         context.applicationContext, PoopyFeedDatabase::class.java, DATABASE_NAME)
                     .addMigrations(
-                        MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                        MIGRATION_1_2,
+                        MIGRATION_2_3,
+                        MIGRATION_3_4,
+                        MIGRATION_4_5,
+                        MIGRATION_5_6,
+                        MIGRATION_6_7)
                     .build()
                     .also { instance = it }
           }

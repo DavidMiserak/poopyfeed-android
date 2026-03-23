@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import net.poopyfeed.pf.data.db.ChartDao
 import net.poopyfeed.pf.data.db.ChildDao
 import net.poopyfeed.pf.data.db.DiaperDao
 import net.poopyfeed.pf.data.db.FeedingDao
@@ -41,6 +42,8 @@ object DatabaseModule {
   @Provides
   @Singleton
   fun provideRemoteKeyDao(db: PoopyFeedDatabase): RemoteKeyDao = db.remoteKeyDao()
+
+  @Provides @Singleton fun provideChartDao(db: PoopyFeedDatabase): ChartDao = db.chartDao()
 
   @Provides
   @Singleton
