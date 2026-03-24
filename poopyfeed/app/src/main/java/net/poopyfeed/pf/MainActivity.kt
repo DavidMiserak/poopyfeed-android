@@ -284,7 +284,10 @@ class MainActivity : AppCompatActivity() {
     navController.navigate(R.id.LoginFragment, null, navOptions)
   }
 
-  /** Used by the new-user tour to spotlight the FAB (same visibility rules as [onDestinationChanged]). */
+  /**
+   * Used by the new-user tour to spotlight the FAB (same visibility rules as
+   * [onDestinationChanged]).
+   */
   fun getFabView(): View = binding.fab
 
   fun getBottomNavView(): BottomNavigationView = binding.bottomNav

@@ -176,9 +176,7 @@ class ChildrenListFragment : Fragment() {
                 getString(R.string.tour_p1_children_title),
                 getString(R.string.tour_p1_children_desc)),
             TourManager.buildTarget(
-                fab,
-                getString(R.string.tour_p1_fab_title),
-                getString(R.string.tour_p1_fab_desc)),
+                fab, getString(R.string.tour_p1_fab_title), getString(R.string.tour_p1_fab_desc)),
             TourManager.buildTarget(
                 notificationsTab,
                 getString(R.string.tour_p1_notifications_title),
