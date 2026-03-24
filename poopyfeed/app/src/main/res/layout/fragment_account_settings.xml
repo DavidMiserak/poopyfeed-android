@@ -589,6 +589,34 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- SECTION 4: Tour (Replay) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_tour"
+            style="@style/Widget.Pf.CardView.Frosted"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginBottom="@dimen/spacing_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_delete">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_12">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_replay_tour"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:text="@string/tour_replay_button" />
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

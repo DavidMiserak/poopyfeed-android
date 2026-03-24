@@ -20,6 +20,7 @@ import net.poopyfeed.pf.data.repository.CachedNapsRepository
 import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.tour.TourPreferences
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,6 +35,7 @@ class ClearSessionUseCaseTest {
   private val cachedNapsRepository: CachedNapsRepository = mockk(relaxed = true)
   private val syncScheduler: SyncScheduler = mockk(relaxed = true)
   private val pendingSyncDao: PendingSyncDao = mockk(relaxed = true)
+  private val tourPreferences: TourPreferences = mockk(relaxed = true)
 
   private val useCase =
       ClearSessionUseCase(
@@ -46,6 +48,7 @@ class ClearSessionUseCaseTest {
           cachedNapsRepository = cachedNapsRepository,
           syncScheduler = syncScheduler,
           pendingSyncDao = pendingSyncDao,
+          tourPreferences = tourPreferences,
       )
 
   @org.junit.Before
@@ -72,6 +75,7 @@ class ClearSessionUseCaseTest {
 
     // FCM unregister is skipped (Firebase throws in test), but caches are still cleared
     coVerify { cachedChildrenRepository.clearCache() }
+    verify { tourPreferences.clearAll() }
     verify { cachedFeedingsRepository.clearSessionCache() }
     verify { cachedDiapersRepository.clearSessionCache() }
     verify { cachedNapsRepository.clearSessionCache() }
@@ -84,6 +88,7 @@ class ClearSessionUseCaseTest {
 
     useCase()
 
+    verify { tourPreferences.clearAll() }
     verify { syncScheduler.cancel() }
     coVerify { pendingSyncDao.clearAll() }
   }

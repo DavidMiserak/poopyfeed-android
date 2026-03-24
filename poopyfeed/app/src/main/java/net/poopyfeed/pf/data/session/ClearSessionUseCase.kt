@@ -16,6 +16,7 @@ import net.poopyfeed.pf.data.repository.NotificationsRepository
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.notifications.PoopyFeedMessagingService
 import net.poopyfeed.pf.sync.SyncScheduler
+import net.poopyfeed.pf.tour.TourPreferences
 
 /**
  * Clears local session data: Room cache (children + CASCADE to feedings/diapers/naps), in-memory
@@ -34,6 +35,7 @@ constructor(
     private val cachedNapsRepository: CachedNapsRepository,
     private val syncScheduler: SyncScheduler,
     private val pendingSyncDao: PendingSyncDao,
+    private val tourPreferences: TourPreferences,
 ) {
 
   suspend operator fun invoke() {
@@ -51,6 +53,9 @@ constructor(
       remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_START)
       remove(PoopyFeedMessagingService.KEY_QUIET_HOURS_END)
     }
+
+    // Clear tour preferences so new user on same device gets the tour again.
+    tourPreferences.clearAll()
 
     syncScheduler.cancel()
     pendingSyncDao.clearAll()

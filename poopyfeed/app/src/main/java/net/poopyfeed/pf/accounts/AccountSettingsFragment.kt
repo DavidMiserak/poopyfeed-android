@@ -17,11 +17,13 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.models.QuietHours
 import net.poopyfeed.pf.data.models.UserProfile
 import net.poopyfeed.pf.databinding.FragmentAccountSettingsBinding
+import net.poopyfeed.pf.tour.TourManager
 import net.poopyfeed.pf.util.logScreenView
 
 /**
@@ -36,6 +38,8 @@ class AccountSettingsFragment : Fragment() {
     get() = _binding!!
 
   private val viewModel: AccountSettingsViewModel by viewModels()
+
+  @Inject lateinit var tourManager: TourManager
 
   private var hasPopulatedFields: Boolean = false
 
@@ -74,6 +78,13 @@ class AccountSettingsFragment : Fragment() {
 
     // SECTION 4: Danger Zone - Delete account button (shows confirmation dialog)
     binding.buttonDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+
+    // SECTION 5: Tour - Replay button
+    binding.buttonReplayTour.setOnClickListener {
+      tourManager.resetForReplay()
+      val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
+      findNavController().navigate(R.id.ChildrenListFragment, null, navOptions)
+    }
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
