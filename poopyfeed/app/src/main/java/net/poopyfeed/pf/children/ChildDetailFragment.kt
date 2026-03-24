@@ -14,9 +14,11 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildDetailBinding
+import net.poopyfeed.pf.tour.TourManager
 import net.poopyfeed.pf.util.logScreenView
 
 /**
@@ -25,6 +27,10 @@ import net.poopyfeed.pf.util.logScreenView
  */
 @AndroidEntryPoint
 class ChildDetailFragment : Fragment() {
+
+  @Inject lateinit var tourManager: TourManager
+
+  private var part2TourScheduled = false
 
   private var _binding: FragmentChildDetailBinding? = null
   private val binding
@@ -285,6 +291,41 @@ class ChildDetailFragment : Fragment() {
       binding.todaySkeleton.visibility = View.VISIBLE
       binding.todayContent.visibility = View.GONE
     }
+
+    maybeScheduleTourPart2()
+  }
+
+  /** Part 2 runs once real "today" stats are shown so the spotlight has a stable target. */
+  private fun maybeScheduleTourPart2() {
+    if (part2TourScheduled) return
+    if (!tourManager.shouldShowPart(2)) return
+    if (binding.todayContent.visibility != View.VISIBLE) return
+    part2TourScheduled = true
+    binding.root.post { showTourPart2() }
+  }
+
+  private fun showTourPart2() {
+    if (_binding == null) return
+    val targets =
+        listOf(
+            TourManager.buildTarget(
+                binding.cardToday,
+                getString(R.string.tour_p2_activity_title),
+                getString(R.string.tour_p2_activity_desc)),
+            TourManager.buildTarget(
+                binding.buttonFeedings,
+                getString(R.string.tour_p2_feedings_title),
+                getString(R.string.tour_p2_feedings_desc)),
+            TourManager.buildTarget(
+                binding.buttonDiapers,
+                getString(R.string.tour_p2_diapers_title),
+                getString(R.string.tour_p2_diapers_desc)),
+            TourManager.buildTarget(
+                binding.buttonNaps,
+                getString(R.string.tour_p2_naps_title),
+                getString(R.string.tour_p2_naps_desc)),
+        )
+    tourManager.showSequence(requireActivity(), 2, targets)
   }
 
   private fun openEditChild() {

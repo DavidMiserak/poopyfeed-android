@@ -17,6 +17,7 @@ import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.repository.CachedChildrenRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
+import net.poopyfeed.pf.tour.TourManager
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -34,6 +35,8 @@ class ChildDetailFragmentTest {
   @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 
   @BindValue @JvmField val repo: CachedChildrenRepository = mockk(relaxed = true)
+
+  @BindValue @JvmField val tourManager: TourManager = mockk(relaxed = true)
 
   private lateinit var navController: TestNavHostController
 
