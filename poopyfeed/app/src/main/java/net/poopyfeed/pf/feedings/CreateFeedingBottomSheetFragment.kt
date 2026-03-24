@@ -16,7 +16,6 @@ import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateFeedingBottomSheetBinding
 import net.poopyfeed.pf.di.TokenManager
@@ -36,7 +35,7 @@ class CreateFeedingBottomSheetFragment : BottomSheetDialogFragment() {
 
   private val viewModel: CreateFeedingViewModel by viewModels()
   @Inject lateinit var tokenManager: TokenManager
-  private var selectedTimestamp: String = Clock.System.now().toString()
+  private var selectedTimestamp: String = kotlin.time.Clock.System.now().toString()
 
   override fun onCreateView(
       inflater: LayoutInflater,

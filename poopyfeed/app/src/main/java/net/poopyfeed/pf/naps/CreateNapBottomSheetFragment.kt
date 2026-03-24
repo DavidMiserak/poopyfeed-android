@@ -16,12 +16,12 @@ import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentCreateNapBottomSheetBinding
 import net.poopyfeed.pf.di.TokenManager
 import net.poopyfeed.pf.util.DatePickerUtils
 import net.poopyfeed.pf.util.formatTimestampForDisplay
+import kotlin.time.Instant
 
 /**
  * Bottom sheet for starting a nap. Start time defaults to now; user can change it. On success
@@ -36,7 +36,7 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
 
   private val viewModel: CreateNapViewModel by viewModels()
   @Inject lateinit var tokenManager: TokenManager
-  private var selectedTimestamp: String = Clock.System.now().toString()
+  private var selectedTimestamp: String = kotlin.time.Clock.System.now().toString()
   private var selectedEndTimestamp: String? = null
 
   override fun onCreateView(
@@ -134,8 +134,8 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
 
   private fun isNow(iso: String): Boolean {
     return try {
-      val instant = kotlinx.datetime.Instant.parse(iso)
-      val now = Clock.System.now()
+      val instant = Instant.parse(iso)
+      val now = kotlin.time.Clock.System.now()
       kotlin.math.abs(instant.toEpochMilliseconds() - now.toEpochMilliseconds()) < 60_000
     } catch (_: Exception) {
       false
@@ -204,8 +204,8 @@ class CreateNapBottomSheetFragment : BottomSheetDialogFragment() {
   private fun isFormValid(): Boolean {
     val endTime = selectedEndTimestamp ?: return true // No end time = valid
     return try {
-      val startMs = kotlinx.datetime.Instant.parse(selectedTimestamp).toEpochMilliseconds()
-      val endMs = kotlinx.datetime.Instant.parse(endTime).toEpochMilliseconds()
+      val startMs = Instant.parse(selectedTimestamp).toEpochMilliseconds()
+      val endMs = Instant.parse(endTime).toEpochMilliseconds()
       endMs > startMs
     } catch (_: Exception) {
       false // Invalid timestamp format

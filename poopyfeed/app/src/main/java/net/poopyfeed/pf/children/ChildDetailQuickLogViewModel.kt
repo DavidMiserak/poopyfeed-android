@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import net.poopyfeed.pf.data.models.ApiResult
 import net.poopyfeed.pf.data.models.CreateDiaperRequest
 import net.poopyfeed.pf.data.models.CreateFeedingRequest
@@ -123,7 +122,7 @@ constructor(
     if (changeType.isBlank()) return
     viewModelScope.launch {
       _diaperState.value = QuickLogDiaperUiState.Saving
-      val timestamp = Clock.System.now().toString()
+      val timestamp = kotlin.time.Clock.System.now().toString()
       val request = CreateDiaperRequest(change_type = changeType.trim(), timestamp = timestamp)
       val result = diapersRepo.createDiaper(childId, request)
       _diaperState.value =
@@ -143,7 +142,7 @@ constructor(
     if (amountOz <= 0) return
     viewModelScope.launch {
       _feedingState.value = QuickLogFeedingUiState.Saving
-      val timestamp = Clock.System.now().toString()
+      val timestamp = kotlin.time.Clock.System.now().toString()
       val request =
           CreateFeedingRequest(
               feeding_type = "bottle",
@@ -169,7 +168,7 @@ constructor(
   fun createNapNow() {
     viewModelScope.launch {
       _napState.value = QuickLogNapUiState.Saving
-      val startTime = Clock.System.now().toString()
+      val startTime = kotlin.time.Clock.System.now().toString()
       val request = CreateNapRequest(start_time = startTime, end_time = null)
       val result = napsRepo.createNap(childId, request)
       _napState.value =
