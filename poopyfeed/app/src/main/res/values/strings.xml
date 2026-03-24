@@ -417,31 +417,34 @@
     <string name="pediatrician_sleep_per_day">%s total sleep/day</string>
     <string name="pediatrician_empty">No activity data for the last 7 days</string>
 
+    <!-- Tour: shared -->
+    <string name="tour_spot_description_format">%1$s\n\nStep %2$d of %3$d · Tap the control inside the spotlight to continue. Tap the dimmed screen or Back to skip.</string>
+
     <!-- Tour: Part 1 - Welcome -->
-    <string name="tour_p1_children_title">Your Children</string>
-    <string name="tour_p1_children_desc">Manage your children and track their daily activities here</string>
-    <string name="tour_p1_fab_title">Add a Child</string>
-    <string name="tour_p1_fab_desc">Tap here to add your first child and start tracking</string>
-    <string name="tour_p1_notifications_title">Notifications</string>
-    <string name="tour_p1_notifications_desc">Get alerts about feeding intervals and nap windows</string>
-    <string name="tour_p1_settings_title">Account &amp; Settings</string>
-    <string name="tour_p1_settings_desc">Manage your account, quiet hours, and replay this tour anytime</string>
+    <string name="tour_p1_children_title">Home for each little one</string>
+    <string name="tour_p1_children_desc">Open a child from this list anytime—you will land on their day at a glance.</string>
+    <string name="tour_p1_fab_title">Add a child</string>
+    <string name="tour_p1_fab_desc">Start here when you are ready to track feedings, diapers, and naps.</string>
+    <string name="tour_p1_notifications_title">Stay in the loop</string>
+    <string name="tour_p1_notifications_desc">We will nudge you when it is time for the next feeding or a nap window.</string>
+    <string name="tour_p1_settings_title">You are in control</string>
+    <string name="tour_p1_settings_desc">Account, quiet hours, and a replay of this walkthrough live behind the menu.</string>
 
     <!-- Tour: Part 2 - Tracking -->
-    <string name="tour_p2_activity_title">Today\'s Activity</string>
-    <string name="tour_p2_activity_desc">See today\'s feedings, diapers, and naps at a glance</string>
-    <string name="tour_p2_feedings_title">Log Feedings</string>
-    <string name="tour_p2_feedings_desc">Track bottle, breast, or solid feedings</string>
-    <string name="tour_p2_diapers_title">Log Diapers</string>
-    <string name="tour_p2_diapers_desc">Record wet and dirty diaper changes</string>
-    <string name="tour_p2_naps_title">Log Naps</string>
-    <string name="tour_p2_naps_desc">Track nap start and end times</string>
+    <string name="tour_p2_activity_title">Today, summarized</string>
+    <string name="tour_p2_activity_desc">Feedings, diapers, and sleep for today show up here first.</string>
+    <string name="tour_p2_feedings_title">Log a feeding</string>
+    <string name="tour_p2_feedings_desc">Bottle, breast, or solids—tap when something goes in.</string>
+    <string name="tour_p2_diapers_title">Log a change</string>
+    <string name="tour_p2_diapers_desc">Quick taps for wet, dirty, or both.</string>
+    <string name="tour_p2_naps_title">Log sleep</string>
+    <string name="tour_p2_naps_desc">Start and end naps so patterns stay honest.</string>
 
     <!-- Tour: Part 3 - Reports -->
-    <string name="tour_p3_charts_title">Activity Reports</string>
-    <string name="tour_p3_charts_desc">See feeding and sleep trends over time</string>
-    <string name="tour_p3_timeline_title">Timeline</string>
-    <string name="tour_p3_timeline_desc">View a day-by-day timeline of all activities</string>
+    <string name="tour_p3_charts_title">Spot trends</string>
+    <string name="tour_p3_charts_desc">Charts show how feeding and sleep shift over the days you pick.</string>
+    <string name="tour_p3_timeline_title">Drill into a day</string>
+    <string name="tour_p3_timeline_desc">The timeline is the full story—every log in order.</string>
 
     <!-- Tour: Replay -->
     <string name="tour_replay_button">Replay Tour</string>

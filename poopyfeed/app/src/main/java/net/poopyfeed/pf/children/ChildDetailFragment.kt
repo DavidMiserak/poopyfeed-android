@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildDetailBinding
 import net.poopyfeed.pf.tour.TourManager
+import net.poopyfeed.pf.tour.TourStep
 import net.poopyfeed.pf.util.logScreenView
 
 /**
@@ -301,31 +302,58 @@ class ChildDetailFragment : Fragment() {
     if (!tourManager.shouldShowPart(2)) return
     if (binding.todayContent.visibility != View.VISIBLE) return
     part2TourScheduled = true
-    binding.root.post { showTourPart2() }
+    binding.root.postDelayed(
+        {
+          if (isAdded) showTourPart2()
+        },
+        TourManager.START_DELAY_MS,
+    )
   }
 
   private fun showTourPart2() {
     if (_binding == null) return
-    val targets =
+    val ctx = requireContext()
+    val total = 4
+    val steps =
         listOf(
-            TourManager.buildTarget(
+            TourStep(
                 binding.cardToday,
-                getString(R.string.tour_p2_activity_title),
-                getString(R.string.tour_p2_activity_desc)),
-            TourManager.buildTarget(
+                TourManager.buildTarget(
+                    ctx,
+                    binding.cardToday,
+                    getString(R.string.tour_p2_activity_title),
+                    getString(R.string.tour_p2_activity_desc),
+                    1,
+                    total)),
+            TourStep(
                 binding.buttonFeedings,
-                getString(R.string.tour_p2_feedings_title),
-                getString(R.string.tour_p2_feedings_desc)),
-            TourManager.buildTarget(
+                TourManager.buildTarget(
+                    ctx,
+                    binding.buttonFeedings,
+                    getString(R.string.tour_p2_feedings_title),
+                    getString(R.string.tour_p2_feedings_desc),
+                    2,
+                    total)),
+            TourStep(
                 binding.buttonDiapers,
-                getString(R.string.tour_p2_diapers_title),
-                getString(R.string.tour_p2_diapers_desc)),
-            TourManager.buildTarget(
+                TourManager.buildTarget(
+                    ctx,
+                    binding.buttonDiapers,
+                    getString(R.string.tour_p2_diapers_title),
+                    getString(R.string.tour_p2_diapers_desc),
+                    3,
+                    total)),
+            TourStep(
                 binding.buttonNaps,
-                getString(R.string.tour_p2_naps_title),
-                getString(R.string.tour_p2_naps_desc)),
+                TourManager.buildTarget(
+                    ctx,
+                    binding.buttonNaps,
+                    getString(R.string.tour_p2_naps_title),
+                    getString(R.string.tour_p2_naps_desc),
+                    4,
+                    total)),
         )
-    tourManager.showSequence(requireActivity(), 2, targets)
+    tourManager.showSequence(requireActivity(), 2, steps)
   }
 
   private fun openEditChild() {

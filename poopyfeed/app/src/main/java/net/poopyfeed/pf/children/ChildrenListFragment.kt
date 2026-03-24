@@ -19,6 +19,7 @@ import net.poopyfeed.pf.MainActivity
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildrenListBinding
 import net.poopyfeed.pf.tour.TourManager
+import net.poopyfeed.pf.tour.TourStep
 import net.poopyfeed.pf.util.logScreenView
 
 /**
@@ -157,37 +158,66 @@ class ChildrenListFragment : Fragment() {
     }
 
     if (tourManager.shouldShowPart(1)) {
-      binding.root.post { showTourPart1() }
+      binding.root.postDelayed(
+          {
+            if (isAdded) showTourPart1()
+          },
+          TourManager.START_DELAY_MS,
+      )
     }
   }
 
   private fun showTourPart1() {
     val activity = requireActivity() as? MainActivity ?: return
+    val ctx = requireContext()
     val bottomNav = activity.getBottomNavView()
     val fab = activity.getFabView()
 
     val childrenTab = bottomNav.findViewById<View>(R.id.ChildrenListFragment) ?: return
     val notificationsTab = bottomNav.findViewById<View>(R.id.NotificationsFragment) ?: return
 
-    val targets =
+    val total = 4
+    val steps =
         listOf(
-            TourManager.buildTarget(
+            TourStep(
                 childrenTab,
-                getString(R.string.tour_p1_children_title),
-                getString(R.string.tour_p1_children_desc)),
-            TourManager.buildTarget(
-                fab, getString(R.string.tour_p1_fab_title), getString(R.string.tour_p1_fab_desc)),
-            TourManager.buildTarget(
+                TourManager.buildTarget(
+                    ctx,
+                    childrenTab,
+                    getString(R.string.tour_p1_children_title),
+                    getString(R.string.tour_p1_children_desc),
+                    1,
+                    total)),
+            TourStep(
+                fab,
+                TourManager.buildTarget(
+                    ctx,
+                    fab,
+                    getString(R.string.tour_p1_fab_title),
+                    getString(R.string.tour_p1_fab_desc),
+                    2,
+                    total)),
+            TourStep(
                 notificationsTab,
-                getString(R.string.tour_p1_notifications_title),
-                getString(R.string.tour_p1_notifications_desc)),
-            TourManager.buildToolbarOverflowTarget(
-                activity.getToolbarForTour(),
-                getString(R.string.tour_p1_settings_title),
-                getString(R.string.tour_p1_settings_desc)),
+                TourManager.buildTarget(
+                    ctx,
+                    notificationsTab,
+                    getString(R.string.tour_p1_notifications_title),
+                    getString(R.string.tour_p1_notifications_desc),
+                    3,
+                    total)),
+            TourStep(
+                null,
+                TourManager.buildToolbarOverflowTarget(
+                    ctx,
+                    activity.getToolbarForTour(),
+                    getString(R.string.tour_p1_settings_title),
+                    getString(R.string.tour_p1_settings_desc),
+                    4,
+                    total)),
         )
 
-    tourManager.showSequence(requireActivity(), 1, targets)
+    tourManager.showSequence(requireActivity(), 1, steps)
   }
 
   private fun navigateToChildDetail(childId: Int) {

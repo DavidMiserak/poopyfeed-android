@@ -65,19 +65,54 @@
 
         </com.google.android.material.chip.ChipGroup>
 
-        <include
-            android:id="@+id/card_feeding_trends"
-            layout="@layout/include_chart_card"
+        <!-- Summary lives below the chart card so MPAndroidChart cannot composite over it. -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_8" />
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/spacing_8">
 
-        <include
-            android:id="@+id/card_sleep_summary"
-            layout="@layout/include_chart_card"
+            <include
+                android:id="@+id/card_feeding_trends"
+                layout="@layout/include_chart_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/text_feeding_chart_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_8"
+                android:layout_marginTop="@dimen/spacing_6"
+                android:fontFamily="@font/dm_sans"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_body_small"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_8" />
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/spacing_8">
+
+            <include
+                android:id="@+id/card_sleep_summary"
+                layout="@layout/include_chart_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/text_sleep_chart_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_8"
+                android:layout_marginTop="@dimen/spacing_6"
+                android:fontFamily="@font/dm_sans"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_body_small"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_export_csv"

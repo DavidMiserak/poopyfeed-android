@@ -36,6 +36,7 @@ import net.poopyfeed.pf.data.db.SleepSummaryDayEntity
 import net.poopyfeed.pf.data.models.WeeklySummaryData
 import net.poopyfeed.pf.databinding.FragmentReportsBinding
 import net.poopyfeed.pf.tour.TourManager
+import net.poopyfeed.pf.tour.TourStep
 import net.poopyfeed.pf.util.logScreenView
 
 @AndroidEntryPoint
@@ -70,24 +71,41 @@ class ReportsFragment : Fragment() {
     chartsViewModel.loadCharts(getSelectedDays())
 
     if (tourManager.shouldShowPart(3)) {
-      binding.root.post { showTourPart3() }
+      binding.root.postDelayed(
+          {
+            if (isAdded) showTourPart3()
+          },
+          TourManager.START_DELAY_MS,
+      )
     }
   }
 
   private fun showTourPart3() {
     if (_binding == null) return
-    val targets =
+    val ctx = requireContext()
+    val total = 2
+    val steps =
         listOf(
-            TourManager.buildTarget(
+            TourStep(
                 binding.cardFeedingTrends.root,
-                getString(R.string.tour_p3_charts_title),
-                getString(R.string.tour_p3_charts_desc)),
-            TourManager.buildTarget(
+                TourManager.buildTarget(
+                    ctx,
+                    binding.cardFeedingTrends.root,
+                    getString(R.string.tour_p3_charts_title),
+                    getString(R.string.tour_p3_charts_desc),
+                    1,
+                    total)),
+            TourStep(
                 binding.cardTimeline,
-                getString(R.string.tour_p3_timeline_title),
-                getString(R.string.tour_p3_timeline_desc)),
+                TourManager.buildTarget(
+                    ctx,
+                    binding.cardTimeline,
+                    getString(R.string.tour_p3_timeline_title),
+                    getString(R.string.tour_p3_timeline_desc),
+                    2,
+                    total)),
         )
-    tourManager.showSequence(requireActivity(), 3, targets)
+    tourManager.showSequence(requireActivity(), 3, steps)
   }
 
   private fun setupChartTitles() {
@@ -180,7 +198,7 @@ class ReportsFragment : Fragment() {
         card.chartLine.visibility = View.GONE
         card.layoutError.visibility = View.GONE
         card.textNoData.visibility = View.GONE
-        card.textChartSummary.visibility = View.GONE
+        binding.textFeedingChartSummary.visibility = View.GONE
       }
       is ChartUiState.Ready -> {
         card.skeletonLoading.visibility = View.GONE
@@ -188,14 +206,17 @@ class ReportsFragment : Fragment() {
         if (state.data.isEmpty()) {
           card.chartLine.visibility = View.GONE
           card.textNoData.visibility = View.VISIBLE
-          card.textChartSummary.visibility = View.GONE
+          binding.textFeedingChartSummary.visibility = View.GONE
         } else {
           card.textNoData.visibility = View.GONE
           card.chartLine.visibility = View.VISIBLE
           renderFeedingLineChart(card.chartLine, state.data)
-          state.weeklySummary?.let { summary ->
-            card.textChartSummary.visibility = View.VISIBLE
-            card.textChartSummary.text = formatFeedingSummary(summary)
+          val feedingSummary = state.weeklySummary
+          if (feedingSummary != null) {
+            binding.textFeedingChartSummary.text = formatFeedingSummary(feedingSummary)
+            binding.textFeedingChartSummary.visibility = View.VISIBLE
+          } else {
+            binding.textFeedingChartSummary.visibility = View.GONE
           }
         }
       }
@@ -203,7 +224,7 @@ class ReportsFragment : Fragment() {
         card.skeletonLoading.visibility = View.GONE
         card.chartLine.visibility = View.GONE
         card.textNoData.visibility = View.GONE
-        card.textChartSummary.visibility = View.GONE
+        binding.textFeedingChartSummary.visibility = View.GONE
         card.layoutError.visibility = View.VISIBLE
       }
     }
@@ -217,7 +238,7 @@ class ReportsFragment : Fragment() {
         card.chartBar.visibility = View.GONE
         card.layoutError.visibility = View.GONE
         card.textNoData.visibility = View.GONE
-        card.textChartSummary.visibility = View.GONE
+        binding.textSleepChartSummary.visibility = View.GONE
       }
       is ChartUiState.Ready -> {
         card.skeletonLoading.visibility = View.GONE
@@ -225,14 +246,17 @@ class ReportsFragment : Fragment() {
         if (state.data.isEmpty()) {
           card.chartBar.visibility = View.GONE
           card.textNoData.visibility = View.VISIBLE
-          card.textChartSummary.visibility = View.GONE
+          binding.textSleepChartSummary.visibility = View.GONE
         } else {
           card.textNoData.visibility = View.GONE
           card.chartBar.visibility = View.VISIBLE
           renderSleepBarChart(card.chartBar, state.data)
-          state.weeklySummary?.let { summary ->
-            card.textChartSummary.visibility = View.VISIBLE
-            card.textChartSummary.text = formatSleepSummary(summary, state.data)
+          val sleepSummary = state.weeklySummary
+          if (sleepSummary != null) {
+            binding.textSleepChartSummary.text = formatSleepSummary(sleepSummary, state.data)
+            binding.textSleepChartSummary.visibility = View.VISIBLE
+          } else {
+            binding.textSleepChartSummary.visibility = View.GONE
           }
         }
       }
@@ -240,7 +264,7 @@ class ReportsFragment : Fragment() {
         card.skeletonLoading.visibility = View.GONE
         card.chartBar.visibility = View.GONE
         card.textNoData.visibility = View.GONE
-        card.textChartSummary.visibility = View.GONE
+        binding.textSleepChartSummary.visibility = View.GONE
         card.layoutError.visibility = View.VISIBLE
       }
     }
