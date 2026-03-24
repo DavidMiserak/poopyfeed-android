@@ -17,6 +17,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -281,4 +283,11 @@ class MainActivity : AppCompatActivity() {
     val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
     navController.navigate(R.id.LoginFragment, null, navOptions)
   }
+
+  /** Used by the new-user tour to spotlight the FAB (same visibility rules as [onDestinationChanged]). */
+  fun getFabView(): View = binding.fab
+
+  fun getBottomNavView(): BottomNavigationView = binding.bottomNav
+
+  fun getToolbarForTour(): MaterialToolbar = binding.toolbar
 }

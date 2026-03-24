@@ -2,6 +2,7 @@ package net.poopyfeed.pf.tour
 
 import android.app.Activity
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetSequence
 import javax.inject.Inject
@@ -67,6 +68,20 @@ constructor(
         description: String,
     ): TapTarget =
         TapTarget.forView(view, title, description)
+            .outerCircleAlpha(0.96f)
+            .titleTextSize(20)
+            .descriptionTextSize(16)
+            .drawShadow(true)
+            .cancelable(true)
+            .tintTarget(true)
+            .transparentTarget(false)
+
+    fun buildToolbarOverflowTarget(
+        toolbar: Toolbar,
+        title: String,
+        description: String,
+    ): TapTarget =
+        TapTarget.forToolbarOverflow(toolbar, title, description)
             .outerCircleAlpha(0.96f)
             .titleTextSize(20)
             .descriptionTextSize(16)

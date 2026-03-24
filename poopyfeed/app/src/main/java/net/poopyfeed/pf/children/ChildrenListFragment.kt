@@ -13,9 +13,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
+import net.poopyfeed.pf.MainActivity
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.databinding.FragmentChildrenListBinding
+import net.poopyfeed.pf.tour.TourManager
 import net.poopyfeed.pf.util.logScreenView
 
 /**
@@ -24,6 +27,8 @@ import net.poopyfeed.pf.util.logScreenView
  */
 @AndroidEntryPoint
 class ChildrenListFragment : Fragment() {
+
+  @Inject lateinit var tourManager: TourManager
 
   private var _binding: FragmentChildrenListBinding? = null
   private val binding
@@ -150,6 +155,41 @@ class ChildrenListFragment : Fragment() {
         navigateToChildDetail(childId)
       }
     }
+
+    if (tourManager.shouldShowPart(1)) {
+      binding.root.post { showTourPart1() }
+    }
+  }
+
+  private fun showTourPart1() {
+    val activity = requireActivity() as? MainActivity ?: return
+    val bottomNav = activity.getBottomNavView()
+    val fab = activity.getFabView()
+
+    val childrenTab = bottomNav.findViewById<View>(R.id.ChildrenListFragment) ?: return
+    val notificationsTab = bottomNav.findViewById<View>(R.id.NotificationsFragment) ?: return
+
+    val targets =
+        listOf(
+            TourManager.buildTarget(
+                childrenTab,
+                getString(R.string.tour_p1_children_title),
+                getString(R.string.tour_p1_children_desc)),
+            TourManager.buildTarget(
+                fab,
+                getString(R.string.tour_p1_fab_title),
+                getString(R.string.tour_p1_fab_desc)),
+            TourManager.buildTarget(
+                notificationsTab,
+                getString(R.string.tour_p1_notifications_title),
+                getString(R.string.tour_p1_notifications_desc)),
+            TourManager.buildToolbarOverflowTarget(
+                activity.getToolbarForTour(),
+                getString(R.string.tour_p1_settings_title),
+                getString(R.string.tour_p1_settings_desc)),
+        )
+
+    tourManager.showSequence(requireActivity(), 1, targets)
   }
 
   private fun navigateToChildDetail(childId: Int) {
