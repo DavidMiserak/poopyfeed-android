@@ -109,6 +109,7 @@ dependencies {
     // UI Components
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.mpandroidchart)
+    implementation(libs.taptargetview)
 
     // Testing
     testImplementation(libs.junit)
