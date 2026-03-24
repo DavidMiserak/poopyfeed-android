@@ -28,16 +28,20 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import net.poopyfeed.pf.R
 import net.poopyfeed.pf.data.db.FeedingTrendDayEntity
 import net.poopyfeed.pf.data.db.SleepSummaryDayEntity
 import net.poopyfeed.pf.data.models.WeeklySummaryData
 import net.poopyfeed.pf.databinding.FragmentReportsBinding
+import net.poopyfeed.pf.tour.TourManager
 import net.poopyfeed.pf.util.logScreenView
 
 @AndroidEntryPoint
 class ReportsFragment : Fragment() {
+
+  @Inject lateinit var tourManager: TourManager
 
   private var _binding: FragmentReportsBinding? = null
   private val binding
@@ -64,6 +68,26 @@ class ReportsFragment : Fragment() {
     collectFlows()
 
     chartsViewModel.loadCharts(getSelectedDays())
+
+    if (tourManager.shouldShowPart(3)) {
+      binding.root.post { showTourPart3() }
+    }
+  }
+
+  private fun showTourPart3() {
+    if (_binding == null) return
+    val targets =
+        listOf(
+            TourManager.buildTarget(
+                binding.cardFeedingTrends.root,
+                getString(R.string.tour_p3_charts_title),
+                getString(R.string.tour_p3_charts_desc)),
+            TourManager.buildTarget(
+                binding.cardTimeline,
+                getString(R.string.tour_p3_timeline_title),
+                getString(R.string.tour_p3_timeline_desc)),
+        )
+    tourManager.showSequence(requireActivity(), 3, targets)
   }
 
   private fun setupChartTitles() {

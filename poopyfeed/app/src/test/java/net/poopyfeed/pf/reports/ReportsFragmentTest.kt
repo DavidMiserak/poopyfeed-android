@@ -18,6 +18,7 @@ import net.poopyfeed.pf.data.repository.AnalyticsRepository
 import net.poopyfeed.pf.data.repository.CachedChartsRepository
 import net.poopyfeed.pf.idleMainLooperUntil
 import net.poopyfeed.pf.launchFragmentInHiltContainer
+import net.poopyfeed.pf.tour.TourManager
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -34,6 +35,7 @@ class ReportsFragmentTest {
 
   @BindValue @JvmField val chartsRepo: CachedChartsRepository = mockk(relaxed = true)
   @BindValue @JvmField val analyticsRepo: AnalyticsRepository = mockk(relaxed = true)
+  @BindValue @JvmField val tourManager: TourManager = mockk(relaxed = true)
 
   private val feedingFlow = MutableStateFlow<List<FeedingTrendDayEntity>>(emptyList())
   private val sleepFlow = MutableStateFlow<List<SleepSummaryDayEntity>>(emptyList())
