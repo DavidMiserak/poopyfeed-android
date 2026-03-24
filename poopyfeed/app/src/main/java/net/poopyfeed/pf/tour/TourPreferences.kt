@@ -2,11 +2,8 @@ package net.poopyfeed.pf.tour
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class TourPreferences @Inject constructor(private val prefs: SharedPreferences) {
+class TourPreferences(private val prefs: SharedPreferences) {
 
   fun shouldShowPart(part: Int): Boolean {
     val key = keyForPart(part) ?: return false
