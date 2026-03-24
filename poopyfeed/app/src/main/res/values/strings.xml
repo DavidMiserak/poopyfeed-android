@@ -416,4 +416,33 @@
     <string name="pediatrician_naps_per_day">%s/day</string>
     <string name="pediatrician_sleep_per_day">%s total sleep/day</string>
     <string name="pediatrician_empty">No activity data for the last 7 days</string>
+
+    <!-- Tour: Part 1 - Welcome -->
+    <string name="tour_p1_children_title">Your Children</string>
+    <string name="tour_p1_children_desc">Manage your children and track their daily activities here</string>
+    <string name="tour_p1_fab_title">Add a Child</string>
+    <string name="tour_p1_fab_desc">Tap here to add your first child and start tracking</string>
+    <string name="tour_p1_notifications_title">Notifications</string>
+    <string name="tour_p1_notifications_desc">Get alerts about feeding intervals and nap windows</string>
+    <string name="tour_p1_settings_title">Account &amp; Settings</string>
+    <string name="tour_p1_settings_desc">Manage your account, quiet hours, and replay this tour anytime</string>
+
+    <!-- Tour: Part 2 - Tracking -->
+    <string name="tour_p2_activity_title">Today\'s Activity</string>
+    <string name="tour_p2_activity_desc">See today\'s feedings, diapers, and naps at a glance</string>
+    <string name="tour_p2_feedings_title">Log Feedings</string>
+    <string name="tour_p2_feedings_desc">Track bottle, breast, or solid feedings</string>
+    <string name="tour_p2_diapers_title">Log Diapers</string>
+    <string name="tour_p2_diapers_desc">Record wet and dirty diaper changes</string>
+    <string name="tour_p2_naps_title">Log Naps</string>
+    <string name="tour_p2_naps_desc">Track nap start and end times</string>
+
+    <!-- Tour: Part 3 - Reports -->
+    <string name="tour_p3_charts_title">Activity Reports</string>
+    <string name="tour_p3_charts_desc">See feeding and sleep trends over time</string>
+    <string name="tour_p3_timeline_title">Timeline</string>
+    <string name="tour_p3_timeline_desc">View a day-by-day timeline of all activities</string>
+
+    <!-- Tour: Replay -->
+    <string name="tour_replay_button">Replay Tour</string>
 </resources>
