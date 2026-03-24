@@ -8,6 +8,7 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.ColorUtils
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.material.color.MaterialColors
@@ -182,8 +183,17 @@ constructor(
               com.google.android.material.R.attr.colorSecondary,
               ContextCompat.getColor(context, R.color.orange_400),
           )
-      val titleColor = ContextCompat.getColor(context, R.color.white)
-      val descriptionColor = ContextCompat.getColor(context, R.color.slate_200)
+      // Match Material "on secondary" so text contrasts with the ring in light and dark theme.
+      // Previously fixed white + slate_200: poor on orange (light gray on mid orange) and on
+      // dark theme's light secondary (white on pale peach).
+      val onSecondary =
+          MaterialColors.getColor(
+              context,
+              com.google.android.material.R.attr.colorOnSecondary,
+              ContextCompat.getColor(context, R.color.white),
+          )
+      val titleColor = onSecondary
+      val descriptionColor = ColorUtils.setAlphaComponent(onSecondary, (255 * 0.92f).toInt())
 
       return this.outerCircleColorInt(ringColor)
           .outerCircleAlpha(0.9f)
