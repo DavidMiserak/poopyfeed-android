@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
@@ -72,8 +72,8 @@ constructor(
               return@combine ""
             }
             try {
-              val startMs = Instant.parse(start).toEpochMilliseconds()
-              val endMs = Instant.parse(end).toEpochMilliseconds()
+              val startMs = kotlin.time.Instant.parse(start).toEpochMilliseconds()
+              val endMs = kotlin.time.Instant.parse(end).toEpochMilliseconds()
               val diffMs = endMs - startMs
               val totalMinutes = (diffMs / (60 * 1000)).toInt()
               when {
@@ -111,7 +111,7 @@ constructor(
       val zonedDateTime = javaLocalDateTime.atZone(zoneId)
       val instant = zonedDateTime.toInstant()
       // Convert to ISO 8601 UTC format (with Z suffix)
-      Instant.fromEpochMilliseconds(instant.toEpochMilli()).toString()
+      kotlin.time.Instant.fromEpochMilliseconds(instant.toEpochMilli()).toString()
     } catch (e: Exception) {
       profileLocalTime + "Z" // Fallback to treating as UTC if parsing fails
     }
@@ -128,7 +128,7 @@ constructor(
   fun convertUtcTimeToLocal(utcTime: String): String {
     return try {
       val tzId = tokenManager.getProfileTimezone() ?: "UTC"
-      val instant = Instant.parse(utcTime)
+      val instant = kotlin.time.Instant.parse(utcTime)
       val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
       localDateTime.toString()
     } catch (e: Exception) {
@@ -147,7 +147,7 @@ constructor(
   fun getCalendarHourMinuteForPicker(utcTime: String): Pair<Int, Int> {
     return try {
       val tzId = tokenManager.getProfileTimezone() ?: "UTC"
-      val instant = Instant.parse(utcTime)
+      val instant = kotlin.time.Instant.parse(utcTime)
       val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
       Pair(localDateTime.hour, localDateTime.minute)
     } catch (e: Exception) {
@@ -168,14 +168,14 @@ constructor(
   fun getDatePickerSelectionMillisForProfileTz(utcTime: String): Long {
     return try {
       val tzId = tokenManager.getProfileTimezone() ?: "UTC"
-      val instant = Instant.parse(utcTime)
+      val instant = kotlin.time.Instant.parse(utcTime)
       val localDateTime = instant.toLocalDateTime(TimeZone.of(tzId))
       val localDate = localDateTime.date
 
       // MaterialDatePicker expects midnight UTC for the desired date.
       // Convert profile timezone date to midnight UTC (not midnight profile TZ).
       val javaLocalDateTime =
-          JavaLocalDateTime.of(localDate.year, localDate.monthNumber, localDate.dayOfMonth, 0, 0, 0)
+          JavaLocalDateTime.of(localDate.year, localDate.month.number, localDate.day, 0, 0, 0)
       val zonedDateTime = javaLocalDateTime.atZone(ZoneId.of("UTC"))
       zonedDateTime.toInstant().toEpochMilli()
     } catch (e: Exception) {
@@ -197,8 +197,8 @@ constructor(
               val durationMinutes =
                   if (nap.end_time != null) {
                     try {
-                      val startMs = Instant.parse(nap.start_time).toEpochMilliseconds()
-                      val endMs = Instant.parse(nap.end_time).toEpochMilliseconds()
+                      val startMs = kotlin.time.Instant.parse(nap.start_time).toEpochMilliseconds()
+                      val endMs = kotlin.time.Instant.parse(nap.end_time).toEpochMilliseconds()
                       ((endMs - startMs) / (60 * 1000)).toInt()
                     } catch (e: Exception) {
                       analyticsTracker.logError(

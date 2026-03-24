@@ -3,8 +3,8 @@ package net.poopyfeed.pf.util
 import java.time.LocalDateTime as JavaLocalDateTime
 import java.time.ZoneId
 import java.util.Locale
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -32,12 +32,12 @@ object DatePickerUtils {
   fun datePickerSelectionMillis(utcIso: String, timezoneId: String?): Long {
     return try {
       val tzId = timezoneId ?: "UTC"
-      val instant = Instant.parse(utcIso)
+      val instant = kotlin.time.Instant.parse(utcIso)
       val localDate = instant.toLocalDateTime(TimeZone.of(tzId)).date
 
       // MaterialDatePicker expects midnight UTC for the desired date
       val javaLdt =
-          JavaLocalDateTime.of(localDate.year, localDate.monthNumber, localDate.dayOfMonth, 0, 0, 0)
+          JavaLocalDateTime.of(localDate.year, localDate.month.number, localDate.day, 0, 0, 0)
       javaLdt.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli()
     } catch (_: Exception) {
       System.currentTimeMillis()
@@ -55,7 +55,7 @@ object DatePickerUtils {
   fun timePickerHourMinute(utcIso: String, timezoneId: String?): Pair<Int, Int> {
     return try {
       val tzId = timezoneId ?: "UTC"
-      val instant = Instant.parse(utcIso)
+      val instant = kotlin.time.Instant.parse(utcIso)
       val local = instant.toLocalDateTime(TimeZone.of(tzId))
       Pair(local.hour, local.minute)
     } catch (_: Exception) {
@@ -74,8 +74,9 @@ object DatePickerUtils {
    * @return Triple of (year, month, day) representing the selected date
    */
   fun extractSelectedDate(pickerMillis: Long): Triple<Int, Int, Int> {
-    val utcDate = Instant.fromEpochMilliseconds(pickerMillis).toLocalDateTime(TimeZone.UTC)
-    return Triple(utcDate.year, utcDate.monthNumber, utcDate.dayOfMonth)
+    val utcDate =
+        kotlin.time.Instant.fromEpochMilliseconds(pickerMillis).toLocalDateTime(TimeZone.UTC)
+    return Triple(utcDate.year, utcDate.month.number, utcDate.day)
   }
 
   /**
@@ -102,7 +103,7 @@ object DatePickerUtils {
       val tzId = timezoneId ?: "UTC"
       val javaLdt = JavaLocalDateTime.of(year, month, day, hour, minute, 0)
       val zonedDt = javaLdt.atZone(ZoneId.of(tzId))
-      Instant.fromEpochMilliseconds(zonedDt.toInstant().toEpochMilli()).toString()
+      kotlin.time.Instant.fromEpochMilliseconds(zonedDt.toInstant().toEpochMilli()).toString()
     } catch (_: Exception) {
       "${String.format(Locale.US, "%04d-%02d-%02dT%02d:%02d:00", year, month, day, hour, minute)}Z"
     }

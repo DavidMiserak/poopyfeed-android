@@ -7,7 +7,6 @@ import io.mockk.mockk
 import java.util.TimeZone
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import kotlinx.datetime.Instant
 import net.poopyfeed.pf.R
 import org.junit.After
 import org.junit.Before
@@ -41,13 +40,13 @@ class DateTimeUtilsTest {
 
   @Test
   fun `Instant parse handles timestamp without fractional seconds`() {
-    val instant = Instant.parse("2024-01-14T10:00:00Z")
+    val instant = kotlin.time.Instant.parse("2024-01-14T10:00:00Z")
     assertEquals(1705226400000L, instant.toEpochMilliseconds())
   }
 
   @Test
   fun `Instant parse handles timestamp with fractional seconds`() {
-    val instant = Instant.parse("2024-01-14T10:00:00.781974Z")
+    val instant = kotlin.time.Instant.parse("2024-01-14T10:00:00.781974Z")
     assertEquals(1705226400781L, instant.toEpochMilliseconds())
   }
 
@@ -248,7 +247,7 @@ class DateTimeUtilsTest {
   @Test
   fun `formatAge uses system timezone for now date`() {
     val dob = "2023-01-02"
-    val nowMillis = Instant.parse("2024-01-02T00:00:00Z").toEpochMilliseconds()
+    val nowMillis = kotlin.time.Instant.parse("2024-01-02T00:00:00Z").toEpochMilliseconds()
 
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     val resultUtc = formatAge(dob, nowMillis)
@@ -265,7 +264,7 @@ class DateTimeUtilsTest {
   fun `formatAge same calendar day in different timezone gives same age`() {
     val dob = "2024-01-15"
     // 2024-01-15 12:00 UTC is Jan 15 in both UTC and America/Los_Angeles
-    val nowMillis = Instant.parse("2024-01-15T12:00:00Z").toEpochMilliseconds()
+    val nowMillis = kotlin.time.Instant.parse("2024-01-15T12:00:00Z").toEpochMilliseconds()
 
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     val resultUtc = formatAge(dob, nowMillis)

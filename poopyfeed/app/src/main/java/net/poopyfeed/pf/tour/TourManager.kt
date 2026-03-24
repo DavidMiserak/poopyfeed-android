@@ -130,7 +130,9 @@ constructor(
 
   companion object {
 
-    /** Delay after layout before starting a tour (ms); keeps spotlights from jumping on first frame. */
+    /**
+     * Delay after layout before starting a tour (ms); keeps spotlights from jumping on first frame.
+     */
     const val START_DELAY_MS: Long = 380L
 
     private const val SCROLL_SETTLE_MS = 200L
@@ -172,8 +174,7 @@ constructor(
     }
 
     private fun TapTarget.applyTourChrome(context: Context): TapTarget {
-      val titleFace =
-          ResourcesCompat.getFont(context, R.font.dm_sans_bold) ?: Typeface.DEFAULT_BOLD
+      val titleFace = ResourcesCompat.getFont(context, R.font.dm_sans_bold) ?: Typeface.DEFAULT_BOLD
       val bodyFace = ResourcesCompat.getFont(context, R.font.dm_sans) ?: Typeface.DEFAULT
       val ringColor =
           MaterialColors.getColor(
@@ -184,8 +185,7 @@ constructor(
       val titleColor = ContextCompat.getColor(context, R.color.white)
       val descriptionColor = ContextCompat.getColor(context, R.color.slate_200)
 
-      return this
-          .outerCircleColorInt(ringColor)
+      return this.outerCircleColorInt(ringColor)
           .outerCircleAlpha(0.9f)
           .titleTypeface(titleFace)
           .descriptionTypeface(bodyFace)

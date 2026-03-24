@@ -4,9 +4,9 @@ import android.content.Context
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import java.util.Locale
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.R
 
@@ -42,7 +42,7 @@ fun formatRelativeTime(
   }
 
   return try {
-    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val millis = kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     val diffMs = nowMillis - millis
     if (diffMs in 0 until DateUtils.MINUTE_IN_MILLIS) {
       context.getString(R.string.child_detail_just_now)
@@ -69,7 +69,7 @@ fun formatRelativeTimeShort(
 ): String {
   if (isoString == null) return "—"
   return try {
-    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val millis = kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     val diffMs = nowMillis - millis
     val diffMinutes = diffMs / 60_000
     val diffHours = diffMs / 3_600_000
@@ -98,19 +98,19 @@ fun formatAge(dobString: String, nowMillis: Long = System.currentTimeMillis()): 
   return try {
     val dob = LocalDate.parse(dobString)
     val now =
-        Instant.fromEpochMilliseconds(nowMillis)
+        kotlin.time.Instant.fromEpochMilliseconds(nowMillis)
             .toLocalDateTime(TimeZone.currentSystemDefault())
             .date
 
     var years = now.year - dob.year
-    var months = now.monthNumber - dob.monthNumber
+    var months = now.month.number - dob.month.number
 
     if (months < 0) {
       years--
       months += 12
     }
 
-    if (now.dayOfMonth < dob.dayOfMonth) {
+    if (now.day < dob.day) {
       months--
       if (months < 0) {
         years--
@@ -138,8 +138,8 @@ fun formatAge(dobString: String, nowMillis: Long = System.currentTimeMillis()): 
  */
 fun formatNapDuration(context: Context, startIso: String, endIso: String): String {
   return try {
-    val startMs = Instant.parse(startIso).toEpochMilliseconds()
-    val endMs = Instant.parse(endIso).toEpochMilliseconds()
+    val startMs = kotlin.time.Instant.parse(startIso).toEpochMilliseconds()
+    val endMs = kotlin.time.Instant.parse(endIso).toEpochMilliseconds()
     val diffMs = endMs - startMs
     val totalMinutes = (diffMs / (60 * 1000)).toInt()
     when {
@@ -158,7 +158,7 @@ fun formatNapDuration(context: Context, startIso: String, endIso: String): Strin
  */
 fun formatTimeForDisplay(context: Context, isoString: String): String {
   return try {
-    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val millis = kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     DateUtils.formatDateTime(context, millis, DateUtils.FORMAT_SHOW_TIME)
   } catch (e: Exception) {
     "—"
@@ -176,7 +176,7 @@ fun formatTimeForDisplayWithTimezone(
     timezoneId: String?,
 ): String {
   return try {
-    val instant = Instant.parse(isoString)
+    val instant = kotlin.time.Instant.parse(isoString)
     val tz =
         timezoneId?.let { runCatching { TimeZone.of(it) }.getOrNull() }
             ?: TimeZone.currentSystemDefault()
@@ -209,7 +209,7 @@ fun formatTimeForDisplayWithTimezone(
  */
 fun formatTimestampForDisplay(context: Context, isoString: String): String {
   return try {
-    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val millis = kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     val dateFlags = DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
     DateUtils.formatDateTime(context, millis, dateFlags)
   } catch (e: Exception) {
@@ -223,7 +223,7 @@ fun formatTimestampForDisplay(context: Context, isoString: String): String {
  */
 fun formatDateForDisplay(context: Context, isoString: String): String {
   return try {
-    val millis = Instant.parse(isoString).toEpochMilliseconds()
+    val millis = kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     DateUtils.formatDateTime(context, millis, DateUtils.FORMAT_SHOW_DATE)
   } catch (e: Exception) {
     isoString

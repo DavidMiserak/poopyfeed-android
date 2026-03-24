@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.TestFixtures
@@ -78,18 +77,19 @@ class TimelineViewModelTest {
   }
 
   private fun getTodayDateString(): String {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    val now = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis())
     val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
     return today.toString()
   }
 
   private fun getYesterdayDateString(): String {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    val now = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis())
     val tz = TimeZone.currentSystemDefault()
     val today = now.toLocalDateTime(tz).date
     // Subtract one day
-    val yesterdayMs = Instant.parse("${today}T00:00:00Z").toEpochMilliseconds() - 86_400_000L
-    val yesterday = Instant.fromEpochMilliseconds(yesterdayMs).toLocalDateTime(tz).date
+    val yesterdayMs =
+        kotlin.time.Instant.parse("${today}T00:00:00Z").toEpochMilliseconds() - 86_400_000L
+    val yesterday = kotlin.time.Instant.fromEpochMilliseconds(yesterdayMs).toLocalDateTime(tz).date
     return yesterday.toString()
   }
 

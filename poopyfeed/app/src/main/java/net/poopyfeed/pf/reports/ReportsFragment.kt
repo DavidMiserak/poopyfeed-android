@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -72,9 +73,7 @@ class ReportsFragment : Fragment() {
 
     if (tourManager.shouldShowPart(3)) {
       binding.root.postDelayed(
-          {
-            if (isAdded) showTourPart3()
-          },
+          { if (isAdded) showTourPart3() },
           TourManager.START_DELAY_MS,
       )
     }
@@ -270,7 +269,7 @@ class ReportsFragment : Fragment() {
     }
   }
 
-  private val brandOrange by lazy { Color.parseColor("#FF6B35") }
+  private val brandOrange by lazy { "#FF6B35".toColorInt() }
   private val axisTextColor by lazy {
     MaterialColors.getColor(
         requireContext(), com.google.android.material.R.attr.colorOnSurfaceVariant, Color.DKGRAY)

@@ -303,9 +303,7 @@ class ChildDetailFragment : Fragment() {
     if (binding.todayContent.visibility != View.VISIBLE) return
     part2TourScheduled = true
     binding.root.postDelayed(
-        {
-          if (isAdded) showTourPart2()
-        },
+        { if (isAdded) showTourPart2() },
         TourManager.START_DELAY_MS,
     )
   }

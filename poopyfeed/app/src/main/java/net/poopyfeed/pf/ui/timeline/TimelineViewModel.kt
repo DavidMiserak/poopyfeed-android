@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.models.ApiResult
@@ -221,7 +221,7 @@ constructor(
 
   private fun parseEpochMs(isoString: String): Long? {
     return try {
-      Instant.parse(isoString).toEpochMilliseconds()
+      kotlin.time.Instant.parse(isoString).toEpochMilliseconds()
     } catch (_: Exception) {
       null
     }
@@ -252,7 +252,7 @@ constructor(
    * local day near midnight in non-UTC timezones.
    */
   private fun filterEventsByDay(events: List<TimelineEvent>, dayOffset: Int): List<TimelineEvent> {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    val now = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis())
     val localTz = timelineTimeZone
     val today = now.toLocalDateTime(localTz).date
     val targetDate = today.subtract(dayOffset)
@@ -262,7 +262,7 @@ constructor(
     return events.filter { event ->
       val eventDate =
           try {
-            Instant.parse(event.at).toLocalDateTime(localTz).date
+            kotlin.time.Instant.parse(event.at).toLocalDateTime(localTz).date
           } catch (_: Exception) {
             null
           }
@@ -272,7 +272,7 @@ constructor(
 
   /** Formats day header label based on offset: "Today", "Yesterday", or "Mon, Mar 4". */
   private fun formatDayHeader(dayOffset: Int): String {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    val now = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis())
     val localTz = timelineTimeZone
     val today = now.toLocalDateTime(localTz).date
     val targetDate = today.subtract(dayOffset)
@@ -282,8 +282,8 @@ constructor(
       1 -> "Yesterday"
       else -> {
         val dayOfWeek = getDayOfWeekAbbreviation(targetDate.dayOfWeek)
-        val monthName = getMonthName(targetDate.monthNumber)
-        "${dayOfWeek}, ${monthName} ${targetDate.dayOfMonth}"
+        val monthName = getMonthName(targetDate.month.number)
+        "${dayOfWeek}, ${monthName} ${targetDate.day}"
       }
     }
   }
@@ -361,8 +361,8 @@ constructor(
           return@launch
         }
 
-        val napStart = Instant.fromEpochMilliseconds(napStartMs).toString()
-        val napEnd = Instant.fromEpochMilliseconds(napEndMs).toString()
+        val napStart = kotlin.time.Instant.fromEpochMilliseconds(napStartMs).toString()
+        val napEnd = kotlin.time.Instant.fromEpochMilliseconds(napEndMs).toString()
 
         val request = CreateNapRequest(start_time = napStart, end_time = napEnd)
         when (val result = napsRepository.createNap(childId, request)) {

@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import net.poopyfeed.pf.analytics.AnalyticsTracker
 import net.poopyfeed.pf.data.repository.CachedNapsRepository
@@ -80,11 +80,10 @@ class CreateNapBottomSheetFragmentTest {
         val pickerMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
 
         // MaterialDatePicker uses UTC internally, so verify date in UTC
-        val pickerDate = Instant.fromEpochMilliseconds(pickerMillis).toLocalDateTime(TimeZone.UTC)
+        val pickerDate =
+            kotlin.time.Instant.fromEpochMilliseconds(pickerMillis).toLocalDateTime(TimeZone.UTC)
 
-        assert(pickerDate.dayOfMonth == 9) {
-          "Picker should show March 9, got ${pickerDate.dayOfMonth}"
-        }
+        assert(pickerDate.day == 9) { "Picker should show March 9, got ${pickerDate.day}" }
         assert(pickerDate.hour == 0) { "Should be midnight UTC, got ${pickerDate.hour}" }
       }
 
@@ -97,20 +96,22 @@ class CreateNapBottomSheetFragmentTest {
 
         // Step 1: Date picker returns midnight UTC of March 9
         // (MaterialDatePicker always returns midnight UTC of selected date)
-        val pickerReturnedMillis = Instant.parse("2024-03-09T00:00:00Z").toEpochMilliseconds()
+        val pickerReturnedMillis =
+            kotlin.time.Instant.parse("2024-03-09T00:00:00Z").toEpochMilliseconds()
 
         // Step 2: Fragment extracts date from millis using UTC
         // (This is the fix - previously used profile TZ which shifted date back)
         val selectedDate =
-            Instant.fromEpochMilliseconds(pickerReturnedMillis).toLocalDateTime(TimeZone.UTC)
+            kotlin.time.Instant.fromEpochMilliseconds(pickerReturnedMillis)
+                .toLocalDateTime(TimeZone.UTC)
 
-        assert(selectedDate.dayOfMonth == 9) {
-          "Selected date should be March 9, got ${selectedDate.dayOfMonth}"
-        }
+        assert(selectedDate.day == 9) { "Selected date should be March 9, got ${selectedDate.day}" }
 
         // Step 3: Combine date (from UTC extraction) + time (from profile TZ picker)
         val selectedProfileDateTime =
-            "${String.format("%04d-%02d-%02d", selectedDate.year, selectedDate.monthNumber, selectedDate.dayOfMonth)}T04:00:00"
+            "${String.format("%04d-%02d-%02d", selectedDate.year, selectedDate.month.number,
+                selectedDate.day
+            )}T04:00:00"
 
         assert(selectedProfileDateTime == "2024-03-09T04:00:00") {
           "Should be 2024-03-09T04:00:00, got $selectedProfileDateTime"
@@ -120,11 +121,11 @@ class CreateNapBottomSheetFragmentTest {
         val resultUtc = viewModel.convertLocalTimeToUtc(selectedProfileDateTime)
 
         // March 9 04:00 ET (UTC-5) = March 9 09:00 UTC
-        val resultInstant = Instant.parse(resultUtc)
+        val resultInstant = kotlin.time.Instant.parse(resultUtc)
         val resultUtcTime = resultInstant.toLocalDateTime(TimeZone.UTC)
 
-        assert(resultUtcTime.dayOfMonth == 9) {
-          "BUG CHECK: Expected March 9, got March ${resultUtcTime.dayOfMonth} (was showing yesterday)"
+        assert(resultUtcTime.day == 9) {
+          "BUG CHECK: Expected March 9, got March ${resultUtcTime.day} (was showing yesterday)"
         }
         assert(resultUtcTime.hour == 9) { "Expected 09:00 UTC, got ${resultUtcTime.hour}" }
       }
@@ -136,22 +137,24 @@ class CreateNapBottomSheetFragmentTest {
         // Converting midnight UTC to a behind-UTC timezone shifts the date back.
         // Fix: extract date in UTC, not profile TZ.
 
-        val pickerReturnedMillis = Instant.parse("2024-03-09T00:00:00Z").toEpochMilliseconds()
+        val pickerReturnedMillis =
+            kotlin.time.Instant.parse("2024-03-09T00:00:00Z").toEpochMilliseconds()
 
         // WRONG (old behavior): extract in profile TZ
         val wrongDate =
-            Instant.fromEpochMilliseconds(pickerReturnedMillis)
+            kotlin.time.Instant.fromEpochMilliseconds(pickerReturnedMillis)
                 .toLocalDateTime(TimeZone.of("US/Eastern"))
         // March 9 00:00 UTC in Eastern = March 8 19:00 → day = 8 (WRONG!)
-        assert(wrongDate.dayOfMonth == 8) {
-          "Sanity check: profile TZ extraction gives March ${wrongDate.dayOfMonth} (should be 8)"
+        assert(wrongDate.day == 8) {
+          "Sanity check: profile TZ extraction gives March ${wrongDate.day} (should be 8)"
         }
 
         // CORRECT (new behavior): extract in UTC
         val correctDate =
-            Instant.fromEpochMilliseconds(pickerReturnedMillis).toLocalDateTime(TimeZone.UTC)
-        assert(correctDate.dayOfMonth == 9) {
-          "UTC extraction should give March 9, got ${correctDate.dayOfMonth}"
+            kotlin.time.Instant.fromEpochMilliseconds(pickerReturnedMillis)
+                .toLocalDateTime(TimeZone.UTC)
+        assert(correctDate.day == 9) {
+          "UTC extraction should give March 9, got ${correctDate.day}"
         }
       }
 
@@ -164,9 +167,10 @@ class CreateNapBottomSheetFragmentTest {
         // Step 1: Get initial date picker millis
         val pickerInitMillis = viewModel.getDatePickerSelectionMillisForProfileTz(utcTime)
         val pickerInitDate =
-            Instant.fromEpochMilliseconds(pickerInitMillis).toLocalDateTime(TimeZone.UTC)
-        assert(pickerInitDate.dayOfMonth == 9) {
-          "Picker should initialize to March 9, got ${pickerInitDate.dayOfMonth}"
+            kotlin.time.Instant.fromEpochMilliseconds(pickerInitMillis)
+                .toLocalDateTime(TimeZone.UTC)
+        assert(pickerInitDate.day == 9) {
+          "Picker should initialize to March 9, got ${pickerInitDate.day}"
         }
 
         // Step 2: User keeps March 9, picker returns midnight UTC March 9
@@ -174,22 +178,23 @@ class CreateNapBottomSheetFragmentTest {
 
         // Step 3: Extract date in UTC
         val selectedDate =
-            Instant.fromEpochMilliseconds(pickerReturnedMillis).toLocalDateTime(TimeZone.UTC)
+            kotlin.time.Instant.fromEpochMilliseconds(pickerReturnedMillis)
+                .toLocalDateTime(TimeZone.UTC)
 
         // Step 4: User picks 21:00 (9 PM) in time picker
         val selectedProfileDateTime =
-            "${selectedDate.year}-${String.format("%02d", selectedDate.monthNumber)}-${String.format("%02d", selectedDate.dayOfMonth)}T21:00:00"
+            "${selectedDate.year}-${String.format("%02d", selectedDate.month.number)}-${String.format("%02d",
+                selectedDate.day
+            )}T21:00:00"
 
         // Step 5: Convert to UTC
         val resultUtc = viewModel.convertLocalTimeToUtc(selectedProfileDateTime)
 
         // March 9 21:00 ET (UTC-5) = March 10 02:00 UTC
-        val resultInstant = Instant.parse(resultUtc)
+        val resultInstant = kotlin.time.Instant.parse(resultUtc)
         val resultUtcTime = resultInstant.toLocalDateTime(TimeZone.UTC)
 
-        assert(resultUtcTime.dayOfMonth == 10) {
-          "Expected March 10, got ${resultUtcTime.dayOfMonth}"
-        }
+        assert(resultUtcTime.day == 10) { "Expected March 10, got ${resultUtcTime.day}" }
         assert(resultUtcTime.hour == 2) { "Expected 02:00 UTC, got ${resultUtcTime.hour}" }
       }
 }

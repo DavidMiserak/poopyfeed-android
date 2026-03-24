@@ -159,9 +159,7 @@ class ChildrenListFragment : Fragment() {
 
     if (tourManager.shouldShowPart(1)) {
       binding.root.postDelayed(
-          {
-            if (isAdded) showTourPart1()
-          },
+          { if (isAdded) showTourPart1() },
           TourManager.START_DELAY_MS,
       )
     }
