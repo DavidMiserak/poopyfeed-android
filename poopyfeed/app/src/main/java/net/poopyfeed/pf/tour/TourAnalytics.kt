@@ -14,7 +14,8 @@ class TourAnalytics @Inject constructor(private val analyticsTracker: AnalyticsT
 
   fun logTourStepViewed(part: Int, step: Int) {
     analyticsTracker.logEvent(
-        "tour_step_viewed", Bundle().apply {
+        "tour_step_viewed",
+        Bundle().apply {
           putInt("part", part)
           putInt("step", step)
         })
@@ -26,7 +27,8 @@ class TourAnalytics @Inject constructor(private val analyticsTracker: AnalyticsT
 
   fun logTourSkipped(part: Int, step: Int) {
     analyticsTracker.logEvent(
-        "tour_skipped", Bundle().apply {
+        "tour_skipped",
+        Bundle().apply {
           putInt("part", part)
           putInt("step", step)
         })
